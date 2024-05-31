@@ -1,0 +1,3 @@
+[submodule "vendor/graphjs"]
+	path = vendor/graphjs
+	url = git@turbina.gsd.inesc-id.pt:mafaldaferreira/graphjs.git
