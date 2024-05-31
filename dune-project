@@ -5,22 +5,24 @@
 (generate_opam_files true)
 
 (source
- (github username/reponame))
+ (github explode-js/explode-js))
 
-(authors "Author Name")
+(authors "Filipe Marques")
 
-(maintainers "Maintainer Name")
+(maintainers "Filipe Marques")
 
-(license LICENSE)
+(license "GPL-3.0-or-later")
 
 (documentation https://url/to/documentation)
 
 (package
  (name explode_js)
- (synopsis "A short synopsis")
- (description "A longer description")
- (depends ocaml dune cmdliner)
+ (synopsis "Automatic exploit generation for Node.js")
+ (description "Explode.js: Automatic exploit generation engine for Node.js applications")
+ (depends
+  ocaml
+  dune
+  cmdliner
+  (ecma-sl (= "0.0.3")))
  (tags
-  (topics "to describe" your project)))
-
-; See the complete stanza docs at https://dune.readthedocs.io/en/stable/dune-files.html#dune-project
+  ("symbolic execution" javascript exploit)))
