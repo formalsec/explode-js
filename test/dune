@@ -1,0 +1,16 @@
+(cram
+ (deps
+  %{bin:explode-js}
+  test_sink_Function.js
+  test_sink_argv.js
+  test_sink_eval.js
+  test_sink_exec.js
+  test_sink_fs.js
+  test_pollution_1.js
+  test_pollution_2.js
+  test_pollution_3.js
+  test_proto.js
+  test_lazy_1.js
+  test_lazy_2.js
+  test_vfunexported.js
+  test_vfunexported.json))

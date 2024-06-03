@@ -1,0 +1,10 @@
+[
+  {
+    "filename" : "test_vfunexported.js",
+    "vuln_type" : "command-injection",
+    "source" : "module.exports",
+    "sink" : "exec",
+    "tainted_params" : [ "x" ],
+    "params_types" : { "x" : "string" }
+  }
+]
