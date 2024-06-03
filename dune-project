@@ -23,6 +23,8 @@
   ocaml
   dune
   cmdliner
-  (ecma-sl (= "0.0.3")))
+  (ecma-sl (= "0.0.3"))
+  bos
+  fpath)
  (tags
   ("symbolic execution" javascript exploit)))
