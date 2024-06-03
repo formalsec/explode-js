@@ -9,11 +9,11 @@ let parse_fpath f str =
 
 let fpath = ((fun str -> `Ok (Fpath.v str)), Fpath.pp)
 
-let valid_fpath = (parse_fpath Bos.OS.Path.exists, Fpath.pp)
+let _valid_fpath = (parse_fpath Bos.OS.Path.exists, Fpath.pp)
 
 let non_dir_fpath = (parse_fpath Bos.OS.File.exists, Fpath.pp)
 
-let dir_fpath = (parse_fpath Bos.OS.Dir.exists, Fpath.pp)
+let _dir_fpath = (parse_fpath Bos.OS.Dir.exists, Fpath.pp)
 
 let input =
   let docv = "FILE" in
