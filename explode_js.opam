@@ -35,6 +35,5 @@ build: [
 ]
 dev-repo: "git+https://github.com/explode-js/explode-js.git"
 pin-depends: [
-  [ "ecma-sl.dev" "git+ssh://git@github.com/formalsec/ECMA-SL.git#v0.0.4"]
   [ "instrumentation2.0.0.1" "git+ssh://git@github.com/formalsec/instrumentation2.git#v0.0.1"]
 ]
