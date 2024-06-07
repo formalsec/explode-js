@@ -13,4 +13,5 @@
   test_lazy_1.js
   test_lazy_2.js
   test_vfunexported.js
-  test_vfunexported.json))
+  test_vfunexported.json
+  (package ecma-sl)))

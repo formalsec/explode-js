@@ -46,8 +46,6 @@ USER explodejs
 WORKDIR /home/explodejs
 
 # Build graphjs and emca-sl
-COPY --chown=explodejs:explodejs ./ecma_sl/ecma_sl /home/explodejs/ecma_sl
-COPY --chown=explodejs:explodejs ./ecma_sl/setup.sh /home/explodejs/ecma_sl/
-COPY --chown=explodejs:explodejs ./graphjs/graphjs /home/explodejs/graphjs
-RUN cd "${BASE}/graphjs" && sudo ./setup.sh
-RUN cd "${BASE}/ecma_sl" && ./setup.sh
+COPY --chown=explodejs:explodejs . /home/explodejs/explode-js
+RUN cd "${BASE}/explode-js/vendor/graphjs" && sudo ./setup.sh
+RUN cd "${BASE}/explode-js/" && ./setup.sh
