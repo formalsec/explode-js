@@ -6,7 +6,7 @@ build:
     paths:
       - _opam
   script:
-    - if [ ! -d _opam ]; then echo "no local switch in the CI cache, we setup a new switch"; opam switch create --yes --no-install . 5.1.0; fi
+    - if [ ! -d _opam ]; then echo "no local switch in the CI cache, we setup a new switch"; opam init -y; opam switch create --yes --no-install . 5.1.1; fi
     - eval $(opam env)
     - sudo apt-get update
     - opam remote add uptodate https://github.com/ocaml/opam-repository.git
