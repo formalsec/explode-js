@@ -1,10 +1,10 @@
 type options =
-  { input : Fpath.t
+  { config : Fpath.t
   ; filename : Fpath.t option
   ; workspace_dir : Fpath.t
-  ; time_limit : int
+  ; time_limit : float
   }
 
-val options : Fpath.t -> Fpath.t option -> Fpath.t -> int -> options
+val options : Fpath.t -> Fpath.t option -> Fpath.t -> float -> options
 
-val main : options -> unit
+val main : options -> int
