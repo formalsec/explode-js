@@ -14,7 +14,7 @@ depends: [
   "ocaml"
   "dune" {>= "3.15"}
   "cmdliner"
-  "ecma-sl" {= "0.0.3"}
+  "ecma-sl" {= "dev"}
   "bos"
   "fpath"
   "odoc" {with-doc}
@@ -35,5 +35,6 @@ build: [
 ]
 dev-repo: "git+https://github.com/explode-js/explode-js.git"
 pin-depends: [
-  [ "ecma-sl.0.0.3" "git+ssh://git@github.com/filipeom/ECMA-SL.git#v0.0.3"]
+  [ "ecma-sl.dev" "git+ssh://git@github.com/formalsec/ECMA-SL.git#v0.0.4"]
+  [ "instrumentation2.0.0.1" "git+ssh://git@github.com/formalsec/instrumentation2.git#v0.0.1"]
 ]
