@@ -23,7 +23,7 @@
   ocaml
   dune
   cmdliner
-  (ecma-sl (= "0.0.3"))
+  (ecma-sl (= "dev"))
   bos
   fpath)
  (tags
