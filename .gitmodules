@@ -1,3 +1,6 @@
 [submodule "vendor/graphjs"]
 	path = vendor/graphjs
 	url = git@turbina.gsd.inesc-id.pt:mafaldaferreira/graphjs.git
+[submodule "vendor/ECMA-SL"]
+	path = vendor/ECMA-SL
+	url = git@github.com:filipeom/ECMA-SL.git
