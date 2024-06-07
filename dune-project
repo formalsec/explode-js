@@ -1,5 +1,7 @@
 (lang dune 3.15)
 
+(using mdx 0.4)
+
 (name explode_js)
 
 (generate_opam_files true)

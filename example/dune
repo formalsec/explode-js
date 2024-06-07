@@ -1,0 +1,6 @@
+(mdx
+ (deps
+  %{bin:explode-js}
+  (file exec.js)
+  (file taint_summary.json))
+ (files README.md))
