@@ -1,1 +1,5 @@
+# OCaml
 _build/
+
+# Explode-js outputs
+**/explode-out/

@@ -21,10 +21,11 @@ two vulnerabilities of command injection depending on the input.
 Explode.js will ask graph.js if it is able to identify the vulnerabilities
 in the function `f`. Graph.js, will output the following taint summary:
 
-```json
+```sh
+$ cat taint_summary.json
 [
   {
-    "filename" : "./test_vfunexported.js",
+    "filename" : "./exec.js",
     "vuln_type" : "command-injection",
     "source" : "module.exports",
     "sink" : "exec",
@@ -32,11 +33,11 @@ in the function `f`. Graph.js, will output the following taint summary:
     "type" : "VFunExported",
     "tainted_params" : [ "source" ],
     "params_types" : {
-      "source" : "array
+      "source" : "array"
     }
   },
   {
-    "filename" : "./test_vfunexported.js",
+    "filename" : "./exec.js",
     "vuln_type" : "command-injection",
     "source" : "module.exports",
     "sink" : "exec",
