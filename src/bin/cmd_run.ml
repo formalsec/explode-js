@@ -18,28 +18,37 @@ let get_tests workspace (config : Fpath.t) (filename : Fpath.t option) =
   Run.run ~mode:0o666 ?file ~config ~output ()
 
 let run_with_timeout limit f =
-  let exception Out_of_time in
-  let set_timer limit =
-    ignore
-    @@ Unix.setitimer Unix.ITIMER_REAL
-         Unix.{ it_value = limit; it_interval = 0.01 }
-  in
-  let unset () =
-    ignore
-    @@ Unix.setitimer Unix.ITIMER_REAL Unix.{ it_value = 0.; it_interval = 0. }
-  in
-  set_timer limit;
-  Sys.set_signal Sys.sigalrm (Sys.Signal_handle (fun _ -> raise Out_of_time));
-  let f () = try `Ok (f ()) with Out_of_time -> `Timeout in
-  Fun.protect f ~finally:unset
+  let exception Sigchld in
+  let open Unix in
+  let did_timeout = ref false in
+  let pid = fork () in
+  if pid = 0 then begin
+    exit (f ())
+  end
+  else begin
+    ( try
+        Sys.set_signal Sys.sigchld (Signal_handle (fun _ -> raise Sigchld));
+        Unix.sleepf limit;
+        did_timeout := true;
+        Unix.kill pid Sys.sigkill;
+        Sys.set_signal Sys.sigchld Signal_default
+      with Sigchld -> () );
+    let chldpid, status = waitpid [] pid in
+    assert (chldpid = pid);
+    if !did_timeout then `Timeout
+    else
+      match status with
+      | WEXITED n -> `Ok n
+      | WSIGNALED _ | WSTOPPED _ -> `Timeout
+  end
 
 let run_single ~time_limit ~(workspace : Fpath.t) (filename : Fpath.t) : int =
+  let f () =
+    let n = Cmd_symbolic.main { filename; entry_func = "main"; workspace } () in
+    if n <> 0 then n else Cmd_replay.main { filename; workspace } ()
+  in
   let result =
-    run_with_timeout time_limit (fun () ->
-        let n =
-          Cmd_symbolic.main { filename; entry_func = "main"; workspace } ()
-        in
-        if n <> 0 then n else Cmd_replay.main { filename; workspace } () )
+    if time_limit > 0.0 then run_with_timeout time_limit f else `Ok (f ())
   in
   match result with
   | `Ok n -> n
