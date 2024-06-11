@@ -17,7 +17,7 @@ dune build
 dune runtest
 ```
 
-- Install `smtml` on your path by running:
+- Install `explode-js` on your path by running:
 
 ```sh
 dune install
