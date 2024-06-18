@@ -24,7 +24,8 @@ let observable_effects = [ File "success"; Stdout "success"; Stdout "polluted" ]
 let env testsuite =
   let ws = Unix.realpath @@ Fpath.to_string testsuite in
   let sharejs = List.hd Share.Location.nodejs in
-  let node_path = Fmt.asprintf ".:%s:%s" ws sharejs in
+  let node_path = OS.Env.opt_var "NODE_PATH" ~absent:"" in
+  let node_path = Fmt.asprintf "%s:.:%s:%s" node_path ws sharejs in
   String.Map.of_list [ ("NODE_PATH", node_path) ]
 
 let execute_witness ~env (test : Fpath.t) (witness : Fpath.t) =
