@@ -1,17 +1,15 @@
 build:
   cache:
     # https://docs.gitlab.com/ee/ci/yaml/#cache
-    key: 5.1.0-ubuntu
+    key: 5.1.1-ubuntu
     # keep a distinct cache for each compiler version
     paths:
       - _opam
   script:
     - if [ ! -d _opam ]; then echo "no local switch in the CI cache, we setup a new switch"; opam init -y; opam switch create --yes --no-install . 5.1.1; fi
     - eval $(opam env)
-    - sudo apt-get update
     - opam remote add uptodate https://github.com/ocaml/opam-repository.git
     - opam install . --deps-only --with-test --with-doc --yes --depext-only
     - opam install . --deps-only --with-test --with-doc --yes
     - dune build
     - dune runtest
-
