@@ -48,4 +48,9 @@ WORKDIR /home/explodejs
 # Build graphjs and emca-sl
 COPY --chown=explodejs:explodejs . /home/explodejs/explode-js
 RUN cd "${BASE}/explode-js/vendor/graphjs" && sudo ./setup.sh
-RUN cd "${BASE}/explode-js/" && ./setup.sh
+RUN cd "${BASE}/explode-js/" && opam init --disable-sandboxing --shell-setup -y \
+    && opam switch create -y ecma-sl 4.14.1 \
+    && eval $(opam env --switch=ecma-sl) \
+    && echo "eval \$(opam env --switch=ecma-sl)" >> ~/.bash_profile \
+    && opam install -y vendor/ECMA-SL \
+    && opam install -y .
