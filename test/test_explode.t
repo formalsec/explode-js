@@ -13,6 +13,13 @@ Test exec explode:
     replaying : test_sink_exec.js...
       running : explode-out/test_sink_exec/test-suite/witness-0.js
        status : true (created file "success")
+Test readFile explode
+  $ explode-js exploit test_sink_fs.js
+     readFile : (`source : __$Str)
+  Found 1 problems!
+    replaying : test_sink_fs.js...
+      running : explode-out/test_sink_fs/test-suite/witness-0.js
+       status : true (undesired file access occurred)
 
 Test polluted explode:
   $ explode-js exploit test_pollution_2.js
