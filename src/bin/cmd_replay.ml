@@ -9,17 +9,20 @@ type options =
   }
 
 let options filename workspace = { filename; workspace }
+
 let node test witness = Cmd.(v "node" % p test % p witness)
 
 type observable =
   | Stdout of string
   | File of string
+  | File_access of Fpath.t
 
 let pp_effect fmt = function
   | Stdout str -> Format.fprintf fmt "(\"%s\" in stdout)" str
   | File f -> Format.fprintf fmt "(created file \"%s\")" f
+  | File_access _ -> Format.fprintf fmt "(undesired file access occurred)"
 
-let observable_effects = [ File "success"; Stdout "success"; Stdout "polluted" ]
+let default_effects = [ File "success"; Stdout "success"; Stdout "polluted" ]
 
 let env testsuite =
   let ws = Unix.realpath @@ Fpath.to_string testsuite in
@@ -28,21 +31,35 @@ let env testsuite =
   let node_path = Fmt.asprintf "%s:.:%s:%s" node_path ws sharejs in
   String.Map.of_list [ ("NODE_PATH", node_path) ]
 
+let with_effects f =
+  (* Don't care if these file operations fail *)
+  let exploit_file = Fpath.(v "./exploited") in
+  let _ = OS.File.write exploit_file "success\n" in
+  let result = f (File_access exploit_file :: default_effects) in
+  let _ = OS.File.delete exploit_file in
+  result
+
 let execute_witness ~env (test : Fpath.t) (witness : Fpath.t) =
   let open OS in
-  Log.app "    running : %a" Fpath.pp witness;
-  let cmd = node test witness in
-  let+ (out, status) = Cmd.(run_out ~env ~err:err_run_out cmd |> out_string) in
-  ( match status with
-  | (_, `Exited 0) -> ()
-  | (_, `Exited _) | (_, `Signaled _) ->
-    Fmt.printf "unexpected node failure: %s" out );
-  List.find_opt
-    (fun effect ->
-      match effect with
-      | File file -> Sys.file_exists file
-      | Stdout sub -> String.find_sub ~sub out |> Option.is_some )
-    observable_effects
+  with_effects (fun observable_effects ->
+      Log.app "    running : %a" Fpath.pp witness;
+      let cmd = node test witness in
+      let+ out, status =
+        Cmd.(run_out ~env ~err:err_run_out cmd |> out_string)
+      in
+      ( match status with
+      | _, `Exited 0 -> ()
+      | _, `Exited _ | _, `Signaled _ ->
+        Fmt.printf "unexpected node failure: %s" out );
+      List.find_opt
+        (fun effect ->
+          match effect with
+          | File file -> Sys.file_exists file
+          | Stdout sub -> String.find_sub ~sub out |> Option.is_some
+          | File_access file ->
+            let stats = Unix.stat (Fpath.to_string file) in
+            stats.Unix.st_atime > stats.Unix.st_ctime )
+        observable_effects )
 
 let payload_to_json (witness, effect) =
   `Assoc
@@ -76,6 +93,9 @@ let replay filename workspace =
           Some (witness, effect)
         | Some (File file as effect) ->
           ignore @@ OS.Path.delete (Fpath.v file);
+          Log.app "     status : true %a" pp_effect effect;
+          Some (witness, effect)
+        | Some (File_access _ as effect) ->
           Log.app "     status : true %a" pp_effect effect;
           Some (witness, effect)
         | None ->
