@@ -1,2 +1,14 @@
 (library
- (name explode_js))
+ (name explode_js)
+ (libraries dune-site))
+
+(generate_sites_module
+  (module site)
+  (sites explode_js))
+
+(install
+ (section
+  (site
+   (explode_js nodejs)))
+ (files
+  (esl_symbolic.js as esl_symbolic.js)))

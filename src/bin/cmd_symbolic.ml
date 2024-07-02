@@ -10,7 +10,9 @@ module Translator = Value_translator
 module Extern_func = Symbolic.P.Extern_func
 
 let ext_esl = ".esl"
+
 let ext_cesl = ".cesl"
+
 let ext_js = ".js"
 
 type options =
@@ -28,11 +30,10 @@ let dispatch_file_ext on_plus on_core on_js (file : Fpath.t) =
   else Error (`Msg (Fmt.asprintf "%a :unreconized file type" Fpath.pp file))
 
 let prog_of_plus file =
-  let (file, path) = (Fpath.filename file, Fpath.to_string file) in
+  let file, path = (Fpath.filename file, Fpath.to_string file) in
   EParsing.load_file ~file path
   |> EParsing.parse_eprog ~file path
-  |> Preprocessor.Imports.resolve_imports
-  |> Preprocessor.Macros.apply_macros
+  |> Preprocessor.Imports.resolve_imports |> Preprocessor.Macros.apply_macros
   |> Compiler.compile_prog
 
 let prog_of_core file =
@@ -56,17 +57,7 @@ let link_env ~extern filename prog =
   Env.Build.add_extern_functions (extern filename env0) env0
 
 let pp_model fmt v =
-  let open Smtml in
-  let pp_mapping fmt (s, v) =
-    Fmt.fprintf fmt {|"%a" : %a|} Symbol.pp s Value.pp v
-  in
-  let pp_vars fmt v =
-    Fmt.pp_print_list
-      ~pp_sep:(fun fmt () -> Fmt.fprintf fmt "@\n, ")
-      pp_mapping fmt v
-  in
-  Fmt.fprintf fmt "@[<v 2>module.exports.symbolic_map =@ { %a@\n}@]" pp_vars
-    (Model.get_bindings v)
+  Yojson.pretty_print ~std:true fmt (Smtml.Model.to_json v)
 
 let err_to_json = function
   | `Abort msg -> `Assoc [ ("type", `String "Abort"); ("sink", `String msg) ]
@@ -88,7 +79,7 @@ let err_to_json = function
 let serialize_thread =
   let module Term = Smtml.Expr in
   let mode = 0o666 in
-  let (next_int, _) = Base.make_counter 0 1 in
+  let next_int, _ = Base.make_counter 0 1 in
   fun ?(witness :
          [ `Abort of string
          | `Assert_failure of Extern_func.value
@@ -110,7 +101,7 @@ let serialize_thread =
           (next_int ())
       in
       let* () =
-        OS.File.writef ~mode Fpath.(f + ".js") "%a" (Fmt.pp_opt pp_model) m
+        OS.File.writef ~mode Fpath.(f + ".json") "%a" (Fmt.pp_opt pp_model) m
       in
       OS.File.writef ~mode Fpath.(f + ".smtml") "%a" Term.pp_smt pc
 
