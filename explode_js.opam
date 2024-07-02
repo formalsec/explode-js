@@ -17,6 +17,8 @@ depends: [
   "ecma-sl"
   "bos"
   "fpath"
+  "yojson"
+  "dune-site"
   "odoc" {with-doc}
 ]
 build: [
