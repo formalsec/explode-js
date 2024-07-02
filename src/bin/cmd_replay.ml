@@ -26,7 +26,7 @@ let default_effects = [ File "success"; Stdout "success"; Stdout "polluted" ]
 
 let env testsuite =
   let ws = Unix.realpath @@ Fpath.to_string testsuite in
-  let sharejs = List.hd Share.Location.nodejs in
+  let sharejs = List.hd Explode_js.Sites.Share.nodejs in
   let node_path = OS.Env.opt_var "NODE_PATH" ~absent:"" in
   let node_path = Fmt.asprintf "%s:.:%s:%s" node_path ws sharejs in
   String.Map.of_list [ ("NODE_PATH", node_path) ]
@@ -83,7 +83,7 @@ let replay filename workspace =
   Log.app "  replaying : %a..." Fpath.pp filename;
   let* testsuite = OS.Dir.must_exist Fpath.(workspace / "test-suite") in
   let env = env testsuite in
-  let* witnesses = OS.Path.matches Fpath.(testsuite / "witness-$(n).js") in
+  let* witnesses = OS.Path.matches Fpath.(testsuite / "witness-$(n).json") in
   let* effectful_payloads =
     list_filter_map witnesses ~f:(fun witness ->
         let+ effect = execute_witness ~env filename witness in

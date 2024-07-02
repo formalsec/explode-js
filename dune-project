@@ -2,6 +2,8 @@
 
 (using mdx 0.4)
 
+(using dune_site 0.1)
+
 (name explode_js)
 
 (generate_opam_files true)
@@ -29,5 +31,8 @@
   bos
   fpath
   yojson
+  dune-site)
  (tags
-  ("symbolic execution" javascript exploit)))
+  ("symbolic execution" javascript exploit))
+ (sites
+  (share nodejs)))

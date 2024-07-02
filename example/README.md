@@ -65,12 +65,12 @@ Genrating explode-out/symbolic_test_1_0.js
        exec : (`source0 : __$Str)
 Found 1 problems!
   replaying : explode-out/symbolic_test_0_0.js...
-    running : explode-out/symbolic_test_0_0/test-suite/witness-0.js
+    running : explode-out/symbolic_test_0_0/test-suite/witness-0.json
      status : true (created file "success")
        exec : (`source : __$Str)
 Found 1 problems!
   replaying : explode-out/symbolic_test_1_0.js...
-    running : explode-out/symbolic_test_1_0/test-suite/witness-1.js
+    running : explode-out/symbolic_test_1_0/test-suite/witness-1.json
      status : true (created file "success")
 ```
 
@@ -91,14 +91,14 @@ explode-out
 │   ├── confirmation.json
 │   ├── symbolic-execution.json
 │   └── test-suite
-│       ├── witness-0.js
+│       ├── witness-0.json
 │       └── witness-0.smtml
 ├── symbolic_test_0_0.js
 ├── symbolic_test_1_0
 │   ├── confirmation.json
 │   ├── symbolic-execution.json
 │   └── test-suite
-│       ├── witness-1.js
+│       ├── witness-1.json
 │       └── witness-1.smtml
 └── symbolic_test_1_0.js
 
@@ -141,7 +141,7 @@ $ cat explode-out/symbolic_test_0_0/confirmation.json
   "filename": "explode-out/symbolic_test_0_0.js",
   "effectful_payloads": [
     {
-      "payload": "explode-out/symbolic_test_0_0/test-suite/witness-0.js",
+      "payload": "explode-out/symbolic_test_0_0/test-suite/witness-0.json",
       "effect": "(created file \"success\")"
     }
   ]
@@ -153,10 +153,8 @@ witness `explode-out/symbolic_test_0_0/test-suite/witness-0.js` was able to
 create a file named `success`. Inspecting the content of the file:
 
 ```sh
-$ cat explode-out/symbolic_test_0_0/test-suite/witness-0.js
-module.exports.symbolic_map =
-  { "source0" : "`touch success`"
-  }
+$ cat explode-out/symbolic_test_0_0/test-suite/witness-0.json
+{ "model": { "source0": { "ty": "str", "value": "`touch success`" } } }
 ```
 
 The content of the file shows that the symbolic map contains the assignment
