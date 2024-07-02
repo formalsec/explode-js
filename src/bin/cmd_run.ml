@@ -42,10 +42,22 @@ let run_with_timeout limit f =
       | WSIGNALED _ | WSTOPPED _ -> `Timeout
   end
 
-let run_single ~time_limit ~(workspace : Fpath.t) (filename : Fpath.t) : int =
+let run_single ~time_limit ~(workspace : Fpath.t) (filename : Fpath.t)
+  original_file taint_summary : int =
+  let original_file = Option.map Fpath.to_string original_file in
+  let taint_summary = Fpath.to_string taint_summary in
   let f () =
     let n = Cmd_symbolic.main { filename; entry_func = "main"; workspace } () in
-    if n <> 0 then n else Cmd_replay.main { filename; workspace } ()
+    if n <> 0 then n
+    else begin
+      match
+        Cmd_replay.replay ?original_file ~taint_summary filename workspace
+      with
+      | Error (`Msg msg) ->
+        Format.eprintf "%s" msg;
+        1
+      | Ok () -> 0
+    end
   in
   let result =
     if time_limit > 0.0 then run_with_timeout time_limit f else `Ok (f ())
@@ -63,7 +75,7 @@ let run_all ({ config; filename; workspace_dir; time_limit } : options) =
     | [] -> Ok 0
     | test :: remaning ->
       let workspace = Fpath.(workspace_dir // rem_ext (base test)) in
-      let n = run_single ~time_limit ~workspace test in
+      let n = run_single ~time_limit ~workspace test filename config in
       if n <> 0 then Error (`Status n) else loop remaning
   in
   loop symbolic_tests

@@ -79,13 +79,24 @@ let write_report ~workspace filename effectful_payloads =
   let report_path = Fpath.(workspace / "confirmation.json") in
   OS.File.writef ~mode report_path "%a" (Yojson.pretty_print ~std:true) json
 
-let replay filename workspace =
+let replay ?original_file ?taint_summary filename workspace =
   Log.app "  replaying : %a..." Fpath.pp filename;
   let* testsuite = OS.Dir.must_exist Fpath.(workspace / "test-suite") in
   let env = env testsuite in
   let* witnesses = OS.Path.matches Fpath.(testsuite / "witness-$(n).json") in
   let* effectful_payloads =
     list_filter_map witnesses ~f:(fun witness ->
+        ( match taint_summary with
+        | Some taint_summary ->
+          let output = Fpath.(workspace / "literal") in
+          let output = Fpath.to_string output in
+          let witness = Fpath.to_string witness in
+          let _ =
+            I2.Run.literal ~mode:0o666 ?file:original_file taint_summary witness
+              output
+          in
+          ()
+        | None -> () );
         let+ effect = execute_witness ~env filename witness in
         match effect with
         | Some (Stdout _ as effect) ->
