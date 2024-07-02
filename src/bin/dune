@@ -1,4 +1,4 @@
 (executable
  (public_name explode-js)
  (name main)
- (libraries explode_js cmdliner fpath bos ecma-sl instrumentation2))
+ (libraries explode_js yojson cmdliner fpath bos ecma-sl instrumentation2))

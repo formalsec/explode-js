@@ -27,6 +27,7 @@
   cmdliner
   ecma-sl
   bos
-  fpath)
+  fpath
+  yojson
  (tags
   ("symbolic execution" javascript exploit)))
