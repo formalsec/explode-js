@@ -65,11 +65,13 @@ Genrating explode-out/symbolic_test_1_0.js
        exec : (`source0 : __$Str)
 Found 1 problems!
   replaying : explode-out/symbolic_test_0_0.js...
+Genrating explode-out/symbolic_test_0_0/literal_0_0.js
     running : explode-out/symbolic_test_0_0/test-suite/witness-0.json
      status : true (created file "success")
        exec : (`source : __$Str)
 Found 1 problems!
   replaying : explode-out/symbolic_test_1_0.js...
+Genrating explode-out/symbolic_test_1_0/literal_1_0.js
     running : explode-out/symbolic_test_1_0/test-suite/witness-1.json
      status : true (created file "success")
 ```
@@ -89,6 +91,7 @@ $ tree explode-out
 explode-out
 ├── symbolic_test_0_0
 │   ├── confirmation.json
+│   ├── literal_0_0.js
 │   ├── symbolic-execution.json
 │   └── test-suite
 │       ├── witness-0.json
@@ -96,13 +99,14 @@ explode-out
 ├── symbolic_test_0_0.js
 ├── symbolic_test_1_0
 │   ├── confirmation.json
+│   ├── literal_1_0.js
 │   ├── symbolic-execution.json
 │   └── test-suite
 │       ├── witness-1.json
 │       └── witness-1.smtml
 └── symbolic_test_1_0.js
 
-5 directories, 10 files
+5 directories, 12 files
 ```
 
 The directory `explode-out` contains the symbolic tests and the directories
