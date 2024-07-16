@@ -16,13 +16,16 @@ type observable =
   | Stdout of string
   | File of string
   | File_access of Fpath.t
+  | Error of string
 
 let pp_effect fmt = function
   | Stdout str -> Format.fprintf fmt "(\"%s\" in stdout)" str
   | File f -> Format.fprintf fmt "(created file \"%s\")" f
   | File_access _ -> Format.fprintf fmt "(undesired file access occurred)"
+  | Error str -> Format.fprintf fmt "(threw Error(\"%s\"))" str
 
-let default_effects = [ File "success"; Stdout "success"; Stdout "polluted" ]
+let default_effects =
+  [ File "success"; Stdout "success"; Stdout "polluted"; Error "I pollute." ]
 
 let env testsuite =
   let ws = Unix.realpath @@ Fpath.to_string testsuite in
@@ -54,11 +57,14 @@ let execute_witness ~env (test : Fpath.t) (witness : Fpath.t) =
       List.find_opt
         (fun effect ->
           match effect with
-          | File file -> Sys.file_exists file
           | Stdout sub -> String.find_sub ~sub out |> Option.is_some
+          | File file -> Sys.file_exists file
           | File_access file ->
             let stats = Unix.stat (Fpath.to_string file) in
-            stats.Unix.st_atime > stats.Unix.st_ctime )
+            stats.Unix.st_atime > stats.Unix.st_ctime
+          | Error str ->
+            let sub = Format.sprintf "Error: %s" str in
+            String.find_sub ~sub out |> Option.is_some )
         observable_effects )
 
 let payload_to_json (witness, effect) =
@@ -99,14 +105,11 @@ let replay ?original_file ?taint_summary filename workspace =
         | None -> () );
         let+ effect = execute_witness ~env filename witness in
         match effect with
-        | Some (Stdout _ as effect) ->
+        | Some ((Stdout _ | File_access _ | Error _) as effect) ->
           Log.app "     status : true %a" pp_effect effect;
           Some (witness, effect)
         | Some (File file as effect) ->
           ignore @@ OS.Path.delete (Fpath.v file);
-          Log.app "     status : true %a" pp_effect effect;
-          Some (witness, effect)
-        | Some (File_access _ as effect) ->
           Log.app "     status : true %a" pp_effect effect;
           Some (witness, effect)
         | None ->
