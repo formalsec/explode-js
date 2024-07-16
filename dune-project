@@ -32,7 +32,7 @@
   fpath
   yojson
   dune-site
-  (instrumentation (= "0.0.5")))
+  (instrumentation2 (= "0.0.5")))
  (tags
   ("symbolic execution" javascript exploit))
  (sites
