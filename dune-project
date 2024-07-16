@@ -31,7 +31,8 @@
   bos
   fpath
   yojson
-  dune-site)
+  dune-site
+  (instrumentation (= "0.0.5")))
  (tags
   ("symbolic execution" javascript exploit))
  (sites

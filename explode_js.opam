@@ -19,6 +19,7 @@ depends: [
   "fpath"
   "yojson"
   "dune-site"
+  "instrumentation" {= "0.0.5"}
   "odoc" {with-doc}
 ]
 build: [
@@ -39,6 +40,6 @@ build: [
 ]
 dev-repo: "git+https://github.com/explode-js/explode-js.git"
 pin-depends: [
-  ["instrumentation2.0.0.4" "git+https://github.com/formalsec/instrumentation2.git#v0.0.4"]
+  ["instrumentation2.0.0.5" "git+https://github.com/formalsec/instrumentation2.git#v0.0.5"]
   ["smtml.dev" "git+https://github.com/formalsec/smtml.git#d1668dbfcdcf78c076d5a3665ae051bfa348873a"]
 ]
