@@ -14,12 +14,12 @@ depends: [
   "ocaml"
   "dune" {>= "3.15"}
   "cmdliner"
-  "ecma-sl"
   "bos"
   "fpath"
   "yojson"
   "dune-site"
-  "instrumentation2" {= "0.0.5"}
+  "ecma-sl"
+  "instrumentation2"
   "odoc" {with-doc}
 ]
 build: [
@@ -40,6 +40,5 @@ build: [
 ]
 dev-repo: "git+https://github.com/explode-js/explode-js.git"
 pin-depends: [
-  ["instrumentation2.0.0.5" "git+https://github.com/formalsec/instrumentation2.git#v0.0.5"]
   ["smtml.dev" "git+https://github.com/formalsec/smtml.git#d1668dbfcdcf78c076d5a3665ae051bfa348873a"]
 ]
