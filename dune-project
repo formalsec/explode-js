@@ -27,12 +27,12 @@
   ocaml
   dune
   cmdliner
-  ecma-sl
   bos
   fpath
   yojson
   dune-site
-  (instrumentation2 (= "0.0.5")))
+  ecma-sl
+  instrumentation2)
  (tags
   ("symbolic execution" javascript exploit))
  (sites
