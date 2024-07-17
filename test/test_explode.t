@@ -71,3 +71,49 @@ Tests full:
   Genrating explode-out/symbolic_test_0_0/literal_0_0.js
       running : explode-out/symbolic_test_0_0/test-suite/witness-0.json
        status : true (created file "success")
+  $ explode-js run test_usecase_4.json
+  Genrating explode-out/symbolic_test_0_0.js
+  "Uncaught TypeError"
+  "Uncaught TypeError"
+  "Uncaught TypeError"
+  "Uncaught TypeError"
+  "Uncaught TypeError"
+  "Uncaught TypeError"
+  "Uncaught TypeError"
+        abort : "Uncaught Error: I pollute."
+  Found 1 problems!
+    replaying : explode-out/symbolic_test_0_0.js...
+  Genrating explode-out/symbolic_test_0_0/literal_0_0.js
+      running : explode-out/symbolic_test_0_0/test-suite/witness-136.json
+       status : true (threw Error("I pollute."))
+  Genrating explode-out/symbolic_test_0_0/literal_0_0.js
+      running : explode-out/symbolic_test_0_0/test-suite/witness-0.json
+       status : false (no side effect)
+  unexpected node failure: $TESTCASE_ROOT/explode-out/symbolic_test_0_0.js:51
+  if (({}).toString == "polluted") { throw Error("I pollute."); }
+                                     ^
+  
+  Error: I pollute.
+      at Object.<anonymous> ($TESTCASE_ROOT/explode-out/symbolic_test_0_0.js:51:42)
+      at Module._compile (node:internal/modules/cjs/loader:1378:14)
+      at Module._extensions..js (node:internal/modules/cjs/loader:1437:10)
+      at Module.load (node:internal/modules/cjs/loader:1212:32)
+      at Module._load (node:internal/modules/cjs/loader:1028:12)
+      at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:142:12)
+      at node:internal/main/run_main_module:28:49
+  
+  Node.js v21.6.1unexpected node failure: $TESTCASE_ROOT/explode-out/symbolic_test_0_0.js:11
+    var segs = path.split('.');
+                    ^
+  
+  TypeError: Cannot read properties of undefined (reading 'split')
+      at exports.set ($TESTCASE_ROOT/explode-out/symbolic_test_0_0.js:11:19)
+      at Object.<anonymous> ($TESTCASE_ROOT/explode-out/symbolic_test_0_0.js:50:16)
+      at Module._compile (node:internal/modules/cjs/loader:1378:14)
+      at Module._extensions..js (node:internal/modules/cjs/loader:1437:10)
+      at Module.load (node:internal/modules/cjs/loader:1212:32)
+      at Module._load (node:internal/modules/cjs/loader:1028:12)
+      at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:142:12)
+      at node:internal/main/run_main_module:28:49
+  
+  Node.js v21.6.1

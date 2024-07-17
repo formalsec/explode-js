@@ -25,7 +25,7 @@ let pp_effect fmt = function
   | Error str -> Format.fprintf fmt "(threw Error(\"%s\"))" str
 
 let default_effects =
-  [ File "success"; Stdout "success"; Stdout "polluted"; Error "I pollute." ]
+  [ File "success"; Stdout "success"; Error "I pollute."; Stdout "polluted" ]
 
 let env testsuite =
   let ws = Unix.realpath @@ Fpath.to_string testsuite in

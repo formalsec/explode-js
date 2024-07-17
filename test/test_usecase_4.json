@@ -1,0 +1,14 @@
+[
+  {
+    "filename" : "test_usecase_4.js",
+    "vuln_type" : "prototype-pollution",
+    "source" : "module.exports.set",
+    "sink" : "obj[seg] = obj[seg] || {};",
+    "tainted_params" : [ "obj", "path", "val" ],
+    "params_types" : {
+      "obj" : "object",
+      "path" : "string",
+      "val" : "any"
+    }
+  }
+]
