@@ -1,3 +1,6 @@
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
 build:
   # cache:
   #   # https://docs.gitlab.com/ee/ci/yaml/#cache
@@ -9,7 +12,6 @@ build:
     - opam init -y && opam switch create --yes --no-install . 5.1.1
     - eval $(opam env)
     - opam remote add uptodate https://github.com/ocaml/opam-repository.git
-    - opam install . --yes --depext-only
-    - opam install . --deps-only --with-test --with-doc --yes
-    - dune build
+    - opam install -y vendor/instrumentation2 vendor/ECMA-SL .
+    - dune build @install
     - dune runtest
