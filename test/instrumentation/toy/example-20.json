@@ -1,0 +1,16 @@
+[
+  {
+    "vuln_type": "code-injection",
+    "source": "f",
+    "sink": "",
+    "tainted_params": [ "x" ],
+    "params_types": { "x": "string" },
+    "sequence" : {
+      "vuln_type": "code-injection",
+      "source": "eval_target",
+      "sink": "eval",
+      "tainted_params": [],
+      "params_types": {}
+    }
+  }
+]

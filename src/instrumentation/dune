@@ -1,0 +1,23 @@
+(library
+ (public_name explode_js-instrumentation)
+ (name i2)
+ (modules
+  run
+  syntax
+  value
+  vuln
+  vuln_intf
+  vuln_parser
+  vuln_symbolic
+  vuln_literal
+  result)
+ (libraries yojson bos bos.setup))
+
+(executable
+ (package explode_js-instrumentation)
+ (public_name instrumentation2)
+ (name main)
+ (modules main)
+ (libraries cmdliner i2)
+ (instrumentation
+  (backend bisect_ppx)))

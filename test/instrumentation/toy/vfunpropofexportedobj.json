@@ -1,0 +1,16 @@
+[
+  {
+    "vuln_type" : "code-injection",
+    "source" : "module.exports.Obj",
+    "sink" : "",
+    "tainted_params" : [ "source" ],
+    "params_types" : { "source" : "string" },
+    "return" : {
+      "vuln_type" : "code-injection",
+      "source" : ".f",
+      "sink" : "eval",
+      "tainted_params" : [ "obj" ],
+      "params_types" : { "obj" : { "cond" : "number" } }
+    }
+  }
+]

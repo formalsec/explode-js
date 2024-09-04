@@ -1,4 +1,5 @@
 (library
+ (package explode_js)
  (name explode_js)
  (libraries dune-site))
 
@@ -7,6 +8,7 @@
   (sites explode_js))
 
 (install
+ (package explode_js)
  (section
   (site
    (explode_js nodejs)))

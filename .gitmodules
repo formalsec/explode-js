@@ -4,6 +4,3 @@
 [submodule "vendor/ECMA-SL"]
 	path = vendor/ECMA-SL
 	url = git@github.com:filipeom/ECMA-SL.git
-[submodule "vendor/instrumentation2"]
-	path = vendor/instrumentation2
-	url = https://github.com/formalsec/instrumentation2.git

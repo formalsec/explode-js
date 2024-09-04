@@ -15,7 +15,7 @@
 
 (maintainers "Filipe Marques")
 
-(license "GPL-3.0-or-later")
+(license MIT)
 
 (documentation https://url/to/documentation)
 
@@ -37,3 +37,17 @@
   ("symbolic execution" javascript exploit))
  (sites
   (share nodejs)))
+
+(package
+ (name explode_js-instrumentation)
+ (synopsis "Instrumentation2")
+ (description "Instrumentation2")
+ (depends
+  ocaml
+  dune
+  (cmdliner (>= 1.2.0))
+  (yojson (>= 2.1.2))
+  (bos (>= 0.2.1))
+  (bisect_ppx (and :with-test (>= 2.5.0))))
+ (tags
+  (javascript nodejs exploit vulnerability)))

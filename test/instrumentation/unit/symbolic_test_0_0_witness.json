@@ -1,0 +1,8 @@
+{
+  "model" : {
+    "some_arg" : {
+      "ty" : "str",
+      "value" : "sou um valor concreto!"
+    }
+  }
+}
