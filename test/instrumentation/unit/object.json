@@ -1,0 +1,9 @@
+[
+  {
+    "vuln_type" : "command-injection",
+    "source" : "module.exports",
+    "sink" : "exec",
+    "tainted_params" : [ "some_arg" ],
+    "params_types" : { "some_arg" : "object" }
+  }
+]

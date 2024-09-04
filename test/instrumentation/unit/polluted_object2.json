@@ -1,0 +1,9 @@
+[
+  {
+    "vuln_type" : "prototype-pollution",
+    "source" : "module.exports",
+    "sink" : "exec",
+    "tainted_params" : [ "some_arg" ],
+    "params_types" : { "some_arg" : "polluted_object2" }
+  }
+]

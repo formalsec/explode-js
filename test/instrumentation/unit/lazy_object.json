@@ -1,0 +1,9 @@
+[
+  {
+    "vuln_type" : "path-traversal",
+    "source" : "module.exports",
+    "sink" : "exec",
+    "tainted_params" : [ "some_arg" ],
+    "params_types" : { "some_arg" : "lazy_object" }
+  }
+]

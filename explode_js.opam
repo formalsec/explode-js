@@ -5,7 +5,7 @@ description:
   "Explode.js: Automatic exploit generation engine for Node.js applications"
 maintainer: ["Filipe Marques"]
 authors: ["Filipe Marques"]
-license: "GPL-3.0-or-later"
+license: "MIT"
 tags: ["symbolic execution" "javascript" "exploit"]
 homepage: "https://github.com/explode-js/explode-js"
 doc: "https://url/to/documentation"

@@ -1,0 +1,5 @@
+(cram
+ (deps
+  %{bin:instrumentation2}
+  (source_tree toy)
+  (source_tree unit)))
