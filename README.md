@@ -1,12 +1,15 @@
 # Explode-js
 
+Automatic exploit generation for Node.js applications. See [examples]
+
+
 ### Build from source
 
 - Install the library dependencies:
 
 ```sh
-git clone https://github.com/formalsec/explodejs.git
-cd explodejs
+git clone https://github.com/formalsec/explode-js.git
+cd explode-js
 opam install . --deps-only
 ```
 
@@ -22,3 +25,5 @@ dune runtest
 ```sh
 dune install
 ```
+
+[examples]: ./example
