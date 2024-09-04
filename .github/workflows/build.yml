@@ -1,0 +1,46 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    env:
+      OCAML_COMPILER: 4.14
+
+    strategy:
+      fail-fast: false
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Setup OCaml ${{ env.OCAML_COMPILER }}
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: ${{ env.OCAML_COMPILER }}
+
+      - name: Install dependencies
+        run: |
+          opam install ./vendor/ECMA-SL
+          opam install -y . --deps-only --with-test
+
+      - name: Build
+        run: opam exec -- dune build @install
+
+      - name: Test
+        run: opam exec -- dune runtest
