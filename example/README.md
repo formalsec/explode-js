@@ -178,9 +178,9 @@ module.exports = function f(source) {
   return exec(source);
 };
 
-let esl_symbolic = require("esl_symbolic");
+var esl_symbolic = require("esl_symbolic");
 esl_symbolic.sealProperties(Object.prototype);
 // Vuln: command-injection
-let source = [ esl_symbolic.string("source0") ];
+var source = [ esl_symbolic.string("source0") ];
 module.exports(source);
 ```

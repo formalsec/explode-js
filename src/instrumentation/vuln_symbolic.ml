@@ -2,13 +2,13 @@ open Format
 open Vuln_intf
 
 let template0 : ('a, Format.formatter, unit) format =
-  "let esl_symbolic = require(\"esl_symbolic\");@\n\
+  "var esl_symbolic = require(\"esl_symbolic\");@\n\
    esl_symbolic.sealProperties(Object.prototype);@\n\
    // Vuln: %a@\n\
    %a"
 
 let template1 : ('a, Format.formatter, unit) format =
-  "let esl_symbolic = require(\"esl_symbolic\");@\n\
+  "var esl_symbolic = require(\"esl_symbolic\");@\n\
    // Vuln: %a@\n\
    %a@\n\
    if (({}).toString == \"polluted\") { throw Error(\"I pollute.\"); }"
@@ -69,7 +69,7 @@ and pp_obj_props fmt props =
 and pp_params_as_decl fmt (params : (string * param_type) list) =
   pp_print_list
     ~pp_sep:(fun fmt () -> fprintf fmt ";@\n")
-    (pp_param "@[<hov 2>let %s =@ %a@]")
+    (pp_param "@[<hov 2>var %s =@ %a@]")
     fmt params
 
 let pp_params_as_args fmt (args : (string * 'a) list) =
