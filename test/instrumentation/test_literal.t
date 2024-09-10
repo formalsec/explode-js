@@ -5,5 +5,5 @@
   }
   
   // Vuln: command-injection
-  let some_arg = "sou um valor concreto!";
+  var some_arg = "sou um valor concreto!";
   module.exports(some_arg);

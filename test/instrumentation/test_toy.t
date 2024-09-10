@@ -7,10 +7,10 @@ Test toy examples:
     return exec(x);
   };
   
-  let esl_symbolic = require("esl_symbolic");
+  var esl_symbolic = require("esl_symbolic");
   esl_symbolic.sealProperties(Object.prototype);
   // Vuln: command-injection
-  let x = esl_symbolic.string("x");
+  var x = esl_symbolic.string("x");
   module.exports(x);
   $ instrumentation2 symbolic toy/vfunretbyexport.json -o -
   Genrating -
@@ -23,12 +23,12 @@ Test toy examples:
     };
   };
   
-  let esl_symbolic = require("esl_symbolic");
+  var esl_symbolic = require("esl_symbolic");
   esl_symbolic.sealProperties(Object.prototype);
   // Vuln: code-injection
-  let a = esl_symbolic.string("a");
+  var a = esl_symbolic.string("a");
   var ret_f1 = f1(a);
-  let b = esl_symbolic.number("b");
+  var b = esl_symbolic.number("b");
   ret_f1(b);
   function f1(a) {
     return function f2(b) {
@@ -38,12 +38,12 @@ Test toy examples:
     };
   };
   
-  let esl_symbolic = require("esl_symbolic");
+  var esl_symbolic = require("esl_symbolic");
   esl_symbolic.sealProperties(Object.prototype);
   // Vuln: code-injection
-  let a = esl_symbolic.string("a");
+  var a = esl_symbolic.string("a");
   var ret_f1 = f1(a);
-  let b = esl_symbolic.number("b");
+  var b = esl_symbolic.number("b");
   ret_f1(b);
   $ instrumentation2 symbolic toy/vfunpropofexportedobj.json toy/vfunpropofexportedobj.js -o -
   Genrating -
@@ -61,12 +61,12 @@ Test toy examples:
   
   module.exports.Obj = Obj;
   
-  let esl_symbolic = require("esl_symbolic");
+  var esl_symbolic = require("esl_symbolic");
   esl_symbolic.sealProperties(Object.prototype);
   // Vuln: code-injection
-  let source = esl_symbolic.string("source");
+  var source = esl_symbolic.string("source");
   var ret_module_exports_Obj = module.exports.Obj(source);
-  let obj = { cond: esl_symbolic.number("cond") };
+  var obj = { cond: esl_symbolic.number("cond") };
   ret_module_exports_Obj.f(obj);
   $ instrumentation2 symbolic toy/example-20.json toy/example-20.js -o -
   Genrating -
@@ -80,9 +80,9 @@ Test toy examples:
     return eval(target);
   }
   
-  let esl_symbolic = require("esl_symbolic");
+  var esl_symbolic = require("esl_symbolic");
   esl_symbolic.sealProperties(Object.prototype);
   // Vuln: code-injection
-  let x = esl_symbolic.string("x");
+  var x = esl_symbolic.string("x");
   f(x);
   eval_target();
