@@ -71,7 +71,7 @@ and pp_obj_props map fmt props =
 and pp_params_as_decl map fmt (params : (string * param_type) list) =
   pp_print_list
     ~pp_sep:(fun fmt () -> fprintf fmt ";@\n")
-    (pp_param map "@[<hov 2>let %s =@ %a@]")
+    (pp_param map "@[<hov 2>var %s =@ %a@]")
     fmt params
 
 let pp_params_as_args fmt (args : (string * 'a) list) =
