@@ -11,15 +11,17 @@ homepage: "https://github.com/explode-js/explode-js"
 doc: "https://url/to/documentation"
 bug-reports: "https://github.com/explode-js/explode-js/issues"
 depends: [
-  "ocaml"
-  "dune" {>= "3.15"}
-  "cmdliner"
   "bos"
-  "fpath"
-  "yojson"
+  "cmdliner"
+  "dune" {>= "3.15"}
   "dune-site"
   "ecma-sl"
+  "fpath"
   "instrumentation2"
+  "ocaml"
+  "smtml"
+  "yojson"
+  "z3"
   "odoc" {with-doc}
 ]
 build: [
@@ -39,6 +41,3 @@ build: [
   ["dune" "install" "-p" name "--create-install-files" name]
 ]
 dev-repo: "git+https://github.com/explode-js/explode-js.git"
-pin-depends: [
-  ["smtml.dev" "git+https://github.com/formalsec/smtml.git#d1668dbfcdcf78c076d5a3665ae051bfa348873a"]
-]

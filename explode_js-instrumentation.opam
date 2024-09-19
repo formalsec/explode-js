@@ -10,12 +10,12 @@ homepage: "https://github.com/explode-js/explode-js"
 doc: "https://url/to/documentation"
 bug-reports: "https://github.com/explode-js/explode-js/issues"
 depends: [
-  "ocaml"
-  "dune" {>= "3.15"}
-  "cmdliner" {>= "1.2.0"}
-  "yojson" {>= "2.1.2"}
   "bos" {>= "0.2.1"}
   "bisect_ppx" {with-test & >= "2.5.0"}
+  "cmdliner" {>= "1.2.0"}
+  "dune" {>= "3.15"}
+  "ocaml"
+  "yojson" {>= "2.1.2"}
   "odoc" {with-doc}
 ]
 build: [

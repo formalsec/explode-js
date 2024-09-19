@@ -1,12 +1,10 @@
 open Bos
 open Ecma_sl
-open Ecma_sl.Syntax.Result
-module PC = Choice_monad.PC
+open Smtml.Syntax.Result
 module Env = Symbolic.P.Env
 module Value = Symbolic.P.Value
 module Choice = Symbolic.P.Choice
 module Thread = Choice_monad.Thread
-module Translator = Value_translator
 module Extern_func = Symbolic.P.Extern_func
 
 let ext_esl = ".esl"
@@ -16,12 +14,14 @@ let ext_cesl = ".cesl"
 let ext_js = ".js"
 
 type options =
-  { filename : Fpath.t
+  { debug : bool
+  ; filename : Fpath.t
   ; entry_func : string
   ; workspace : Fpath.t
   }
 
-let options filename entry_func workspace = { filename; entry_func; workspace }
+let options debug filename entry_func workspace =
+  { debug; filename; entry_func; workspace }
 
 let dispatch_file_ext on_plus on_core on_js (file : Fpath.t) =
   if Fpath.has_ext ext_esl file then Ok (on_plus file)
@@ -33,8 +33,8 @@ let prog_of_plus file =
   let file, path = (Fpath.filename file, Fpath.to_string file) in
   EParsing.load_file ~file path
   |> EParsing.parse_eprog ~file path
-  |> Preprocessor.Imports.resolve_imports |> Preprocessor.Macros.apply_macros
-  |> Compiler.compile_prog
+  |> Preprocessor.Imports.resolve_imports ~stdlib:Share.stdlib
+  |> Preprocessor.Macros.apply_macros |> Compiler.compile_prog
 
 let prog_of_core file =
   let file = Fpath.to_string file in
@@ -47,17 +47,18 @@ let prog_of_js file =
   let ast_file = Fpath.(file -+ "_ast.cesl") in
   let* () = OS.Cmd.run (js2ecma_sl file ast_file) in
   let* ast = OS.File.read ast_file in
-  let* es6 = OS.File.read (Fpath.v (Option.get (Share.es6_interp ()))) in
+  let es6 = Share.es6_sym_interp () in
   let program = String.concat ";\n" [ ast; es6 ] in
   let+ () = OS.File.delete ast_file in
   Parsing.parse_prog program
 
-let link_env ~extern filename prog =
+let link_env filename prog =
   let env0 = Env.Build.empty () |> Env.Build.add_functions prog in
-  Env.Build.add_extern_functions (extern filename env0) env0
+  Env.Build.add_extern_functions (Symbolic_esl_ffi.extern_cmds env0) env0
+  |> Env.Build.add_extern_functions Symbolic_esl_ffi.concrete_api
+  |> Env.Build.add_extern_functions (Symbolic_esl_ffi.symbolic_api filename)
 
-let pp_model fmt v =
-  Yojson.pretty_print ~std:true fmt (Smtml.Model.to_json v)
+let pp_model fmt v = Yojson.pretty_print ~std:true fmt (Smtml.Model.to_json v)
 
 let err_to_json = function
   | `Abort msg -> `Assoc [ ("type", `String "Abort"); ("sink", `String msg) ]
@@ -77,7 +78,6 @@ let err_to_json = function
     `Assoc [ ("type", `String "Failure"); ("sink", `String msg) ]
 
 let serialize_thread =
-  let module Term = Smtml.Expr in
   let mode = 0o666 in
   let next_int, _ = Base.make_counter 0 1 in
   fun ?(witness :
@@ -88,9 +88,9 @@ let serialize_thread =
          | `ReadFile_failure of Extern_func.value
          ]
          option ) workspace thread ->
-    let pc = PC.to_list @@ Thread.pc thread in
+    let pc = Thread.pc thread in
     let solver = Thread.solver thread in
-    match Solver.check solver pc with
+    match Solver.check_set solver pc with
     | `Unsat | `Unknown -> Ok ()
     | `Sat ->
       let m = Solver.model solver in
@@ -103,7 +103,10 @@ let serialize_thread =
       let* () =
         OS.File.writef ~mode Fpath.(f + ".json") "%a" (Fmt.pp_opt pp_model) m
       in
-      OS.File.writef ~mode Fpath.(f + ".smtml") "%a" Term.pp_smt pc
+      OS.File.writef ~mode
+        Fpath.(f + ".smtml")
+        "%a" Smtml.Expr.pp_smt
+        (Smtml.Expr.Set.to_list pc)
 
 let write_report ~workspace filename exec_time solver_time solver_count problems
     =
@@ -122,9 +125,9 @@ let write_report ~workspace filename exec_time solver_time solver_count problems
   OS.File.writef ~mode rpath "%a" (Yojson.pretty_print ~std:true) json
 
 let run ~workspace filename entry_func =
-  let open Syntax.Result in
+  (* Log.Config.log_debugs := true; *)
   let* prog = dispatch_file_ext prog_of_plus prog_of_core prog_of_js filename in
-  let env = link_env ~extern:Symbolic_extern.api filename prog in
+  let env = link_env filename prog in
   let start = Stdlib.Sys.time () in
   let thread = Choice_monad.Thread.create () in
   let result = Symbolic_interpreter.main env entry_func in
@@ -134,7 +137,7 @@ let run ~workspace filename entry_func =
   let* _ = OS.Dir.create ~mode:0o777 ~path:true testsuite in
   let* problems =
     list_filter_map
-      ~f:(fun (ret, thread) ->
+      (fun (ret, thread) ->
         let+ witness =
           match ret with
           | Ok _ -> Ok None
@@ -145,7 +148,7 @@ let run ~workspace filename entry_func =
           | Error (`Failure msg) -> Error (`Msg msg)
         in
         ( match serialize_thread ?witness workspace thread with
-        | Error (`Msg msg) -> Log.log ~header:false "%s" msg
+        | Error (`Msg msg) -> Logs.warn (fun m -> m "%s" msg)
         | Ok () -> () );
         witness )
       results
@@ -158,9 +161,10 @@ let run ~workspace filename entry_func =
   Log.debug "solver time : %fs@." solv_time;
   write_report ~workspace filename exec_time solv_time solv_cnt problems
 
-let main { filename; entry_func; workspace } () =
+let main { debug; filename; entry_func; workspace } () =
+  Log.Config.log_debugs := debug;
   match run ~workspace filename entry_func with
   | Error (`Msg s) ->
-    Log.log ~header:false "%s" s;
+    Logs.err (fun m -> m "%s" s);
     1
   | Ok () -> 0

@@ -1,6 +1,6 @@
 open Bos
 open Ecma_sl
-open Ecma_sl.Syntax.Result
+open Smtml.Syntax.Result
 module String = Astring.String
 
 type options =
@@ -45,7 +45,7 @@ let with_effects f =
 let execute_witness ~env (test : Fpath.t) (witness : Fpath.t) =
   let open OS in
   with_effects (fun observable_effects ->
-      Log.app "    running : %a" Fpath.pp witness;
+      Logs.app (fun m -> m "    running : %a" Fpath.pp witness);
       let cmd = node test witness in
       let+ out, status =
         Cmd.(run_out ~env ~err:err_run_out cmd |> out_string)
@@ -86,12 +86,13 @@ let write_report ~workspace filename effectful_payloads =
   OS.File.writef ~mode report_path "%a" (Yojson.pretty_print ~std:true) json
 
 let replay ?original_file ?taint_summary filename workspace =
-  Log.app "  replaying : %a..." Fpath.pp filename;
+  Logs.app (fun m -> m "  replaying : %a..." Fpath.pp filename);
   let* testsuite = OS.Dir.must_exist Fpath.(workspace / "test-suite") in
   let env = env testsuite in
   let* witnesses = OS.Path.matches Fpath.(testsuite / "witness-$(n).json") in
   let* effectful_payloads =
-    list_filter_map witnesses ~f:(fun witness ->
+    list_filter_map
+      (fun witness ->
         ( match taint_summary with
         | Some taint_summary ->
           let output = Fpath.(workspace / "literal") in
@@ -106,21 +107,22 @@ let replay ?original_file ?taint_summary filename workspace =
         let+ effect = execute_witness ~env filename witness in
         match effect with
         | Some ((Stdout _ | File_access _ | Error _) as effect) ->
-          Log.app "     status : true %a" pp_effect effect;
+          Logs.app (fun m -> m "     status : true %a" pp_effect effect);
           Some (witness, effect)
         | Some (File file as effect) ->
           ignore @@ OS.Path.delete (Fpath.v file);
-          Log.app "     status : true %a" pp_effect effect;
+          Logs.app (fun m -> m "     status : true %a" pp_effect effect);
           Some (witness, effect)
         | None ->
-          Log.app "     status : false (no side effect)";
+          Logs.app (fun m -> m "     status : false (no side effect)");
           None )
+      witnesses
   in
   write_report ~workspace filename effectful_payloads
 
 let main { filename; workspace } () =
   match replay filename workspace with
   | Error (`Msg msg) ->
-    Log.log ~header:false "%s" msg;
+    Logs.err (fun m -> m "%s" msg);
     1
   | Ok () -> 0
