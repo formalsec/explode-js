@@ -1,3 +1,6 @@
-(dirs :standard \ ECMA-SL graphjs)
+(dirs :standard \ ECMA-SL)
 
-(vendored_dirs instrumentation2)
+(install
+ (package explode_js)
+ (section bin)
+ (source_trees (graphjs as .)))
