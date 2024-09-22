@@ -32,9 +32,10 @@ let time_limit =
   let doc = "Maximum time limit for analysis" in
   Arg.(value & opt float 0.0 & info [ "timeout" ] ~doc)
 
+let sdocs = Manpage.s_common_options
+
 let cmd_run =
   let doc = "Explode.js symbolic vulnerability confirmation engine" in
-  let sdocs = Manpage.s_common_options in
   let description = "Tries to blow stuff up" in
   let man = [ `S Manpage.s_description; `P description ] in
   let man_xrefs = [] in
@@ -53,7 +54,6 @@ let cmd_run =
 
 let cmd_exploit =
   let doc = "Explode.js single file symbolic confirmation" in
-  let sdocs = Manpage.s_common_options in
   let description = "Tries to blow stuff up" in
   let man = [ `S Manpage.s_description; `P description ] in
   let man_xrefs = [] in
@@ -63,6 +63,17 @@ let cmd_exploit =
   let info = Cmd.info "exploit" ~doc ~sdocs ~man ~man_xrefs in
   Cmd.v info Term.(const Cmd_exploit.main $ options)
 
+let cmd_full =
+  let doc = "Explode.js full analysis" in
+  let description = "Tries to blow stuff up" in
+  let man = [ `S Manpage.s_description; `P description ] in
+  let man_xrefs = [] in
+  let options =
+    Term.(const Cmd_full.options $ input $ workspace_dir $ time_limit)
+  in
+  let info = Cmd.info "full" ~doc ~sdocs ~man ~man_xrefs in
+  Cmd.v info Term.(const Cmd_full.main $ options)
+
 let main =
   let info = Cmd.info "explode-js" in
-  Cmd.group info [ cmd_run; cmd_exploit ]
+  Cmd.group info [ cmd_exploit; cmd_run; cmd_full ]

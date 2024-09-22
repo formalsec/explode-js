@@ -1,7 +1,7 @@
 (library
  (package explode_js)
  (name explode_js)
- (libraries dune-site))
+ (libraries bos dune-site))
 
 (generate_sites_module
   (module site)
