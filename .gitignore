@@ -3,3 +3,5 @@ _build/
 
 # Explode-js outputs
 **/explode-out/
+
+import.report
