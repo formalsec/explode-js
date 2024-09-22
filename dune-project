@@ -32,7 +32,9 @@
   yojson
   dune-site
   ecma-sl
-  instrumentation2)
+  instrumentation2
+  eio
+  eio_main)
  (tags
   ("symbolic execution" javascript exploit))
  (sites
@@ -43,11 +45,11 @@
  (synopsis "Instrumentation2")
  (description "Instrumentation2")
  (depends
-  ocaml
-  dune
-  (cmdliner (>= 1.2.0))
-  (yojson (>= 2.1.2))
+  (bisect_ppx (and :with-test (>= 2.5.0)))
   (bos (>= 0.2.1))
-  (bisect_ppx (and :with-test (>= 2.5.0))))
+  (cmdliner (>= 1.2.0))
+  dune
+  ocaml
+  (yojson (>= 2.1.2)))
  (tags
   (javascript nodejs exploit vulnerability)))

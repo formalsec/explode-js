@@ -20,6 +20,8 @@ depends: [
   "dune-site"
   "ecma-sl"
   "instrumentation2"
+  "eio"
+  "eio_main"
   "odoc" {with-doc}
 ]
 build: [
