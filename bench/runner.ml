@@ -1,6 +1,8 @@
-module Json = Yojson.Basic
+open Bos
 
-[@@@ocaml.warning "-69"]
+[@@@ocaml.warning "-32"]
+
+module Json = Yojson.Basic
 
 let ( let* ) = Result.bind
 
@@ -16,12 +18,12 @@ let list_bind_map f l =
   in
   list_bind_map_cps f l Fun.id
 
-type benchmarks =
-  { cwe22 : Fpath.t list
-  ; cwe78 : Fpath.t list
-  ; cwe94 : Fpath.t list
-  ; cwe471 : Fpath.t list
-  ; cwe1321 : Fpath.t list
+type 'a benchmarks =
+  { cwe22 : 'a
+  ; cwe78 : 'a
+  ; cwe94 : 'a
+  ; cwe471 : 'a
+  ; cwe1321 : 'a
   }
 
 let filename = Fpath.v "vulcan-22-78-94-471-1321-all.json"
@@ -30,24 +32,19 @@ let config =
   let filename = Fpath.to_string filename in
   Json.from_file ~fname:filename filename
 
+let pp_json fmt v = Json.pretty_print ~std:true fmt v
+
 let fpath = function
   | `String str -> Ok (Fpath.v str)
-  | x ->
-    Error
-      (Format.asprintf "Could not parse string from: %a"
-         (Json.pretty_print ~std:true)
-         x )
+  | x -> Error (`Msg (Fmt.str "Could not parse string from: %a" pp_json x))
 
 let list parser = function
   | `List l -> list_bind_map parser l
-  | x ->
-    Error
-      (Format.asprintf "Could not parse list from: %a"
-         (Json.pretty_print ~std:true)
-         x )
+  | x -> Error (`Msg (Fmt.str "Could not parse list from: %a" pp_json x))
 
-let set_prefix_path_for cwe p =
-  Fpath.(v "datasets" / "vulcan-dataset" / "_build" / "packages" / cwe // p)
+let vulcan_prefix = Fpath.(v "data" / "vulcan-dataset" / "_build" / "packages")
+
+let set_prefix_path_for cwe p = Fpath.(vulcan_prefix / cwe // p)
 
 let parsed_benchmarks =
   let* cwe22 = list fpath @@ Json.Util.member "packages/CWE-22" config in
@@ -68,49 +65,88 @@ let benchmarks =
 
 let started_at = Unix.localtime @@ Unix.gettimeofday ()
 
-let p_time fmt
-  ({ tm_year; tm_mon; tm_mday; tm_hour; tm_min; tm_sec; _ } : Unix.tm) =
-  Format.fprintf fmt "%04d%02d%02dT%02d%02d%02d" (tm_year + 1900) (tm_mon + 1)
-    tm_mday tm_hour tm_min tm_sec
-
 let pp_time fmt
   ({ tm_year; tm_mon; tm_mday; tm_hour; tm_min; tm_sec; _ } : Unix.tm) =
-  Format.fprintf fmt "%04d-%02d-%02dT%02d:%02d:%02d" (tm_year + 1900)
-    (tm_mon + 1) tm_mday tm_hour tm_min tm_sec
+  Fmt.pf fmt "%04d%02d%02dT%02d%02d%02d" (tm_year + 1900) (tm_mon + 1) tm_mday
+    tm_hour tm_min tm_sec
 
-let _ = [ p_time; pp_time ]
+let results_dir = Fpath.(v (Fmt.str "res-%a" pp_time started_at))
 
-let run_worker p =
-  Eio.traceln "Processing %a" Fpath.pp p;
-  Eio_unix.sleep 5.0
+let explode ~workspace_dir ~file =
+  Cmd.(v "explode-js" % "full" % "--workspace" % p workspace_dir % p file)
+
+let pp_status fmt = function
+  | `Exited n -> Fmt.pf fmt "Exited %a" Fmt.int n
+  | `Signaled n -> Fmt.pf fmt "Signaled %a" Fmt.int n
+
+(* FIXME: Maybe we could return the error instead of raising an exception? *)
+let run_worker benchmark =
+  let short_path =
+    match Fpath.rem_prefix vulcan_prefix benchmark with
+    | Some path -> path
+    | None -> assert false
+  in
+  let workspace_dir = Fpath.(results_dir // short_path) in
+  ( match OS.Dir.create ~path:true ~mode:0o777 workspace_dir with
+  | Ok _ -> ()
+  | Error (`Msg err) -> Fmt.failwith "%s" err );
+  let out = Fpath.(workspace_dir / "stdout") in
+  let err = OS.Cmd.err_file @@ Fpath.(workspace_dir / "stderr") in
+  let run_out = OS.Cmd.run_out ~err @@ explode ~workspace_dir ~file:benchmark in
+  let status =
+    match OS.Cmd.out_file out run_out with
+    | Ok ((), (_, status)) -> status
+    | Error (`Msg _err) -> Fmt.failwith "Could not write file: %a" Fpath.pp out
+  in
+  Eio.traceln "@[<v 2>Run %a@;%a@]" Fpath.pp workspace_dir pp_status status
+
+let map_run_worker sw pool l =
+  List.map
+    (fun elt ->
+      Eio.Executor_pool.submit_fork ~sw pool ~weight:1.0 (fun () ->
+          run_worker elt ) )
+    l
+
+let map_wait_worker l =
+  List.map
+    (fun promise ->
+      match Eio.Promise.await promise with
+      | Ok () -> ()
+      | Error exn -> Fmt.epr "uncaught exception: %s@." (Printexc.to_string exn)
+      )
+    l
 
 let results =
-  Format.printf "Started at %a@." pp_time started_at;
-  let* benchmarks in
+  Fmt.pr "Started at %a@." pp_time started_at;
+  let* { cwe22; cwe78; cwe94; cwe471; cwe1321 } = benchmarks in
+  let* _ = OS.Dir.create ~path:true ~mode:0o777 results_dir in
   Eio_main.run @@ fun env ->
   let domain_mgr = Eio.Stdenv.domain_mgr env in
   Eio.Switch.run @@ fun sw ->
-  let pool = Eio.Executor_pool.create ~sw ~domain_count:4 domain_mgr in
-  let promises =
-    List.map
-      (fun p ->
-        Eio.Executor_pool.submit_fork ~sw pool ~weight:1.0 (fun () ->
-            run_worker p ) )
-      benchmarks.cwe22
+  (* Domains - 1? *)
+  let domain_count = Domain.recommended_domain_count () - 1 in
+  let pool = Eio.Executor_pool.create ~sw ~domain_count domain_mgr in
+  let { cwe22; cwe78; cwe94; cwe471; cwe1321 } =
+    { cwe22 = map_run_worker sw pool cwe22
+    ; cwe78 = map_run_worker sw pool cwe78
+    ; cwe94 = map_run_worker sw pool cwe94
+    ; cwe471 = map_run_worker sw pool cwe471
+    ; cwe1321 = map_run_worker sw pool cwe1321
+    }
   in
   let results =
-    List.map
-      (fun promise ->
-        match Eio.Promise.await promise with
-        | Ok () -> ()
-        | Error _exn -> Format.eprintf "An exception was raised@." )
-      promises
+    { cwe22 = map_wait_worker cwe22
+    ; cwe78 = map_wait_worker cwe78
+    ; cwe94 = map_wait_worker cwe94
+    ; cwe471 = map_wait_worker cwe471
+    ; cwe1321 = map_wait_worker cwe1321
+    }
   in
   Ok results
 
 let () =
   match results with
   | Ok _ -> exit 0
-  | Error err ->
-    Format.eprintf "@[<v>unexpected error:@ %s@]@." err;
+  | Error (`Msg err) ->
+    Fmt.epr "@[<v>unexpected error:@ %s@]@." err;
     exit 1
