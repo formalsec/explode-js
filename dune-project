@@ -33,6 +33,7 @@
   eio_main
   explode_js-instrumentation
   fpath
+  mdx
   ocaml
   yojson)
  (tags
