@@ -20,6 +20,7 @@ depends: [
   "eio_main"
   "explode_js-instrumentation"
   "fpath"
+  "mdx"
   "ocaml"
   "yojson"
   "odoc" {with-doc}

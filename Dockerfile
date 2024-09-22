@@ -1,4 +1,4 @@
-ARG BASE_OS="ubuntu:22.04"
+ARG BASE_OS="ubuntu:23.04"
 FROM ${BASE_OS}
 
 ENV BASE=/home/explodejs
@@ -8,7 +8,7 @@ SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update && \
     apt-get install -y python3 python3-pip curl ca-certificates gnupg wget unzip libgmp-dev opam graphviz sudo && \
-    pip install --upgrade pip setuptools
+    pip install --break-system-packages --upgrade pip setuptools
 
 # Install Node.js
 RUN mkdir -p /etc/apt/keyrings \
@@ -47,9 +47,19 @@ WORKDIR /home/explodejs
 
 # Build graphjs and emca-sl
 COPY --chown=explodejs:explodejs . /home/explodejs/explode-js
-RUN cd "${BASE}/explode-js/vendor/graphjs" && sudo ./setup.sh
-RUN cd "${BASE}/explode-js/" && opam init --disable-sandboxing --shell-setup -y \
+
+RUN opam init --disable-sandboxing --shell-setup -y \
     && opam switch create -y ecma-sl 5.1.1 \
     && eval $(opam env --switch=ecma-sl) \
-    && echo "eval \$(opam env --switch=ecma-sl)" >> ~/.bash_profile \
-    && opam install -y vendor vendor/ECMA-SL .
+    && opam update \
+    && echo "eval \$(opam env --switch=ecma-sl)" >> ~/.bash_profile
+
+RUN cd "${BASE}/explode-js/vendor/graphjs" \
+    && sudo pip install --break-system-packages -r ./requirements.txt \
+    && cd ./parser && sudo npm install && tsc
+
+RUN cd "${BASE}/explode-js/" && eval $(opam env --switch=ecma-sl) \
+    && opam install -y ./vendor/ECMA-SL \
+    && opam install -y . --deps-only \
+    && dune build \
+    && dune install
