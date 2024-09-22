@@ -24,17 +24,17 @@
  (synopsis "Automatic exploit generation for Node.js")
  (description "Explode.js: Automatic exploit generation engine for Node.js applications")
  (depends
-  ocaml
-  dune
-  cmdliner
   bos
-  fpath
-  yojson
+  cmdliner
+  dune
   dune-site
   ecma-sl
-  instrumentation2
   eio
-  eio_main)
+  eio_main
+  explode_js-instrumentation
+  fpath
+  ocaml
+  yojson)
  (tags
   ("symbolic execution" javascript exploit))
  (sites
