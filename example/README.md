@@ -22,32 +22,64 @@ Explode.js will ask graph.js if it is able to identify the vulnerabilities
 in the function `f`. Graph.js, will output the following taint summary:
 
 ```sh
-$ cat taint_summary.json
+$ graphjs --with-types -f exec.js -o explode-out
+...
+$ cat explode-out/taint_summary.json
 [
-  {
-    "filename" : "./exec.js",
-    "vuln_type" : "command-injection",
-    "source" : "module.exports",
-    "sink" : "exec",
-    "sink_lineno" : 5,
-    "type" : "VFunExported",
-    "tainted_params" : [ "source" ],
-    "params_types" : {
-      "source" : "array"
+    {
+        "type": "VFunExported",
+        "filename": ...
+        "vuln_type": "command-injection",
+        "sink": "return exec(source.join(' '));",
+        "sink_lineno": 5,
+        "source": "module.exports",
+        "tainted_params": [
+            "source"
+        ],
+        "params_types": {
+            "source": {
+                "_union": [
+                    "array",
+                    "string"
+                ]
+            }
+        },
+        "call_paths": [
+            {
+                "type": "Call",
+                "fn_name": "119.f-o24",
+                "fn_id": "82",
+                "source_fn_id": "82"
+            }
+        ]
+    },
+    {
+        "type": "VFunExported",
+        "filename": ...
+        "vuln_type": "command-injection",
+        "sink": "return exec(source);",
+        "sink_lineno": 7,
+        "source": "module.exports",
+        "tainted_params": [
+            "source"
+        ],
+        "params_types": {
+            "source": {
+                "_union": [
+                    "array",
+                    "string"
+                ]
+            }
+        },
+        "call_paths": [
+            {
+                "type": "Call",
+                "fn_name": "119.f-o24",
+                "fn_id": "82",
+                "source_fn_id": "82"
+            }
+        ]
     }
-  },
-  {
-    "filename" : "./exec.js",
-    "vuln_type" : "command-injection",
-    "source" : "module.exports",
-    "sink" : "exec",
-    "sink_lineno" : 7,
-    "type" : "VFunExported",
-    "tainted_params" : [ "source" ],
-    "params_types" : {
-      "source" : "string"
-    }
-  }
 ]
 ```
 
@@ -59,9 +91,11 @@ vulnerability is related to the case where the `source` parameter is a string.
 To confirm the vulnerabilities, Explode.js will execute explode-js like this:
 
 ```sh
-$ explode-js run taint_summary.json
+$ explode-js run --filename exec.js explode-out/taint_summary.json
 Genrating explode-out/symbolic_test_0_0.js
+Genrating explode-out/symbolic_test_0_1.js
 Genrating explode-out/symbolic_test_1_0.js
+Genrating explode-out/symbolic_test_1_1.js
        exec : (`source0 : __$Str)
 Found 1 problems!
   replaying : explode-out/symbolic_test_0_0.js...
@@ -70,9 +104,21 @@ Genrating explode-out/symbolic_test_0_0/literal_0_0.js
      status : true (created file "success")
        exec : (`source : __$Str)
 Found 1 problems!
+  replaying : explode-out/symbolic_test_0_1.js...
+Genrating explode-out/symbolic_test_0_1/literal_0_1.js
+    running : explode-out/symbolic_test_0_1/test-suite/witness-1.json
+     status : true (created file "success")
+       exec : (`source0 : __$Str)
+Found 1 problems!
   replaying : explode-out/symbolic_test_1_0.js...
 Genrating explode-out/symbolic_test_1_0/literal_1_0.js
-    running : explode-out/symbolic_test_1_0/test-suite/witness-1.json
+    running : explode-out/symbolic_test_1_0/test-suite/witness-2.json
+     status : true (created file "success")
+       exec : (`source : __$Str)
+Found 1 problems!
+  replaying : explode-out/symbolic_test_1_1.js...
+Genrating explode-out/symbolic_test_1_1/literal_1_1.js
+    running : explode-out/symbolic_test_1_1/test-suite/witness-3.json
      status : true (created file "success")
 ```
 
@@ -89,6 +135,18 @@ Below we analyse the directory structure created by explode-js:
 ```sh
 $ tree explode-out
 explode-out
+├── graph
+│   ├── dependency_graph.txt
+│   ├── exec.js
+│   ├── graph_stats.json
+│   ├── graph.svg
+│   ├── nodes.csv
+│   └── rels.csv
+├── run
+│   ├── neo4j_import.txt
+│   ├── neo4j_start.txt
+│   ├── neo4j_stop.txt
+│   └── time_stats.txt
 ├── symbolic_test_0_0
 │   ├── confirmation.json
 │   ├── literal_0_0.js
@@ -97,16 +155,34 @@ explode-out
 │       ├── witness-0.json
 │       └── witness-0.smtml
 ├── symbolic_test_0_0.js
+├── symbolic_test_0_1
+│   ├── confirmation.json
+│   ├── literal_0_1.js
+│   ├── symbolic-execution.json
+│   └── test-suite
+│       ├── witness-1.json
+│       └── witness-1.smtml
+├── symbolic_test_0_1.js
 ├── symbolic_test_1_0
 │   ├── confirmation.json
 │   ├── literal_1_0.js
 │   ├── symbolic-execution.json
 │   └── test-suite
-│       ├── witness-1.json
-│       └── witness-1.smtml
-└── symbolic_test_1_0.js
+│       ├── witness-2.json
+│       └── witness-2.smtml
+├── symbolic_test_1_0.js
+├── symbolic_test_1_1
+│   ├── confirmation.json
+│   ├── literal_1_1.js
+│   ├── symbolic-execution.json
+│   └── test-suite
+│       ├── witness-3.json
+│       └── witness-3.smtml
+├── symbolic_test_1_1.js
+├── taint_summary_detection.json
+└── taint_summary.json
 
-5 directories, 12 files
+11 directories, 36 files
 ```
 
 The directory `explode-out` contains the symbolic tests and the directories
