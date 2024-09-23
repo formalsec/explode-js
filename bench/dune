@@ -1,3 +1,3 @@
 (executable
  (name runner)
- (libraries bos eio eio_main fpath unix yojson))
+ (libraries bos cmdliner eio eio_main fpath unix yojson))

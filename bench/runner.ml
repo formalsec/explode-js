@@ -39,10 +39,12 @@ let fpath = function
   | x -> Error (`Msg (Fmt.str "Could not parse string from: %a" pp_json x))
 
 let list parser = function
+  | `Null -> Ok []
   | `List l -> list_bind_map parser l
   | x -> Error (`Msg (Fmt.str "Could not parse list from: %a" pp_json x))
 
-let vulcan_prefix = Fpath.(v "datasets" / "vulcan-dataset" / "_build" / "packages")
+let vulcan_prefix =
+  Fpath.(v "datasets" / "vulcan-dataset" / "_build" / "packages")
 
 let set_prefix_path_for cwe p = Fpath.(vulcan_prefix / cwe // p)
 
@@ -72,15 +74,18 @@ let pp_time fmt
 
 let results_dir = Fpath.(v (Fmt.str "res-%a" pp_time started_at))
 
-let explode ~workspace_dir ~file =
-  Cmd.(v "explode-js" % "full" % "--workspace" % p workspace_dir % p file)
+let explode ~workspace_dir ~file time_limit =
+  let cmd0 = Cmd.(v "explode-js" % "full" % "--workspace" % p workspace_dir) in
+  match time_limit with
+  | None -> Cmd.(cmd0 % p file)
+  | Some timeout -> Cmd.(cmd0 % "--timeout" % string_of_int timeout % p file)
 
 let pp_status fmt = function
   | `Exited n -> Fmt.pf fmt "Exited %a" Fmt.int n
   | `Signaled n -> Fmt.pf fmt "Signaled %a" Fmt.int n
 
 (* FIXME: Maybe we could return the error instead of raising an exception? *)
-let run_worker benchmark =
+let run_worker timeout benchmark =
   let short_path =
     match Fpath.rem_prefix vulcan_prefix benchmark with
     | Some path -> path
@@ -92,7 +97,9 @@ let run_worker benchmark =
   | Error (`Msg err) -> Fmt.failwith "%s" err );
   let out = Fpath.(workspace_dir / "stdout") in
   let err = OS.Cmd.err_file @@ Fpath.(workspace_dir / "stderr") in
-  let run_out = OS.Cmd.run_out ~err @@ explode ~workspace_dir ~file:benchmark in
+  let run_out =
+    OS.Cmd.run_out ~err @@ explode ~workspace_dir ~file:benchmark timeout
+  in
   let status =
     match OS.Cmd.out_file out run_out with
     | Ok ((), (_, status)) -> status
@@ -100,11 +107,11 @@ let run_worker benchmark =
   in
   Eio.traceln "@[<v 2>Run %a@;%a@]" Fpath.pp workspace_dir pp_status status
 
-let map_run_worker sw pool l =
+let map_run_worker sw pool timeout l =
   List.map
     (fun elt ->
       Eio.Executor_pool.submit_fork ~sw pool ~weight:1.0 (fun () ->
-          run_worker elt ) )
+          run_worker timeout elt ) )
     l
 
 let map_wait_worker l =
@@ -116,22 +123,22 @@ let map_wait_worker l =
       )
     l
 
-let results =
+let main _jobs timeout =
   Fmt.pr "Started at %a@." pp_time started_at;
   let* { cwe22; cwe78; cwe94; cwe471; cwe1321 } = benchmarks in
   let* _ = OS.Dir.create ~path:true ~mode:0o777 results_dir in
   Eio_main.run @@ fun env ->
   let domain_mgr = Eio.Stdenv.domain_mgr env in
   Eio.Switch.run @@ fun sw ->
-  (* Domains - 1? *)
-  let domain_count = Domain.recommended_domain_count () - 1 in
+  (* Domain_count = 1 because graphjs can't be run in parallel *)
+  let domain_count = 1 in
   let pool = Eio.Executor_pool.create ~sw ~domain_count domain_mgr in
   let { cwe22; cwe78; cwe94; cwe471; cwe1321 } =
-    { cwe22 = map_run_worker sw pool cwe22
-    ; cwe78 = map_run_worker sw pool cwe78
-    ; cwe94 = map_run_worker sw pool cwe94
-    ; cwe471 = map_run_worker sw pool cwe471
-    ; cwe1321 = map_run_worker sw pool cwe1321
+    { cwe22 = map_run_worker sw pool timeout cwe22
+    ; cwe78 = map_run_worker sw pool timeout cwe78
+    ; cwe94 = map_run_worker sw pool timeout cwe94
+    ; cwe471 = map_run_worker sw pool timeout cwe471
+    ; cwe1321 = map_run_worker sw pool timeout cwe1321
     }
   in
   let results =
@@ -144,9 +151,26 @@ let results =
   in
   Ok results
 
+let cli =
+  let open Cmdliner in
+  let jobs =
+    let doc = "Number of threads to use (currently ignored)" in
+    Arg.(value & opt int 1 & info [ "jobs" ] ~doc)
+  in
+  let timeout =
+    let doc = "Time limit per benchmark run" in
+    Arg.(value & opt (some int) None & info [ "timeout" ] ~doc)
+  in
+  let doc = "Explode-js benchmark runner" in
+  let info = Cmd.info "runner" ~doc in
+  Cmd.v info Term.(const main $ jobs $ timeout)
+
 let () =
-  match results with
-  | Ok _ -> exit 0
-  | Error (`Msg err) ->
-    Fmt.epr "@[<v>unexpected error:@ %s@]@." err;
-    exit 1
+  match Cmdliner.Cmd.eval_value' cli with
+  | `Exit n -> exit n
+  | `Ok v -> (
+    match v with
+    | Ok _ -> exit 0
+    | Error (`Msg err) ->
+      Fmt.epr "@[<hov>unexpected error:@ %s@]@." err;
+      exit 1 )
