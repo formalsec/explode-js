@@ -42,7 +42,7 @@ let list parser = function
   | `List l -> list_bind_map parser l
   | x -> Error (`Msg (Fmt.str "Could not parse list from: %a" pp_json x))
 
-let vulcan_prefix = Fpath.(v "data" / "vulcan-dataset" / "_build" / "packages")
+let vulcan_prefix = Fpath.(v "datasets" / "vulcan-dataset" / "_build" / "packages")
 
 let set_prefix_path_for cwe p = Fpath.(vulcan_prefix / cwe // p)
 
