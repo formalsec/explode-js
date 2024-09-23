@@ -72,8 +72,6 @@ let pp_time fmt
   Fmt.pf fmt "%04d%02d%02dT%02d%02d%02d" (tm_year + 1900) (tm_mon + 1) tm_mday
     tm_hour tm_min tm_sec
 
-let results_dir = Fpath.(v (Fmt.str "res-%a" pp_time started_at))
-
 let explode ~workspace_dir ~file time_limit =
   let cmd0 = Cmd.(v "explode-js" % "full" % "--workspace" % p workspace_dir) in
   match time_limit with
@@ -85,13 +83,13 @@ let pp_status fmt = function
   | `Signaled n -> Fmt.pf fmt "Signaled %a" Fmt.int n
 
 (* FIXME: Maybe we could return the error instead of raising an exception? *)
-let run_worker timeout benchmark =
+let run_worker timeout output benchmark =
   let short_path =
     match Fpath.rem_prefix vulcan_prefix benchmark with
     | Some path -> path
     | None -> assert false
   in
-  let workspace_dir = Fpath.(results_dir // short_path) in
+  let workspace_dir = Fpath.(output // short_path) in
   ( match OS.Dir.create ~path:true ~mode:0o777 workspace_dir with
   | Ok _ -> ()
   | Error (`Msg err) -> Fmt.failwith "%s" err );
@@ -107,11 +105,11 @@ let run_worker timeout benchmark =
   in
   Eio.traceln "@[<v 2>Run %a@;%a@]" Fpath.pp workspace_dir pp_status status
 
-let map_run_worker sw pool timeout l =
+let map_run_worker sw pool timeout output l =
   List.map
     (fun elt ->
       Eio.Executor_pool.submit_fork ~sw pool ~weight:1.0 (fun () ->
-          run_worker timeout elt ) )
+          run_worker timeout output elt ) )
     l
 
 let map_wait_worker l =
@@ -123,10 +121,11 @@ let map_wait_worker l =
       )
     l
 
-let main _jobs timeout =
+let main _jobs timeout output =
   Fmt.pr "Started at %a@." pp_time started_at;
   let* { cwe22; cwe78; cwe94; cwe471; cwe1321 } = benchmarks in
-  let* _ = OS.Dir.create ~path:true ~mode:0o777 results_dir in
+  let output = Fpath.v @@ Fmt.str "%s-%a" output pp_time started_at in
+  let* _ = OS.Dir.create ~path:true ~mode:0o777 output in
   Eio_main.run @@ fun env ->
   let domain_mgr = Eio.Stdenv.domain_mgr env in
   Eio.Switch.run @@ fun sw ->
@@ -134,11 +133,11 @@ let main _jobs timeout =
   let domain_count = 1 in
   let pool = Eio.Executor_pool.create ~sw ~domain_count domain_mgr in
   let { cwe22; cwe78; cwe94; cwe471; cwe1321 } =
-    { cwe22 = map_run_worker sw pool timeout cwe22
-    ; cwe78 = map_run_worker sw pool timeout cwe78
-    ; cwe94 = map_run_worker sw pool timeout cwe94
-    ; cwe471 = map_run_worker sw pool timeout cwe471
-    ; cwe1321 = map_run_worker sw pool timeout cwe1321
+    { cwe22 = map_run_worker sw pool timeout output cwe22
+    ; cwe78 = map_run_worker sw pool timeout output cwe78
+    ; cwe94 = map_run_worker sw pool timeout output cwe94
+    ; cwe471 = map_run_worker sw pool timeout output cwe471
+    ; cwe1321 = map_run_worker sw pool timeout output cwe1321
     }
   in
   let results =
@@ -161,9 +160,13 @@ let cli =
     let doc = "Time limit per benchmark run" in
     Arg.(value & opt (some int) None & info [ "timeout" ] ~doc)
   in
+  let output =
+    let doc = "Output directory to store results" in
+    Arg.(value & opt string "res" & info [ "output" ] ~doc)
+  in
   let doc = "Explode-js benchmark runner" in
   let info = Cmd.info "runner" ~doc in
-  Cmd.v info Term.(const main $ jobs $ timeout)
+  Cmd.v info Term.(const main $ jobs $ timeout $ output)
 
 let () =
   match Cmdliner.Cmd.eval_value' cli with
