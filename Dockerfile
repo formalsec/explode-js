@@ -7,7 +7,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update && \
-    apt-get install -y python3 python3-pip curl ca-certificates gnupg wget unzip libgmp-dev opam graphviz sudo && \
+    apt-get install -y python3 python3-pip curl ca-certificates gnupg wget unzip libgmp-dev opam graphviz sudo vim && \
     pip install --break-system-packages --upgrade pip setuptools
 
 # Install Node.js
