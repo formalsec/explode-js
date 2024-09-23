@@ -3,7 +3,7 @@
 	url = git@github.com:formalsec/graphjs.git
 [submodule "vendor/ECMA-SL"]
 	path = vendor/ECMA-SL
-	url = git@github.com:formalsec/ECMA-SL.git
+	url = git@github.com:filipeom/ECMA-SL.git
 [submodule "bench/datasets"]
 	path = bench/datasets
 	url = https://github.com/formalsec/explode-js_datasets.git
