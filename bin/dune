@@ -5,6 +5,8 @@
  (libraries
   bos
   cmdliner
+  eio
+  eio_main
   ecma-sl
   explode_js
   explode_js-instrumentation
