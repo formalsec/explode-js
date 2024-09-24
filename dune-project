@@ -29,9 +29,8 @@
   dune
   dune-site
   ecma-sl
-  eio
-  eio_main
   explode_js-instrumentation
+  extunix
   fpath
   mdx
   ocaml
