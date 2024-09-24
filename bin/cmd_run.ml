@@ -5,7 +5,7 @@ type options =
   { config : Fpath.t
   ; filename : Fpath.t option
   ; workspace_dir : Fpath.t
-  ; time_limit : float
+  ; time_limit : float option
   }
 
 let options config filename workspace_dir time_limit =

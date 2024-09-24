@@ -4,69 +4,84 @@ open Ecma_sl.Syntax.Result
 type options =
   { filename : Fpath.t
   ; workspace_dir : Fpath.t
-  ; time_limit : float
+  ; time_limit : float option
   }
 
 let options filename workspace_dir time_limit =
   { filename; workspace_dir; time_limit }
 
-let full ~sw mgr filename workspace_dir =
-  let* _ = Bos.OS.Dir.create ~path:true ~mode:0o777 workspace_dir in
-  let graphjs_time_path = Fpath.(workspace_dir / "graphjs_time.txt") in
-  let explode_time_path = Fpath.(workspace_dir / "explode_time.txt") in
-  (* 1. Run graphjs *)
-  let graphjs_start = Unix.gettimeofday () in
+let run_with_timeout limit f =
+  let exception Sigchld in
+  let open Unix in
+  let did_timeout = ref false in
+  let pid = fork () in
+  if pid = 0 then begin
+    exit (f ())
+  end
+  else begin
+    ( try
+        Sys.set_signal Sys.sigchld (Signal_handle (fun _ -> raise Sigchld));
+        Unix.sleepf limit;
+        did_timeout := true;
+        Unix.kill pid Sys.sigkill;
+        Sys.set_signal Sys.sigchld Signal_default
+      with Sigchld -> () );
+    let chldpid, status = waitpid [] pid in
+    assert (chldpid = pid);
+    if !did_timeout then `Timeout
+    else
+      match status with
+      | WEXITED n -> `Ok n
+      | WSIGNALED _ | WSTOPPED _ -> `Timeout
+  end
 
-  let args = Graphjs.run ~file:filename ~output:workspace_dir in
-  let handle = Eio.Process.spawn ~sw mgr args in
-  let status = Eio.Process.await handle in
-  let graphjs_time = Unix.gettimeofday () -. graphjs_start in
-  let _ = Bos.OS.File.writef graphjs_time_path "%f@." graphjs_time in
-  let* () =
-    match status with
-    | `Exited 0 -> Ok ()
-    | `Exited n | `Signaled n ->
-      Error (`Msg (Fmt.str "Graphjs exited with non-zero code: %d" n))
+let full filename workspace_dir =
+  let res =
+    let graphjs_time_path = Fpath.(workspace_dir / "graphjs_time.txt") in
+    let explode_time_path = Fpath.(workspace_dir / "explode_time.txt") in
+    (* 1. Run graphjs *)
+    let graphjs_start = Unix.gettimeofday () in
+    let* status = Graphjs.run ~file:filename ~output:workspace_dir in
+    let graphjs_time = Unix.gettimeofday () -. graphjs_start in
+    let _ = Bos.OS.File.writef graphjs_time_path "%f@." graphjs_time in
+    let* () =
+      match status with
+      | `Exited 0 -> Ok ()
+      | `Exited n | `Signaled n ->
+        Error (`Msg (Fmt.str "Graphjs exited with non-zero code: %d" n))
+    in
+    let taint_summary = Fpath.(workspace_dir / "taint_summary.json") in
+    let* taint_summary_exists = Bos.OS.File.exists taint_summary in
+    if taint_summary_exists then
+      let options =
+        (* Runs symbolic execution tests for 30s each *)
+        Cmd_run.options taint_summary (Some filename) workspace_dir (Some 30.)
+      in
+      let explode_start = Unix.gettimeofday () in
+      let result = Cmd_run.main options in
+      let explode_time = Unix.gettimeofday () -. explode_start in
+      let _ = Bos.OS.File.writef explode_time_path "%f@." explode_time in
+      Ok result
+    else Ok 0
   in
-  let taint_summary = Fpath.(workspace_dir / "taint_summary.json") in
-  let* taint_summary_exists = Bos.OS.File.exists taint_summary in
-  Ok
-    ( if taint_summary_exists then
-        let options =
-          (* Runs symbolic execution tests for 30s each *)
-          Cmd_run.options taint_summary (Some filename) workspace_dir 30.
-        in
-        let explode_start = Unix.gettimeofday () in
-        let result = Cmd_run.main options in
-        let explode_time = Unix.gettimeofday () -. explode_start in
-        let _ = Bos.OS.File.writef explode_time_path "%f@." explode_time in
-        result
-      else 0 )
-
-exception Timeout
-
-let run_with_timelimit filename workspace_dir time_limit =
-  (* FIXME: Is this horrible? I can't tell *)
-  let open Eio in
-  Eio_main.run @@ fun env ->
-  let proc_mgr = Stdenv.process_mgr env in
-  Switch.run @@ fun sw ->
-  Fiber.fork_daemon ~sw (fun () ->
-      Eio_unix.sleep time_limit;
-      raise Timeout );
-  let promise =
-    Fiber.fork_promise ~sw (fun () -> full ~sw proc_mgr filename workspace_dir)
-  in
-  Fiber.yield ();
-  Promise.await promise
+  match res with
+  | Ok n -> n
+  | Error (`Msg err) ->
+    Logs.err (fun m -> m "unexpected error: %s" err);
+    1
 
 let run { filename; workspace_dir; time_limit } =
-  try
-    match run_with_timelimit filename workspace_dir time_limit with
-    | Ok res -> res
-    | Error exn -> Error (`Msg (Printexc.to_string exn))
-  with Timeout ->
-    Logs.warn (fun m -> m "Time limit reached for: %a" Fpath.pp filename);
+  let* _ = Bos.OS.Dir.create ~path:true ~mode:0o777 workspace_dir in
+  let work () = full filename workspace_dir in
+  let res =
+    match time_limit with
+    | None -> `Ok (work ())
+    | Some limit -> run_with_timeout limit work
+  in
+  match res with
+  | `Ok n -> Ok n
+  | `Timeout ->
+    Logs.warn (fun m -> m "time limit reached");
     Ok 0
 
 let main opt = match run opt with Ok n -> n | Error _err -> 1
