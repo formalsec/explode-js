@@ -30,7 +30,7 @@ let workspace_dir =
 
 let time_limit =
   let doc = "Maximum time limit for analysis" in
-  Arg.(value & opt float 0.0 & info [ "timeout" ] ~doc)
+  Arg.(value & opt (some float) None & info [ "timeout" ] ~doc)
 
 let sdocs = Manpage.s_common_options
 
