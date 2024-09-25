@@ -1,5 +1,4 @@
 open Bos
-
 module Json = Yojson.Basic
 
 let ( let* ) = Result.bind
@@ -72,6 +71,8 @@ let pp_time fmt
   Fmt.pf fmt "%04d%02d%02dT%02d%02d%02d" (tm_year + 1900) (tm_mon + 1) tm_mday
     tm_hour tm_min tm_sec
 
+let results_dir = Fpath.(v (Fmt.str "res-%a" pp_time started_at))
+
 let explode ~workspace_dir ~file time_limit =
   Cmd.(
     v "explode-js" % "full" % "--workspace" % p workspace_dir % "--timeout"
@@ -114,6 +115,7 @@ let dup2 src dst =
   Unix.dup2 file src
 
 let fork_work fmt timeout output benchmark =
+  let benchmark = Fpath.normalize benchmark in
   let short_path =
     match Fpath.rem_prefix vulcan_prefix benchmark with
     | Some path -> path
@@ -145,7 +147,7 @@ let map_fork_work fmt time_limit output l =
 
 let main _jobs timeout output =
   let* { cwe22; cwe78; cwe94; cwe471; cwe1321 } = benchmarks in
-  let output = Fpath.v @@ Fmt.str "%s-%a" output pp_time started_at in
+  let output = Fpath.(output // results_dir) in
   let* _ = OS.Dir.create ~path:true ~mode:0o777 output in
   Out_channel.with_open_text Fpath.(to_string (output / "results")) @@ fun oc ->
   let fmt = Some (Format.formatter_of_out_channel oc) in
@@ -162,6 +164,7 @@ let main _jobs timeout output =
 
 let cli =
   let open Cmdliner in
+  let fpath = ((fun str -> `Ok (Fpath.v str)), Fpath.pp) in
   let jobs =
     let doc = "Number of threads to use (currently ignored)" in
     Arg.(value & opt int 1 & info [ "jobs" ] ~doc)
@@ -172,7 +175,7 @@ let cli =
   in
   let output =
     let doc = "Output directory to store results" in
-    Arg.(value & opt string "res" & info [ "output" ] ~doc)
+    Arg.(value & opt fpath (Fpath.v ".") & info [ "output" ] ~doc)
   in
   let doc = "Explode-js benchmark runner" in
   let info = Cmd.info "runner" ~doc in
