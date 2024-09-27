@@ -34,7 +34,10 @@
   fpath
   mdx
   ocaml
-  yojson)
+  owl
+  owl-plplot
+  yojson
+  glob)
  (tags
   ("symbolic execution" javascript exploit))
  (sites

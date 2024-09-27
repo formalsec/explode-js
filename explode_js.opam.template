@@ -1,0 +1,3 @@
+pin-depends: [
+  ["glob.0.1" "git+https://github.com/filipeom/ocaml-glob.git#058add780af9f5fd072c6e00b6ca6301c2c38c52"]
+]
