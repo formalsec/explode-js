@@ -1,0 +1,11 @@
+(executable
+ (name fast_df)
+ (libraries owl glob))
+
+(executable
+ (name nodemedic_df)
+ (libraries owl glob))
+
+(executable
+ (name cdf)
+ (libraries owl owl-plplot))
