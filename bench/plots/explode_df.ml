@@ -2,6 +2,8 @@ let debug = false
 
 let debug k = if debug then k Format.eprintf
 
+let _ = debug
+
 let ( let* ) = Result.bind
 
 module File = struct
