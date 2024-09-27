@@ -1,16 +1,3 @@
-type marker =
-  [ `Timeout
-  | `Finished
-  | `Error
-  ]
-
-let pp_marker fmt = function
-  | `Timeout -> Format.pp_print_string fmt "Timeout"
-  | `Finished -> Format.pp_print_string fmt "Finished"
-  | `Error -> Format.pp_print_string fmt "Error"
-
-let str_mark = Format.asprintf "%a" pp_marker
-
 let debug = false
 
 let debug k = if debug then k Format.eprintf
@@ -28,14 +15,6 @@ module File = struct
         (`Msg (Format.asprintf "Could not find files with: %a" Fpath.pp pattern))
     | x :: _ -> Ok x
 end
-
-let parse_marker file : marker =
-  In_channel.with_open_text (Fpath.to_string file) @@ fun ic ->
-  let line = input_line ic in
-  if String.starts_with ~prefix:"timeout" line then `Timeout
-  else if String.starts_with ~prefix:"success" line then `Finished
-  else if String.starts_with ~prefix:"tool error" line then `Error
-  else assert false
 
 let parse_time =
   let pattern = Dune_re.Perl.re {|(real|user|sys)\s+(\d+)m([\d.]+)s|} in
@@ -67,12 +46,12 @@ let parse_results (ds, ms, rs, us, ss) dir =
     let results_dir = Fpath.to_string dir in
     assert (Sys.is_directory results_dir);
     let* marker_file = File.find Fpath.(dir / "**" / "finished.marker") in
-    let marker = parse_marker marker_file in
+    let marker = Marker.from_file marker_file in
     match marker with
     | `Timeout ->
       Ok
         ( results_dir :: ds
-        , str_mark marker :: ms
+        , Marker.to_string marker :: ms
         , 600. :: rs
         , 0. :: us
         , 0. :: ss )
@@ -84,7 +63,7 @@ let parse_results (ds, ms, rs, us, ss) dir =
       let stime = List.assoc "sys" times in
       Ok
         ( results_dir :: ds
-        , str_mark marker :: ms
+        , Marker.to_string marker :: ms
         , rtime :: rs
         , utime :: us
         , stime :: ss )

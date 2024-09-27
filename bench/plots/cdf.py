@@ -2,43 +2,91 @@ import sys
 import pandas as pd
 import matplotlib.pyplot as plt
 
-if len(sys.argv) < 2:
-    print(f"usage: {sys.argv[0]} /path/to/file.csv")
-    exit(1)
+# CSV files
+csv_fast = "fast-vulcan-secbench-results.csv"
+csv_nodemedic = "nodemedic-vulcan-secbench-results.csv"
+csv_explode = "explode-vulcan-results.csv"
 
-csv_file = sys.argv[1]
+# Upper bound of time to consider
+time_ub = 220
 
-df = pd.read_csv(csv_file)
-df = df.sort_values(by="rtime")
-n_rows = len(df)
-df = df[df['rtime'] < 300]
-df['cumulative_markers'] = [ (i / n_rows) * 100 for i in range(1, len(df) + 1)]
+# Parse data frames
+df_fast = pd.read_csv(csv_fast)
+df_fast = df_fast.sort_values(by="rtime")
+df_fast_rows = len(df_fast)
+df_fast = df_fast[df_fast['rtime'] < time_ub]
+df_fast['cumulative_markers'] = [ (i / df_fast_rows) * 100 for i in range(1, len(df_fast) + 1) ]
+
+df_nodemedic = pd.read_csv(csv_nodemedic)
+df_nodemedic = df_nodemedic.sort_values(by="rtime")
+df_nodemedic_rows = len(df_nodemedic)
+df_nodemedic = df_nodemedic[df_nodemedic['rtime'] < time_ub]
+df_nodemedic['cumulative_markers'] = [ (i / df_nodemedic_rows) * 100 for i in range(1, len(df_nodemedic) + 1) ]
+
+df_explode = pd.read_csv(csv_explode)
+df_explode = df_explode.sort_values(by="total_time")
+df_explode_rows = len(df_explode)
+df_explode = df_explode[df_explode['total_time'] < time_ub]
+df_explode['cumulative_markers'] = [ (i / df_explode_rows) * 100 for i in range(1, len(df_explode) + 1) ]
+
+# Plot configuration
+thickness_grid = 2.0
+thickness_plot = 5.0
+fontsize_ticks = 30
+fontsize_text = 36
 plt.figure(figsize=(14, 8))
-plt.step(df['rtime'], df['cumulative_markers'], where='post', label='FAST', linewidth=5.0)
-# Set the x and y axis to start at zero and remove margins
-plt.xlim(left=0)  # X-axis starts at 0
-plt.ylim(bottom=0)  # Y-axis starts at 0
-#plt.margins(x=0, y=0)  # Remove any margins around the plot
-plt.xlabel('Time (s)', fontsize=36)
-plt.ylabel('Percentage of finished files [%]', fontsize=30)
-plt.minorticks_on()
-plt.grid(True, which='major', linestyle='-', linewidth=2.0)
-# plt.grid(True, which='minor', linestyle=':', linewidth=2.0)
 
-# Remove the top and right frame (spines)
+# Plot fast
+plt.step(
+    df_fast['rtime'],
+    df_fast['cumulative_markers'],
+    where='post',
+    label='FAST',
+    linewidth=thickness_plot
+)
+
+# Plot nodemedic
+plt.step(
+    df_nodemedic['rtime'],
+    df_nodemedic['cumulative_markers'],
+    where='post',
+    label='NodeMedic',
+    linewidth=thickness_plot
+)
+
+plt.step(
+    df_explode['total_time'],
+    df_explode['cumulative_markers'],
+    where='post',
+    label='Explode.js',
+    linewidth=thickness_plot
+)
+
+plt.xlim(left=0)  # X-axis starts at 0
+plt.xticks(fontsize=fontsize_ticks)
+plt.xlabel('Time (s)', fontsize=fontsize_text)
+
+plt.ylim(bottom=0)  # Y-axis starts at 0
+plt.yticks(fontsize=fontsize_ticks)
+plt.ylabel('Percentage of finished files [%]', fontsize=fontsize_ticks)
+
+plt.minorticks_on()
+plt.grid(True, which='major', linestyle='-', linewidth=thickness_grid)
+
 ax = plt.gca()  # Get current axes
+
 ax.spines['top'].set_visible(False)
 ax.spines['right'].set_visible(False)
-ax.spines['bottom'].set_linewidth(2.0)
-ax.spines['left'].set_linewidth(2.0)
-ax.tick_params(axis='x', width=2.0)
-ax.tick_params(axis='y', width=2.0)
-ax.tick_params(axis='x', which='minor', width=2)
-ax.tick_params(axis='y', which='minor', width=2)
+ax.spines['bottom'].set_linewidth(thickness_grid)
+ax.spines['left'].set_linewidth(thickness_grid)
 
-plt.xticks(fontsize=30)
-plt.yticks(fontsize=30)
-plt.legend(loc='lower right', fontsize=36)
+ax.tick_params(axis='x', width=thickness_grid)
+ax.tick_params(axis='y', width=thickness_grid)
+ax.tick_params(axis='x', which='minor', width=thickness_grid)
+ax.tick_params(axis='y', which='minor', width=thickness_grid)
 
+# Put legend on
+plt.legend(loc='lower right', fontsize=fontsize_text)
+# Save fig
 plt.tight_layout()
 plt.savefig("cdf.pdf")

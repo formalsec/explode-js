@@ -7,5 +7,9 @@
  (libraries owl glob))
 
 (executable
+ (name explode_df)
+ (libraries owl glob))
+
+(executable
  (name cdf)
  (libraries owl owl-plplot))
