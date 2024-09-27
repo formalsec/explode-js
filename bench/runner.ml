@@ -78,6 +78,7 @@ let explode ~workspace_dir ~file time_limit =
     v "explode-js" % "full" % "--workspace" % p workspace_dir % "--timeout"
     % string_of_float time_limit % p file )
 
+(* TODO: use marker instead *)
 let pp_status fmt = function
   | `Timeout -> Fmt.pf fmt "Timeout"
   | `Exited n -> Fmt.pf fmt "Exited %a" Fmt.int n
