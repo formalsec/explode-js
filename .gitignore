@@ -1,8 +1,6 @@
-# OCaml
 _build/
+venv/
 
-# Explode-js outputs
-import.report
 res*/
+import.report
 explode-out/
-
