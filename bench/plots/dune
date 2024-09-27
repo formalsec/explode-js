@@ -11,5 +11,6 @@
  (libraries owl glob))
 
 (executable
+ (enabled_if false)
  (name cdf)
  (libraries owl owl-plplot))
