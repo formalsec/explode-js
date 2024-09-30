@@ -10,3 +10,6 @@
 [submodule "bench/code-vuln-runner"]
 	path = bench/code-vuln-runner
 	url = ssh://git@gitlab-syssec.dpss.inesc-id.pt:2222/mcoimbra/code-vuln-runner.git
+[submodule "bench/explodejs-datasets"]
+	path = bench/explodejs-datasets
+	url = ssh://git@gitlab-syssec.dpss.inesc-id.pt:2222/mafaldaferreira/explodejs-datasets.git
