@@ -1,20 +1,10 @@
+open Explode_js_bench
+
 let debug = false
 
 let debug k = if debug then k Format.eprintf
 
 let ( let* ) = Result.bind
-
-module File = struct
-  let find_all pattern = Glob.glob ~recursive:true pattern
-
-  let find pattern =
-    let* files = Glob.glob ~recursive:true pattern in
-    match files with
-    | [] ->
-      Error
-        (`Msg (Format.asprintf "Could not find files with: %a" Fpath.pp pattern))
-    | x :: _ -> Ok x
-end
 
 let parse_time =
   let pattern = Dune_re.Perl.re {|(real|user|sys)\s+(\d+)m([\d.]+)s|} in
