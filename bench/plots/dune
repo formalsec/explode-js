@@ -7,15 +7,15 @@
 
 (executable
  (name fast_df)
- (libraries owl glob explode_js.bench)
+ (libraries explode_js.bench owl )
  (modules fast_df))
 
 (executable
  (name nodemedic_df)
- (libraries owl glob explode_js.bench)
+ (libraries explode_js.bench owl yojson)
  (modules nodemedic_df))
 
 (executable
  (name explode_df)
- (libraries owl glob explode_js.bench)
+ (libraries explode_js.bench owl)
  (modules explode_df))

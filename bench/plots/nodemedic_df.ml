@@ -44,7 +44,38 @@ let parse_time =
     in
     loop []
 
-let parse_cwe _path = "CWE-XX"
+let parse_cwe =
+  let index =
+    let index_file = Fpath.(v "explodejs-datasets" / "index.json") in
+    Yojson.Basic.from_file Fpath.(to_string index_file)
+    |> Yojson.Basic.Util.to_list
+  in
+  let re =
+    Dune_re.(
+      compile
+      @@ Perl.re
+           {|([a-zA-Z0-9-]+)-(\d+\.\d+\.\d+(?:-[a-zA-Z0-9]+\.\d+)?(?:-[a-zA-Z0-9]+)?)|} )
+  in
+  fun path ->
+    let basename = Fpath.(basename (v path)) in
+    let package, _version =
+      let group = Dune_re.exec re basename in
+      (Dune_re.Group.get group 1, Dune_re.Group.get group 2)
+    in
+    let pkg =
+      List.find_opt
+        (fun json ->
+          String.equal
+            Yojson.Basic.Util.(to_string (member "package" json))
+            package )
+        index
+    in
+    Option.map
+      (fun pkg ->
+        let vulns = Yojson.Basic.Util.(to_list (member "vulns" pkg)) in
+        let vuln0 = List.hd vulns in
+        Yojson.Basic.Util.(to_string (member "cwe" vuln0)) )
+      pkg
 
 let parse_results series dir =
   let result =
@@ -52,7 +83,11 @@ let parse_results series dir =
     assert (Sys.is_directory results_dir);
     let* marker_file = File.find Fpath.(dir / "**" / "finished.marker") in
     let marker = Marker.from_file marker_file in
-    let cwe = parse_cwe @@ Fpath.to_string marker_file in
+    let cwe =
+      match parse_cwe @@ Fpath.to_string dir with
+      | Some cwe -> cwe
+      | None -> "CWE-XYZ"
+    in
     match marker with
     | Timeout ->
       series.benchmark <- results_dir :: series.benchmark;
