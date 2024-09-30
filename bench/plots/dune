@@ -1,16 +1,21 @@
+(library
+ (public_name explode_js.bench)
+ (name explode_js_bench)
+ (modules marker file)
+ (libraries glob fpath))
+
+
 (executable
  (name fast_df)
- (libraries owl glob))
+ (libraries owl glob explode_js.bench)
+ (modules fast_df))
 
 (executable
  (name nodemedic_df)
- (libraries owl glob))
+ (libraries owl glob explode_js.bench)
+ (modules nodemedic_df))
 
 (executable
  (name explode_df)
- (libraries owl glob))
-
-(executable
- (enabled_if false)
- (name cdf)
- (libraries owl owl-plplot))
+ (libraries owl glob explode_js.bench)
+ (modules explode_df))

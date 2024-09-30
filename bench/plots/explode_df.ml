@@ -4,20 +4,6 @@ let debug k = if debug then k Format.eprintf
 
 let _ = debug
 
-let ( let* ) = Result.bind
-
-module File = struct
-  let _find_all pattern = Glob.glob ~recursive:true pattern
-
-  let _find pattern =
-    let* files = Glob.glob ~recursive:true pattern in
-    match files with
-    | [] ->
-      Error
-        (`Msg (Format.asprintf "Could not find files with: %a" Fpath.pp pattern))
-    | x :: _ -> Ok x
-end
-
 let parse_line (bs, ms, sts, sys, ts) line =
   let line = String.trim line in
   match String.split_on_char ' ' line with
