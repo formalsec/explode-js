@@ -13,18 +13,47 @@ type series =
   ; mutable rtime : float list
   ; mutable utime : float list
   ; mutable stime : float list
+  ; mutable solv_time : float list
+  ; mutable detection : string list
+  ; mutable exploit : string list
   }
 
 let empty_series () =
-  { benchmark = []; cwe = []; marker = []; rtime = []; utime = []; stime = [] }
+  { benchmark = []
+  ; cwe = []
+  ; marker = []
+  ; rtime = []
+  ; utime = []
+  ; stime = []
+  ; solv_time = []
+  ; detection = []
+  ; exploit = []
+  }
 
 let header
-  { benchmark = _; cwe = _; marker = _; rtime = _; utime = _; stime = _ } =
-  [| "benchmark"; "cwe"; "marker"; "rtime"; "utime"; "stime" |]
+  { benchmark = _
+  ; cwe = _
+  ; marker = _
+  ; rtime = _
+  ; utime = _
+  ; stime = _
+  ; solv_time = _
+  ; detection = _
+  ; exploit = _
+  } =
+  [| "benchmark"
+   ; "cwe"
+   ; "marker"
+   ; "rtime"
+   ; "utime"
+   ; "stime"
+   ; "solv_time"
+   ; "detection"
+   ; "exploit"
+  |]
 
 let parse_time =
-  let pattern = Dune_re.Perl.re {|(real|user|sys)\s+(\d+)m([\d.]+)s|} in
-  let pattern = Dune_re.compile pattern in
+  let re = Dune_re.(compile @@ Perl.re {|(real|user|sys)\s+(\d+)m([\d.]+)s|}) in
   fun file ->
     In_channel.with_open_text (Fpath.to_string file) @@ fun ic ->
     let rec loop acc =
@@ -32,7 +61,7 @@ let parse_time =
       | None -> acc
       | Some line -> (
         debug (fun k -> k "parse_time: line: %s@." line);
-        let group = Dune_re.exec_opt pattern line in
+        let group = Dune_re.exec_opt re line in
         match group with
         | None ->
           debug (fun k -> k "parse_time: no match@.");
@@ -48,11 +77,33 @@ let parse_time =
     loop []
 
 let parse_cwe =
-  let pattern = Dune_re.(compile @@ Perl.re {|.*(CWE-\d+).*|}) in
+  let re = Dune_re.(compile @@ Perl.re {|.*(CWE-\d+).*|}) in
   fun path ->
-    match Dune_re.exec_opt pattern path with
+    match Dune_re.exec_opt re path with
     | None -> "CWE-XX"
     | Some group -> Dune_re.Group.get group 1
+
+let parse_answer =
+  let det_re = Dune_re.(compile @@ Perl.re {|Detection:\s+(\w+)|}) in
+  let exp_re = Dune_re.(compile @@ Perl.re {|Exploit:\s+(\w+)|}) in
+  fun file ->
+    In_channel.with_open_text Fpath.(to_string file) @@ fun ic ->
+    let contents = In_channel.input_all ic in
+    let detection = Dune_re.exec_opt det_re contents in
+    let detection = Option.map (fun g -> Dune_re.Group.get g 1) detection in
+    let exploit = Dune_re.exec_opt exp_re contents in
+    let exploit = Option.map (fun g -> Dune_re.Group.get g 1) exploit in
+    (detection, exploit)
+
+let parse_solv_time =
+  let re =
+    Dune_re.(compile @@ Perl.re {|"pass":\s+"3",\s+"time":\s+([0-9.]+)|})
+  in
+  fun file ->
+    In_channel.with_open_text Fpath.(to_string file) @@ fun ic ->
+    let contents = In_channel.input_all ic in
+    let solv_time = Dune_re.exec_opt re contents in
+    Option.map (fun g -> float_of_string @@ Dune_re.Group.get g 1) solv_time
 
 let parse_results series dir =
   let result =
@@ -67,10 +118,13 @@ let parse_results series dir =
       series.cwe <- cwe :: series.cwe;
       series.marker <- Marker.to_string marker :: series.marker;
       series.rtime <- 600.0 :: series.rtime;
-      series.utime <- 0.0 :: series.utime;
-      series.stime <- 0.0 :: series.stime;
+      series.utime <- Float.nan :: series.utime;
+      series.stime <- Float.nan :: series.stime;
+      series.solv_time <- Float.nan :: series.solv_time;
+      series.detection <- "failed" :: series.detection;
+      series.exploit <- "failed" :: series.exploit;
       Ok ()
-    | _ ->
+    | Exited 1 ->
       let* time_file = File.find Fpath.(dir / "**" / "time.txt") in
       let times = parse_time time_file in
       series.benchmark <- results_dir :: series.benchmark;
@@ -79,6 +133,27 @@ let parse_results series dir =
       series.rtime <- List.assoc "real" times :: series.rtime;
       series.utime <- List.assoc "user" times :: series.utime;
       series.stime <- List.assoc "sys" times :: series.stime;
+      series.solv_time <- Float.nan :: series.solv_time;
+      series.detection <- "failed" :: series.detection;
+      series.exploit <- "failed" :: series.exploit;
+      Ok ()
+    | _ ->
+      let* time_file = File.find Fpath.(dir / "**" / "time.txt") in
+      let times = parse_time time_file in
+      let* eval_ndjson = File.find Fpath.(dir / "**" / "evaluation.ndjson") in
+      let solv_time = parse_solv_time eval_ndjson in
+      let* log_file = File.find Fpath.(dir / "**" / "fast-stdout.log") in
+      let det, exp = parse_answer log_file in
+      series.benchmark <- results_dir :: series.benchmark;
+      series.cwe <- cwe :: series.cwe;
+      series.marker <- Marker.to_string marker :: series.marker;
+      series.rtime <- List.assoc "real" times :: series.rtime;
+      series.utime <- List.assoc "user" times :: series.utime;
+      series.stime <- List.assoc "sys" times :: series.stime;
+      series.solv_time <-
+        Option.value solv_time ~default:Float.nan :: series.solv_time;
+      series.detection <- Option.value det ~default:"failed" :: series.detection;
+      series.exploit <- Option.value exp ~default:"failed" :: series.exploit;
       Ok ()
   in
   match result with Ok res -> res | Error (`Msg err) -> failwith err
@@ -101,6 +176,9 @@ let main () =
          ; Dataframe.pack_float_series @@ Array.of_list series.rtime
          ; Dataframe.pack_float_series @@ Array.of_list series.utime
          ; Dataframe.pack_float_series @@ Array.of_list series.stime
+         ; Dataframe.pack_float_series @@ Array.of_list series.solv_time
+         ; Dataframe.pack_string_series @@ Array.of_list series.detection
+         ; Dataframe.pack_string_series @@ Array.of_list series.exploit
         |]
   in
   Format.printf "%a" Owl_pretty.pp_dataframe df;
