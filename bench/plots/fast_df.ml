@@ -6,6 +6,22 @@ let debug k = if debug then k Format.eprintf
 
 let ( let* ) = Result.bind
 
+type series =
+  { mutable benchmark : string list
+  ; mutable cwe : string list
+  ; mutable marker : string list
+  ; mutable rtime : float list
+  ; mutable utime : float list
+  ; mutable stime : float list
+  }
+
+let empty_series () =
+  { benchmark = []; cwe = []; marker = []; rtime = []; utime = []; stime = [] }
+
+let header
+  { benchmark = _; cwe = _; marker = _; rtime = _; utime = _; stime = _ } =
+  [| "benchmark"; "cwe"; "marker"; "rtime"; "utime"; "stime" |]
+
 let parse_time =
   let pattern = Dune_re.Perl.re {|(real|user|sys)\s+(\d+)m([\d.]+)s|} in
   let pattern = Dune_re.compile pattern in
@@ -31,32 +47,39 @@ let parse_time =
     in
     loop []
 
-let parse_results (ds, ms, rs, us, ss) dir =
+let parse_cwe =
+  let pattern = Dune_re.(compile @@ Perl.re {|.*(CWE-\d+).*|}) in
+  fun path ->
+    match Dune_re.exec_opt pattern path with
+    | None -> "CWE-XX"
+    | Some group -> Dune_re.Group.get group 1
+
+let parse_results series dir =
   let result =
     let results_dir = Fpath.to_string dir in
     assert (Sys.is_directory results_dir);
     let* marker_file = File.find Fpath.(dir / "**" / "finished.marker") in
     let marker = Marker.from_file marker_file in
+    let cwe = parse_cwe @@ Fpath.to_string marker_file in
     match marker with
-    | `Timeout ->
-      Ok
-        ( results_dir :: ds
-        , Marker.to_string marker :: ms
-        , 600. :: rs
-        , 0. :: us
-        , 0. :: ss )
+    | Timeout ->
+      series.benchmark <- results_dir :: series.benchmark;
+      series.cwe <- cwe :: series.cwe;
+      series.marker <- Marker.to_string marker :: series.marker;
+      series.rtime <- 600.0 :: series.rtime;
+      series.utime <- 0.0 :: series.utime;
+      series.stime <- 0.0 :: series.stime;
+      Ok ()
     | _ ->
       let* time_file = File.find Fpath.(dir / "**" / "time.txt") in
       let times = parse_time time_file in
-      let rtime = List.assoc "real" times in
-      let utime = List.assoc "user" times in
-      let stime = List.assoc "sys" times in
-      Ok
-        ( results_dir :: ds
-        , Marker.to_string marker :: ms
-        , rtime :: rs
-        , utime :: us
-        , stime :: ss )
+      series.benchmark <- results_dir :: series.benchmark;
+      series.cwe <- cwe :: series.cwe;
+      series.marker <- Marker.to_string marker :: series.marker;
+      series.rtime <- List.assoc "real" times :: series.rtime;
+      series.utime <- List.assoc "user" times :: series.utime;
+      series.stime <- List.assoc "sys" times :: series.stime;
+      Ok ()
   in
   match result with Ok res -> res | Error (`Msg err) -> failwith err
 
@@ -66,21 +89,18 @@ let main () =
   let* secbench =
     File.find_all Fpath.(v "results/secbench-fast-out/**/*_fast")
   in
-  let ds, ms, rs, us, ss =
-    List.fold_left parse_results ([], [], [], [], []) vulcan
-  in
-  let ds, ms, rs, us, ss =
-    List.fold_left parse_results (ds, ms, rs, us, ss) secbench
-  in
+  let series = empty_series () in
+  List.iter (parse_results series) vulcan;
+  List.iter (parse_results series) secbench;
   let df =
-    Dataframe.make
-      [| "benchmark"; "marker"; "rtime"; "utime"; "stime" |]
+    Dataframe.make (header series)
       ~data:
-        [| Dataframe.pack_string_series @@ Array.of_list ds
-         ; Dataframe.pack_string_series @@ Array.of_list ms
-         ; Dataframe.pack_float_series @@ Array.of_list rs
-         ; Dataframe.pack_float_series @@ Array.of_list us
-         ; Dataframe.pack_float_series @@ Array.of_list ss
+        [| Dataframe.pack_string_series @@ Array.of_list series.benchmark
+         ; Dataframe.pack_string_series @@ Array.of_list series.cwe
+         ; Dataframe.pack_string_series @@ Array.of_list series.marker
+         ; Dataframe.pack_float_series @@ Array.of_list series.rtime
+         ; Dataframe.pack_float_series @@ Array.of_list series.utime
+         ; Dataframe.pack_float_series @@ Array.of_list series.stime
         |]
   in
   Format.printf "%a" Owl_pretty.pp_dataframe df;

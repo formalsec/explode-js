@@ -1,41 +1,84 @@
+open Explode_js_bench
+
 let debug = false
 
 let debug k = if debug then k Format.eprintf
 
 let _ = debug
 
-let parse_line (bs, ms, sts, sys, ts) line =
+type series =
+  { mutable benchmark : string list
+  ; mutable cwe : string list
+  ; mutable marker : string list
+  ; mutable real_time : float list
+  ; mutable static_time : float list
+  ; mutable symb_time : float list
+  }
+
+let empty_series () =
+  { benchmark = []
+  ; cwe = []
+  ; marker = []
+  ; real_time = []
+  ; static_time = []
+  ; symb_time = []
+  }
+
+let header
+  { benchmark = _
+  ; cwe = _
+  ; marker = _
+  ; real_time = _
+  ; static_time = _
+  ; symb_time = _
+  } =
+  [| "benchmark"; "cwe"; "marker"; "real_time"; "static_time"; "symb_time" |]
+
+let parse_cwe =
+  let pattern = Dune_re.(compile @@ Perl.re {|.*(CWE-\d+).*|}) in
+  fun path ->
+    match Dune_re.exec_opt pattern path with
+    | None -> "CWE-XX"
+    | Some group -> Dune_re.Group.get group 1
+
+let parse_line series line =
   let line = String.trim line in
   match String.split_on_char ' ' line with
-  | [ "Run"; filename ] -> (filename :: bs, ms, sts, sys, ts)
-  | [ "Exited"; _code; _; total_time ] ->
-    ( bs
-    , "Finished" :: ms
-    , 0. :: sts
-    , 0. :: sys
-    , float_of_string total_time :: ts )
+  | [ "Run"; filename ] ->
+    series.benchmark <- filename :: series.benchmark;
+    series.cwe <- parse_cwe filename :: series.cwe
+  | [ "Exited"; code; _; total_time ] ->
+    series.marker <-
+      Marker.(to_string @@ exited @@ int_of_string code) :: series.marker;
+    series.real_time <- float_of_string total_time :: series.real_time;
+    series.static_time <- 0.0 :: series.static_time;
+    series.symb_time <- 0.0 :: series.symb_time
   | [ "Timeout"; _; total_time ] ->
-    (bs, "Timeout" :: ms, 0. :: sts, 0. :: sys, float_of_string total_time :: ts)
+    series.marker <- Marker.(to_string timeout) :: series.marker;
+    series.real_time <- float_of_string total_time :: series.real_time;
+    series.static_time <- 0.0 :: series.static_time;
+    series.symb_time <- 0.0 :: series.symb_time
   | _ -> Format.ksprintf failwith "could not parse line: %s" line
 
-let parse_results (bs, ms, sts, sys, ts) results_file =
+let parse_results series results_file =
   In_channel.with_open_text results_file @@ fun ic ->
   let lines = In_channel.input_lines ic in
-  List.fold_left parse_line (bs, ms, sts, sys, ts) (List.tl lines)
+  List.iter (parse_line series) (List.tl lines)
 
 let main () =
   let open Owl in
-  let vulcan = "results/res-20240925T135331/results" in
-  let bs, ms, sts, sys, ts = parse_results ([], [], [], [], []) vulcan in
+  let vulcan = "results/res-20240929T012449/results" in
+  let series = empty_series () in
+  parse_results series vulcan;
   let df =
-    Dataframe.make
-      [| "benchmark"; "marker"; "static_time"; "symbolic_time"; "total_time" |]
+    Dataframe.make (header series)
       ~data:
-        [| Dataframe.pack_string_series @@ Array.of_list bs
-         ; Dataframe.pack_string_series @@ Array.of_list ms
-         ; Dataframe.pack_float_series @@ Array.of_list sts
-         ; Dataframe.pack_float_series @@ Array.of_list sys
-         ; Dataframe.pack_float_series @@ Array.of_list ts
+        [| Dataframe.pack_string_series @@ Array.of_list series.benchmark
+         ; Dataframe.pack_string_series @@ Array.of_list series.cwe
+         ; Dataframe.pack_string_series @@ Array.of_list series.marker
+         ; Dataframe.pack_float_series @@ Array.of_list series.real_time
+         ; Dataframe.pack_float_series @@ Array.of_list series.static_time
+         ; Dataframe.pack_float_series @@ Array.of_list series.symb_time
         |]
   in
   Format.printf "%a" Owl_pretty.pp_dataframe df;
