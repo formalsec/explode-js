@@ -1,5 +1,1 @@
-(dirs plots)
-
-(executable
- (name runner)
- (libraries bos cmdliner extunix fpath unix yojson))
+(dirs plots runner2)
