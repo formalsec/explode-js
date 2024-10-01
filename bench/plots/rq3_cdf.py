@@ -12,21 +12,21 @@ time_ub = 124
 
 # Parse data frames
 df_fast = pd.read_csv(csv_fast)
-df_fast = df_fast.sort_values(by="rtime")
+df_fast = df_fast.sort_values(by="total_time")
 df_fast_rows = len(df_fast)
-df_fast = df_fast[df_fast['rtime'] <= time_ub]
+df_fast = df_fast[df_fast['total_time'] <= time_ub]
 df_fast['cumulative_markers'] = [ (i / df_fast_rows) * 100 for i in range(1, len(df_fast) + 1) ]
 
 df_nodemedic = pd.read_csv(csv_nodemedic)
-df_nodemedic = df_nodemedic.sort_values(by="rtime")
+df_nodemedic = df_nodemedic.sort_values(by="total_time")
 df_nodemedic_rows = len(df_nodemedic)
-df_nodemedic = df_nodemedic[df_nodemedic['rtime'] <= time_ub]
+df_nodemedic = df_nodemedic[df_nodemedic['total_time'] <= time_ub]
 df_nodemedic['cumulative_markers'] = [ (i / df_nodemedic_rows) * 100 for i in range(1, len(df_nodemedic) + 1) ]
 
 df_explode = pd.read_csv(csv_explode)
-df_explode = df_explode.sort_values(by="rtime")
+df_explode = df_explode.sort_values(by="total_time")
 df_explode_rows = len(df_explode)
-df_explode = df_explode[df_explode['rtime'] <= time_ub]
+df_explode = df_explode[df_explode['total_time'] <= time_ub]
 df_explode['cumulative_markers'] = [ (i / df_explode_rows) * 100 for i in range(1, len(df_explode) + 1) ]
 
 # Plot configuration
@@ -38,7 +38,7 @@ plt.figure(figsize=(14, 8))
 
 # Plot fast
 plt.step(
-    df_fast['rtime'],
+    df_fast['total_time'],
     df_fast['cumulative_markers'],
     where='post',
     label='FAST',
@@ -47,7 +47,7 @@ plt.step(
 
 # Plot nodemedic
 plt.step(
-    df_nodemedic['rtime'],
+    df_nodemedic['total_time'],
     df_nodemedic['cumulative_markers'],
     where='post',
     label='NodeMedic',
@@ -55,7 +55,7 @@ plt.step(
 )
 
 plt.step(
-    df_explode['rtime'],
+    df_explode['total_time'],
     df_explode['cumulative_markers'],
     where='post',
     label='Explode.js',

@@ -10,17 +10,17 @@ type series =
   { mutable benchmark : string list
   ; mutable cwe : string list
   ; mutable marker : string list
-  ; mutable rtime : float list
   ; mutable utime : float list
   ; mutable stime : float list
+  ; mutable total_time : float list
   }
 
 let empty_series () =
-  { benchmark = []; cwe = []; marker = []; rtime = []; utime = []; stime = [] }
+  { benchmark = []; cwe = []; marker = []; utime = []; stime = []; total_time = [] }
 
 let header
-  { benchmark = _; cwe = _; marker = _; rtime = _; utime = _; stime = _ } =
-  [| "benchmark"; "cwe"; "marker"; "rtime"; "utime"; "stime" |]
+  { benchmark = _; cwe = _; marker = _; utime = _; stime = _; total_time = _ } =
+  [| "benchmark"; "cwe"; "marker"; "utime"; "stime"; "total_time" |]
 
 let parse_time =
   let pattern = Dune_re.Perl.re {|([\d.]+)|} in
@@ -93,9 +93,9 @@ let parse_results series dir =
       series.benchmark <- results_dir :: series.benchmark;
       series.cwe <- cwe :: series.cwe;
       series.marker <- Marker.to_string marker :: series.marker;
-      series.rtime <- 600.0 :: series.rtime;
       series.utime <- 0.0 :: series.utime;
       series.stime <- 0.0 :: series.stime;
+      series.total_time <- 600.0 :: series.total_time;
       Ok ()
     | _ ->
       let* time_file =
@@ -105,9 +105,9 @@ let parse_results series dir =
       series.benchmark <- results_dir :: series.benchmark;
       series.cwe <- cwe :: series.cwe;
       series.marker <- Marker.to_string marker :: series.marker;
-      series.rtime <- List.assoc "real" times :: series.rtime;
       series.utime <- 0.0 :: series.utime;
       series.stime <- 0.0 :: series.stime;
+      series.total_time <- List.assoc "real" times :: series.total_time;
       Ok ()
   in
   match result with Ok res -> res | Error (`Msg err) -> failwith err
@@ -129,9 +129,9 @@ let main () =
         [| Dataframe.pack_string_series @@ Array.of_list series.benchmark
          ; Dataframe.pack_string_series @@ Array.of_list series.cwe
          ; Dataframe.pack_string_series @@ Array.of_list series.marker
-         ; Dataframe.pack_float_series @@ Array.of_list series.rtime
          ; Dataframe.pack_float_series @@ Array.of_list series.utime
          ; Dataframe.pack_float_series @@ Array.of_list series.stime
+         ; Dataframe.pack_float_series @@ Array.of_list series.total_time
         |]
   in
   Format.printf "%a" Owl_pretty.pp_dataframe df;

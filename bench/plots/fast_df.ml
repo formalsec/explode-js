@@ -10,10 +10,9 @@ type series =
   { mutable benchmark : string list
   ; mutable cwe : string list
   ; mutable marker : string list
-  ; mutable rtime : float list
-  ; mutable utime : float list
-  ; mutable stime : float list
-  ; mutable solv_time : float list
+  ; mutable path_time : float list
+  ; mutable expl_time : float list
+  ; mutable total_time : float list
   ; mutable detection : string list
   ; mutable exploit : string list
   }
@@ -22,10 +21,9 @@ let empty_series () =
   { benchmark = []
   ; cwe = []
   ; marker = []
-  ; rtime = []
-  ; utime = []
-  ; stime = []
-  ; solv_time = []
+  ; path_time = []
+  ; expl_time = []
+  ; total_time = []
   ; detection = []
   ; exploit = []
   }
@@ -34,20 +32,18 @@ let header
   { benchmark = _
   ; cwe = _
   ; marker = _
-  ; rtime = _
-  ; utime = _
-  ; stime = _
-  ; solv_time = _
+  ; path_time = _
+  ; expl_time = _
+  ; total_time = _
   ; detection = _
   ; exploit = _
   } =
   [| "benchmark"
    ; "cwe"
    ; "marker"
-   ; "rtime"
-   ; "utime"
-   ; "stime"
-   ; "solv_time"
+   ; "path_time"
+   ; "expl_time"
+   ; "total_time"
    ; "detection"
    ; "exploit"
   |]
@@ -117,10 +113,9 @@ let parse_results series dir =
       series.benchmark <- results_dir :: series.benchmark;
       series.cwe <- cwe :: series.cwe;
       series.marker <- Marker.to_string marker :: series.marker;
-      series.rtime <- 600.0 :: series.rtime;
-      series.utime <- Float.nan :: series.utime;
-      series.stime <- Float.nan :: series.stime;
-      series.solv_time <- Float.nan :: series.solv_time;
+      series.path_time <- Float.nan :: series.path_time;
+      series.expl_time <- Float.nan :: series.expl_time;
+      series.total_time <- 600.0 :: series.total_time;
       series.detection <- "failed" :: series.detection;
       series.exploit <- "failed" :: series.exploit;
       Ok ()
@@ -130,10 +125,9 @@ let parse_results series dir =
       series.benchmark <- results_dir :: series.benchmark;
       series.cwe <- cwe :: series.cwe;
       series.marker <- Marker.to_string marker :: series.marker;
-      series.rtime <- List.assoc "real" times :: series.rtime;
-      series.utime <- List.assoc "user" times :: series.utime;
-      series.stime <- List.assoc "sys" times :: series.stime;
-      series.solv_time <- Float.nan :: series.solv_time;
+      series.path_time <- Float.nan :: series.path_time;
+      series.expl_time <- Float.nan :: series.expl_time;
+      series.total_time <- List.assoc "real" times :: series.total_time;
       series.detection <- "failed" :: series.detection;
       series.exploit <- "failed" :: series.exploit;
       Ok ()
@@ -147,11 +141,12 @@ let parse_results series dir =
       series.benchmark <- results_dir :: series.benchmark;
       series.cwe <- cwe :: series.cwe;
       series.marker <- Marker.to_string marker :: series.marker;
-      series.rtime <- List.assoc "real" times :: series.rtime;
-      series.utime <- List.assoc "user" times :: series.utime;
-      series.stime <- List.assoc "sys" times :: series.stime;
-      series.solv_time <-
-        Option.value solv_time ~default:Float.nan :: series.solv_time;
+      let total_time = List.assoc "real" times in
+      let expl_time = Option.value solv_time ~default:0. in
+      let path_time = total_time -. expl_time in
+      series.path_time <- path_time :: series.path_time;
+      series.expl_time <- expl_time :: series.expl_time;
+      series.total_time <- total_time :: series.total_time;
       series.detection <- Option.value det ~default:"failed" :: series.detection;
       series.exploit <- Option.value exp ~default:"failed" :: series.exploit;
       Ok ()
@@ -173,10 +168,9 @@ let main () =
         [| Dataframe.pack_string_series @@ Array.of_list series.benchmark
          ; Dataframe.pack_string_series @@ Array.of_list series.cwe
          ; Dataframe.pack_string_series @@ Array.of_list series.marker
-         ; Dataframe.pack_float_series @@ Array.of_list series.rtime
-         ; Dataframe.pack_float_series @@ Array.of_list series.utime
-         ; Dataframe.pack_float_series @@ Array.of_list series.stime
-         ; Dataframe.pack_float_series @@ Array.of_list series.solv_time
+         ; Dataframe.pack_float_series @@ Array.of_list series.path_time
+         ; Dataframe.pack_float_series @@ Array.of_list series.expl_time
+         ; Dataframe.pack_float_series @@ Array.of_list series.total_time
          ; Dataframe.pack_string_series @@ Array.of_list series.detection
          ; Dataframe.pack_string_series @@ Array.of_list series.exploit
         |]
