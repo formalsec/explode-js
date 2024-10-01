@@ -7,7 +7,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update && \
-    apt-get install -y python3 python3-pip curl ca-certificates gnupg wget unzip libgmp-dev opam graphviz sudo vim && \
+    apt-get install -y wget curl git unzip python3 python3-pip ca-certificates gnupg libgmp-dev graphviz sudo neovim && \
+    echo "/usr/local/bin" | bash -c "sh <(curl -fsSL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)" && \
     pip install --break-system-packages --upgrade pip setuptools
 
 # Install Node.js
@@ -49,7 +50,7 @@ WORKDIR /home/explodejs
 COPY --chown=explodejs:explodejs . /home/explodejs/explode-js
 
 RUN opam init --disable-sandboxing --shell-setup -y \
-    && opam switch create -y ecma-sl 5.1.1 \
+    && opam switch create -y ecma-sl 5.2.0 \
     && eval $(opam env --switch=ecma-sl) \
     && opam update \
     && echo "eval \$(opam env --switch=ecma-sl)" >> ~/.bash_profile
@@ -59,7 +60,8 @@ RUN cd "${BASE}/explode-js/vendor/graphjs" \
     && cd ./parser && sudo npm install && tsc
 
 RUN cd "${BASE}/explode-js/" && eval $(opam env --switch=ecma-sl) \
-    && opam install -y ./vendor/ECMA-SL \
-    && opam install -y . --deps-only \
+    && sudo apt update \
+    && opam install -y ./vendor/ECMA-SL --confirm-level=unsafe-yes \
+    && opam install -y . --deps-only --confirm-level=unsafe-yes \
     && dune build \
     && dune install

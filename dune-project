@@ -34,8 +34,7 @@
   fpath
   mdx
   ocaml
-  owl
-  owl-plplot
+  (owl (>= 1.1))
   yojson
   glob)
  (tags
