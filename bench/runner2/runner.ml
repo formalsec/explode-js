@@ -4,11 +4,13 @@ open Explode_js_bench
 
 let log fmt k = match fmt with None -> () | Some fmt -> k (Fmt.pf fmt)
 
-let filename = Fpath.(v "explode-js_datasets" / "index.json")
+let datasets_dir = Fpath.v "explodejs-datasets"
+
+let filename = Fpath.(datasets_dir / "index.json")
 
 let benchmarks =
   let benchmarks = Index.from_file (Fpath.to_string filename) in
-  List.map (Fpath.append (Fpath.v "explode-js_datasets")) benchmarks
+  List.map (Fpath.append datasets_dir) benchmarks
 
 let started_at = Unix.localtime @@ Unix.gettimeofday ()
 

@@ -25,5 +25,6 @@ let from_file filename =
   List.concat_map
     (fun pkg ->
       let vulns = Json.Util.(to_list @@ member "vulns" pkg) in
-      List.map fpath_exn vulns )
+      List.map (fun vuln -> fpath_exn @@ Json.Util.member "filename" vuln) vulns
+      )
     (Json.Util.to_list json_index)
