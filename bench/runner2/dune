@@ -1,3 +1,4 @@
 (executable
  (name runner)
- (libraries bos cmdliner extunix fpath unix yojson))
+ (libraries bos cmdliner extunix fpath unix yojson explode_js.bench)
+ (modules index runner syntax))
