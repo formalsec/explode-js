@@ -4,3 +4,6 @@ venv/
 res*/
 import.report
 explode-out/
+
+# Ignore graph pdf outputs
+*.pdf
