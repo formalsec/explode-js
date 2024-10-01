@@ -10,7 +10,7 @@ type series =
   { mutable benchmark : string list
   ; mutable cwe : string list
   ; mutable marker : string list
-  ; mutable real_time : float list
+  ; mutable rtime : float list
   ; mutable static_time : float list
   ; mutable symb_time : float list
   }
@@ -19,7 +19,7 @@ let empty_series () =
   { benchmark = []
   ; cwe = []
   ; marker = []
-  ; real_time = []
+  ; rtime = []
   ; static_time = []
   ; symb_time = []
   }
@@ -28,11 +28,11 @@ let header
   { benchmark = _
   ; cwe = _
   ; marker = _
-  ; real_time = _
+  ; rtime = _
   ; static_time = _
   ; symb_time = _
   } =
-  [| "benchmark"; "cwe"; "marker"; "real_time"; "static_time"; "symb_time" |]
+  [| "benchmark"; "cwe"; "marker"; "rtime"; "static_time"; "symb_time" |]
 
 let parse_cwe =
   let pattern = Dune_re.(compile @@ Perl.re {|.*(CWE-\d+).*|}) in
@@ -50,12 +50,12 @@ let parse_line series line =
   | [ "Exited"; code; _; total_time ] ->
     series.marker <-
       Marker.(to_string @@ exited @@ int_of_string code) :: series.marker;
-    series.real_time <- float_of_string total_time :: series.real_time;
+    series.rtime <- float_of_string total_time :: series.rtime;
     series.static_time <- 0.0 :: series.static_time;
     series.symb_time <- 0.0 :: series.symb_time
   | [ "Timeout"; _; total_time ] ->
     series.marker <- Marker.(to_string timeout) :: series.marker;
-    series.real_time <- float_of_string total_time :: series.real_time;
+    series.rtime <- float_of_string total_time :: series.rtime;
     series.static_time <- 0.0 :: series.static_time;
     series.symb_time <- 0.0 :: series.symb_time
   | _ -> Format.ksprintf failwith "could not parse line: %s" line
@@ -76,7 +76,7 @@ let main () =
         [| Dataframe.pack_string_series @@ Array.of_list series.benchmark
          ; Dataframe.pack_string_series @@ Array.of_list series.cwe
          ; Dataframe.pack_string_series @@ Array.of_list series.marker
-         ; Dataframe.pack_float_series @@ Array.of_list series.real_time
+         ; Dataframe.pack_float_series @@ Array.of_list series.rtime
          ; Dataframe.pack_float_series @@ Array.of_list series.static_time
          ; Dataframe.pack_float_series @@ Array.of_list series.symb_time
         |]
