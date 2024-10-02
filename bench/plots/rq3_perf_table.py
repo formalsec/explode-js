@@ -8,7 +8,7 @@ from texttable import Texttable
 def load_data(filename):
     return pd.read_csv(filename)
 
-# FIXME: these functions were a quick yank-paste. Ask chatgpt if this can be improved.
+# TODO: these functions were a quick yank-paste. Ask chatgpt if this can be improved.
 def fast(df):
     df = df[df['marker'] != "Timeout"]
     # Ensure total_time is treated as a float (it might be a string initially)
@@ -60,11 +60,21 @@ def nodemedic(df):
     # Ensure total_time is treated as a float (it might be a string initially)
     df['total_time'] = pd.to_numeric(df['total_time'], errors='coerce')
 
+    avg_fuzz_time_df = df.groupby('cwe')['fuzz_time'].mean().reset_index()
+    avg_fuzz_time_df = avg_fuzz_time_df.sort_values(by='cwe')
+    total_avg_fuzz_time = df['fuzz_time'].mean()
+
+    avg_expl_time_df = df.groupby('cwe')['expl_time'].mean().reset_index()
+    avg_expl_time_df = avg_expl_time_df.sort_values(by='cwe')
+    total_avg_expl_time = df['expl_time'].mean()
+
     avg_total_time_df = df.groupby('cwe')['total_time'].mean().reset_index()
     avg_total_time_df = avg_total_time_df.sort_values(by='cwe')
     total_avg_total_time = df['total_time'].mean()
 
     return {
+        "fuzz_time" : (avg_fuzz_time_df, total_avg_fuzz_time),
+        "expl_time" : (avg_expl_time_df, total_avg_expl_time),
         "total_time" : (avg_total_time_df, total_avg_total_time)
     }
 
@@ -113,21 +123,48 @@ fast_total_cwe_94 = avg_total_fast_df[avg_total_fast_df['cwe'] == 'CWE-94']['tot
 fast_total_cwe_471 = avg_total_fast_df[avg_total_fast_df['cwe'] == 'CWE-471']['total_time'].values[0]
 
 avg_nodemedic = nodemedic(load_data("nodemedic-vulcan-secbench-results.csv"))
-avg_nodemedic_df, nodemedic_total_avg_time = avg_nodemedic["total_time"]
+avg_fuzz_nodemedic_df, nodemedic_total_fuzz_avg_time = avg_nodemedic["fuzz_time"]
+avg_expl_nodemedic_df, nodemedic_total_expl_avg_time = avg_nodemedic["expl_time"]
+avg_total_nodemedic_df, nodemedic_total_avg_time = avg_nodemedic["total_time"]
 
-nodemedic_cwe_22 = avg_nodemedic_df[avg_nodemedic_df['cwe'] == 'CWE-22']['total_time'].values[0]
-nodemedic_cwe_78 = avg_nodemedic_df[avg_nodemedic_df['cwe'] == 'CWE-78']['total_time'].values[0]
-nodemedic_cwe_94 = avg_nodemedic_df[avg_nodemedic_df['cwe'] == 'CWE-94']['total_time'].values[0]
-nodemedic_cwe_471 = avg_nodemedic_df[avg_nodemedic_df['cwe'] == 'CWE-471']['total_time'].values[0]
+nodemedic_fuzz_cwe_22 = avg_fuzz_nodemedic_df[avg_fuzz_nodemedic_df['cwe'] == 'CWE-22']['fuzz_time'].values[0]
+nodemedic_fuzz_cwe_78 = avg_fuzz_nodemedic_df[avg_fuzz_nodemedic_df['cwe'] == 'CWE-78']['fuzz_time'].values[0]
+nodemedic_fuzz_cwe_94 = avg_fuzz_nodemedic_df[avg_fuzz_nodemedic_df['cwe'] == 'CWE-94']['fuzz_time'].values[0]
+nodemedic_fuzz_cwe_471 = avg_fuzz_nodemedic_df[avg_fuzz_nodemedic_df['cwe'] == 'CWE-471']['fuzz_time'].values[0]
+
+nodemedic_expl_cwe_22 = avg_expl_nodemedic_df[avg_expl_nodemedic_df['cwe'] == 'CWE-22']['expl_time'].values[0]
+nodemedic_expl_cwe_78 = avg_expl_nodemedic_df[avg_expl_nodemedic_df['cwe'] == 'CWE-78']['expl_time'].values[0]
+nodemedic_expl_cwe_94 = avg_expl_nodemedic_df[avg_expl_nodemedic_df['cwe'] == 'CWE-94']['expl_time'].values[0]
+nodemedic_expl_cwe_471 = avg_expl_nodemedic_df[avg_expl_nodemedic_df['cwe'] == 'CWE-471']['expl_time'].values[0]
+
+nodemedic_total_cwe_22 = avg_total_nodemedic_df[avg_total_nodemedic_df['cwe'] == 'CWE-22']['total_time'].values[0]
+nodemedic_total_cwe_78 = avg_total_nodemedic_df[avg_total_nodemedic_df['cwe'] == 'CWE-78']['total_time'].values[0]
+nodemedic_total_cwe_94 = avg_total_nodemedic_df[avg_total_nodemedic_df['cwe'] == 'CWE-94']['total_time'].values[0]
+nodemedic_total_cwe_471 = avg_total_nodemedic_df[avg_total_nodemedic_df['cwe'] == 'CWE-471']['total_time'].values[0]
 
 table_str = Texttable()
-table_str.set_cols_align(["c"] + ["r"] * 3 + ["r"] * 3 + ["r"])
+table_str.set_cols_align(["c"] + ["r"] * 9)
 table_str.add_rows([
-    ["CWE"    , "Static"                     , "Symbolic"                 , "Total"               , "Path Gen.", "Expl. Gen.", "FAST", "NodeMedic"],
-    ["CWE-22" , explode_static_cwe_22        , explode_symb_cwe_22        , explode_total_cwe_22  , fast_path_cwe_22, fast_expl_cwe_22, fast_total_cwe_22 , str(nodemedic_cwe_22)],
-    ["CWE-78" , explode_static_cwe_78        , explode_symb_cwe_78        , explode_total_cwe_78  , fast_path_cwe_78, fast_expl_cwe_78, fast_total_cwe_78, str(nodemedic_cwe_78)],
-    ["CWE-94" , explode_static_cwe_94        , explode_symb_cwe_94        , explode_total_cwe_94  , fast_path_cwe_94, fast_expl_cwe_94, fast_total_cwe_94 , str(nodemedic_cwe_94)],
-    ["CWE-471", explode_static_cwe_471       , explode_symb_cwe_471       , explode_total_cwe_471 , fast_path_cwe_471, fast_expl_cwe_471, fast_total_cwe_471, str(nodemedic_cwe_471)],
-    ["Total"  , explode_total_static_avg_time, explode_total_symb_avg_time, explode_total_avg_time, fast_total_path_avg_time, fast_total_expl_avg_time, fast_total_avg_time, str(nodemedic_total_avg_time)]
+    ["CWE"    , "Static"                     , "Symbolic"                 , "Total"               , "Path Gen.", "Expl. Gen.", "FAST", "Fuzz", "Exp. Synth", "NodeMedic"],
+    ["CWE-22" , explode_static_cwe_22        , explode_symb_cwe_22        , explode_total_cwe_22  ,
+                fast_path_cwe_22             , fast_expl_cwe_22           , fast_total_cwe_22     ,
+                nodemedic_fuzz_cwe_22        , nodemedic_expl_cwe_22      , nodemedic_total_cwe_22
+    ],
+    ["CWE-78" , explode_static_cwe_78        , explode_symb_cwe_78        , explode_total_cwe_78  ,
+                fast_path_cwe_78             , fast_expl_cwe_78           , fast_total_cwe_78     ,
+                nodemedic_fuzz_cwe_78        , nodemedic_expl_cwe_78      , nodemedic_total_cwe_78
+    ],
+    ["CWE-94" , explode_static_cwe_94        , explode_symb_cwe_94        , explode_total_cwe_94  ,
+                fast_path_cwe_94             , fast_expl_cwe_94           , fast_total_cwe_94     ,
+                nodemedic_fuzz_cwe_94        , nodemedic_expl_cwe_94      , nodemedic_total_cwe_94
+    ],
+    ["CWE-471", explode_static_cwe_471       , explode_symb_cwe_471       , explode_total_cwe_471 ,
+                fast_path_cwe_471            , fast_expl_cwe_471          , fast_total_cwe_471,
+                nodemedic_fuzz_cwe_471       , nodemedic_expl_cwe_471     , nodemedic_total_cwe_471
+    ],
+    ["Total"  , explode_total_static_avg_time, explode_total_symb_avg_time, explode_total_avg_time,
+                fast_total_path_avg_time     , fast_total_expl_avg_time   , fast_total_avg_time   ,
+                nodemedic_total_fuzz_avg_time, nodemedic_total_expl_avg_time, nodemedic_total_avg_time
+     ]
 ])
 print(latextable.draw_latex(table_str))
