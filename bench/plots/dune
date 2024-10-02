@@ -17,5 +17,5 @@
 
 (executable
  (name explode_df)
- (libraries explode_js.bench owl)
+ (libraries explode_js.bench owl yojson)
  (modules explode_df))

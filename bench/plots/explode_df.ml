@@ -1,4 +1,5 @@
 open Explode_js_bench
+module Json = Yojson.Basic
 
 let debug = false
 
@@ -13,6 +14,7 @@ type series =
   ; mutable static_time : float list
   ; mutable symb_time : float list
   ; mutable total_time : float list
+  ; mutable exploit : string list
   }
 
 let empty_series () =
@@ -22,6 +24,7 @@ let empty_series () =
   ; static_time = []
   ; symb_time = []
   ; total_time = []
+  ; exploit = []
   }
 
 let header
@@ -31,8 +34,16 @@ let header
   ; static_time = _
   ; symb_time = _
   ; total_time = _
+  ; exploit = _
   } =
-  [| "benchmark"; "cwe"; "marker"; "static_time"; "symb_time"; "total_time" |]
+  [| "benchmark"
+   ; "cwe"
+   ; "marker"
+   ; "static_time"
+   ; "symb_time"
+   ; "total_time"
+   ; "exploit"
+  |]
 
 let parse_cwe =
   let pattern = Dune_re.(compile @@ Perl.re {|.*(CWE-\d+).*|}) in
@@ -58,6 +69,26 @@ let parse_times file =
   let symbolic_time = Fpath.(rel_path / "explode_time.txt") in
   (parse_time static_time, parse_time symbolic_time)
 
+let parse_report file =
+  let _file = Fpath.to_string file in
+  (* let report = Json.from_file file in *)
+  (* let problems = Json.Util.member "problems" report in *)
+  (* match problems with `List [] -> false | `List _ -> true | _ -> false *)
+  true
+
+let parse_result file =
+  let file = Fpath.v file in
+  let rel_path = Option.get @@ Fpath.rem_prefix (Fpath.v "/bench/") file in
+  let reports =
+    File.find_all Fpath.(rel_path / "**" / "symbolic-execution.json")
+  in
+  match reports with
+  | Error _ -> assert false
+  | Ok reports -> (
+    match List.find_opt parse_report reports with
+    | None -> "false"
+    | Some _ -> "true" )
+
 let parse_line series line =
   let line = String.trim line in
   match String.split_on_char ' ' line with
@@ -67,15 +98,19 @@ let parse_line series line =
   | [ "Exited"; code; _; total_time ] ->
     series.marker <-
       Marker.(to_string @@ exited @@ int_of_string code) :: series.marker;
-    let static_time, symbolic_time = parse_times @@ List.hd series.benchmark in
+    let file = List.hd series.benchmark in
+    let static_time, symbolic_time = parse_times file in
     series.static_time <- static_time :: series.static_time;
     series.symb_time <- symbolic_time :: series.symb_time;
-    series.total_time <- float_of_string total_time :: series.total_time
+    series.total_time <- float_of_string total_time :: series.total_time;
+    let exploit = parse_result file in
+    series.exploit <- exploit :: series.exploit
   | [ "Timeout"; _; total_time ] ->
     series.marker <- Marker.(to_string timeout) :: series.marker;
     series.static_time <- 0.0 :: series.static_time;
     series.symb_time <- 0.0 :: series.symb_time;
-    series.total_time <- float_of_string total_time :: series.total_time
+    series.total_time <- float_of_string total_time :: series.total_time;
+    series.exploit <- "false" :: series.exploit
   | _ -> Format.ksprintf failwith "could not parse line: %s" line
 
 let parse_results series results_file =
@@ -97,6 +132,7 @@ let main () =
          ; Dataframe.pack_float_series @@ Array.of_list series.static_time
          ; Dataframe.pack_float_series @@ Array.of_list series.symb_time
          ; Dataframe.pack_float_series @@ Array.of_list series.total_time
+         ; Dataframe.pack_string_series @@ Array.of_list series.exploit
         |]
   in
   Format.printf "%a" Owl_pretty.pp_dataframe df;
