@@ -1,4 +1,5 @@
 open Explode_js_bench
+module Json = Yojson.Basic
 
 let debug = false
 
@@ -10,19 +11,41 @@ type series =
   { mutable benchmark : string list
   ; mutable cwe : string list
   ; mutable marker : string list
-  ; mutable utime : float list
-  ; mutable stime : float list
+  ; mutable fuzz_time : float list
+  ; mutable expl_time : float list
   ; mutable total_time : float list
+  ; mutable exploit : string list
   }
 
 let empty_series () =
-  { benchmark = []; cwe = []; marker = []; utime = []; stime = []; total_time = [] }
+  { benchmark = []
+  ; cwe = []
+  ; marker = []
+  ; fuzz_time = []
+  ; expl_time = []
+  ; total_time = []
+  ; exploit = []
+  }
 
 let header
-  { benchmark = _; cwe = _; marker = _; utime = _; stime = _; total_time = _ } =
-  [| "benchmark"; "cwe"; "marker"; "utime"; "stime"; "total_time" |]
+  { benchmark = _
+  ; cwe = _
+  ; marker = _
+  ; fuzz_time = _
+  ; expl_time = _
+  ; total_time = _
+  ; exploit = _
+  } =
+  [| "benchmark"
+   ; "cwe"
+   ; "marker"
+   ; "fuzz_time"
+   ; "expl_time"
+   ; "total_time"
+   ; "exploit"
+  |]
 
-let parse_time =
+let parse_run_times =
   let pattern = Dune_re.Perl.re {|([\d.]+)|} in
   let pattern = Dune_re.compile pattern in
   fun file ->
@@ -44,6 +67,7 @@ let parse_time =
     in
     loop []
 
+(* What *)
 let parse_cwe =
   let index =
     let index_file = Fpath.(v "explodejs-datasets" / "index.json") in
@@ -77,6 +101,33 @@ let parse_cwe =
         Yojson.Basic.Util.(to_string (member "cwe" vuln0)) )
       pkg
 
+let task_time_or_zero = function
+  | `Null -> 0.
+  | json -> Json.Util.(to_number @@ member "time" json)
+
+let parse_results file =
+  let file = Fpath.to_string file in
+  let json = Json.from_file ~fname:file file in
+  let results = Json.Util.(to_list @@ member "rows" json) in
+  assert (List.length results = 1);
+  let results = List.hd results in
+  let task_results = Json.Util.member "taskResults" results in
+  let fuzz_time =
+    Json.Util.member "runInstrumented" task_results |> task_time_or_zero
+  in
+  let expl0 =
+    Json.Util.member "trivialExploit" task_results |> task_time_or_zero
+  in
+  let expl1 =
+    Json.Util.member "checkExploit" task_results |> task_time_or_zero
+  in
+  let expl2 = Json.Util.member "smt" task_results |> task_time_or_zero in
+  let has_exploit =
+    let exploit_results = Json.Util.member "sinksHit" results in
+    match exploit_results with `List _ -> "true" | _ -> "false"
+  in
+  (fuzz_time /. 1000., (expl0 +. expl1 +. expl2) /. 1000., has_exploit)
+
 let parse_results series dir =
   let result =
     let results_dir = Fpath.to_string dir in
@@ -93,21 +144,25 @@ let parse_results series dir =
       series.benchmark <- results_dir :: series.benchmark;
       series.cwe <- cwe :: series.cwe;
       series.marker <- Marker.to_string marker :: series.marker;
-      series.utime <- 0.0 :: series.utime;
-      series.stime <- 0.0 :: series.stime;
+      series.fuzz_time <- Float.nan :: series.fuzz_time;
+      series.expl_time <- Float.nan :: series.expl_time;
       series.total_time <- 600.0 :: series.total_time;
+      series.exploit <- "false" :: series.exploit;
       Ok ()
     | _ ->
       let* time_file =
         File.find Fpath.(dir / "**" / "NodeMedic-docker-duration-seconds.txt")
       in
-      let times = parse_time time_file in
+      let results_file = Fpath.(dir / "results.json") in
+      let run_times = parse_run_times time_file in
+      let fuzz_time, expl_time, has_exploit = parse_results results_file in
       series.benchmark <- results_dir :: series.benchmark;
       series.cwe <- cwe :: series.cwe;
       series.marker <- Marker.to_string marker :: series.marker;
-      series.utime <- 0.0 :: series.utime;
-      series.stime <- 0.0 :: series.stime;
-      series.total_time <- List.assoc "real" times :: series.total_time;
+      series.fuzz_time <- fuzz_time :: series.fuzz_time;
+      series.expl_time <- expl_time :: series.expl_time;
+      series.total_time <- List.assoc "real" run_times :: series.total_time;
+      series.exploit <- has_exploit :: series.exploit;
       Ok ()
   in
   match result with Ok res -> res | Error (`Msg err) -> failwith err
@@ -129,9 +184,10 @@ let main () =
         [| Dataframe.pack_string_series @@ Array.of_list series.benchmark
          ; Dataframe.pack_string_series @@ Array.of_list series.cwe
          ; Dataframe.pack_string_series @@ Array.of_list series.marker
-         ; Dataframe.pack_float_series @@ Array.of_list series.utime
-         ; Dataframe.pack_float_series @@ Array.of_list series.stime
+         ; Dataframe.pack_float_series @@ Array.of_list series.fuzz_time
+         ; Dataframe.pack_float_series @@ Array.of_list series.expl_time
          ; Dataframe.pack_float_series @@ Array.of_list series.total_time
+         ; Dataframe.pack_string_series @@ Array.of_list series.exploit
         |]
   in
   Format.printf "%a" Owl_pretty.pp_dataframe df;
