@@ -89,4 +89,4 @@ ax.tick_params(axis='y', which='minor', width=thickness_grid)
 plt.legend(loc='lower right', fontsize=fontsize_text)
 # Save fig
 plt.tight_layout()
-plt.savefig("cdf.pdf")
+plt.savefig("rq3_cdf_finish.pdf")
