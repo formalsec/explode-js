@@ -155,9 +155,9 @@ let parse_results series dir =
 
 let main () =
   let open Owl in
-  let* vulcan = File.find_all Fpath.(v "results/vulcan-fast-out/**/*_fast") in
+  let* vulcan = File.find_all Fpath.(v "results/fast/vulcan-dataset/**/*_fast") in
   let* secbench =
-    File.find_all Fpath.(v "results/secbench-fast-out/**/*_fast")
+    File.find_all Fpath.(v "results/fast/secbench-dataset/**/*_fast")
   in
   let series = empty_series () in
   List.iter (parse_results series) vulcan;
