@@ -1,4 +1,9 @@
+import json
 import pandas as pd
+
+def load_json(filename):
+    with open(filename, 'r') as fd:
+        return json.load(fd)
 
 def load_data(filename):
     return pd.read_csv(filename)
