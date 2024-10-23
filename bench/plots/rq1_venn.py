@@ -1,57 +1,112 @@
+import os
 import re
 import utils
 
-import pandas as pd
 import matplotlib.pyplot as plt
-from matplotlib_venn import venn2
+from matplotlib_venn import venn3, venn2
+
+index = utils.load_json("explodejs-datasets/index.json")
+index_by_file = {}
+for pkg in index:
+    name_version = pkg["package"] + "_" + pkg["version"]
+    for vuln in pkg["vulns"]:
+        filename = vuln["filename"]
+        short_filename = "/".join(filename.split("/")[:3])
+        index_by_file[short_filename] = name_version
 
 nm_re = r"([a-zA-Z0-9-]+)-(\d+\.\d+\.\d+(?:-[a-zA-Z]+\.\d+)?)"
 
 def normalize_nm(path):
-    print(path)
     match = re.search(nm_re, path)
     if match:
         return match.group(1) + "_" + match.group(2)
     # Should be unreachable
     assert(False)
 
-fast_re = r"([a-zA-Z0-9-]+)_(\d+\.\d+\.\d+(?:-[a-zA-Z]+\.\d+)?)"
-
 def normalize_fast(path):
-    print(path)
-    match = re.search(fast_re, path)
-    if match:
-        return match.group(1) + "_" + match.group(2)
-    # Should be unreachable
-    # assert(False)
-    return path
+    path = os.path.splitext(path)[0] + ".js"
+    split_path = path.split("/")
+    path = "/".join(split_path[2:5])
+    return index_by_file[path]
+
+def normalize_explode(path):
+    try:
+        return index_by_file[path]
+    except:
+        print(path)
+        return path
 
 df_fast = utils.load_data("fast-vulcan-secbench-results.csv")
 df_nodemedic = utils.load_data("nodemedic-vulcan-secbench-results.csv")
+df_explode = utils.load_data("explode-vulcan-secbench-results.csv")
 
-df_nodemedic_cwe_78 = df_nodemedic[(df_nodemedic['cwe'] == 'CWE-78') & (df_nodemedic['exploit'] == True)]
+df_fast_cwe_22 = df_fast[(df_fast['cwe'] == 'CWE-22') & (df_fast['exploit'] == 'successful')]
+df_explode_cwe_22 = df_explode[(df_explode['cwe'] == 'CWE-22') & (df_explode['control_path'] == 'true')]
+
 df_fast_cwe_78 = df_fast[(df_fast['cwe'] == 'CWE-78') & (df_fast['exploit'] == 'successful')]
+df_nodemedic_cwe_78 = df_nodemedic[(df_nodemedic['cwe'] == 'CWE-78') & (df_nodemedic['exploit'] == True)]
+df_explode_cwe_78 = df_explode[(df_explode['cwe'] == 'CWE-78') & (df_explode['control_path'] == 'true')]
 
-df_nodemedic_cwe_94 = df_nodemedic[(df_nodemedic['cwe'] == 'CWE-94') & (df_nodemedic['exploit'] == True)]
 df_fast_cwe_94 = df_fast[(df_fast['cwe'] == 'CWE-94') & (df_fast['exploit'] == 'successful')]
+df_nodemedic_cwe_94 = df_nodemedic[(df_nodemedic['cwe'] == 'CWE-94') & (df_nodemedic['exploit'] == True)]
+df_explode_cwe_94 = df_explode[(df_explode['cwe'] == 'CWE-94') & (df_explode['control_path'] == 'true')]
+
+df_fast_cwe_471 = df_fast[(df_fast['cwe'] == 'CWE-471') & (df_fast['exploit'] == 'successful')]
+df_explode_cwe_471 = df_explode[(df_explode['cwe'] == 'CWE-471') & (df_explode['control_path'] == 'true')]
 
 # Extract benchmark names for Venn diagram
-nodemedic_cwe_78 = set(map(normalize_nm, df_nodemedic_cwe_78['benchmark']))
+fast_cwe_22 = set(map(normalize_fast, df_fast_cwe_22['benchmark']))
+explode_cwe_22 = set(map(normalize_explode, df_explode_cwe_22['benchmark']))
+
 fast_cwe_78 = set(map(normalize_fast, df_fast_cwe_78['benchmark']))
+nodemedic_cwe_78 = set(map(normalize_nm, df_nodemedic_cwe_78['benchmark']))
+explode_cwe_78 = set(map(normalize_explode, df_explode_cwe_78['benchmark']))
 
-nodemedic_cwe_94 = set(map(normalize_nm, df_nodemedic_cwe_94['benchmark']))
 fast_cwe_94 = set(map(normalize_fast, df_fast_cwe_94['benchmark']))
+nodemedic_cwe_94 = set(map(normalize_nm, df_nodemedic_cwe_94['benchmark']))
+explode_cwe_94 = set(map(normalize_explode, df_explode_cwe_94['benchmark']))
 
-plt.figure(figsize=(12, 6))
+fast_cwe_471 = set(map(normalize_fast, df_fast_cwe_471['benchmark']))
+explode_cwe_471 = set(map(normalize_explode, df_explode_cwe_471['benchmark']))
 
-plt.subplot(1, 2, 1)
-venn = venn2([nodemedic_cwe_78, fast_cwe_78], set_labels=('NodeMedic', 'FAST'))
-plt.title("CWE-78")
+plt.figure(figsize=(12, 4))
 
-plt.subplot(1, 2, 2)
-venn = venn2([nodemedic_cwe_94, fast_cwe_94], set_labels=('NodeMedic', 'FAST'))
-plt.title("CWE-94")
+plt.subplot(1, 4, 1)
+cwe22 = venn2(
+        [fast_cwe_22, explode_cwe_22],
+        set_labels=('', ''),
+        set_colors=('firebrick', 'orange')
+)
+plt.title("CWE-22", fontsize=14)
 
-plt.figlegend(['Detected by NodeMedic', 'Detected by Fast', 'Detected by Both'], loc='lower center', ncol=3)
-plt.tight_layout()#rect=[0, 0, 1, 0.95])  # Make space for the legend
+plt.subplot(1, 4, 2)
+cwe78 = venn3(
+        [nodemedic_cwe_78, fast_cwe_78, explode_cwe_78],
+        set_labels=('', '', ''),
+        set_colors=('cadetblue', 'firebrick', 'orange'),
+)
+plt.title("CWE-78", fontsize=14)
+
+plt.subplot(1, 4, 3)
+cwe94 = venn3(
+        [nodemedic_cwe_94, fast_cwe_94, explode_cwe_94],
+        set_labels=('', '', ''),
+        set_colors=('cadetblue', 'firebrick', 'orange'),
+)
+plt.title("CWE-94", fontsize=14)
+
+plt.subplot(1, 4, 4)
+cwe1312 = venn2(
+        [fast_cwe_471, explode_cwe_471],
+        set_labels=('', ''),
+        set_colors=('firebrick', 'orange')
+)
+plt.title("CWE-1321", fontsize=14)
+
+for text in cwe22.subset_labels + cwe78.subset_labels + cwe94.subset_labels + cwe1312.subset_labels:
+    if text:
+        text.set_fontsize(12)
+
+plt.figlegend(['Detected by NodeMedic', 'Detected by Explode-js', 'Detected by FAST'], loc='lower center', ncol=3, fontsize=16)
+plt.tight_layout(pad=5.0)#pad=1.0, rect=[0, 0.05, 1, 0.95])
 plt.savefig("rq1_venn.pdf")
