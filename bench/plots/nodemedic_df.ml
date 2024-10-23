@@ -170,10 +170,10 @@ let parse_results series dir =
 let main () =
   let open Owl in
   let* vulcan =
-    File.find_all Fpath.(v "results/vulcan-nodemedic-out/**/*_NodeMedic")
+    File.find_all Fpath.(v "results/nodemedic/vulcan-dataset/**/*_NodeMedic")
   in
   let* secbench =
-    File.find_all Fpath.(v "results/secbench-nodemedic-out/**/*_NodeMedic")
+    File.find_all Fpath.(v "results/nodemedic/secbench-dataset/**/*_NodeMedic")
   in
   let series = empty_series () in
   List.iter (parse_results series) vulcan;
