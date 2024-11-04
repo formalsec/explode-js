@@ -69,44 +69,63 @@ explode_cwe_94 = set(map(normalize_explode, df_explode_cwe_94['benchmark']))
 fast_cwe_471 = set(map(normalize_fast, df_fast_cwe_471['benchmark']))
 explode_cwe_471 = set(map(normalize_explode, df_explode_cwe_471['benchmark']))
 
+fontsize_title = 14
+width_edge = 1.5
+color_fast = '#BAE1FF'
+color_explode = '#FF5733'
+color_nodemedic = '#3357FF'
+color_edge = '#000000'
+
 plt.figure(figsize=(12, 4))
 
-plt.subplot(1, 4, 1)
+plt.subplot(1, 3, 1)
 cwe22 = venn2(
         [fast_cwe_22, explode_cwe_22],
         set_labels=('', ''),
-        set_colors=('firebrick', 'orange')
+        set_colors=(color_fast, color_explode)
 )
-plt.title("CWE-22", fontsize=14)
+plt.title("CWE-22", fontsize=fontsize_title)
+for subset in ('10', '01', '11'):
+    if cwe22.get_patch_by_id(subset):
+        cwe22.get_patch_by_id(subset).set_edgecolor(color_edge)
+        cwe22.get_patch_by_id(subset).set_linewidth(width_edge)
 
-plt.subplot(1, 4, 2)
+plt.subplot(1, 3, 2)
 cwe78 = venn3(
         [nodemedic_cwe_78, fast_cwe_78, explode_cwe_78],
         set_labels=('', '', ''),
-        set_colors=('cadetblue', 'firebrick', 'orange'),
+        set_colors=(color_nodemedic, color_fast, color_explode),
 )
-plt.title("CWE-78", fontsize=14)
+plt.title("CWE-78", fontsize=fontsize_title)
+for subset in ('100', '010', '001', '110', '101', '011', '111'):
+    if cwe78.get_patch_by_id(subset):
+        cwe78.get_patch_by_id(subset).set_edgecolor(color_edge)
+        cwe78.get_patch_by_id(subset).set_linewidth(width_edge)
 
-plt.subplot(1, 4, 3)
+plt.subplot(1, 3, 3)
 cwe94 = venn3(
         [nodemedic_cwe_94, fast_cwe_94, explode_cwe_94],
         set_labels=('', '', ''),
-        set_colors=('cadetblue', 'firebrick', 'orange'),
+        set_colors=(color_nodemedic, color_fast, color_explode),
 )
-plt.title("CWE-94", fontsize=14)
+plt.title("CWE-94", fontsize=fontsize_title)
+for subset in ('100', '010', '001', '110', '101', '011', '111'):
+    if cwe94.get_patch_by_id(subset):
+        cwe94.get_patch_by_id(subset).set_edgecolor(color_edge)
+        cwe94.get_patch_by_id(subset).set_linewidth(width_edge)
 
-plt.subplot(1, 4, 4)
-cwe1312 = venn2(
-        [fast_cwe_471, explode_cwe_471],
-        set_labels=('', ''),
-        set_colors=('firebrick', 'orange')
-)
-plt.title("CWE-1321", fontsize=14)
+# plt.subplot(1, 4, 4)
+# cwe1312 = venn2(
+#         [fast_cwe_471, explode_cwe_471],
+#         set_labels=('', ''),
+#         set_colors=('firebrick', 'orange')
+# )
+# plt.title("CWE-1321", fontsize=14)
 
-for text in cwe22.subset_labels + cwe78.subset_labels + cwe94.subset_labels + cwe1312.subset_labels:
+for text in cwe22.subset_labels + cwe78.subset_labels + cwe94.subset_labels:
     if text:
         text.set_fontsize(12)
 
-plt.figlegend(['Detected by NodeMedic', 'Detected by Explode-js', 'Detected by FAST'], loc='lower center', ncol=3, fontsize=16)
+plt.figlegend(['Detected by FAST', 'Detected by Explode-js', 'Detected by NodeMedic'], loc='lower center', ncol=3, fontsize=16)
 plt.tight_layout(pad=5.0)#pad=1.0, rect=[0, 0.05, 1, 0.95])
 plt.savefig("rq1_venn.pdf")
