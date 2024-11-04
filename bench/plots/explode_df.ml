@@ -118,11 +118,10 @@ let parse_results series results_file =
   let lines = In_channel.input_lines ic in
   List.iter (parse_line series) (List.tl lines)
 
-let main () =
+let main results_file output_file =
   let open Owl in
-  let vulcan = "results/res-20240929T012449/results" in
   let series = empty_series () in
-  parse_results series vulcan;
+  parse_results series results_file;
   let df =
     Dataframe.make (header series)
       ~data:
@@ -136,6 +135,11 @@ let main () =
         |]
   in
   Format.printf "%a" Owl_pretty.pp_dataframe df;
-  Ok (Dataframe.to_csv ~sep:',' df "explode-vulcan-results.csv")
+  Ok (Dataframe.to_csv ~sep:',' df output_file)
 
-let () = match main () with Ok () -> exit 0 | Error (`Msg err) -> failwith err
+let result =
+  let results_file = "results/res-20240929T012449/results" in
+  let id = Filename.(basename (dirname results_file)) in
+  main results_file (Format.sprintf "explode-%s.csv" id)
+
+let () = match result with Ok () -> exit 0 | Error (`Msg err) -> failwith err
