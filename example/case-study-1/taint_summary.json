@@ -1,0 +1,23 @@
+[
+  {
+    "filename": "./index.js",
+    "vuln_type": "command-injection",
+    "sink": "exec(cmd, { cwd: base }, function(err, stdout)",
+    "sink_lineno": 90,
+    "source": "module.exports",
+    "tainted_params": [],
+    "params_types": {},
+    "returns": {
+      "source": ".add",
+      "tainted_params": [ "opts" ],
+      "params_types": {
+        "opts" : "string"
+      },
+      "returns": {
+        "source": ".run",
+        "tainted_params": [],
+        "params_types": {}
+      }
+    }
+  }
+]
