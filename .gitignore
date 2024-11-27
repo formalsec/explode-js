@@ -2,6 +2,7 @@ _build/
 venv/
 
 res*/
+results
 import.report
 explode-out/
 
