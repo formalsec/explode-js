@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="https://latex.vercel.app/style.css">
+  </head>
+  <body class="libertinus">
+    <h1>Explode-js</h1>
+    <h2>Benchmarking</h1>
+    <div>
+      <h3>Runs</h3>
+      <table>
+        <caption>Run index table</caption>
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Time limit</th>
+            <th>Output dir</th>
+            <th>Filter</th>
+            <th>Index</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for run in runs %}
+          <tr>
+            <td>{{ run.timestamp }}</td>
+            <td>{{ run.time_limit }}</td>
+            <td><a href="/results/{{ run.timestamp }}">{{ run.output_dir }}</a></td>
+            <td>{{ run.filter_ }}</td>
+            <td>{{ run.index }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

@@ -1,4 +1,45 @@
 (executable
- (name runner)
- (libraries bos cmdliner extunix fpath unix yojson explode_js.bench)
- (modules index runner syntax))
+ (name main)
+ (public_name runner)
+ (package explode_js-runner)
+ (modules
+  cmd_run
+  cmd_web
+  cwe
+  db
+  json_index
+  main
+  package
+  run_action
+  run_metadata
+  run_proc
+  run_proc_result
+  run_result
+  syntax
+  site
+  templates
+  vulnerability)
+ (libraries
+  cmdliner
+  core_unix
+  dune-site
+  fpath
+  fmt
+  sqlite3
+  sqlite3_utils
+  jingoo
+  tiny_httpd
+  yojson))
+
+(generate_sites_module
+ (module site)
+ (sites explode_js-runner))
+
+(install
+ (package explode_js-runner)
+ (section
+  (site
+   (explode_js-runner templates)))
+  (files
+   (templates/index.html as index.html)
+   (templates/results.html as results.html)))
