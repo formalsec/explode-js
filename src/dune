@@ -4,8 +4,8 @@
  (libraries bos dune-site))
 
 (generate_sites_module
-  (module site)
-  (sites explode_js))
+ (module site)
+ (sites explode_js))
 
 (install
  (package explode_js)
