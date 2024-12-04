@@ -4,10 +4,9 @@
  (modules marker file)
  (libraries glob fpath))
 
-
 (executable
  (name fast_df)
- (libraries explode_js.bench owl )
+ (libraries explode_js.bench owl)
  (modules fast_df))
 
 (executable

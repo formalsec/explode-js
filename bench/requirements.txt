@@ -1,0 +1,4 @@
+matplotlib
+matplotlib_venn
+latextable
+pandas

@@ -21,6 +21,5 @@ let () =
   Plot.set_xlabel h "Time (s)";
   Plot.set_ylabel h "Percentage of finished files [%]";
 
-
   Plot.legend_on h ~position:SouthEast [| "FAST" |];
   Plot.output h

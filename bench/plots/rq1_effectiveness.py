@@ -89,16 +89,16 @@ fast_total = [ fast_tp_total, fast_fn_total, fast_e_total, fast_r_total, fast_er
 
 nodemedic_df = utils.load_data("nodemedic-vulcan-secbench-results.csv")
 
-nodemedic_tp_cwe_78 = nodemedic_df[((nodemedic_df['cwe'] == 'CWE-78') | (nodemedic_df['cwe'] == 'CWE-XYZ')) & (nodemedic_df['exploit'] == True)]['exploit'].count()
+nodemedic_tp_cwe_78 = nodemedic_df[((nodemedic_df['cwe'] == 'CWE-78') | (nodemedic_df['cwe'] == 'CWE-XYZ')) & (nodemedic_df['taintpath'] == True)]['taintpath'].count()
 nodemedic_fn_cwe_78 = total_cwe_78 - nodemedic_tp_cwe_78
-nodemedic_e_cwe_78 = nodemedic_tp_cwe_78
+nodemedic_e_cwe_78 =  nodemedic_df[((nodemedic_df['cwe'] == 'CWE-78') | (nodemedic_df['cwe'] == 'CWE-XYZ')) & (nodemedic_df['exploit'] == True)]['exploit'].count()
 nodemedic_r_cwe_78 = utils.recall(nodemedic_tp_cwe_78, nodemedic_fn_cwe_78)
 nodemedic_er_cwe_78 = utils.er(nodemedic_e_cwe_78, nodemedic_tp_cwe_78, 0, nodemedic_fn_cwe_78)
 nodemedic_cwe_78 = [ nodemedic_tp_cwe_78, nodemedic_fn_cwe_78, nodemedic_e_cwe_78, nodemedic_r_cwe_78, nodemedic_er_cwe_78 ]
 
-nodemedic_tp_cwe_94 = nodemedic_df[((nodemedic_df['cwe'] == 'CWE-94') | (nodemedic_df['cwe'] == 'CWE-XYZ')) & (nodemedic_df['exploit'] == True)]['exploit'].count()
+nodemedic_tp_cwe_94 = nodemedic_df[((nodemedic_df['cwe'] == 'CWE-94') | (nodemedic_df['cwe'] == 'CWE-XYZ')) & (nodemedic_df['taintpath'] == True)]['taintpath'].count()
 nodemedic_fn_cwe_94 = total_cwe_94 - nodemedic_tp_cwe_94
-nodemedic_e_cwe_94 = nodemedic_tp_cwe_94
+nodemedic_e_cwe_94 = nodemedic_df[((nodemedic_df['cwe'] == 'CWE-94') | (nodemedic_df['cwe'] == 'CWE-XYZ')) & (nodemedic_df['exploit'] == True)]['exploit'].count()
 nodemedic_r_cwe_94 = utils.recall(nodemedic_tp_cwe_94, nodemedic_fn_cwe_94)
 nodemedic_er_cwe_94 = utils.er(nodemedic_e_cwe_94, nodemedic_tp_cwe_94, 0, nodemedic_fn_cwe_94)
 nodemedic_cwe_94 = [ nodemedic_tp_cwe_94, nodemedic_fn_cwe_94, nodemedic_e_cwe_94, nodemedic_r_cwe_94, nodemedic_er_cwe_94 ]
