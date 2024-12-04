@@ -59,9 +59,13 @@ let rec param (json : Json.t) =
   | _ -> Error (`Unknown_param (asprintf "%a" Json.pp json))
 
 let string_opt = function `String str -> Some str | `Null | _ -> None
+
 let string = function `String str -> Ok str | _ -> Error `Expected_string
+
 let int_opt = function `Int i -> Some i | `Null | _ -> None
+
 let list = function `List lst -> Ok lst | _ -> Error `Expected_list
+
 let assoc = function `Assoc lst -> Ok lst | _ -> Error `Expected_assoc
 
 let bind v f =
