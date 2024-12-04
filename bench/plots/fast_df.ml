@@ -155,13 +155,19 @@ let parse_results series dir =
 
 let main () =
   let open Owl in
-  let* vulcan = File.find_all Fpath.(v "results/fast/vulcan-dataset/**/*_fast") in
-  let* secbench =
-    File.find_all Fpath.(v "results/fast/secbench-dataset/**/*_fast")
+  let* results =
+    (* let* vulcan = *)
+    (*   File.find_all Fpath.(v "results/fast/vulcan-dataset/**/*_fast") *)
+    (* in *)
+    (* let* secbench = *)
+    (*   File.find_all Fpath.(v "results/fast/secbench-dataset/**/*_fast") *)
+    (* in *)
+    (* Ok (vulcan @ secbench) *)
+    File.find_all
+      Fpath.(v "results/fast/zeroday/2024-11-14-FAST_44_out_v2/**/*_fast")
   in
   let series = empty_series () in
-  List.iter (parse_results series) vulcan;
-  List.iter (parse_results series) secbench;
+  List.iter (parse_results series) results;
   let df =
     Dataframe.make (header series)
       ~data:
@@ -176,6 +182,7 @@ let main () =
         |]
   in
   Format.printf "%a" Owl_pretty.pp_dataframe df;
-  Ok (Dataframe.to_csv ~sep:',' df "fast-vulcan-secbench-results.csv")
+  (* Ok (Dataframe.to_csv ~sep:',' df "fast-vulcan-secbench-results.csv") *)
+  Ok (Dataframe.to_csv ~sep:',' df "fast-zeroday.csv")
 
 let () = match main () with Ok () -> exit 0 | Error (`Msg err) -> failwith err
