@@ -1,10 +1,12 @@
+# OCaml
 _build/
-venv/
 
-res*/
-results
+# Tool execution
 import.report
 explode-out/
 
-# Ignore graph pdf outputs
+# Benchmarking
 *.pdf
+res*/
+results
+__pycache__/

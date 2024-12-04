@@ -3,4 +3,5 @@
 (install
  (package explode_js)
  (section bin)
- (source_trees (graphjs as .)))
+ (source_trees
+  (graphjs as .)))
