@@ -55,3 +55,14 @@
   (yojson (>= 2.1.2)))
  (tags
   (javascript nodejs exploit vulnerability)))
+
+(package
+ (name explode_js-runner)
+ (synopsis "Explode-js runner")
+ (description "explode_js-runner")
+ (depends
+  dune
+  dune-site
+  explode-js)
+  (sites
+   (share templates)))
