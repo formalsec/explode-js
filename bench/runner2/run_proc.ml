@@ -26,11 +26,11 @@ let run ?time_limit prog argv : Run_proc_result.t =
   let stderr_read, stderr_write = Unix.pipe ~close_on_exec:false () in
   let pid =
     Unix.fork_exec ~prog ~argv () ~preexec_fn:(fun () ->
-        Unix.close stdout_read;
-        Unix.close stderr_read;
-        dup2 ~src:stdout_write ~dst:Unix.stdout;
-        dup2 ~src:stderr_write ~dst:Unix.stderr;
-        Option.iter set_time_limit time_limit )
+      Unix.close stdout_read;
+      Unix.close stderr_read;
+      dup2 ~src:stdout_write ~dst:Unix.stdout;
+      dup2 ~src:stderr_write ~dst:Unix.stderr;
+      Option.iter set_time_limit time_limit )
   in
   Unix.close stdout_write;
   Unix.close stderr_write;

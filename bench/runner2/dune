@@ -40,6 +40,6 @@
  (section
   (site
    (explode_js-runner templates)))
-  (files
-   (templates/index.html as index.html)
-   (templates/results.html as results.html)))
+ (files
+  (templates/index.html as index.html)
+  (templates/results.html as results.html)))
