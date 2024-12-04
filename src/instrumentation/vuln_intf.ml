@@ -38,9 +38,13 @@ and cont =
 
 module type Intf = sig
   type nonrec vuln_type = vuln_type
+
   type nonrec param_type = param_type
+
   type nonrec object_type = object_type
+
   type nonrec vuln_conf = vuln_conf
+
   type nonrec cont = cont
 
   val unroll : vuln_conf -> vuln_conf list

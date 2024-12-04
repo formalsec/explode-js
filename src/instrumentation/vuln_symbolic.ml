@@ -79,6 +79,7 @@ let pp_params_as_args fmt (args : (string * 'a) list) =
     pp_print_string fmt args
 
 let normalize = String.map (fun c -> match c with '.' | ' ' -> '_' | _ -> c)
+
 let ( let* ) v f = Option.bind v f
 
 let pp fmt (v : vuln_conf) =

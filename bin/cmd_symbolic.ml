@@ -56,8 +56,7 @@ let link_env ~extern filename prog =
   let env0 = Env.Build.empty () |> Env.Build.add_functions prog in
   Env.Build.add_extern_functions (extern filename env0) env0
 
-let pp_model fmt v =
-  Yojson.pretty_print ~std:true fmt (Smtml.Model.to_json v)
+let pp_model fmt v = Yojson.pretty_print ~std:true fmt (Smtml.Model.to_json v)
 
 let err_to_json = function
   | `Abort msg -> `Assoc [ ("type", `String "Abort"); ("sink", `String msg) ]

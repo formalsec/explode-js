@@ -80,8 +80,18 @@ let select_db ?timestamp db =
     ~ty:
       Db.Ty.
         ( [ text; text; int; text; int; blob; blob; float; float; float; int ]
-        , fun package version id filename returncode stdout stderr rtime utime
-            stime timestamp ->
+        , fun package
+            version
+            id
+            filename
+            returncode
+            stdout
+            stderr
+            rtime
+            utime
+            stime
+            timestamp
+          ->
             let pkg = { Package.package; version; vulns = [] } in
             let cwe = Cwe.CWE_22 in
             let filename = Fpath.v filename in
