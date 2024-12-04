@@ -14,6 +14,7 @@ type series =
   ; mutable fuzz_time : float list
   ; mutable expl_time : float list
   ; mutable total_time : float list
+  ; mutable taintpath : string list
   ; mutable exploit : string list
   }
 
@@ -24,6 +25,7 @@ let empty_series () =
   ; fuzz_time = []
   ; expl_time = []
   ; total_time = []
+  ; taintpath = []
   ; exploit = []
   }
 
@@ -34,6 +36,7 @@ let header
   ; fuzz_time = _
   ; expl_time = _
   ; total_time = _
+  ; taintpath = _
   ; exploit = _
   } =
   [| "benchmark"
@@ -42,6 +45,7 @@ let header
    ; "fuzz_time"
    ; "expl_time"
    ; "total_time"
+   ; "taintpath"
    ; "exploit"
   |]
 
@@ -105,8 +109,19 @@ let task_time_or_zero = function
   | `Null -> 0.
   | json -> Json.Util.(to_number @@ member "time" json)
 
-let parse_results file =
-  let file = Fpath.to_string file in
+let find_taint =
+  let re =
+    Dune_re.(
+      compile @@ Perl.re ".*Found the following input that causes a flow.*" )
+  in
+  fun str -> Dune_re.execp re str
+
+let find_expl =
+  let re = Dune_re.(compile @@ Perl.re ".*Exploit(s) found for functions:.*") in
+  fun str -> Dune_re.execp re str
+
+let parse_results results_file stdout_file =
+  let file = Fpath.to_string results_file in
   let json = Json.from_file ~fname:file file in
   let results = Json.Util.(to_list @@ member "rows" json) in
   assert (List.length results = 1);
@@ -122,11 +137,15 @@ let parse_results file =
     Json.Util.member "checkExploit" task_results |> task_time_or_zero
   in
   let expl2 = Json.Util.member "smt" task_results |> task_time_or_zero in
-  let has_exploit =
-    let exploit_results = Json.Util.member "sinksHit" results in
-    match exploit_results with `List _ -> "true" | _ -> "false"
+  let has_taintpath, has_exploit =
+    In_channel.with_open_text (Fpath.to_string stdout_file) @@ fun ic ->
+    let data = In_channel.input_all ic in
+    (string_of_bool @@ find_taint data, string_of_bool @@ find_expl data)
   in
-  (fuzz_time /. 1000., (expl0 +. expl1 +. expl2) /. 1000., has_exploit)
+  ( fuzz_time /. 1000.
+  , (expl0 +. expl1 +. expl2) /. 1000.
+  , has_taintpath
+  , has_exploit )
 
 let parse_results series dir =
   let result =
@@ -147,6 +166,7 @@ let parse_results series dir =
       series.fuzz_time <- Float.nan :: series.fuzz_time;
       series.expl_time <- Float.nan :: series.expl_time;
       series.total_time <- 600.0 :: series.total_time;
+      series.taintpath <- "false" :: series.taintpath;
       series.exploit <- "false" :: series.exploit;
       Ok ()
     | _ ->
@@ -154,14 +174,18 @@ let parse_results series dir =
         File.find Fpath.(dir / "**" / "NodeMedic-docker-duration-seconds.txt")
       in
       let results_file = Fpath.(dir / "results.json") in
+      let* stdout_file = File.find Fpath.(dir / "**" / "PID-*.stdout.log") in
       let run_times = parse_run_times time_file in
-      let fuzz_time, expl_time, has_exploit = parse_results results_file in
+      let fuzz_time, expl_time, has_taintpath, has_exploit =
+        parse_results results_file stdout_file
+      in
       series.benchmark <- results_dir :: series.benchmark;
       series.cwe <- cwe :: series.cwe;
       series.marker <- Marker.to_string marker :: series.marker;
       series.fuzz_time <- fuzz_time :: series.fuzz_time;
       series.expl_time <- expl_time :: series.expl_time;
       series.total_time <- List.assoc "real" run_times :: series.total_time;
+      series.taintpath <- has_taintpath :: series.taintpath;
       series.exploit <- has_exploit :: series.exploit;
       Ok ()
   in
@@ -169,15 +193,19 @@ let parse_results series dir =
 
 let main () =
   let open Owl in
-  let* vulcan =
-    File.find_all Fpath.(v "results/nodemedic/vulcan-dataset/**/*_NodeMedic")
-  in
-  let* secbench =
-    File.find_all Fpath.(v "results/nodemedic/secbench-dataset/**/*_NodeMedic")
+  let* results =
+    (*   let* vulcan = *)
+    (*     File.find_all Fpath.(v "results/nodemedic/20240906-vulcan/**/*_NodeMedic") *)
+    (*   in *)
+    (*   let* secbench = *)
+    (*     File.find_all *)
+    (*       Fpath.(v "results/nodemedic/20240906-secbench/**/*_NodeMedic") *)
+    (*   in *)
+    (*   Ok (vulcan @ secbench) *)
+    File.find_all Fpath.(v "results/nodemedic/zeroday/**/*_NodeMedic")
   in
   let series = empty_series () in
-  List.iter (parse_results series) vulcan;
-  List.iter (parse_results series) secbench;
+  List.iter (parse_results series) results;
   let df =
     Dataframe.make (header series)
       ~data:
@@ -187,10 +215,13 @@ let main () =
          ; Dataframe.pack_float_series @@ Array.of_list series.fuzz_time
          ; Dataframe.pack_float_series @@ Array.of_list series.expl_time
          ; Dataframe.pack_float_series @@ Array.of_list series.total_time
+         ; Dataframe.pack_string_series @@ Array.of_list series.taintpath
          ; Dataframe.pack_string_series @@ Array.of_list series.exploit
         |]
   in
   Format.printf "%a" Owl_pretty.pp_dataframe df;
-  Ok (Dataframe.to_csv ~sep:',' df "nodemedic-vulcan-secbench-results.csv")
+  (* let csv_output_path = "nodemedic-vulcan-secbench-results.csv" in *)
+  let csv_output_path = "nodemedic-vulcan-zeroday.csv" in
+  Ok (Dataframe.to_csv ~sep:',' df csv_output_path)
 
 let () = match main () with Ok () -> exit 0 | Error (`Msg err) -> failwith err
