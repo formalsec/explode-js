@@ -1,6 +1,8 @@
 <!DOCTYPE html>
+<html lang="en">
 <html>
   <head>
+    <meta charset="UTF-8">
     <title>Run {{ timestamp }}</title>
     <link rel="stylesheet" href="https://latex.vercel.app/style.css">
   </head>
@@ -30,8 +32,8 @@
             <td>{{ result.version }}</td>
             <td>{{ result.filename }}</td>
             <td>{{ result.returncode }}</td>
-            <td></td>
-            <td></td>
+            <td><a href="/results/{{ timestamp }}/{{ result.vuln_id }}/stdout">stdout</a></td>
+            <td><a href="/results/{{ timestamp }}/{{ result.vuln_id }}/stderr">stderr</a></td>
             <td>{{ result.rtime }}</td>
             <td>{{ result.utime }}</td>
             <td>{{ result.stime }}</td>

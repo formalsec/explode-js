@@ -1,6 +1,17 @@
 open Jingoo
 module S = Tiny_httpd
 
+let outputs db timestamp vuln_id file _req =
+  let results = Run_result.select_db ~timestamp db in
+  let v = List.find (fun (v : Run_result.t) -> v.vuln.id = vuln_id) results in
+  let contents =
+    match file with
+    | "stdout" -> v.raw.stdout
+    | "stderr" -> v.raw.stderr
+    | _ -> Jg_template.from_file Templates.not_found
+  in
+  S.Response.make_string (Ok contents)
+
 let results db timestamp _req =
   let open Jg_types in
   let results =
@@ -28,6 +39,9 @@ let main addr port db_path =
   S.add_route_handler server
     S.Route.(exact "results" @/ int @/ return)
     (results db);
+  S.add_route_handler server
+    S.Route.(exact "results" @/ int @/ int @/ string @/ return)
+    (outputs db);
 
   Fmt.epr "listening on http://%s:%d@." (S.addr server) (S.port server);
   match S.run server with Ok () -> Ok () | Error e -> Error (`Exn e)
