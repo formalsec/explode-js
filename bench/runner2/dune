@@ -42,4 +42,5 @@
    (explode_js-runner templates)))
  (files
   (templates/index.html as index.html)
-  (templates/results.html as results.html)))
+  (templates/results.html as results.html)
+  (templates/404.html as 404.html)))

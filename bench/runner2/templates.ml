@@ -10,3 +10,5 @@ let search_file (location : string list) (file : string) : string option =
 let index = search_file templates "index.html" |> Option.get
 
 let results = search_file templates "results.html" |> Option.get
+
+let not_found = search_file templates "404.html" |> Option.get
