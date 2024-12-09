@@ -120,7 +120,7 @@ let write_report ~workspace filename exec_time solver_time solver_count problems
   let rpath = Fpath.(workspace / "symbolic-execution.json") in
   OS.File.writef ~mode rpath "%a" (Yojson.pretty_print ~std:true) json
 
-let run ~workspace filename entry_func =
+let run ~workspace ~filename ~entry_func =
   let open Syntax.Result in
   let* prog = dispatch_file_ext prog_of_plus prog_of_core prog_of_js filename in
   let env = link_env ~extern:Symbolic_extern.api filename prog in
@@ -156,10 +156,3 @@ let run ~workspace filename entry_func =
   Log.debug "  exec time : %fs@." exec_time;
   Log.debug "solver time : %fs@." solv_time;
   write_report ~workspace filename exec_time solv_time solv_cnt problems
-
-let main { filename; entry_func; workspace } () =
-  match run ~workspace filename entry_func with
-  | Error (`Msg s) ->
-    Log.log ~header:false "%s" s;
-    1
-  | Ok () -> 0

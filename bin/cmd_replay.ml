@@ -115,10 +115,3 @@ let replay ?original_file ?taint_summary filename workspace =
         None )
   in
   write_report ~workspace filename effectful_payloads
-
-let main { filename; workspace } () =
-  match replay filename workspace with
-  | Error (`Msg msg) ->
-    Log.log ~header:false "%s" msg;
-    1
-  | Ok () -> 0
