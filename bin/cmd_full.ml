@@ -53,24 +53,28 @@ let full filename workspace_dir =
     let taint_summary = Fpath.(workspace_dir / "taint_summary.json") in
     let* taint_summary_exists = Bos.OS.File.exists taint_summary in
     if taint_summary_exists then
-      let options =
-        (* Runs symbolic execution tests for 30s each *)
-        Cmd_run.options taint_summary (Some filename) workspace_dir (Some 30.)
-      in
       let explode_start = Unix.gettimeofday () in
-      let result = Cmd_run.main options in
+      let result =
+        Cmd_run.run ~config:taint_summary ~filename:(Some filename)
+          ~workspace_dir ~time_limit:(Some 30.0)
+      in
       let explode_time = Unix.gettimeofday () -. explode_start in
       let _ = Bos.OS.File.writef explode_time_path "%f@." explode_time in
-      Ok result
+      result
     else Ok 0
   in
   match res with
   | Ok n -> n
-  | Error (`Msg err) ->
-    Logs.err (fun m -> m "unexpected error: %s" err);
-    1
+  | Error err -> (
+    match err with
+    | #I2.Result.err as error ->
+      Format.eprintf "error: %a@." I2.Result.pp error;
+      I2.Result.to_code error
+    | `Status n ->
+      Format.eprintf "error: Failed during symbolic execution/confirmation@.";
+      n )
 
-let run { filename; workspace_dir; time_limit } =
+let run ~filename ~workspace_dir ~time_limit =
   let* _ = Bos.OS.Dir.create ~path:true ~mode:0o777 workspace_dir in
   let work () = full filename workspace_dir in
   let res =
@@ -83,5 +87,3 @@ let run { filename; workspace_dir; time_limit } =
   | `Timeout ->
     Logs.warn (fun m -> m "time limit reached");
     Ok 0
-
-let main opt = match run opt with Ok n -> n | Error _err -> 1

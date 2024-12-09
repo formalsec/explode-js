@@ -3,3 +3,4 @@ Test that timeout works:
         abort : "Uncaught SyntaxError: Must include statements to encode"
          eval : s_concat(["`", (`x0 : __$Str), "`"])
   explode-js: [WARNING] time limit reached
+  [1]

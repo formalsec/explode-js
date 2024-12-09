@@ -1,16 +1,6 @@
 open I2
 open Ecma_sl.Syntax.Result
 
-type options =
-  { config : Fpath.t
-  ; filename : Fpath.t option
-  ; workspace_dir : Fpath.t
-  ; time_limit : float option
-  }
-
-let options config filename workspace_dir time_limit =
-  { config; filename; workspace_dir; time_limit }
-
 let get_tests workspace (config : Fpath.t) (filename : Fpath.t option) =
   let file = Option.map Fpath.to_string filename in
   let config = Fpath.to_string config in
@@ -33,7 +23,7 @@ let run_single ~(workspace : Fpath.t) (filename : Fpath.t) original_file
     | Ok () -> 0
   end
 
-let run_all ({ config; filename; workspace_dir; _ } : options) =
+let run ~config ~filename ~workspace_dir ~time_limit:_ =
   let* _ = Bos.OS.Dir.create ~mode:0o777 workspace_dir in
   let* symbolic_tests = get_tests workspace_dir config filename in
   let rec loop = function
@@ -44,15 +34,3 @@ let run_all ({ config; filename; workspace_dir; _ } : options) =
       if n <> 0 then Error (`Status n) else loop remaning
   in
   loop symbolic_tests
-
-let main opts =
-  match run_all opts with
-  | Ok n -> n
-  | Error err -> (
-    match err with
-    | #I2.Result.err as error ->
-      Format.eprintf "error: %a@." I2.Result.pp error;
-      I2.Result.to_code error
-    | `Status n ->
-      Format.eprintf "error: Failed during symbolic execution/confirmation@.";
-      n )
