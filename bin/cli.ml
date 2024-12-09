@@ -1,4 +1,5 @@
 open Cmdliner
+open Cmdliner.Term.Syntax
 
 let parse_fpath f str =
   let file = Fpath.v str in
@@ -34,7 +35,7 @@ let time_limit =
 
 let sdocs = Manpage.s_common_options
 
-let cmd_run =
+let info_run =
   let doc = "Explode.js symbolic vulnerability confirmation engine" in
   let description = "Tries to blow stuff up" in
   let man = [ `S Manpage.s_description; `P description ] in
@@ -46,34 +47,59 @@ let cmd_run =
     ; Cmd.Exit.info ~doc:"on internal timeout (when set)" 4
     ]
   in
-  let options =
-    Term.(const Cmd_run.options $ input $ filename $ workspace_dir $ time_limit)
-  in
-  let info = Cmd.info "run" ~doc ~sdocs ~exits ~man ~man_xrefs in
-  Cmd.v info Term.(const Cmd_run.main $ options)
+  Cmd.info "run" ~doc ~sdocs ~exits ~man ~man_xrefs
 
-let cmd_exploit =
+let cmd_run =
+  let+ config = input
+  and+ filename
+  and+ workspace_dir
+  and+ time_limit in
+  Cmd_run.run ~config ~filename ~workspace_dir ~time_limit
+
+let info_exploit =
   let doc = "Explode.js single file symbolic confirmation" in
   let description = "Tries to blow stuff up" in
   let man = [ `S Manpage.s_description; `P description ] in
   let man_xrefs = [] in
-  let options =
-    Term.(const Cmd_exploit.options $ input $ workspace_dir $ time_limit)
-  in
-  let info = Cmd.info "exploit" ~doc ~sdocs ~man ~man_xrefs in
-  Cmd.v info Term.(const Cmd_exploit.main $ options)
+  Cmd.info "exploit" ~doc ~sdocs ~man ~man_xrefs
 
-let cmd_full =
+let cmd_exploit =
+  (* Term.(const Cmd_exploit.options $ input $ workspace_dir $ time_limit) *)
+  let+ filename = input
+  and+ workspace_dir
+  and+ time_limit in
+  Cmd_exploit.run ~filename ~workspace_dir ~time_limit
+
+let info_full =
   let doc = "Explode.js full analysis" in
   let description = "Tries to blow stuff up" in
   let man = [ `S Manpage.s_description; `P description ] in
   let man_xrefs = [] in
-  let options =
-    Term.(const Cmd_full.options $ input $ workspace_dir $ time_limit)
-  in
-  let info = Cmd.info "full" ~doc ~sdocs ~man ~man_xrefs in
-  Cmd.v info Term.(const Cmd_full.main $ options)
+  Cmd.info "full" ~doc ~sdocs ~man ~man_xrefs
 
-let main =
+let cmd_full =
+  let+ filename = input
+  and+ workspace_dir
+  and+ time_limit in
+  Cmd_full.run ~filename ~workspace_dir ~time_limit
+
+let v :
+  ( int
+  , [ `Expected_assoc
+    | `Expected_list
+    | `Expected_string
+    | `Malformed_json of string
+    | `Msg of string
+    | `Status of int
+    | `Unknown_param of string
+    | `Unknown_param_type of string
+    | `Unknown_vuln_type of string
+    ] )
+  result
+  Cmd.t =
   let info = Cmd.info "explode-js" in
-  Cmd.group info [ cmd_exploit; cmd_run; cmd_full ]
+  Cmd.group info
+    [ Cmd.v info_exploit cmd_exploit
+    ; Cmd.v info_run cmd_run
+    ; Cmd.v info_full cmd_full
+    ]
