@@ -28,7 +28,6 @@
   cmdliner
   dune
   dune-site
-  ecma-sl
   explode_js-instrumentation
   extunix
   fpath
@@ -63,7 +62,8 @@
  (depends
   dune
   dune-site
-  explode-js)
+  explode_js
+  jingoo)
   (sites
    (share templates)
    (share static)))

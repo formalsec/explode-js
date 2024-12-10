@@ -15,7 +15,6 @@ depends: [
   "cmdliner"
   "dune" {>= "3.15"}
   "dune-site"
-  "ecma-sl"
   "explode_js-instrumentation"
   "extunix"
   "fpath"

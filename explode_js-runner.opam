@@ -11,7 +11,8 @@ bug-reports: "https://github.com/explode-js/explode-js/issues"
 depends: [
   "dune" {>= "3.15"}
   "dune-site"
-  "explode-js"
+  "explode_js"
+  "jingoo"
   "odoc" {with-doc}
 ]
 build: [
