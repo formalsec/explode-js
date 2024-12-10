@@ -3,27 +3,29 @@ module Json = Yojson.Basic
 
 let parse_report output_dir =
   let report_path = Fpath.(output_dir / "report.json") in
-  let json = Json.from_file (Fpath.to_string report_path) in
-  let json_list = Json.Util.to_list json in
-  let control_path =
-    List.exists
-      (fun json ->
-        let failures = Json.Util.(member "failures" json |> to_list) in
-        List.length failures > 0 )
-      json_list
-  in
-  let exploit =
-    List.exists
-      (fun json ->
-        let failures = Json.Util.(member "failures" json |> to_list) in
-        List.exists
-          (fun json ->
-            Json.Util.member "exploit" json
-            |> Json.Util.member "success" |> Json.Util.to_bool )
-          failures )
-      json_list
-  in
-  (Fmt.str "%a" (Json.pretty_print ~std:true) json, control_path, exploit)
+  if not (Sys.file_exists (Fpath.to_string report_path)) then ("", false, false)
+  else
+    let json = Json.from_file (Fpath.to_string report_path) in
+    let json_list = Json.Util.to_list json in
+    let control_path =
+      List.exists
+        (fun json ->
+          let failures = Json.Util.(member "failures" json |> to_list) in
+          List.length failures > 0 )
+        json_list
+    in
+    let exploit =
+      List.exists
+        (fun json ->
+          let failures = Json.Util.(member "failures" json |> to_list) in
+          List.exists
+            (fun json ->
+              Json.Util.member "exploit" json
+              |> Json.Util.member "success" |> Json.Util.to_bool )
+            failures )
+        json_list
+    in
+    (Fmt.str "%a" (Json.pretty_print ~std:true) json, control_path, exploit)
 
 let work db ({ timestamp; time_limit; output_dir; filter; _ } : Run_metadata.t)
   (pkg : Package.t) : Run_result.t list =
