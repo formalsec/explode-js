@@ -5,6 +5,8 @@ Test eval explode :
     replaying : test_sink_eval.js...
       running : explode-out/test_sink_eval/test-suite/witness-0.json
        status : true ("success" in stdout)
+      running : explode-out/test_sink_eval/test-suite/witness-1.json
+       status : true ("success" in stdout)
 
 Test exec explode:
   $ explode-js exploit test_sink_exec.js

@@ -193,8 +193,8 @@ execution summary of the first symbolic test:
 $ cat explode-out/symbolic_test_0_0/report.json
 {
   "filename": "explode-out/symbolic_test_0_0.js",
-  "execution_time": 9.799999999998699e-05,
-  "solver_time": 0.001996000000000109,
+  "execution_time": 0.00010000000000001674,
+  "solver_time": 0.0016900000000008575,
   "solver_queries": 1,
   "num_failures": 1,
   "failures": [
