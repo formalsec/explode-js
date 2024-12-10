@@ -50,20 +50,6 @@ let link_env ~extern filename prog =
 
 let pp_model fmt v = Yojson.pretty_print ~std:true fmt (Smtml.Model.to_json v)
 
-let serialize_thread =
-  let module Term = Smtml.Expr in
-  fun (witness : Sym_failure_type.t) workspace thread ->
-    let pc = PC.to_list @@ Thread.pc thread in
-    let solver = Thread.solver thread in
-    let model =
-      match Solver.check solver pc with
-      | `Unsat | `Unknown -> None
-      | `Sat -> Solver.model solver
-    in
-    let* pc_path, model = Sym_failure.serialize workspace pc model in
-    let exploit = Sym_failure.default_exploit () in
-    Ok { Sym_failure.ty = witness; pc; pc_path; model; exploit }
-
 let no_stop_at_failure = false
 
 let from_file ~workspace filename =
@@ -86,10 +72,10 @@ let from_file ~workspace filename =
       | Error (`Failure msg) -> Error (`Msg msg)
       | Error
           ( ( `Abort _ | `Assert_failure _ | `Eval_failure _ | `Exec_failure _
-            | `ReadFile_failure _ ) as witness ) ->
+            | `ReadFile_failure _ ) as ty ) ->
         let cnt = succ cnt in
-        let* failure = serialize_thread witness workspace thread in
-        let failures = failure :: failures in
+        let* witnesses = Sym_path_resolver.solve ty workspace thread in
+        let failures = witnesses @ failures in
         if no_stop_at_failure then print_and_count_failures (cnt, failures) tl
         else Ok (cnt, failures) )
   in
