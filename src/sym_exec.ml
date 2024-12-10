@@ -66,13 +66,13 @@ let serialize_thread =
 
 let no_stop_at_failure = false
 
-let from_file ~workspace ~filename ~entry_func =
+let from_file ~workspace filename =
   let open Syntax.Result in
   let* prog = dispatch_file_ext prog_of_plus prog_of_core prog_of_js filename in
   let env = link_env ~extern:Symbolic_extern.api filename prog in
   let start = Stdlib.Sys.time () in
   let thread = Choice_monad.Thread.create () in
-  let result = Symbolic_interpreter.main env entry_func in
+  let result = Symbolic_interpreter.main env "main" in
   let results = Choice.run result thread in
   let exec_time = Stdlib.Sys.time () -. start in
   let testsuite = Fpath.(workspace / "test-suite") in

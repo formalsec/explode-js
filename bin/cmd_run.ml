@@ -11,9 +11,7 @@ let get_tests workspace (config : Fpath.t) (filename : Fpath.t option) =
 let run_single ~(workspace : Fpath.t) (test : Fpath.t) filename taint_summary =
   let original_file = Option.map Fpath.to_string filename in
   let taint_summary = Fpath.to_string taint_summary in
-  let* sym_result =
-    Sym_exec.from_file ~filename:test ~entry_func:"main" ~workspace
-  in
+  let* sym_result = Sym_exec.from_file ~workspace test in
   let* () =
     Replay.run ?original_file ~taint_summary test workspace sym_result
   in
