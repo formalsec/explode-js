@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <!-- <link rel="stylesheet" href="https://latex.vercel.app/style.css"> -->
+    <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" href="/static/css/normalize.css">
+    <link rel="stylesheet" href="/static/css/skeleton.css">
+  </head>
+  <body>
+    <div class="container">
+      <h4>{{ title }}</h1>
+      <pre style="white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; max-height: 100vh; overflow: auto; width: 100%; box-sizing: border-box;">
+      <code>{{ output }}</code>
+      </pre>
+      <p><a href="/results/{{ timestamp }}">Go back</a></p>
+    </div>
+  </body>
+</html>

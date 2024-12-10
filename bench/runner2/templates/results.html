@@ -4,12 +4,17 @@
   <head>
     <meta charset="UTF-8">
     <title>Run {{ timestamp }}</title>
-    <link rel="stylesheet" href="https://latex.vercel.app/style.css">
+    <!-- Fonts -->
+    <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" href="/static/css/normalize.css">
+    <link rel="stylesheet" href="/static/css/skeleton.css">
   </head>
-  <body class="libertinus">
-    <h1>Run {{ timestamp }} results </h1>
-    <div>
-      <table>
+  <body>
+    <div class="container">
+      <h4>Run {{ timestamp }} results </h1>
+      <div style="max-width: 100%; max-height: 85vh; overflow-x: auto; overflow-y: auto; border: 1px solid #ddd;">
+      <table style="width: 100%; border-collapse: collapse;">
         <thead>
           <tr>
             <th>id</th>
@@ -22,6 +27,9 @@
             <th>rtime</th>
             <th>utime</th>
             <th>stime</th>
+            <th>report</th>
+            <th>control_path</th>
+            <th>exploit</th>
           </tr>
         </thead>
         <tbody>
@@ -37,10 +45,15 @@
             <td>{{ result.rtime }}</td>
             <td>{{ result.utime }}</td>
             <td>{{ result.stime }}</td>
+            <td><a href="/results/{{ timestamp }}/{{ result.vuln_id }}/report">report</a></td>
+            <td>{{ result.control_path }}</td>
+            <td>{{ result.exploit }}</td>
           </tr>
         {% endfor %}
         </tbody>
       </table>
+      </div>
+      <p><a href="/">Go back</a></p>
     </div>
   </body>
 </html>
