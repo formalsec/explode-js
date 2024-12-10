@@ -21,10 +21,10 @@ let cli =
     in
     let cwe =
       ( (fun str ->
-          match Cwe.of_string str with
+          match Explode_js.Cwe.of_string str with
           | Ok cwe -> `Ok cwe
           | Error (`Parsing str) -> `Error str )
-      , Cwe.pp )
+      , Explode_js.Cwe.pp )
     in
     Arg.(value & opt (some cwe) None & info [ "filter" ] ~doc)
   in

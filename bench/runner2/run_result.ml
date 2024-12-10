@@ -138,7 +138,7 @@ let select_db ?timestamp db =
             timestamp
           ->
             let pkg = { Package.package; version; vulns = [] } in
-            let cwe = Cwe.CWE_22 in
+            let cwe = Explode_js.Cwe.CWE_22 in
             let filename = Fpath.v filename in
             let lineno = "?" in
             let vuln = { Vulnerability.cwe; filename; lineno; id } in
