@@ -31,7 +31,9 @@ let work db ({ timestamp; time_limit; output_dir; filter; _ } : Run_metadata.t)
     match filter with
     | None -> pkg.vulns
     | Some cwe ->
-      List.filter (fun (v : Vulnerability.t) -> Cwe.equal cwe v.cwe) pkg.vulns
+      List.filter
+        (fun (v : Vulnerability.t) -> Explode_js.Cwe.equal cwe v.cwe)
+        pkg.vulns
   in
   List.fold_left
     (fun acc (vuln : Vulnerability.t) ->

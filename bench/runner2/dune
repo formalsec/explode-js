@@ -5,7 +5,6 @@
  (modules
   cmd_run
   cmd_web
-  cwe
   db
   json_index
   main
@@ -23,6 +22,7 @@
   cmdliner
   core_unix
   dune-site
+  explode_js
   fpath
   fmt
   sqlite3

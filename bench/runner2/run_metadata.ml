@@ -1,3 +1,5 @@
+module Cwe = Explode_js.Cwe
+
 type t =
   { timestamp : int
   ; time_limit : int
