@@ -58,67 +58,21 @@ let link_env ~extern filename prog =
 
 let pp_model fmt v = Yojson.pretty_print ~std:true fmt (Smtml.Model.to_json v)
 
-let err_to_json = function
-  | `Abort msg -> `Assoc [ ("type", `String "Abort"); ("sink", `String msg) ]
-  | `Assert_failure v ->
-    let v = Fmt.asprintf "%a" Value.pp v in
-    `Assoc [ ("type", `String "Assert failure"); ("sink", `String v) ]
-  | `Eval_failure v ->
-    let v = Fmt.asprintf "%a" Value.pp v in
-    `Assoc [ ("type", `String "Eval failure"); ("sink", `String v) ]
-  | `Exec_failure v ->
-    let v = Fmt.asprintf "%a" Value.pp v in
-    `Assoc [ ("type", `String "Exec failure"); ("sink", `String v) ]
-  | `ReadFile_failure v ->
-    let v = Fmt.asprintf "%a" Value.pp v in
-    `Assoc [ ("type", `String "ReadFile failure"); ("sink", `String v) ]
-  | `Failure msg ->
-    `Assoc [ ("type", `String "Failure"); ("sink", `String msg) ]
-
 let serialize_thread =
   let module Term = Smtml.Expr in
-  let mode = 0o666 in
-  let next_int, _ = Base.make_counter 0 1 in
-  fun ?(witness :
-         [ `Abort of string
-         | `Assert_failure of Extern_func.value
-         | `Eval_failure of Extern_func.value
-         | `Exec_failure of Extern_func.value
-         | `ReadFile_failure of Extern_func.value
-         ]
-         option ) workspace thread ->
+  fun (witness : Sym_failure_type.t) workspace thread ->
     let pc = PC.to_list @@ Thread.pc thread in
     let solver = Thread.solver thread in
-    match Solver.check solver pc with
-    | `Unsat | `Unknown -> Ok ()
-    | `Sat ->
-      let m = Solver.model solver in
-      let f =
-        Fmt.ksprintf
-          Fpath.(add_seg (workspace / "test-suite"))
-          (match witness with None -> "testcase-%d" | Some _ -> "witness-%d")
-          (next_int ())
-      in
-      let* () =
-        OS.File.writef ~mode Fpath.(f + ".json") "%a" (Fmt.pp_opt pp_model) m
-      in
-      OS.File.writef ~mode Fpath.(f + ".smtml") "%a" Term.pp_smt pc
+    let model =
+      match Solver.check solver pc with
+      | `Unsat | `Unknown -> None
+      | `Sat -> Solver.model solver
+    in
+    let* pc_path, model = Sym_failure.serialize workspace pc model in
+    let exploit = Sym_failure.default_exploit () in
+    Ok { Sym_failure.ty = witness; pc; pc_path; model; exploit}
 
-let write_report ~workspace filename exec_time solver_time solver_count problems
-    =
-  let mode = 0o666 in
-  let json : Yojson.t =
-    `Assoc
-      [ ("filename", `String (Fpath.to_string filename))
-      ; ("execution_time", `Float exec_time)
-      ; ("solver_time", `Float solver_time)
-      ; ("solver_queries", `Int solver_count)
-      ; ("num_problems", `Int (List.length problems))
-      ; ("problems", `List (List.map err_to_json problems))
-      ]
-  in
-  let rpath = Fpath.(workspace / "symbolic-execution.json") in
-  OS.File.writef ~mode rpath "%a" (Yojson.pretty_print ~std:true) json
+let no_stop_at_failure = false
 
 let run ~workspace ~filename ~entry_func =
   let open Syntax.Result in
@@ -131,28 +85,27 @@ let run ~workspace ~filename ~entry_func =
   let exec_time = Stdlib.Sys.time () -. start in
   let testsuite = Fpath.(workspace / "test-suite") in
   let* _ = OS.Dir.create ~mode:0o777 ~path:true testsuite in
-  let* problems =
-    list_filter_map
-      ~f:(fun (ret, thread) ->
-        let+ witness =
-          match ret with
-          | Ok _ -> Ok None
-          | Error
-              ( ( `Abort _ | `Assert_failure _ | `Eval_failure _
-                | `Exec_failure _ | `ReadFile_failure _ ) as err ) ->
-            Ok (Some err)
-          | Error (`Failure msg) -> Error (`Msg msg)
-        in
-        ( match serialize_thread ?witness workspace thread with
-        | Error (`Msg msg) -> Log.log ~header:false "%s" msg
-        | Ok () -> () );
-        witness )
-      results
+  let rec print_and_count_failures (cnt, failures) results =
+    match results () with
+    | Seq.Nil -> Ok (cnt, failures)
+    | Seq.Cons ((result, thread), tl) -> (
+      match result with
+      | Ok _ -> print_and_count_failures (cnt, failures) tl
+      | Error (`Failure msg) -> Error (`Msg msg)
+      | Error
+          ( ( `Abort _ | `Assert_failure _ | `Eval_failure _ | `Exec_failure _
+            | `ReadFile_failure _ ) as witness ) ->
+        let cnt = succ cnt in
+        let* failure = serialize_thread witness workspace thread in
+        let failures = failure :: failures in
+        if no_stop_at_failure then print_and_count_failures (cnt, failures) tl
+        else Ok (cnt, failures) )
   in
-  let n = List.length problems in
+  let* n, failures = print_and_count_failures (0, []) results in
   if n = 0 then Fmt.printf "All Ok!@." else Fmt.printf "Found %d problems!@." n;
   let solv_time = !Solver.solver_time in
   let solv_cnt = !Solver.solver_count in
   Log.debug "  exec time : %fs@." exec_time;
   Log.debug "solver time : %fs@." solv_time;
-  write_report ~workspace filename exec_time solv_time solv_cnt problems
+  let res = { Sym_result.filename; exec_time; solv_time; solv_cnt; failures } in
+  Ok res

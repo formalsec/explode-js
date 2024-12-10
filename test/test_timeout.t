@@ -1,8 +1,7 @@
 Test that timeout works:
   $ explode-js exploit --timeout 5 test_timeout.js
         abort : "Uncaught SyntaxError: Must include statements to encode"
-         eval : s_concat(["`", (`x0 : __$Str), "`"])
-  Found 2 problems!
+  Found 1 problems!
     replaying : test_timeout.js...
       running : explode-out/test_timeout/test-suite/witness-0.json
        status : false (no side effect)
