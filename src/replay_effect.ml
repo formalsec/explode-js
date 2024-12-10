@@ -10,5 +10,5 @@ let pp fmt = function
   | File_access _ -> Format.fprintf fmt "(undesired file access occurred)"
   | Error str -> Format.fprintf fmt "(threw Error(\"%s\"))" str
 
-let default =
+let defaults =
   [ File "success"; Stdout "success"; Error "I pollute."; Stdout "polluted" ]

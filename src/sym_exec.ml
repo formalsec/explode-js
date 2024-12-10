@@ -15,14 +15,6 @@ let ext_cesl = ".cesl"
 
 let ext_js = ".js"
 
-type options =
-  { filename : Fpath.t
-  ; entry_func : string
-  ; workspace : Fpath.t
-  }
-
-let options filename entry_func workspace = { filename; entry_func; workspace }
-
 let dispatch_file_ext on_plus on_core on_js (file : Fpath.t) =
   if Fpath.has_ext ext_esl file then Ok (on_plus file)
   else if Fpath.has_ext ext_cesl file then Ok (on_core file)
@@ -70,11 +62,11 @@ let serialize_thread =
     in
     let* pc_path, model = Sym_failure.serialize workspace pc model in
     let exploit = Sym_failure.default_exploit () in
-    Ok { Sym_failure.ty = witness; pc; pc_path; model; exploit}
+    Ok { Sym_failure.ty = witness; pc; pc_path; model; exploit }
 
 let no_stop_at_failure = false
 
-let run ~workspace ~filename ~entry_func =
+let from_file ~workspace ~filename ~entry_func =
   let open Syntax.Result in
   let* prog = dispatch_file_ext prog_of_plus prog_of_core prog_of_js filename in
   let env = link_env ~extern:Symbolic_extern.api filename prog in
