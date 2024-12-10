@@ -17,18 +17,29 @@ let run_single ~(workspace : Fpath.t) (test : Fpath.t) filename taint_summary =
   in
   let report_path = Fpath.(workspace / "report.json") in
   let report = Sym_result.to_json sym_result in
-  Bos.OS.File.writef ~mode:0o666 report_path "%a"
-    (Yojson.pretty_print ~std:true)
-    report
+  let* () =
+    Bos.OS.File.writef ~mode:0o666 report_path "%a"
+      (Yojson.pretty_print ~std:true)
+      report
+  in
+  Ok sym_result
 
 let run ~config ~filename ~workspace_dir ~time_limit:_ =
   let* _ = Bos.OS.Dir.create ~mode:0o777 workspace_dir in
   let* symbolic_tests = get_tests workspace_dir config filename in
-  let rec loop = function
-    | [] -> Ok 0
+  let rec loop results = function
+    | [] -> Ok results
     | test :: remaning ->
       let workspace = Fpath.(workspace_dir // rem_ext (base test)) in
-      let* () = run_single ~workspace test filename config in
-      loop remaning
+      let* sym_result = run_single ~workspace test filename config in
+      loop (sym_result :: results) remaning
   in
-  loop symbolic_tests
+  let* results = loop [] symbolic_tests in
+  let results_json = `List (List.map Sym_result.to_json results) in
+  let results_report = Fpath.(workspace_dir / "report.json") in
+  let* () =
+    Bos.OS.File.writef ~mode:0o666 results_report "%a"
+      (Yojson.pretty_print ~std:true)
+      results_json
+  in
+  Ok 0

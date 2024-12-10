@@ -142,6 +142,7 @@ explode-out
 │   ├── graph.svg
 │   ├── nodes.csv
 │   └── rels.csv
+├── report.json
 ├── run
 │   ├── neo4j_import.txt
 │   ├── neo4j_start.txt
@@ -178,7 +179,7 @@ explode-out
 ├── taint_summary_detection.json
 └── taint_summary.json
 
-11 directories, 32 files
+11 directories, 33 files
 ```
 
 The directory `explode-out` contains the symbolic tests and the directories
@@ -192,8 +193,8 @@ execution summary of the first symbolic test:
 $ cat explode-out/symbolic_test_0_0/report.json
 {
   "filename": "explode-out/symbolic_test_0_0.js",
-  "execution_time": 0.00010999999999999899,
-  "solver_time": 0.001522999999999719,
+  "execution_time": 9.799999999998699e-05,
+  "solver_time": 0.001996000000000109,
   "solver_queries": 1,
   "num_failures": 1,
   "failures": [
