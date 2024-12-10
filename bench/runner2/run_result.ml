@@ -9,9 +9,10 @@ type t =
   }
 
 let pp fmt { pkg; vuln; raw; control_path; exploit; _ } =
-  Fmt.pf fmt "@[<v 2>Run %d: %s@%s@;File %a@;%aControl Path: %a@;Exploit: %a@]"
-    vuln.id pkg.package pkg.version Fpath.pp vuln.filename Run_proc_result.pp
-    raw Fmt.bool control_path Fmt.bool exploit
+  Fmt.pf fmt
+    "@[<v 2>Run %d: %s@%s@;File %a@;%a@;Control Path: %a@;Exploit: %a@]" vuln.id
+    pkg.package pkg.version Fpath.pp vuln.filename Run_proc_result.pp raw
+    Fmt.bool control_path Fmt.bool exploit
 
 let pp_csv fmt { pkg; vuln; raw; timestamp; control_path; exploit; _ } =
   Fmt.pf fmt "%s,%s,%a,%a,%a,%a,%a" pkg.package pkg.version Vulnerability.pp_csv
