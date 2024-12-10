@@ -1,4 +1,29 @@
 open Syntax
+module Json = Yojson.Basic
+
+let parse_report output_dir =
+  let report_path = Fpath.(output_dir / "report.json") in
+  let json = Json.from_file (Fpath.to_string report_path) in
+  let json_list = Json.Util.to_list json in
+  let control_path =
+    List.exists
+      (fun json ->
+        let failures = Json.Util.(member "failures" json |> to_list) in
+        List.length failures > 0 )
+      json_list
+  in
+  let exploit =
+    List.exists
+      (fun json ->
+        let failures = Json.Util.(member "failures" json |> to_list) in
+        List.exists
+          (fun json ->
+            Json.Util.member "exploit" json
+            |> Json.Util.member "success" |> Json.Util.to_bool )
+          failures )
+      json_list
+  in
+  (Fmt.str "%a" (Json.pretty_print ~std:true) json, control_path, exploit)
 
 let work db ({ timestamp; time_limit; output_dir; filter; _ } : Run_metadata.t)
   (pkg : Package.t) : Run_result.t list =
@@ -19,7 +44,17 @@ let work db ({ timestamp; time_limit; output_dir; filter; _ } : Run_metadata.t)
         let raw =
           Run_action.run time_limit output_dir vuln.filename exploit_tmpl
         in
-        let res = { Run_result.pkg; vuln; raw; timestamp } in
+        let report, control_path, exploit = parse_report output_dir in
+        let res =
+          { Run_result.pkg
+          ; vuln
+          ; raw
+          ; report
+          ; control_path
+          ; exploit
+          ; timestamp
+          }
+        in
         Fmt.epr "%a@." Run_result.pp res;
         Run_result.to_db db res;
         res :: acc )
