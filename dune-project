@@ -65,4 +65,5 @@
   dune-site
   explode-js)
   (sites
-   (share templates)))
+   (share templates)
+   (share static)))

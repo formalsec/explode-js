@@ -15,9 +15,9 @@
   run_proc
   run_proc_result
   run_result
+  share
   syntax
   site
-  templates
   vulnerability)
  (libraries
   cmdliner
@@ -43,4 +43,14 @@
  (files
   (templates/index.html as index.html)
   (templates/results.html as results.html)
+  (templates/output.html as output.html)
   (templates/404.html as 404.html)))
+
+(install
+ (package explode_js-runner)
+ (section
+  (site
+   (explode_js-runner static)))
+ (files
+  (static/css/normalize.css as css/normalize.css)
+  (static/css/skeleton.css as css/skeleton.css)))
