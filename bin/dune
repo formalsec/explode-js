@@ -2,12 +2,4 @@
  (package explode_js)
  (public_name explode-js)
  (name main)
- (libraries
-  bos
-  cmdliner
-  ecma-sl
-  explode_js
-  explode_js-instrumentation
-  fmt
-  fpath
-  yojson))
+ (libraries bos cmdliner explode_js explode_js-instrumentation))

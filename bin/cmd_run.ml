@@ -1,3 +1,5 @@
+open Explode_js
+
 let ( let* ) = Result.bind
 
 let get_tests workspace (config : Fpath.t) (filename : Fpath.t option) =
@@ -10,10 +12,10 @@ let run_single ~(workspace : Fpath.t) (test : Fpath.t) filename taint_summary =
   let original_file = Option.map Fpath.to_string filename in
   let taint_summary = Fpath.to_string taint_summary in
   let* sym_result =
-    Cmd_symbolic.run ~filename:test ~entry_func:"main" ~workspace
+    Sym_exec.from_file ~filename:test ~entry_func:"main" ~workspace
   in
   let* () =
-    Cmd_replay.replay ?original_file ~taint_summary test workspace sym_result
+    Replay.run ?original_file ~taint_summary test workspace sym_result
   in
   let report_path = Fpath.(workspace / "report.json") in
   let report = Sym_result.to_json sym_result in

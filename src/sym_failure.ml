@@ -17,7 +17,7 @@ let pp_model fmt { data; _ } = Smtml.Model.pp ~no_values:false fmt data
 
 type exploit =
   { mutable success : bool
-  ; mutable effect : Effects.t option
+  ; mutable effect : Replay_effect.t option
   }
 
 let default_exploit () = { success = false; effect = None }
@@ -28,7 +28,7 @@ let exploit_to_json { success; effect } =
     ; ( "effect"
       , match effect with
         | None -> `Null
-        | Some e -> `String (Fmt.str "%a" Effects.pp e) )
+        | Some e -> `String (Fmt.str "%a" Replay_effect.pp e) )
     ]
 
 type t =
