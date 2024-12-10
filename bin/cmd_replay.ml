@@ -3,29 +3,7 @@ open Ecma_sl
 open Ecma_sl.Syntax.Result
 module String = Astring.String
 
-type options =
-  { filename : Fpath.t
-  ; workspace : Fpath.t
-  }
-
-let options filename workspace = { filename; workspace }
-
 let node test witness = Cmd.(v "node" % p test % p witness)
-
-type observable =
-  | Stdout of string
-  | File of string
-  | File_access of Fpath.t
-  | Error of string
-
-let pp_effect fmt = function
-  | Stdout str -> Format.fprintf fmt "(\"%s\" in stdout)" str
-  | File f -> Format.fprintf fmt "(created file \"%s\")" f
-  | File_access _ -> Format.fprintf fmt "(undesired file access occurred)"
-  | Error str -> Format.fprintf fmt "(threw Error(\"%s\"))" str
-
-let default_effects =
-  [ File "success"; Stdout "success"; Error "I pollute."; Stdout "polluted" ]
 
 let env testsuite =
   let ws = Unix.realpath @@ Fpath.to_string testsuite in
@@ -35,10 +13,11 @@ let env testsuite =
   String.Map.of_list [ ("NODE_PATH", node_path) ]
 
 let with_effects f =
+  let open Effects in
   (* Don't care if these file operations fail *)
   let exploit_file = Fpath.(v "./exploited") in
   let _ = OS.File.write exploit_file "success\n" in
-  let result = f (File_access exploit_file :: default_effects) in
+  let result = f (File_access exploit_file :: Effects.default) in
   let _ = OS.File.delete exploit_file in
   result
 
@@ -55,7 +34,7 @@ let execute_witness ~env (test : Fpath.t) (witness : Fpath.t) =
     List.find_opt
       (fun effect ->
         match effect with
-        | Stdout sub -> String.find_sub ~sub out |> Option.is_some
+        | Effects.Stdout sub -> String.find_sub ~sub out |> Option.is_some
         | File file -> Sys.file_exists file
         | File_access file ->
           let stats = Unix.stat (Fpath.to_string file) in
@@ -65,53 +44,40 @@ let execute_witness ~env (test : Fpath.t) (witness : Fpath.t) =
           String.find_sub ~sub out |> Option.is_some )
       observable_effects )
 
-let payload_to_json (witness, effect) =
-  `Assoc
-    [ ("payload", `String (Fpath.to_string witness))
-    ; ("effect", `String (Format.asprintf "%a" pp_effect effect))
-    ]
+let generate_literal_test ?original_file taint_summary workspace witness =
+  match taint_summary with
+  | None -> ()
+  | Some taint_summary ->
+    let output = Fpath.(workspace / "literal") in
+    let output = Fpath.to_string output in
+    let witness = Fpath.to_string witness in
+    let _ =
+      I2.Run.literal ~mode:0o666 ?file:original_file taint_summary witness
+        output
+    in
+    ()
 
-let write_report ~workspace filename effectful_payloads =
-  let mode = 0o666 in
-  let json :> Yojson.t =
-    `Assoc
-      [ ("filename", `String (Fpath.to_string filename))
-      ; ( "effectful_payloads"
-        , `List (List.map payload_to_json effectful_payloads) )
-      ]
-  in
-  let report_path = Fpath.(workspace / "confirmation.json") in
-  OS.File.writef ~mode report_path "%a" (Yojson.pretty_print ~std:true) json
-
-let replay ?original_file ?taint_summary filename workspace =
+let replay ?original_file ?taint_summary filename workspace sym_result =
   Log.app "  replaying : %a..." Fpath.pp filename;
   let* testsuite = OS.Dir.must_exist Fpath.(workspace / "test-suite") in
   let env = env testsuite in
-  let* witnesses = OS.Path.matches Fpath.(testsuite / "witness-$(n).json") in
-  let* effectful_payloads =
-    list_filter_map witnesses ~f:(fun witness ->
-      ( match taint_summary with
-      | Some taint_summary ->
-        let output = Fpath.(workspace / "literal") in
-        let output = Fpath.to_string output in
-        let witness = Fpath.to_string witness in
-        let _ =
-          I2.Run.literal ~mode:0o666 ?file:original_file taint_summary witness
-            output
-        in
-        ()
-      | None -> () );
+  let failures = sym_result.Sym_result.failures in
+  list_iter failures ~f:(fun { Sym_failure.model; exploit; _ } ->
+    match model with
+    | None -> Ok ()
+    | Some { path = witness; _ } -> (
+      generate_literal_test ?original_file taint_summary workspace witness;
       let+ effect = execute_witness ~env filename witness in
       match effect with
       | Some ((Stdout _ | File_access _ | Error _) as effect) ->
-        Log.app "     status : true %a" pp_effect effect;
-        Some (witness, effect)
+        Log.app "     status : true %a" Effects.pp effect;
+        exploit.success <- true;
+        exploit.effect <- Some effect;
+        ()
       | Some (File file as effect) ->
         ignore @@ OS.Path.delete (Fpath.v file);
-        Log.app "     status : true %a" pp_effect effect;
-        Some (witness, effect)
-      | None ->
-        Log.app "     status : false (no side effect)";
-        None )
-  in
-  write_report ~workspace filename effectful_payloads
+        Log.app "     status : true %a" Effects.pp effect;
+        exploit.success <- true;
+        exploit.effect <- Some effect;
+        ()
+      | None -> Log.app "     status : false (no side effect)" ) )
