@@ -21,6 +21,7 @@
             <th>Output dir</th>
             <th>Filter</th>
             <th>Index</th>
+            <th>Csv</th>
           </tr>
         </thead>
         <tbody>
@@ -31,6 +32,7 @@
             <td><a href="/results/{{ run.timestamp }}">{{ run.output_dir }}</a></td>
             <td>{{ run.filter_ }}</td>
             <td>{{ run.index }}</td>
+            <td><a href="/results/{{ run.timestamp }}/csv">to csv</a></td>
           </tr>
         {% endfor %}
         </tbody>
