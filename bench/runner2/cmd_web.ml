@@ -29,7 +29,10 @@ let outputs db timestamp vuln_id file _req =
     | "stdout" -> Ok v.raw.stdout
     | "stderr" -> Ok v.raw.stderr
     | "report" -> Ok v.report
-    | _ -> Error (404, Jg_template.from_file Share.Templates.not_found)
+    | _ ->
+      Error
+        ( S.Response_code.not_found
+        , Jg_template.from_file Share.Templates.not_found )
   in
   S.Response.make_string
   @@
@@ -43,6 +46,13 @@ let outputs db timestamp vuln_id file _req =
   in
   Ok (Jg_template.from_file ~models Share.Templates.output)
 
+let to_csv db timestamp _req =
+  let results =
+    Run_result.select_db ~timestamp db
+    |> List.sort (fun (r1 : Run_result.t) r2 -> compare r1.vuln.id r2.vuln.id)
+  in
+  S.Response.make_string (Ok (Run_result.to_csv_string results))
+
 let main addr port db_path =
   Db.with_db ~mode:`READONLY (Fpath.to_string db_path) @@ fun db ->
   let server = S.create ~addr ~port () in
@@ -55,6 +65,9 @@ let main addr port db_path =
   S.add_route_handler server
     S.Route.(exact "results" @/ int @/ int @/ string @/ return)
     (outputs db);
+  S.add_route_handler server
+    S.Route.(exact "results" @/ int @/ exact "csv" @/ return)
+    (to_csv db);
   (* Dirs *)
   let config = S.Dir.default_config () in
   let dir = List.hd Share.Static.root in
