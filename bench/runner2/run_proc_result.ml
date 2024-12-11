@@ -23,4 +23,4 @@ let pp fmt { returncode; utime; stime; rtime; _ } =
 let pp_csv fmt { returncode; stdout; stderr; rtime; utime; stime } =
   let stdout = String.escaped stdout in
   let stderr = String.escaped stderr in
-  Fmt.pf fmt "%d,%s,%s,%f,%f,%f" returncode stdout stderr rtime utime stime
+  Fmt.pf fmt "%d|%s|%s|%f|%f|%f" returncode stdout stderr rtime utime stime
