@@ -2,7 +2,7 @@ import os
 import csv
 import json
 
-input_csv = 'explodejs-datasets/res-20241210172356/results.csv'
+input_csv = 'datasets/res-20241217164607/results.csv'
 
 def with_csv(filename, f):
     with open(filename, 'r') as csvfile:
@@ -59,7 +59,7 @@ def main():
                 sinks.append({
                     "sym_test": sym_test_filename,
                     "sink": failure["sink"],
-                    "exploit" : True if failure["exploit"]["success"] == "true" else False
+                    "exploit" : failure["exploit"]["success"]
                 })
 
         assert (len(sinks) > 0)
