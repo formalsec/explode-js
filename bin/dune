@@ -2,6 +2,8 @@
  (package explode_js)
  (public_name explode-js)
  (name main)
+ (flags
+  (:standard -open Explode_js_prelude))
  (libraries bos cmdliner explode_js explode_js.instrumentation)
  (instrumentation
    (backend bisect_ppx)))

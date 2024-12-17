@@ -8,7 +8,7 @@ let solve (ty : Sym_failure_type.t) workspace thread =
   let pc = PC.to_list @@ Thread.pc thread in
   let solver = Thread.solver thread in
   let pcs = Exploit_patterns.apply pc ty in
-  Ecma_sl.Syntax.Result.list_map pcs ~f:(fun pc ->
+  Result.list_map pcs ~f:(fun pc ->
     let model =
       match Solver.check solver pc with
       | `Unsat | `Unknown -> None
