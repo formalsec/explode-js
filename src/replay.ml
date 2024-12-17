@@ -3,7 +3,18 @@ open Ecma_sl
 open Ecma_sl.Syntax.Result
 module String = Astring.String
 
+let npmi = Cmd.(v "npm" % "i")
+
 let node test witness = Cmd.(v "node" % p test % p witness)
+
+let setup_npm_dependencies () =
+  let pkg_json = Fpath.(v "." / "package.json") in
+  let* file_exists = OS.File.exists pkg_json in
+  if not file_exists then Ok ()
+  else
+    let run_out = OS.Cmd.run_out ~err:OS.Cmd.err_run_out npmi in
+    let* _ = OS.Cmd.out_null run_out in
+    Ok ()
 
 let env testsuite =
   let ws = Unix.realpath @@ Fpath.to_string testsuite in
@@ -59,6 +70,7 @@ let generate_literal_test ?original_file taint_summary workspace witness =
 
 let run ?original_file ?taint_summary filename workspace sym_result =
   Log.app "  replaying : %a..." Fpath.pp filename;
+  let* () = setup_npm_dependencies () in
   let* testsuite = OS.Dir.must_exist Fpath.(workspace / "test-suite") in
   let env = env testsuite in
   let failures = sym_result.Sym_result.failures in
