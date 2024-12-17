@@ -1,4 +1,4 @@
-  $ instrumentation2 literal -o - unit/string.json unit/identity.js --witness unit/symbolic_test_0_0_witness.json
+  $ explode-js instrument --mode concrete -o - --filename unit/identity.js --witness unit/symbolic_test_0_0_witness.json unit/string.json
   Genrating -
   module.exports = function identity(some_arg) {
     return some_arg

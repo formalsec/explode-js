@@ -96,19 +96,17 @@ let info_instrument =
 
 let cmd_instrument =
   let mode =
+    let open Cmd_instrument in
     let doc = "Instrumentation mode." in
-    Arg.(
-      value
-      & opt Cmd_instrument.instrument_conv Symbolic
-      & info [ "instrument-mode" ] ~doc )
+    Arg.(value & opt instrument_conv Symbolic & info [ "mode" ] ~doc)
   in
   let witness =
     let doc = "Witness file." in
-    Arg.(required & opt (some string) None & info [ "witness" ] ~doc)
+    Arg.(value & opt (some string) None & info [ "witness" ] ~doc)
   in
   let output_file =
     let doc = "Output file." in
-    Arg.(value & opt string "symbolic_test" & info [ "output" ] ~doc)
+    Arg.(value & opt string "symbolic_test" & info [ "output"; "o" ] ~doc)
   in
   let+ debug
   and+ mode

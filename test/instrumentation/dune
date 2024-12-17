@@ -1,5 +1,5 @@
 (cram
  (deps
-  %{bin:instrumentation2}
+  %{bin:explode-js}
   (source_tree toy)
   (source_tree unit)))
