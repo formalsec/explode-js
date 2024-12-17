@@ -2,4 +2,6 @@
  (package explode_js)
  (public_name explode-js)
  (name main)
- (libraries bos cmdliner explode_js explode_js-instrumentation))
+ (libraries bos cmdliner explode_js explode_js.instrumentation)
+ (instrumentation
+   (backend bisect_ppx)))

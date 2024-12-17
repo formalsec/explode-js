@@ -16,7 +16,11 @@ let non_dir_fpath = (parse_fpath Bos.OS.File.exists, Fpath.pp)
 
 let _dir_fpath = (parse_fpath Bos.OS.Dir.exists, Fpath.pp)
 
-let input =
+let debug =
+  let doc = "Debug mode." in
+  Arg.(value & flag & info [ "debug" ] ~doc)
+
+let input0 =
   let docv = "FILE" in
   let doc = "Name of the input file." in
   Arg.(required & pos 0 (some non_dir_fpath) None & info [] ~doc ~docv)
@@ -50,7 +54,7 @@ let info_run =
   Cmd.info "run" ~doc ~sdocs ~exits ~man ~man_xrefs
 
 let cmd_run =
-  let+ config = input
+  let+ config = input0
   and+ filename
   and+ workspace_dir
   and+ time_limit in
@@ -65,7 +69,7 @@ let info_exploit =
 
 let cmd_exploit =
   (* Term.(const Cmd_exploit.options $ input $ workspace_dir $ time_limit) *)
-  let+ filename = input
+  let+ filename = input0
   and+ workspace_dir
   and+ time_limit in
   Cmd_exploit.run ~filename ~workspace_dir ~time_limit
@@ -78,10 +82,41 @@ let info_full =
   Cmd.info "full" ~doc ~sdocs ~man ~man_xrefs
 
 let cmd_full =
-  let+ filename = input
+  let+ filename = input0
   and+ workspace_dir
   and+ time_limit in
   Cmd_full.run ~filename ~workspace_dir ~time_limit
+
+let info_instrument =
+  let doc = "Explode.js test instrumentator" in
+  let description = "" in
+  let man = [ `S Manpage.s_description; `P description ] in
+  let man_xrefs = [] in
+  Cmd.info "instrument" ~doc ~sdocs ~man ~man_xrefs
+
+let cmd_instrument =
+  let mode =
+    let doc = "Instrumentation mode." in
+    Arg.(
+      value
+      & opt Cmd_instrument.instrument_conv Symbolic
+      & info [ "instrument-mode" ] ~doc )
+  in
+  let witness =
+    let doc = "Witness file." in
+    Arg.(required & opt (some string) None & info [ "witness" ] ~doc)
+  in
+  let output_file =
+    let doc = "Output file." in
+    Arg.(value & opt string "symbolic_test" & info [ "output" ] ~doc)
+  in
+  let+ debug
+  and+ mode
+  and+ taint_summary = input0
+  and+ file = filename
+  and+ witness
+  and+ output_file in
+  Cmd_instrument.run ~debug ~mode ~taint_summary ~file ~witness ~output_file
 
 let v :
   ( int
@@ -102,4 +137,5 @@ let v :
     [ Cmd.v info_exploit cmd_exploit
     ; Cmd.v info_run cmd_run
     ; Cmd.v info_full cmd_full
+    ; Cmd.v info_instrument cmd_instrument
     ]

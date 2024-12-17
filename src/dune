@@ -5,7 +5,7 @@
   bos
   dune-site
   ecma-sl
-  explode_js-instrumentation
+  explode_js.instrumentation
   fmt
   fpath
   yojson))

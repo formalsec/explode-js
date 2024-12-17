@@ -25,6 +25,7 @@
  (description "Explode.js: Automatic exploit generation engine for Node.js applications")
  (depends
   bos
+  (bisect_ppx (and :with-test (>= 2.5.0)))
   cmdliner
   dune
   dune-site
@@ -40,20 +41,6 @@
   ("symbolic execution" javascript exploit))
  (sites
   (share nodejs)))
-
-(package
- (name explode_js-instrumentation)
- (synopsis "Instrumentation2")
- (description "Instrumentation2")
- (depends
-  (bisect_ppx (and :with-test (>= 2.5.0)))
-  (bos (>= 0.2.1))
-  (cmdliner (>= 1.2.0))
-  dune
-  ocaml
-  (yojson (>= 2.1.2)))
- (tags
-  (javascript nodejs exploit vulnerability)))
 
 (package
  (name explode_js-runner)
