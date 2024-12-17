@@ -37,7 +37,7 @@ let execute_witness ~env (test : Fpath.t) (witness : Fpath.t) =
   with_effects (fun observable_effects ->
     Log.app "    running : %a" Fpath.pp witness;
     let cmd = node test witness in
-    let+ out, status = Cmd.(run_out ~env ~err:err_run_out cmd |> out_string) in
+    let+ out, status = Cmd.(run_out ~env cmd |> out_string) in
     ( match status with
     | _, `Exited 0 -> ()
     | _, `Exited _ | _, `Signaled _ ->
