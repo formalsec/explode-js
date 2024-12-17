@@ -1,4 +1,4 @@
-open Instrumentation
+open Explode_js_instrumentation
 
 type instrument =
   | Symbolic

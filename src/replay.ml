@@ -63,8 +63,8 @@ let generate_literal_test ?original_file taint_summary workspace witness =
     let output = Fpath.to_string output in
     let witness = Fpath.to_string witness in
     let _ =
-      Instrumentation.Run.literal ~mode:0o666 ?file:original_file taint_summary
-        witness output
+      Explode_js_instrumentation.Run.literal ~mode:0o666 ?file:original_file
+        taint_summary witness output
     in
     ()
 
