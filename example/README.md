@@ -92,33 +92,33 @@ To confirm the vulnerabilities, Explode.js will execute explode-js like this:
 
 ```sh
 $ explode-js run --filename exec.js _results/run/taint_summary.json
-Genrating _results/symbolic_test_0_0.js
-Genrating _results/symbolic_test_0_1.js
-Genrating _results/symbolic_test_1_0.js
-Genrating _results/symbolic_test_1_1.js
+Genrating ./symbolic_test_0_0.js
+Genrating ./symbolic_test_0_1.js
+Genrating ./symbolic_test_1_0.js
+Genrating ./symbolic_test_1_1.js
        exec : (#source0 : __$Str)
 Found 1 problems!
-  replaying : _results/symbolic_test_0_0.js...
-Genrating _results/symbolic_test_0_0/literal_0_0.js
-    running : _results/symbolic_test_0_0/test-suite/witness-0.json
+  replaying : ./symbolic_test_0_0.js...
+Genrating ./symbolic_test_0_0/literal_0_0.js
+    running : ./symbolic_test_0_0/test-suite/witness-0.json
      status : true (created file "success")
        exec : (#source : __$Str)
 Found 1 problems!
-  replaying : _results/symbolic_test_0_1.js...
-Genrating _results/symbolic_test_0_1/literal_0_1.js
-    running : _results/symbolic_test_0_1/test-suite/witness-1.json
+  replaying : ./symbolic_test_0_1.js...
+Genrating ./symbolic_test_0_1/literal_0_1.js
+    running : ./symbolic_test_0_1/test-suite/witness-1.json
      status : true (created file "success")
        exec : (#source0 : __$Str)
 Found 1 problems!
-  replaying : _results/symbolic_test_1_0.js...
-Genrating _results/symbolic_test_1_0/literal_1_0.js
-    running : _results/symbolic_test_1_0/test-suite/witness-2.json
+  replaying : ./symbolic_test_1_0.js...
+Genrating ./symbolic_test_1_0/literal_1_0.js
+    running : ./symbolic_test_1_0/test-suite/witness-2.json
      status : true (created file "success")
        exec : (#source : __$Str)
 Found 1 problems!
-  replaying : _results/symbolic_test_1_1.js...
-Genrating _results/symbolic_test_1_1/literal_1_1.js
-    running : _results/symbolic_test_1_1/test-suite/witness-3.json
+  replaying : ./symbolic_test_1_1.js...
+Genrating ./symbolic_test_1_1/literal_1_1.js
+    running : ./symbolic_test_1_1/test-suite/witness-3.json
      status : true (created file "success")
 ```
 
@@ -135,51 +135,53 @@ Below we analyse the directory structure created by explode-js:
 ```sh
 $ tree _results
 _results
-├── graph
-│   ├── dependency_graph.txt
-│   ├── exec.js
-│   ├── graph_stats.json
-│   ├── graph.svg
-│   ├── nodes.csv
-│   └── rels.csv
-├── report.json
-├── run
-│   ├── neo4j_import.txt
-│   ├── neo4j_start.txt
-│   ├── neo4j_stop.txt
-│   └── time_stats.txt
-├── symbolic_test_0_0
-│   ├── literal_0_0.js
-│   ├── report.json
-│   └── test-suite
-│       ├── witness-0.json
-│       └── witness-0.smtml
-├── symbolic_test_0_0.js
-├── symbolic_test_0_1
-│   ├── literal_0_1.js
-│   ├── report.json
-│   └── test-suite
-│       ├── witness-1.json
-│       └── witness-1.smtml
-├── symbolic_test_0_1.js
-├── symbolic_test_1_0
-│   ├── literal_1_0.js
-│   ├── report.json
-│   └── test-suite
-│       ├── witness-2.json
-│       └── witness-2.smtml
-├── symbolic_test_1_0.js
-├── symbolic_test_1_1
-│   ├── literal_1_1.js
-│   ├── report.json
-│   └── test-suite
-│       ├── witness-3.json
-│       └── witness-3.smtml
-├── symbolic_test_1_1.js
-├── taint_summary_detection.json
-└── taint_summary.json
+└── run
+    ├── exec.js
+    ├── graph
+    │   ├── dependency_graph.txt
+    │   ├── exec.js
+    │   ├── graph_stats.json
+    │   ├── graph.svg
+    │   ├── nodes.csv
+    │   └── rels.csv
+    ├── report.json
+    ├── run
+    │   ├── neo4j_import.txt
+    │   ├── neo4j_start.txt
+    │   ├── neo4j_stop.txt
+    │   └── time_stats.txt
+    ├── symbolic_test_0_0
+    │   ├── literal_0_0.js
+    │   ├── report.json
+    │   └── test-suite
+    │       ├── witness-0.json
+    │       └── witness-0.smtml
+    ├── symbolic_test_0_0.js
+    ├── symbolic_test_0_1
+    │   ├── literal_0_1.js
+    │   ├── report.json
+    │   └── test-suite
+    │       ├── witness-1.json
+    │       └── witness-1.smtml
+    ├── symbolic_test_0_1.js
+    ├── symbolic_test_1_0
+    │   ├── literal_1_0.js
+    │   ├── report.json
+    │   └── test-suite
+    │       ├── witness-2.json
+    │       └── witness-2.smtml
+    ├── symbolic_test_1_0.js
+    ├── symbolic_test_1_1
+    │   ├── literal_1_1.js
+    │   ├── report.json
+    │   └── test-suite
+    │       ├── witness-3.json
+    │       └── witness-3.smtml
+    ├── symbolic_test_1_1.js
+    ├── taint_summary_detection.json
+    └── taint_summary.json
 
-11 directories, 33 files
+12 directories, 34 files
 ```
 
 The directory `_results/run` contains the symbolic tests and the directories
@@ -192,9 +194,9 @@ execution summary of the first symbolic test:
 ```sh
 $ cat _results/run/symbolic_test_0_0/report.json
 {
-  "filename": "_results/symbolic_test_0_0.js",
-  "execution_time": 8.600000000000274e-05,
-  "solver_time": 0.005644999999999456,
+  "filename": "./symbolic_test_0_0.js",
+  "execution_time": 9.100000000000774e-05,
+  "solver_time": 0.005696999999999619,
   "solver_queries": 1,
   "num_failures": 1,
   "failures": [
@@ -202,12 +204,12 @@ $ cat _results/run/symbolic_test_0_0/report.json
       "type": "Exec failure",
       "sink": "(#source0 : __$Str)",
       "pc": "(str.contains source0 \"`touch success`\")",
-      "pc_path": "_results/symbolic_test_0_0/test-suite/witness-0.smtml",
+      "pc_path": "./symbolic_test_0_0/test-suite/witness-0.smtml",
       "model": {
         "data": {
           "model": { "source0": { "ty": "str", "value": "`touch success`" } }
         },
-        "path": "_results/symbolic_test_0_0/test-suite/witness-0.json"
+        "path": "./symbolic_test_0_0/test-suite/witness-0.json"
       },
       "exploit": { "success": true, "effect": "(created file \"success\")" }
     }
