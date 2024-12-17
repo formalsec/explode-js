@@ -66,10 +66,11 @@ let full filename workspace_dir =
   match res with
   | Ok n -> n
   | Error err -> (
+    let open Explode_js_instrumentation in
     match err with
-    | #Instrumentation.Result.err as error ->
-      Format.eprintf "error: %a@." Instrumentation.Result.pp error;
-      Instrumentation.Result.to_code error
+    | #Instrument_result.err as error ->
+      Format.eprintf "error: %a@." Instrument_result.pp error;
+      Instrument_result.to_code error
     | `Status n ->
       Format.eprintf "error: Failed during symbolic execution/confirmation@.";
       n )

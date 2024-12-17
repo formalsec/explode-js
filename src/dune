@@ -1,11 +1,30 @@
 (library
- (package explode_js)
+ (public_name explode_js.prelude)
+ (name explode_js_prelude)
+ (modules explode_js_prelude))
+
+(library
  (name explode_js)
+ (modules
+  cwe
+  exploit_patterns
+  graphjs
+  replay
+  replay_effect
+  sites
+  sym_exec
+  sym_failure
+  sym_failure_type
+  sym_path_resolver
+  sym_result)
+ (flags
+  (:standard -open Explode_js_prelude))
  (libraries
   bos
   dune-site
   ecma-sl
   explode_js.instrumentation
+  explode_js.prelude
   fmt
   fpath
   yojson))
@@ -21,3 +40,4 @@
    (explode_js nodejs)))
  (files
   (esl_symbolic.js as esl_symbolic.js)))
+

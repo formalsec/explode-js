@@ -14,7 +14,6 @@ let pp fmt = function
   | `Undefined -> Format.pp_print_string fmt "undefined"
 
 module Parser = struct
-  open Syntax.Result
   module Json = Yojson.Basic
   module Util = Yojson.Basic.Util
 
@@ -32,7 +31,8 @@ module Parser = struct
     let model = Util.member "model" json |> Util.to_assoc in
     List.fold_left add_binding Map.empty model
 
-  let from_file (fname : string) : (t Map.t, [> Result.err ]) result =
+  let from_file (fname : string) : (t Map.t, [> Instrument_result.err ]) result =
+    let open Result in
     let* json =
       try Ok (Json.from_file ~fname fname)
       with Yojson.Json_error msg -> Error (`Malformed_json msg)

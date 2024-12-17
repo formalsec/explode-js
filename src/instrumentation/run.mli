@@ -4,7 +4,7 @@ val run :
   -> config:string
   -> output:string
   -> unit
-  -> (Fpath.t list, [> Result.err ]) result
+  -> (Fpath.t list, [> Instrument_result.err ]) result
 
 val literal :
      ?mode:int
@@ -12,4 +12,4 @@ val literal :
   -> string
   -> string
   -> string
-  -> (unit, [> Result.err ]) result
+  -> (unit, [> Instrument_result.err ]) result

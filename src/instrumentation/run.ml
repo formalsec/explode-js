@@ -1,5 +1,4 @@
 open Bos_setup
-open Syntax.Result
 module Json = Yojson.Basic
 module Util = Yojson.Basic.Util
 
@@ -18,6 +17,7 @@ let write_literal_test ~mode map file module_data vuln =
 
 (** [run file config output] creates symbolic tests [file] from [config] *)
 let run ?(mode = 0o644) ?file ~config ~output () =
+  let open Result in
   let+ vulns = Vuln_parser.from_file config in
   List.mapi
     (fun i vuln ->
@@ -48,6 +48,7 @@ let run ?(mode = 0o644) ?file ~config ~output () =
   |> List.concat
 
 let literal ?(mode = 0o644) ?file taint_summary witness output =
+  let open Result in
   let* vulns = Vuln_parser.from_file taint_summary in
   let+ witness_map = Value.Parser.from_file witness in
   List.iteri

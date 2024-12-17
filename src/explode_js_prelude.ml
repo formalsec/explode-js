@@ -1,9 +1,13 @@
+include Stdlib
+
 module Result = struct
+  include Result
+
   let ( let* ) v f = Result.bind v f
 
   let ( let+ ) v f = Result.map f v
 
-  let list_map f vs =
+  let list_map ~f vs =
     let rec aux acc = function
       | [] -> Ok (List.rev acc)
       | v :: vs -> (
@@ -13,6 +17,8 @@ module Result = struct
 end
 
 module List = struct
+  include List
+
   let ( let* ) v f = List.concat_map f v
 
   let ( let+ ) v f = List.map f v

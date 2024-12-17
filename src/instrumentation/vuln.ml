@@ -3,7 +3,7 @@ include Vuln_intf
 (** [unroll_params params] performs type unrolling of union types *)
 let rec unroll_params (params : (string * param_type) list) :
   (string * param_type) list list =
-  let open Syntax.List in
+  let open List in
   let rec loop wl acc =
     match wl with
     | [] -> acc
@@ -28,7 +28,7 @@ let rec unroll_params (params : (string * param_type) list) :
   List.rev params
 
 let rec unroll (vuln : vuln_conf) : vuln_conf list =
-  let open Syntax.List in
+  let open List in
   let cs =
     let+ params = unroll_params vuln.params in
     { vuln with params }
