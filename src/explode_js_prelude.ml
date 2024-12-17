@@ -8,12 +8,22 @@ module Result = struct
   let ( let+ ) v f = Result.map f v
 
   let list_map ~f vs =
-    let rec aux acc = function
+    let rec loop acc = function
       | [] -> Ok (List.rev acc)
-      | v :: vs -> (
-        match f v with Ok v -> aux (v :: acc) vs | Error _ as e -> e )
+      | hd :: tl ->
+        let* v = f hd in
+        loop (v :: acc) tl
     in
-    aux [] vs
+    loop [] vs
+
+  let list_iter ~f vs =
+    let rec loop = function
+      | [] -> Ok ()
+      | hd :: tl ->
+        let* () = f hd in
+        loop tl
+    in
+    loop vs
 end
 
 module List = struct

@@ -73,7 +73,8 @@ let bind v f =
     let+ v = f v in
     Some v
 
-let rec from_json (json : Json.t) : (vuln_conf, [> Instrument_result.err ]) result =
+let rec from_json (json : Json.t) :
+  (vuln_conf, [> Instrument_result.err ]) result =
   let filename = string_opt (Util.member "filename" json) in
   let* ty = bind (string_opt (Util.member "vuln_type" json)) vuln_type in
   let source = string_opt (Util.member "source" json) in
@@ -120,7 +121,8 @@ let rec from_json (json : Json.t) : (vuln_conf, [> Instrument_result.err ]) resu
   ; cont
   }
 
-let from_file (fname : string) : (vuln_conf list, [> Instrument_result.err ]) result =
+let from_file (fname : string) :
+  (vuln_conf list, [> Instrument_result.err ]) result =
   try
     let json = Json.from_file ~fname fname in
     Logs.debug (fun m -> m "json of %s:@.%a" fname Json.pp json);

@@ -1,6 +1,6 @@
 open Bos
 open Ecma_sl
-open Ecma_sl.Syntax.Result
+open Result
 module PC = Choice_monad.PC
 module Env = Symbolic.P.Env
 module Value = Symbolic.P.Value

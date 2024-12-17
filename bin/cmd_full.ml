@@ -1,5 +1,5 @@
 open Explode_js
-open Ecma_sl.Syntax.Result
+open Result
 
 type options =
   { filename : Fpath.t

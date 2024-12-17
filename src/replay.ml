@@ -1,6 +1,6 @@
 open Bos
 open Ecma_sl
-open Ecma_sl.Syntax.Result
+open Result
 module String = Astring.String
 
 let npmi = Cmd.(v "npm" % "i")
