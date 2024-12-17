@@ -54,11 +54,11 @@ let info_run =
   Cmd.info "run" ~doc ~sdocs ~exits ~man ~man_xrefs
 
 let cmd_run =
-  let+ config = input0
+  let+ workspace_dir
+  and+ taint_summary = input0
   and+ filename
-  and+ workspace_dir
   and+ time_limit in
-  Cmd_run.run ~config ~filename ~workspace_dir ~time_limit
+  Cmd_run.run ~workspace_dir ~taint_summary ~filename ~time_limit
 
 let info_exploit =
   let doc = "Explode.js single file symbolic confirmation" in

@@ -55,8 +55,8 @@ let full filename workspace_dir =
     if taint_summary_exists then
       let explode_start = Unix.gettimeofday () in
       let result =
-        Cmd_run.run ~config:taint_summary ~filename:(Some filename)
-          ~workspace_dir ~time_limit:(Some 30.0)
+        Cmd_run.run ~taint_summary ~filename:(Some filename) ~workspace_dir
+          ~time_limit:(Some 30.0)
       in
       let explode_time = Unix.gettimeofday () -. explode_start in
       let _ = Bos.OS.File.writef explode_time_path "%f@." explode_time in
