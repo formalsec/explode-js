@@ -2,7 +2,7 @@ open Syntax
 module Json = Yojson.Basic
 
 let parse_report output_dir =
-  let report_path = Fpath.(output_dir / "report.json") in
+  let report_path = Fpath.(output_dir / "run" / "report.json") in
   if not (Sys.file_exists (Fpath.to_string report_path)) then ("", false, false)
   else
     let json = Json.from_file (Fpath.to_string report_path) in
