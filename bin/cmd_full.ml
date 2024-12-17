@@ -67,9 +67,9 @@ let full filename workspace_dir =
   | Ok n -> n
   | Error err -> (
     match err with
-    | #I2.Result.err as error ->
-      Format.eprintf "error: %a@." I2.Result.pp error;
-      I2.Result.to_code error
+    | #Instrumentation.Result.err as error ->
+      Format.eprintf "error: %a@." Instrumentation.Result.pp error;
+      Instrumentation.Result.to_code error
     | `Status n ->
       Format.eprintf "error: Failed during symbolic execution/confirmation@.";
       n )
