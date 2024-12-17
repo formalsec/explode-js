@@ -34,10 +34,8 @@ let with_workspace workspace_dir taint_summary filename f =
       Ok (Some file_base)
   in
   (* Run in the workspace_dir *)
-  let* result =
-    Bos.OS.Dir.with_current workspace_dir f
-      (Fpath.v ".", taint_summary, filename)
-  in
+  let f () = f (Fpath.v ".") taint_summary filename in
+  let* result = Bos.OS.Dir.with_current workspace_dir f () in
   result
 
 let get_tests workspace (config : Fpath.t) (filename : Fpath.t option) =
@@ -64,7 +62,7 @@ let run_single ~(workspace : Fpath.t) (test : Fpath.t) filename taint_summary =
 
 let run ~workspace_dir ~taint_summary ~filename ~time_limit:_ =
   with_workspace workspace_dir taint_summary filename
-  @@ fun (workspace_dir, taint_summary, filename) ->
+  @@ fun workspace_dir taint_summary filename ->
   let* symbolic_tests = get_tests workspace_dir taint_summary filename in
   let rec loop results = function
     | [] -> Ok results
