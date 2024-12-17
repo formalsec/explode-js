@@ -1,5 +1,5 @@
 Test unit:
-  $ instrumentation2 symbolic -o - unit/any.json unit/identity.js
+  $ explode-js instrument --mode symbolic -o - --filename unit/identity.js unit/any.json
   Genrating -
   module.exports = function identity(some_arg) {
     return some_arg
@@ -10,7 +10,7 @@ Test unit:
   // Vuln: command-injection
   var some_arg = esl_symbolic.any("some_arg");
   module.exports(some_arg);
-  $ instrumentation2 symbolic -o - unit/array.json unit/identity.js
+  $ explode-js instrument --mode symbolic -o - --filename unit/identity.js unit/array.json
   Genrating -
   module.exports = function identity(some_arg) {
     return some_arg
@@ -21,7 +21,7 @@ Test unit:
   // Vuln: command-injection
   var some_arg = [ esl_symbolic.string("some_arg0") ];
   module.exports(some_arg);
-  $ instrumentation2 symbolic -o - unit/array2.json unit/identity.js
+  $ explode-js instrument --mode symbolic -o - --filename unit/identity.js unit/array2.json
   Genrating -
   module.exports = function identity(some_arg) {
     return some_arg
@@ -33,7 +33,7 @@ Test unit:
   var some_arg =
     [ esl_symbolic.string("some_arg0"), esl_symbolic.boolean("some_arg1"), esl_symbolic.number("some_arg2") ];
   module.exports(some_arg);
-  $ instrumentation2 symbolic -o - unit/bool.json unit/identity.js
+  $ explode-js instrument --mode symbolic -o - --filename unit/identity.js unit/bool.json
   Genrating -
   module.exports = function identity(some_arg) {
     return some_arg
@@ -44,7 +44,7 @@ Test unit:
   // Vuln: command-injection
   var some_arg = esl_symbolic.boolean("some_arg");
   module.exports(some_arg);
-  $ instrumentation2 symbolic -o - unit/function.json unit/identity.js
+  $ explode-js instrument --mode symbolic -o - --filename unit/identity.js unit/function.json
   Genrating -
   module.exports = function identity(some_arg) {
     return some_arg
@@ -55,7 +55,7 @@ Test unit:
   // Vuln: command-injection
   var some_arg = esl_symbolic.function("some_arg");
   module.exports(some_arg);
-  $ instrumentation2 symbolic -o - unit/lazy_object.json unit/identity.js
+  $ explode-js instrument --mode symbolic -o - --filename unit/identity.js unit/lazy_object.json
   Genrating -
   module.exports = function identity(some_arg) {
     return some_arg
@@ -66,7 +66,7 @@ Test unit:
   // Vuln: path-traversal
   var some_arg = esl_symbolic.lazy_object();
   module.exports(some_arg);
-  $ instrumentation2 symbolic -o - unit/number.json unit/identity.js
+  $ explode-js instrument --mode symbolic -o - --filename unit/identity.js unit/number.json
   Genrating -
   module.exports = function identity(some_arg) {
     return some_arg
@@ -77,7 +77,7 @@ Test unit:
   // Vuln: command-injection
   var some_arg = esl_symbolic.number("some_arg");
   module.exports(some_arg);
-  $ instrumentation2 symbolic -o - unit/object.json unit/identity.js
+  $ explode-js instrument --mode symbolic -o - --filename unit/identity.js unit/object.json
   Genrating -
   module.exports = function identity(some_arg) {
     return some_arg
@@ -88,7 +88,7 @@ Test unit:
   // Vuln: command-injection
   var some_arg = {  };
   module.exports(some_arg);
-  $ instrumentation2 symbolic -o - unit/polluted_object2.json unit/identity.js
+  $ explode-js instrument --mode symbolic -o - --filename unit/identity.js unit/polluted_object2.json
   Genrating -
   module.exports = function identity(some_arg) {
     return some_arg
@@ -99,7 +99,7 @@ Test unit:
   var some_arg = esl_symbolic.polluted_object(2);
   module.exports(some_arg);
   if (({}).toString == "polluted") { throw Error("I pollute."); }
-  $ instrumentation2 symbolic -o - unit/polluted_object3.json unit/identity.js
+  $ explode-js instrument --mode symbolic -o - --filename unit/identity.js unit/polluted_object3.json
   Genrating -
   module.exports = function identity(some_arg) {
     return some_arg
@@ -110,7 +110,7 @@ Test unit:
   var some_arg = esl_symbolic.polluted_object(3);
   module.exports(some_arg);
   if (({}).toString == "polluted") { throw Error("I pollute."); }
-  $ instrumentation2 symbolic -o - unit/string.json unit/identity.js
+  $ explode-js instrument --mode symbolic -o - --filename unit/identity.js unit/string.json
   Genrating -
   module.exports = function identity(some_arg) {
     return some_arg
@@ -121,7 +121,7 @@ Test unit:
   // Vuln: command-injection
   var some_arg = esl_symbolic.string("some_arg");
   module.exports(some_arg);
-  $ instrumentation2 symbolic -o - unit/union.json unit/identity.js
+  $ explode-js instrument --mode symbolic -o - --filename unit/identity.js unit/union.json
   Genrating -
   Genrating -
   Genrating -
@@ -152,7 +152,7 @@ Test unit:
   // Vuln: command-injection
   var some_arg = esl_symbolic.number("some_arg");
   module.exports(some_arg);
-  $ instrumentation2 symbolic -o - unit/dynamic.json unit/identity.js
+  $ explode-js instrument --mode symbolic -o - --filename unit/identity.js unit/dynamic.json
   Genrating -
   module.exports = function identity(some_arg) {
     return some_arg

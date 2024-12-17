@@ -31,6 +31,7 @@ let run ~debug ~mode ~taint_summary ~file ~witness ~output_file =
     | Error _ as e -> e
     | Ok _n -> Ok 0 )
   | Concrete -> (
+    let witness = Option.get witness in
     match Run.literal ?file taint_summary witness output_file with
     | Ok () -> Ok 0
     | Error _ as e -> e )
