@@ -21,15 +21,15 @@
             <th>package</th>
             <th>version</th>
             <th>filename</th>
-            <th>returncode</th>
+            <th>exit</th>
             <th>stdout</th>
             <th>stderr</th>
             <th>rtime</th>
-            <th>utime</th>
-            <th>stime</th>
+            <!-- <th>utime</th> -->
+            <!-- <th>stime</th> -->
             <th>report</th>
-            <th>control_path</th>
-            <th>exploit</th>
+            <th>c_path</th>
+            <th>E</th>
           </tr>
         </thead>
         <tbody>
@@ -43,8 +43,8 @@
             <td><a href="/results/{{ timestamp }}/{{ result.vuln_id }}/stdout">stdout</a></td>
             <td><a href="/results/{{ timestamp }}/{{ result.vuln_id }}/stderr">stderr</a></td>
             <td>{{ result.rtime }}</td>
-            <td>{{ result.utime }}</td>
-            <td>{{ result.stime }}</td>
+            <!-- <td>{{ result.utime }}</td> -->
+            <!-- <td>{{ result.stime }}</td> -->
             <td><a href="/results/{{ timestamp }}/{{ result.vuln_id }}/report">report</a></td>
             <td>{{ result.control_path }}</td>
             <td>{{ result.exploit }}</td>
