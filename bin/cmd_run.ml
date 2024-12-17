@@ -25,7 +25,8 @@ let run_single ~(workspace : Fpath.t) (test : Fpath.t) filename taint_summary =
   Ok sym_result
 
 let run ~config ~filename ~workspace_dir ~time_limit:_ =
-  let* _ = Bos.OS.Dir.create ~mode:0o777 workspace_dir in
+  let workspace_dir = Fpath.(workspace_dir / "run") in
+  let* _ = Bos.OS.Dir.create ~path:true ~mode:0o777 workspace_dir in
   let* symbolic_tests = get_tests workspace_dir config filename in
   let rec loop results = function
     | [] -> Ok results
