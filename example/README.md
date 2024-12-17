@@ -22,9 +22,9 @@ Explode.js will ask graph.js if it is able to identify the vulnerabilities
 in the function `f`. Graph.js, will output the following taint summary:
 
 ```sh
-$ graphjs --with-types -f exec.js -o explode-out
+$ graphjs --with-types -f exec.js -o _results/run
 ...
-$ cat explode-out/taint_summary.json
+$ cat _results/run/taint_summary.json
 [
     {
         "type": "VFunExported",
@@ -91,34 +91,34 @@ vulnerability is related to the case where the `source` parameter is a string.
 To confirm the vulnerabilities, Explode.js will execute explode-js like this:
 
 ```sh
-$ explode-js run --filename exec.js explode-out/taint_summary.json
-Genrating explode-out/symbolic_test_0_0.js
-Genrating explode-out/symbolic_test_0_1.js
-Genrating explode-out/symbolic_test_1_0.js
-Genrating explode-out/symbolic_test_1_1.js
+$ explode-js run --filename exec.js _results/run/taint_summary.json
+Genrating _results/symbolic_test_0_0.js
+Genrating _results/symbolic_test_0_1.js
+Genrating _results/symbolic_test_1_0.js
+Genrating _results/symbolic_test_1_1.js
        exec : (#source0 : __$Str)
 Found 1 problems!
-  replaying : explode-out/symbolic_test_0_0.js...
-Genrating explode-out/symbolic_test_0_0/literal_0_0.js
-    running : explode-out/symbolic_test_0_0/test-suite/witness-0.json
+  replaying : _results/symbolic_test_0_0.js...
+Genrating _results/symbolic_test_0_0/literal_0_0.js
+    running : _results/symbolic_test_0_0/test-suite/witness-0.json
      status : true (created file "success")
        exec : (#source : __$Str)
 Found 1 problems!
-  replaying : explode-out/symbolic_test_0_1.js...
-Genrating explode-out/symbolic_test_0_1/literal_0_1.js
-    running : explode-out/symbolic_test_0_1/test-suite/witness-1.json
+  replaying : _results/symbolic_test_0_1.js...
+Genrating _results/symbolic_test_0_1/literal_0_1.js
+    running : _results/symbolic_test_0_1/test-suite/witness-1.json
      status : true (created file "success")
        exec : (#source0 : __$Str)
 Found 1 problems!
-  replaying : explode-out/symbolic_test_1_0.js...
-Genrating explode-out/symbolic_test_1_0/literal_1_0.js
-    running : explode-out/symbolic_test_1_0/test-suite/witness-2.json
+  replaying : _results/symbolic_test_1_0.js...
+Genrating _results/symbolic_test_1_0/literal_1_0.js
+    running : _results/symbolic_test_1_0/test-suite/witness-2.json
      status : true (created file "success")
        exec : (#source : __$Str)
 Found 1 problems!
-  replaying : explode-out/symbolic_test_1_1.js...
-Genrating explode-out/symbolic_test_1_1/literal_1_1.js
-    running : explode-out/symbolic_test_1_1/test-suite/witness-3.json
+  replaying : _results/symbolic_test_1_1.js...
+Genrating _results/symbolic_test_1_1/literal_1_1.js
+    running : _results/symbolic_test_1_1/test-suite/witness-3.json
      status : true (created file "success")
 ```
 
@@ -126,15 +126,15 @@ The output show that explode-js first created two symbolic tests, `symbolic_test
 and `symbolic_test_1_0.js`, and then executed explode-js with each of them. The output
 shows that both tests found a problem, and subsequently during the replaying phase
 where the symbolic tests are executed with the concrete models generated in
-`explode-out/symbolic_test_0_0/test-suite/witness-0.js` and `explode-out/symbolic_test_1_0/test-suite/witness-1.js`,
+`_results/run/symbolic_test_0_0/test-suite/witness-0.js` and `_results/run/symbolic_test_1_0/test-suite/witness-1.js`,
 respectively, each being able to create a file named `success`. This confirms that
 the vulnerabilities are present in the function `f`.
 
 Below we analyse the directory structure created by explode-js:
 
 ```sh
-$ tree explode-out
-explode-out
+$ tree _results
+_results
 ├── graph
 │   ├── dependency_graph.txt
 │   ├── exec.js
@@ -182,19 +182,19 @@ explode-out
 11 directories, 33 files
 ```
 
-The directory `explode-out` contains the symbolic tests and the directories
+The directory `_results/run` contains the symbolic tests and the directories
 `symbolic_test_0_0` and `symbolic_test_1_0` contain the result of the respective
 symbolic test.
 
-The `explode-out/symbolic_test_0_0/report.json` contains the symbolic
+The `_results/run/symbolic_test_0_0/report.json` contains the symbolic
 execution summary of the first symbolic test:
 
 ```sh
-$ cat explode-out/symbolic_test_0_0/report.json
+$ cat _results/run/symbolic_test_0_0/report.json
 {
-  "filename": "explode-out/symbolic_test_0_0.js",
-  "execution_time": 0.00010000000000001674,
-  "solver_time": 0.0016900000000008575,
+  "filename": "_results/symbolic_test_0_0.js",
+  "execution_time": 8.600000000000274e-05,
+  "solver_time": 0.005644999999999456,
   "solver_queries": 1,
   "num_failures": 1,
   "failures": [
@@ -202,12 +202,12 @@ $ cat explode-out/symbolic_test_0_0/report.json
       "type": "Exec failure",
       "sink": "(#source0 : __$Str)",
       "pc": "(str.contains source0 \"`touch success`\")",
-      "pc_path": "explode-out/symbolic_test_0_0/test-suite/witness-0.smtml",
+      "pc_path": "_results/symbolic_test_0_0/test-suite/witness-0.smtml",
       "model": {
         "data": {
           "model": { "source0": { "ty": "str", "value": "`touch success`" } }
         },
-        "path": "explode-out/symbolic_test_0_0/test-suite/witness-0.json"
+        "path": "_results/symbolic_test_0_0/test-suite/witness-0.json"
       },
       "exploit": { "success": true, "effect": "(created file \"success\")" }
     }
@@ -223,11 +223,11 @@ the failure.
 Furthermore, the report contains the information related to the confirmation
 of the respective failure in the `"exploit"` field.
 The `"model"` field shows the model generated by symbolic execution. Here, it is
-located at `explode-out/symbolic_test_0_0/test-suite/witness-0.js`.
+located at `_results/run/symbolic_test_0_0/test-suite/witness-0.js`.
 Inspecting the contents of the file:
 
 ```sh
-$ cat explode-out/symbolic_test_0_0/test-suite/witness-0.json
+$ cat _results/run/symbolic_test_0_0/test-suite/witness-0.json
 { "model": { "source0": { "ty": "str", "value": "`touch success`" } } }
 ```
 
@@ -235,10 +235,10 @@ It shows that the a symbolic model with the assignment to the `#source0`,
 which is the a concrete assignment that triggers the vulnerability in the
 function `f`.
 
-For reference, the `explode-out/symbolic_test_0_0.js` looks like this:
+For reference, the `_results/run/symbolic_test_0_0.js` looks like this:
 
 ```sh
-$ cat explode-out/symbolic_test_0_0.js
+$ cat _results/run/symbolic_test_0_0.js
 let exec = require('child_process').exec;
 
 module.exports = function f(source) {

@@ -27,7 +27,7 @@ let filename =
 
 let workspace_dir =
   let doc = "Directory to store intermediate results" in
-  Arg.(value & opt fpath (Fpath.v "explode-out") & info [ "workspace" ] ~doc)
+  Arg.(value & opt fpath (Fpath.v "_results") & info [ "workspace" ] ~doc)
 
 let time_limit =
   let doc = "Maximum time limit for analysis" in
