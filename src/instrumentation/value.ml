@@ -31,7 +31,8 @@ module Parser = struct
     let model = Util.member "model" json |> Util.to_assoc in
     List.fold_left add_binding Map.empty model
 
-  let from_file (fname : string) : (t Map.t, [> Instrument_result.err ]) result =
+  let from_file (fname : string) : (t Map.t, [> Instrument_result.err ]) result
+      =
     let open Result in
     let* json =
       try Ok (Json.from_file ~fname fname)
