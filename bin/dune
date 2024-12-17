@@ -6,4 +6,4 @@
   (:standard -open Explode_js_prelude))
  (libraries bos cmdliner explode_js explode_js.instrumentation)
  (instrumentation
-   (backend bisect_ppx)))
+  (backend bisect_ppx)))
