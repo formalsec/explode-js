@@ -1,4 +1,5 @@
 open Explode_js
+open Explode_js_instrumentation
 
 let ( let* ) = Result.bind
 
@@ -42,7 +43,7 @@ let get_tests workspace (config : Fpath.t) (filename : Fpath.t option) =
   let file = Option.map Fpath.to_string filename in
   let config = Fpath.to_string config in
   let output = Fpath.(to_string @@ (workspace / "symbolic_test")) in
-  Explode_js_instrumentation.Run.run ~mode:0o666 ?file ~config ~output ()
+  Run.run ~mode:0o666 ?file ~config ~output ()
 
 let run_single ~(workspace : Fpath.t) (test : Fpath.t) filename taint_summary =
   let original_file = Option.map Fpath.to_string filename in
@@ -66,10 +67,13 @@ let run ~workspace_dir ~taint_summary ~filename ~time_limit:_ =
   let* symbolic_tests = get_tests workspace_dir taint_summary filename in
   let rec loop results = function
     | [] -> Ok results
-    | test :: remaning ->
-      let workspace = Fpath.(workspace_dir // rem_ext (base test)) in
-      let* sym_result = run_single ~workspace test filename taint_summary in
-      loop (sym_result :: results) remaning
+    | test :: remaning -> (
+      match test with
+      | Run.Single_shot test ->
+        let workspace = Fpath.(workspace_dir // rem_ext (base test)) in
+        let* sym_result = run_single ~workspace test filename taint_summary in
+        loop (sym_result :: results) remaning
+      | Client_server { client = _; server = _ } -> assert false )
   in
   let* results = loop [] symbolic_tests in
   let results_json = `List (List.map Sym_result.to_json results) in

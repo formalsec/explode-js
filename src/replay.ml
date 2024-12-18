@@ -68,7 +68,8 @@ let generate_literal_test ?original_file taint_summary workspace witness =
     in
     ()
 
-let run ?original_file ?taint_summary filename workspace sym_result =
+let run ?(literal_test = true) ?original_file ?taint_summary filename workspace
+  sym_result =
   Log.app "  replaying : %a..." Fpath.pp filename;
   let* () = setup_npm_dependencies () in
   let* testsuite = OS.Dir.must_exist Fpath.(workspace / "test-suite") in
@@ -78,7 +79,8 @@ let run ?original_file ?taint_summary filename workspace sym_result =
     match model with
     | None -> Ok ()
     | Some { path = witness; _ } -> (
-      generate_literal_test ?original_file taint_summary workspace witness;
+      if literal_test then
+        generate_literal_test ?original_file taint_summary workspace witness;
       let+ effect = execute_witness ~env filename witness in
       match effect with
       | Some ((Stdout _ | File_access _ | Error _) as effect) ->

@@ -2,74 +2,74 @@ open Bos_setup
 module Json = Yojson.Basic
 module Util = Yojson.Basic.Util
 
-let get_test_name prefix i =
+type test_type =
+  | Single_shot of Fpath.t
+  | Client_server of
+      { client : Fpath.t
+      ; server : Fpath.t
+      }
+
+let fresh_testname prefix i =
   match prefix with
   | "-" -> Fpath.v "-"
   | _ -> Fmt.kstr Fpath.v "%s_%d.js" prefix i
 
-let write_test ~mode ~file module_data vuln =
+let get_filename dirname taint_summary = function
+  | Some f -> f
+  | None -> (
+    match taint_summary.Vuln_intf.filename with
+    | Some file -> Filename.concat dirname file
+    | None -> assert false )
+
+let write_test ~mode ~file filename vuln =
   Fmt.epr "Genrating %a@." Fpath.pp file;
   let test = Templates.Symbolic.v vuln in
+  let module_data = In_channel.(with_open_text filename input_all) in
   OS.File.writef ~mode file "%s@\n%s@." module_data test
 
-let write_literal_test ~mode map file module_data vuln =
+let write_literal_test ~mode map file filename vuln =
   Format.eprintf "Genrating %a@." Fpath.pp file;
   let test = Templates.Literal.v map vuln in
+  let module_data = In_channel.(with_open_text filename input_all) in
   OS.File.writef ~mode file "%s@\n%s@." module_data test
 
 (** [run file config output] creates symbolic tests [file] from [config] *)
-let run ?(mode = 0o644) ?file ~config ~output () =
+let run ?(mode = 0o644) ?file:filename ~config:ts_path ~output:output_file () =
   let open Result in
-  let+ vulns = Vuln_parser.from_file config in
-  let confs = List.concat_map Vuln.unroll vulns in
+  let+ vulns = Vuln_parser.from_file ts_path in
+  let tss = List.concat_map Vuln.unroll vulns in
   List.mapi
-    (fun i conf ->
-      let output_file = get_test_name output i in
-      let filename =
-        match file with
-        | Some f -> f
-        | None ->
-          let filename =
-            match conf.Vuln_intf.filename with
-            | Some f -> f
-            | None -> assert false
-          in
-          Filename.(concat (dirname config) filename)
-      in
-      let module_data = In_channel.(with_open_text filename input_all) in
-      let () =
-        match write_test ~mode ~file:output_file module_data conf with
-        | Ok () -> ()
-        | Error (`Msg msg) -> failwith msg
-      in
-      output_file )
-    confs
+    (fun i ts ->
+      let filename = get_filename (Filename.dirname ts_path) ts filename in
+      let output_file = fresh_testname output_file i in
+      match ts.ty with
+      | None | Some (Vuln_type.Cmd_injection | Code_injection | Proto_pollution)
+        ->
+        let () =
+          match write_test ~mode ~file:output_file filename ts with
+          | Ok () -> ()
+          | Error (`Msg msg) -> failwith msg
+        in
+        Single_shot output_file
+      | Some Path_traversal ->
+        Client_server { client = Fpath.v "."; server = Fpath.v "." } )
+    tss
 
-let literal ?(mode = 0o644) ?file taint_summary witness output =
+let literal ?(mode = 0o644) ?file:filename taint_summary_path witness output =
   let open Result in
-  let* vulns = Vuln_parser.from_file taint_summary in
+  let* vulns = Vuln_parser.from_file taint_summary_path in
   let+ model = Model.Parser.from_file witness in
   let confs = List.concat_map Vuln.unroll vulns in
   List.iteri
-    (fun i conf ->
+    (fun i ts ->
       let st = Fmt.str "symbolic_test_%d" i in
       match Astring.String.find_sub ~sub:st witness with
       | None -> ()
       | Some _ -> (
-        let output_file = get_test_name output i in
-        let filename =
-          match file with
-          | Some f -> f
-          | None ->
-            let filename =
-              match conf.Vuln_intf.filename with
-              | Some f -> f
-              | None -> assert false
-            in
-            Filename.(concat (dirname taint_summary) filename)
-        in
-        let module_data = In_channel.(with_open_text filename input_all) in
-        match write_literal_test ~mode model output_file module_data conf with
+        let dirname = Filename.dirname taint_summary_path in
+        let filename = get_filename dirname ts filename in
+        let output_file = fresh_testname output i in
+        match write_literal_test ~mode model output_file filename ts with
         | Ok () -> ()
         | Error (`Msg msg) -> failwith msg ) )
     confs

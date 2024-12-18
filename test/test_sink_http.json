@@ -1,0 +1,14 @@
+[
+  {
+    "filename" : "./test_sink_http.js",
+    "vuln_type" : "path-traversal",
+    "source" : "",
+    "sink" : "exec",
+    "tainted_params" : [],
+    "params_types" : {},
+    "client" : {
+      "type" : "GET",
+      "port" : "8888"
+    }
+  }
+]
