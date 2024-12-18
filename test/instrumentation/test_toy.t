@@ -8,7 +8,6 @@ Test toy examples:
   };
   
   var esl_symbolic = require("esl_symbolic");
-  esl_symbolic.sealProperties(Object.prototype);
   // Vuln: command-injection
   var x = esl_symbolic.string("x");
   module.exports(x);
@@ -24,7 +23,6 @@ Test toy examples:
   };
   
   var esl_symbolic = require("esl_symbolic");
-  esl_symbolic.sealProperties(Object.prototype);
   // Vuln: code-injection
   var a = esl_symbolic.string("a");
   var ret_f1 = f1(a);
@@ -39,7 +37,6 @@ Test toy examples:
   };
   
   var esl_symbolic = require("esl_symbolic");
-  esl_symbolic.sealProperties(Object.prototype);
   // Vuln: code-injection
   var a = esl_symbolic.string("a");
   var ret_f1 = f1(a);
@@ -62,7 +59,6 @@ Test toy examples:
   module.exports.Obj = Obj;
   
   var esl_symbolic = require("esl_symbolic");
-  esl_symbolic.sealProperties(Object.prototype);
   // Vuln: code-injection
   var source = esl_symbolic.string("source");
   var ret_module_exports_Obj = module.exports.Obj(source);
@@ -81,7 +77,6 @@ Test toy examples:
   }
   
   var esl_symbolic = require("esl_symbolic");
-  esl_symbolic.sealProperties(Object.prototype);
   // Vuln: code-injection
   var x = esl_symbolic.string("x");
   f(x);
