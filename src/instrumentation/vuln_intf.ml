@@ -1,9 +1,3 @@
-type vuln_type =
-  | Cmd_injection
-  | Code_injection
-  | Path_traversal
-  | Proto_pollution
-
 type param_type =
   | Any
   | Number
@@ -20,9 +14,9 @@ and object_type =
   | `Normal of (string * param_type) list
   ]
 
-type vuln_conf =
+type t =
   { filename : string option
-  ; ty : vuln_type option
+  ; ty : Vuln_type.t option
   ; source : string option
   ; source_lineno : int option
   ; sink : string option
@@ -33,19 +27,17 @@ type vuln_conf =
   }
 
 and cont =
-  | Return of vuln_conf
-  | Sequence of vuln_conf
+  | Return of t
+  | Sequence of t
 
 module type Intf = sig
-  type nonrec vuln_type = vuln_type
-
   type nonrec param_type = param_type
 
   type nonrec object_type = object_type
 
-  type nonrec vuln_conf = vuln_conf
+  type nonrec t = t
 
   type nonrec cont = cont
 
-  val unroll : vuln_conf -> vuln_conf list
+  val unroll : t -> t list
 end

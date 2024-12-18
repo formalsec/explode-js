@@ -27,7 +27,7 @@ let rec unroll_params (params : (string * param_type) list) :
   let+ params = loop params [ [] ] in
   List.rev params
 
-let rec unroll (vuln : vuln_conf) : vuln_conf list =
+let rec unroll (vuln : t) : t list =
   let open List in
   let cs =
     let+ params = unroll_params vuln.params in

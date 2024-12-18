@@ -4,13 +4,6 @@ open Result
 module Json = Yojson.Basic
 module Util = Yojson.Basic.Util
 
-let vuln_type = function
-  | "command-injection" -> Ok Cmd_injection
-  | "code-injection" -> Ok Code_injection
-  | "path-traversal" -> Ok Path_traversal
-  | "prototype-pollution" -> Ok Proto_pollution
-  | str -> Error (`Unknown_vuln_type str)
-
 let param_type (ty : string) =
   match String.trim ty with
   | "any" -> Ok Any
@@ -30,7 +23,7 @@ let fix_dynamic_prop =
   function
   | "*" ->
     incr counter;
-    Format.sprintf "dp%d" !counter
+    Fmt.str "dp%d" !counter
   | str -> str
 
 let rec param (json : Json.t) =
@@ -73,10 +66,12 @@ let bind v f =
     let+ v = f v in
     Some v
 
-let rec from_json (json : Json.t) :
-  (vuln_conf, [> Instrument_result.err ]) result =
+let rec from_json (json : Json.t) : (Vuln.t, [> Instrument_result.err ]) result
+    =
   let filename = string_opt (Util.member "filename" json) in
-  let* ty = bind (string_opt (Util.member "vuln_type" json)) vuln_type in
+  let* ty =
+    bind (string_opt (Util.member "vuln_type" json)) Vuln_type.of_string
+  in
   let source = string_opt (Util.member "source" json) in
   let source_lineno = int_opt (Util.member "source_lineno" json) in
   let sink = string_opt (Util.member "sink" json) in
@@ -122,10 +117,10 @@ let rec from_json (json : Json.t) :
   }
 
 let from_file (fname : string) :
-  (vuln_conf list, [> Instrument_result.err ]) result =
-  try
-    let json = Json.from_file ~fname fname in
+  (Vuln.t list, [> Instrument_result.err ]) result =
+  match Json.from_file ~fname fname with
+  | exception Yojson.Json_error msg -> Error (`Malformed_json msg)
+  | json ->
     Logs.debug (fun m -> m "json of %s:@.%a" fname Json.pp json);
     let* vulns = list json in
     list_map ~f:from_json vulns
-  with Yojson.Json_error msg -> Error (`Malformed_json msg)

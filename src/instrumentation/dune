@@ -2,14 +2,16 @@
  (public_name explode_js.instrumentation)
  (name explode_js_instrumentation)
  (modules
+  model
   run
   value
   vuln
   vuln_intf
   vuln_parser
-  vuln_symbolic
   vuln_literal
+  vuln_symbolic
+  vuln_type
   instrument_result)
  (flags
   (:standard -open Explode_js_prelude))
- (libraries yojson bos bos.setup explode_js.prelude))
+ (libraries yojson bos bos.setup explode_js.prelude fmt))

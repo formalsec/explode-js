@@ -6,7 +6,6 @@ Test unit:
   }
   
   var esl_symbolic = require("esl_symbolic");
-  esl_symbolic.sealProperties(Object.prototype);
   // Vuln: command-injection
   var some_arg = esl_symbolic.any("some_arg");
   module.exports(some_arg);
@@ -17,7 +16,6 @@ Test unit:
   }
   
   var esl_symbolic = require("esl_symbolic");
-  esl_symbolic.sealProperties(Object.prototype);
   // Vuln: command-injection
   var some_arg = [ esl_symbolic.string("some_arg0") ];
   module.exports(some_arg);
@@ -28,10 +26,10 @@ Test unit:
   }
   
   var esl_symbolic = require("esl_symbolic");
-  esl_symbolic.sealProperties(Object.prototype);
   // Vuln: command-injection
   var some_arg =
-    [ esl_symbolic.string("some_arg0"), esl_symbolic.boolean("some_arg1"), esl_symbolic.number("some_arg2") ];
+    [ esl_symbolic.string("some_arg0"), esl_symbolic.boolean("some_arg1"),
+      esl_symbolic.number("some_arg2") ];
   module.exports(some_arg);
   $ explode-js instrument --mode symbolic -o - --filename unit/identity.js unit/bool.json
   Genrating -
@@ -40,7 +38,6 @@ Test unit:
   }
   
   var esl_symbolic = require("esl_symbolic");
-  esl_symbolic.sealProperties(Object.prototype);
   // Vuln: command-injection
   var some_arg = esl_symbolic.boolean("some_arg");
   module.exports(some_arg);
@@ -51,7 +48,6 @@ Test unit:
   }
   
   var esl_symbolic = require("esl_symbolic");
-  esl_symbolic.sealProperties(Object.prototype);
   // Vuln: command-injection
   var some_arg = esl_symbolic.function("some_arg");
   module.exports(some_arg);
@@ -62,7 +58,6 @@ Test unit:
   }
   
   var esl_symbolic = require("esl_symbolic");
-  esl_symbolic.sealProperties(Object.prototype);
   // Vuln: path-traversal
   var some_arg = esl_symbolic.lazy_object();
   module.exports(some_arg);
@@ -73,7 +68,6 @@ Test unit:
   }
   
   var esl_symbolic = require("esl_symbolic");
-  esl_symbolic.sealProperties(Object.prototype);
   // Vuln: command-injection
   var some_arg = esl_symbolic.number("some_arg");
   module.exports(some_arg);
@@ -84,7 +78,6 @@ Test unit:
   }
   
   var esl_symbolic = require("esl_symbolic");
-  esl_symbolic.sealProperties(Object.prototype);
   // Vuln: command-injection
   var some_arg = {  };
   module.exports(some_arg);
@@ -117,7 +110,6 @@ Test unit:
   }
   
   var esl_symbolic = require("esl_symbolic");
-  esl_symbolic.sealProperties(Object.prototype);
   // Vuln: command-injection
   var some_arg = esl_symbolic.string("some_arg");
   module.exports(some_arg);
@@ -130,7 +122,6 @@ Test unit:
   }
   
   var esl_symbolic = require("esl_symbolic");
-  esl_symbolic.sealProperties(Object.prototype);
   // Vuln: command-injection
   var some_arg = esl_symbolic.string("some_arg");
   module.exports(some_arg);
@@ -139,7 +130,6 @@ Test unit:
   }
   
   var esl_symbolic = require("esl_symbolic");
-  esl_symbolic.sealProperties(Object.prototype);
   // Vuln: command-injection
   var some_arg = esl_symbolic.boolean("some_arg");
   module.exports(some_arg);
@@ -148,7 +138,6 @@ Test unit:
   }
   
   var esl_symbolic = require("esl_symbolic");
-  esl_symbolic.sealProperties(Object.prototype);
   // Vuln: command-injection
   var some_arg = esl_symbolic.number("some_arg");
   module.exports(some_arg);
@@ -159,7 +148,6 @@ Test unit:
   }
   
   var esl_symbolic = require("esl_symbolic");
-  esl_symbolic.sealProperties(Object.prototype);
   // Vuln: command-injection
   var obj = { dp0: esl_symbolic.any("dp0") };
   module.exports(obj);
