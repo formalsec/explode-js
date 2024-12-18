@@ -4,6 +4,8 @@
  (modules
   model
   run
+  template
+  templates
   value
   vuln
   vuln_intf

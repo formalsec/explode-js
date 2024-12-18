@@ -1,22 +1,6 @@
 open Format
 open Vuln_intf
 
-let template0 : ('a, Format.formatter, unit) format =
-  "var esl_symbolic = require(\"esl_symbolic\");@\n\
-   // Vuln: %a@\n\
-   %a"
-
-let template1 : ('a, Format.formatter, unit) format =
-  "var esl_symbolic = require(\"esl_symbolic\");@\n\
-   // Vuln: %a@\n\
-   %a@\n\
-   if (({}).toString == \"polluted\") { throw Error(\"I pollute.\"); }"
-
-let get_template = function
-  | Some (Vuln_type.Cmd_injection | Code_injection | Path_traversal) ->
-    template0
-  | Some Proto_pollution | None -> template1
-
 let fresh_str =
   let id = ref 0 in
   fun () ->
@@ -67,24 +51,22 @@ let normalize = String.map (fun c -> match c with '.' | ' ' -> '_' | _ -> c)
 
 let ( let* ) v f = Option.bind v f
 
-let pp fmt (v : t) =
-  let rec pp_aux fmt { source; params; cont; _ } =
-    if List.length params > 0 then Fmt.pf fmt "%a;@\n" pp_params_as_decl params;
-    match (cont, source) with
-    | None, Some "" -> ()
-    | None, Some source -> Fmt.pf fmt "%s(%a);" source pp_params_as_args params
-    | Some (Return ret), Some source ->
-      let var_aux = "ret_" ^ normalize source in
-      Fmt.pf fmt "var %s = %s(%a);@\n" var_aux source pp_params_as_args params;
-      let source =
-        let* ret_source = ret.source in
-        Some (var_aux ^ ret_source)
-      in
-      pp_aux fmt { ret with source }
-    | Some (Sequence cont), Some source ->
-      Fmt.pf fmt "%s(%a);@\n" source pp_params_as_args params;
-      pp_aux fmt cont
-    | _, None -> assert false
-  in
-  let template = get_template v.ty in
-  Fmt.pf fmt template (Fmt.option Vuln_type.pp) v.ty pp_aux v
+let rec pp fmt { source; params; cont; _ } =
+  if List.length params > 0 then Fmt.pf fmt "%a;@\n" pp_params_as_decl params;
+  match (cont, source) with
+  | None, Some "" -> ()
+  | None, Some source -> Fmt.pf fmt "%s(%a);" source pp_params_as_args params
+  | Some (Return ret), Some source ->
+    let var_aux = "ret_" ^ normalize source in
+    Fmt.pf fmt "var %s = %s(%a);@\n" var_aux source pp_params_as_args params;
+    let source =
+      let* ret_source = ret.source in
+      Some (var_aux ^ ret_source)
+    in
+    pp fmt { ret with source }
+  | Some (Sequence cont), Some source ->
+    Fmt.pf fmt "%s(%a);@\n" source pp_params_as_args params;
+    pp fmt cont
+  | _, None -> assert false
+
+let to_string = Fmt.str "%a" pp

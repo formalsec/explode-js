@@ -8,12 +8,14 @@ let get_test_name prefix i =
   | _ -> Fmt.kstr Fpath.v "%s_%d.js" prefix i
 
 let write_test ~mode ~file module_data vuln =
-  Format.eprintf "Genrating %a@." Fpath.pp file;
-  OS.File.writef ~mode file "%s@\n%a@." module_data Vuln_symbolic.pp vuln
+  Fmt.epr "Genrating %a@." Fpath.pp file;
+  let test = Templates.Symbolic.v vuln in
+  OS.File.writef ~mode file "%s@\n%s@." module_data test
 
 let write_literal_test ~mode map file module_data vuln =
   Format.eprintf "Genrating %a@." Fpath.pp file;
-  OS.File.writef ~mode file "%s@\n%a@." module_data (Vuln_literal.pp map) vuln
+  let test = Templates.Literal.v map vuln in
+  OS.File.writef ~mode file "%s@\n%s@." module_data test
 
 (** [run file config output] creates symbolic tests [file] from [config] *)
 let run ?(mode = 0o644) ?file ~config ~output () =

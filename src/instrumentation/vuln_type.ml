@@ -10,6 +10,8 @@ let pp fmt = function
   | Path_traversal -> Fmt.string fmt "path-traversal"
   | Proto_pollution -> Fmt.string fmt "prototype-pollution"
 
+let to_string = Fmt.str "%a" pp
+
 let of_string = function
   | "command-injection" -> Ok Cmd_injection
   | "code-injection" -> Ok Code_injection
