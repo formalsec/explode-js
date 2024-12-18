@@ -71,6 +71,7 @@ let pp fmt (v : t) =
   let rec pp_aux fmt { source; params; cont; _ } =
     if List.length params > 0 then Fmt.pf fmt "%a;@\n" pp_params_as_decl params;
     match (cont, source) with
+    | None, Some "" -> ()
     | None, Some source -> Fmt.pf fmt "%s(%a);" source pp_params_as_args params
     | Some (Return ret), Some source ->
       let var_aux = "ret_" ^ normalize source in
