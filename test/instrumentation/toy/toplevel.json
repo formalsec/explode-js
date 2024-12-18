@@ -1,0 +1,8 @@
+[
+  {
+    "vuln_type": "code-injection",
+    "source": "",
+    "tainted_params": [],
+    "params_types": {}
+  }
+]
