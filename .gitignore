@@ -9,4 +9,5 @@ explode-out/
 *.pdf
 res*/
 results
+_results
 __pycache__/

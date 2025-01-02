@@ -1,13 +1,14 @@
 open Bos
-open Ecma_sl
 open Result
-module PC = Choice_monad.PC
-module Env = Symbolic.P.Env
-module Value = Symbolic.P.Value
-module Choice = Symbolic.P.Choice
-module Thread = Choice_monad.Thread
-module Translator = Value_translator
-module Extern_func = Symbolic.P.Extern_func
+
+[@@@ocaml.warning "-21"]
+
+module Env = Ecma_sl.Symbolic.P.Env
+module Value = Ecma_sl.Symbolic.P.Value
+module Choice = Ecma_sl.Symbolic.P.Choice
+module Thread = Ecma_sl.Choice_monad.Thread
+module Solver = Ecma_sl.Solver
+module Extern_func = Ecma_sl.Symbolic.P.Extern_func
 
 let ext_esl = ".esl"
 
@@ -19,18 +20,19 @@ let dispatch_file_ext on_plus on_core on_js (file : Fpath.t) =
   if Fpath.has_ext ext_esl file then Ok (on_plus file)
   else if Fpath.has_ext ext_cesl file then Ok (on_core file)
   else if Fpath.has_ext ext_js file then on_js file
-  else Error (`Msg (Fmt.asprintf "%a :unreconized file type" Fpath.pp file))
+  else Error (`Msg (Fmt.str "%a :unreconized file type" Fpath.pp file))
 
 let prog_of_plus file =
+  let open Ecma_sl in
   let file, path = (Fpath.filename file, Fpath.to_string file) in
   EParsing.load_file ~file path
   |> EParsing.parse_eprog ~file path
-  |> Preprocessor.Imports.resolve_imports |> Preprocessor.Macros.apply_macros
-  |> Compiler.compile_prog
+  |> Preprocessor.Imports.resolve_imports ~stdlib:Ecma_sl.Share.stdlib
+  |> Preprocessor.Macros.apply_macros |> Compiler.compile_prog
 
 let prog_of_core file =
   let file = Fpath.to_string file in
-  Parsing.load_file file |> Parsing.parse_prog ~file
+  Ecma_sl.Parsing.load_file file |> Ecma_sl.Parsing.parse_prog ~file
 
 let prog_of_js file =
   let js2ecma_sl file output =
@@ -39,26 +41,30 @@ let prog_of_js file =
   let ast_file = Fpath.(file -+ "_ast.cesl") in
   let* () = OS.Cmd.run (js2ecma_sl file ast_file) in
   let* ast = OS.File.read ast_file in
-  let* es6 = OS.File.read (Fpath.v (Option.get (Share.es6_interp ()))) in
+  let es6 = Ecma_sl.Share.es6_sym_interp () in
   let program = String.concat ";\n" [ ast; es6 ] in
   let+ () = OS.File.delete ast_file in
-  Parsing.parse_prog program
+  Ecma_sl.Parsing.parse_prog program
 
-let link_env ~extern filename prog =
+let link_env filename prog =
+  let open Ecma_sl in
   let env0 = Env.Build.empty () |> Env.Build.add_functions prog in
-  Env.Build.add_extern_functions (extern filename env0) env0
+  Env.Build.add_extern_functions (Symbolic_esl_ffi.extern_cmds env0) env0
+  |> Env.Build.add_extern_functions Symbolic_esl_ffi.concrete_api
+  |> Env.Build.add_extern_functions (Symbolic_esl_ffi.symbolic_api filename)
 
 let pp_model fmt v = Yojson.pretty_print ~std:true fmt (Smtml.Model.to_json v)
 
 let no_stop_at_failure = false
 
 let from_file ~workspace filename =
-  let open Syntax.Result in
+  Ecma_sl.Log.Config.log_warns := true;
+  (* Ecma_sl.Log.Config.log_debugs := true; *)
   let* prog = dispatch_file_ext prog_of_plus prog_of_core prog_of_js filename in
-  let env = link_env ~extern:Symbolic_extern.api filename prog in
+  let env = link_env filename prog in
   let start = Stdlib.Sys.time () in
-  let thread = Choice_monad.Thread.create () in
-  let result = Symbolic_interpreter.main env "main" in
+  let thread = Thread.create () in
+  let result = Ecma_sl.Symbolic_interpreter.main env "main" in
   let results = Choice.run result thread in
   let exec_time = Stdlib.Sys.time () -. start in
   let testsuite = Fpath.(workspace / "test-suite") in
@@ -80,10 +86,9 @@ let from_file ~workspace filename =
         else Ok (cnt, failures) )
   in
   let* n, failures = print_and_count_failures (0, []) results in
-  if n = 0 then Fmt.printf "All Ok!@." else Fmt.printf "Found %d problems!@." n;
+  if n = 0 then Fmt.pr "All Ok!@." else Fmt.pr "Found %d problems!@." n;
   let solv_time = !Solver.solver_time in
   let solv_cnt = !Solver.solver_count in
-  Log.debug "  exec time : %fs@." exec_time;
-  Log.debug "solver time : %fs@." solv_time;
-  let res = { Sym_result.filename; exec_time; solv_time; solv_cnt; failures } in
-  Ok res
+  Ecma_sl.Log.debug "  exec time : %fs" exec_time;
+  Ecma_sl.Log.debug "solver time : %fs" solv_time;
+  Ok { Sym_result.filename; exec_time; solv_time; solv_cnt; failures }

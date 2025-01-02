@@ -1,5 +1,4 @@
 open Bos
-open Ecma_sl
 open Result
 module String = Astring.String
 
@@ -20,7 +19,7 @@ let env testsuite =
   let ws = Unix.realpath @@ Fpath.to_string testsuite in
   let sharejs = List.hd Sites.Share.nodejs in
   let node_path = OS.Env.opt_var "NODE_PATH" ~absent:"" in
-  let node_path = Fmt.asprintf "%s:.:%s:%s" node_path ws sharejs in
+  let node_path = Fmt.str "%s:.:%s:%s" node_path ws sharejs in
   String.Map.of_list [ ("NODE_PATH", node_path) ]
 
 let with_effects f =
@@ -35,13 +34,13 @@ let with_effects f =
 let execute_witness ~env (test : Fpath.t) (witness : Fpath.t) =
   let open OS in
   with_effects (fun observable_effects ->
-    Log.app "    running : %a" Fpath.pp witness;
+    Fmt.pr "    running : %a@." Fpath.pp witness;
     let cmd = node test witness in
     let+ out, status = Cmd.(run_out ~env cmd |> out_string) in
     ( match status with
     | _, `Exited 0 -> ()
-    | _, `Exited _ | _, `Signaled _ ->
-      Fmt.printf "unexpected node failure: %s" out );
+    | _, `Exited _ | _, `Signaled _ -> Fmt.pr "unexpected node failure: %s" out
+    );
     List.find_opt
       (fun effect ->
         match effect with
@@ -69,7 +68,7 @@ let generate_literal_test ?original_file taint_summary workspace witness =
     ()
 
 let run ?original_file ?taint_summary filename workspace sym_result =
-  Log.app "  replaying : %a..." Fpath.pp filename;
+  Fmt.pr "  replaying : %a...@." Fpath.pp filename;
   let* () = setup_npm_dependencies () in
   let* testsuite = OS.Dir.must_exist Fpath.(workspace / "test-suite") in
   let env = env testsuite in
@@ -82,14 +81,14 @@ let run ?original_file ?taint_summary filename workspace sym_result =
       let+ effect = execute_witness ~env filename witness in
       match effect with
       | Some ((Stdout _ | File_access _ | Error _) as effect) ->
-        Log.app "     status : true %a" Replay_effect.pp effect;
+        Fmt.pr "     status : true %a@." Replay_effect.pp effect;
         exploit.success <- true;
         exploit.effect <- Some effect;
         ()
       | Some (File file as effect) ->
         ignore @@ OS.Path.delete (Fpath.v file);
-        Log.app "     status : true %a" Replay_effect.pp effect;
+        Fmt.pr "     status : true %a@." Replay_effect.pp effect;
         exploit.success <- true;
         exploit.effect <- Some effect;
         ()
-      | None -> Log.app "     status : false (no side effect)" ) )
+      | None -> Fmt.pr "     status : false (no side effect)@." ) )
