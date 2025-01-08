@@ -1,9 +1,3 @@
-# Explode-js evaluation
+# Explode.js evaluation
 
-## Zeroday Evaluation
-
-| Experiment | Results Directory |
-|:----------:|:-----------------:|
-| 2.1 | ecma-sl-testing-output-with-deps |
-| 2.2 | 2024-07-03_explodejs-889170d-ecma-sl-testing-output-with-deps |
-| 2.3 | 2024-07-18_explodejs-bb99bb4-ecma-sl-testing-output-with-deps |
+In an effort to organize and visualise benchmark runs a [google sheet](https://docs.google.com/spreadsheets/d/1T_-RcOprzrC_945zFUhkIDcJkiOc9PzzzsGpG7nCnEQ/edit?gid=0#gid=0) was created to summarise results.
