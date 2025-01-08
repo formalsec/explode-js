@@ -2,7 +2,6 @@
 
 Automatic exploit generation for Node.js applications. See [examples]
 
-
 ### Build from source
 
 - Install the library dependencies:
@@ -26,4 +25,9 @@ dune runtest
 dune install
 ```
 
+### Evaluation
+
+For benchmarking and evaluation see [bench]
+
+[bench]: ./bench
 [examples]: ./example
