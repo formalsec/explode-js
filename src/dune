@@ -11,18 +11,18 @@
   graphjs
   replay
   replay_effect
+  site
   sites
   sym_exec
   sym_failure
-  sym_failure_type
-  sym_path_resolver
-  sym_result)
+  sym_path_resolver)
  (flags
   (:standard -open Explode_js_prelude))
  (libraries
   bos
   dune-site
   ecma-sl
+  ecma-sl.symbolic
   explode_js.instrumentation
   explode_js.prelude
   fmt
