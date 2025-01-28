@@ -92,33 +92,37 @@ To confirm the vulnerabilities, Explode.js will execute explode-js like this:
 
 ```sh
 $ explode-js run --filename exec.js _results/run/taint_summary.json
-Genrating ./symbolic_test_0_0.js
-Genrating ./symbolic_test_0_1.js
-Genrating ./symbolic_test_1_0.js
-Genrating ./symbolic_test_1_1.js
-       exec : (#source0 : __$Str)
+Genrating ./symbolic_test_0.js
+Genrating ./symbolic_test_1.js
+Genrating ./symbolic_test_2.js
+Genrating ./symbolic_test_3.js
+exec(source0)
+       exec : source0
 Found 1 problems!
-  replaying : ./symbolic_test_0_0.js...
-Genrating ./symbolic_test_0_0/literal_0_0.js
-    running : ./symbolic_test_0_0/test-suite/witness-0.json
+  replaying : ./symbolic_test_0.js...
+Genrating ./symbolic_test_0/literal_0.js
+    running : ./symbolic_test_0/test-suite/witness-0.json
      status : true (created file "success")
-       exec : (#source : __$Str)
+exec(source)
+       exec : source
 Found 1 problems!
-  replaying : ./symbolic_test_0_1.js...
-Genrating ./symbolic_test_0_1/literal_0_1.js
-    running : ./symbolic_test_0_1/test-suite/witness-1.json
+  replaying : ./symbolic_test_1.js...
+Genrating ./symbolic_test_1/literal_1.js
+    running : ./symbolic_test_1/test-suite/witness-1.json
      status : true (created file "success")
-       exec : (#source0 : __$Str)
+exec(source0)
+       exec : source0
 Found 1 problems!
-  replaying : ./symbolic_test_1_0.js...
-Genrating ./symbolic_test_1_0/literal_1_0.js
-    running : ./symbolic_test_1_0/test-suite/witness-2.json
+  replaying : ./symbolic_test_2.js...
+Genrating ./symbolic_test_2/literal_2.js
+    running : ./symbolic_test_2/test-suite/witness-2.json
      status : true (created file "success")
-       exec : (#source : __$Str)
+exec(source)
+       exec : source
 Found 1 problems!
-  replaying : ./symbolic_test_1_1.js...
-Genrating ./symbolic_test_1_1/literal_1_1.js
-    running : ./symbolic_test_1_1/test-suite/witness-3.json
+  replaying : ./symbolic_test_3.js...
+Genrating ./symbolic_test_3/literal_3.js
+    running : ./symbolic_test_3/test-suite/witness-3.json
      status : true (created file "success")
 ```
 
@@ -150,34 +154,34 @@ _results
     │   ├── neo4j_start.txt
     │   ├── neo4j_stop.txt
     │   └── time_stats.txt
-    ├── symbolic_test_0_0
-    │   ├── literal_0_0.js
+    ├── symbolic_test_0
+    │   ├── literal_0.js
     │   ├── report.json
     │   └── test-suite
     │       ├── witness-0.json
     │       └── witness-0.smtml
-    ├── symbolic_test_0_0.js
-    ├── symbolic_test_0_1
-    │   ├── literal_0_1.js
+    ├── symbolic_test_0.js
+    ├── symbolic_test_1
+    │   ├── literal_1.js
     │   ├── report.json
     │   └── test-suite
     │       ├── witness-1.json
     │       └── witness-1.smtml
-    ├── symbolic_test_0_1.js
-    ├── symbolic_test_1_0
-    │   ├── literal_1_0.js
+    ├── symbolic_test_1.js
+    ├── symbolic_test_2
+    │   ├── literal_2.js
     │   ├── report.json
     │   └── test-suite
     │       ├── witness-2.json
     │       └── witness-2.smtml
-    ├── symbolic_test_1_0.js
-    ├── symbolic_test_1_1
-    │   ├── literal_1_1.js
+    ├── symbolic_test_2.js
+    ├── symbolic_test_3
+    │   ├── literal_3.js
     │   ├── report.json
     │   └── test-suite
     │       ├── witness-3.json
     │       └── witness-3.smtml
-    ├── symbolic_test_1_1.js
+    ├── symbolic_test_3.js
     ├── taint_summary_detection.json
     └── taint_summary.json
 
@@ -192,24 +196,24 @@ The `_results/run/symbolic_test_0_0/report.json` contains the symbolic
 execution summary of the first symbolic test:
 
 ```sh
-$ cat _results/run/symbolic_test_0_0/report.json
+$ cat _results/run/symbolic_test_0/report.json
 {
-  "filename": "./symbolic_test_0_0.js",
-  "execution_time": 9.100000000000774e-05,
-  "solver_time": 0.005696999999999619,
+  "filename": "./symbolic_test_0.js",
+  "execution_time": 0.00010000000000001674,
+  "solver_time": 0.001443000000000083,
   "solver_queries": 1,
   "num_failures": 1,
   "failures": [
     {
       "type": "Exec failure",
-      "sink": "(#source0 : __$Str)",
+      "sink": "source0",
       "pc": "(str.contains source0 \"`touch success`\")",
-      "pc_path": "./symbolic_test_0_0/test-suite/witness-0.smtml",
+      "pc_path": "./symbolic_test_0/test-suite/witness-0.smtml",
       "model": {
         "data": {
           "model": { "source0": { "ty": "str", "value": "`touch success`" } }
         },
-        "path": "./symbolic_test_0_0/test-suite/witness-0.json"
+        "path": "./symbolic_test_0/test-suite/witness-0.json"
       },
       "exploit": { "success": true, "effect": "(created file \"success\")" }
     }
@@ -218,7 +222,7 @@ $ cat _results/run/symbolic_test_0_0/report.json
 ```
 
 Observe that the symbolic execution summary shows that the symbolic test
-`symbolic_test_0_0.js` found a failure related to the sink "Exec" and that
+`symbolic_test_0.js` found a failure related to the sink "Exec" and that
 the symbolic expression `(#source0 : __$Str)` was responsible for triggering
 the failure.
 
@@ -229,7 +233,7 @@ located at `_results/run/symbolic_test_0_0/test-suite/witness-0.js`.
 Inspecting the contents of the file:
 
 ```sh
-$ cat _results/run/symbolic_test_0_0/test-suite/witness-0.json
+$ cat _results/run/symbolic_test_0/test-suite/witness-0.json
 { "model": { "source0": { "ty": "str", "value": "`touch success`" } } }
 ```
 
@@ -240,7 +244,7 @@ function `f`.
 For reference, the `_results/run/symbolic_test_0_0.js` looks like this:
 
 ```sh
-$ cat _results/run/symbolic_test_0_0.js
+$ cat _results/run/symbolic_test_0.js
 let exec = require('child_process').exec;
 
 module.exports = function f(source) {
@@ -251,7 +255,6 @@ module.exports = function f(source) {
 };
 
 var esl_symbolic = require("esl_symbolic");
-esl_symbolic.sealProperties(Object.prototype);
 // Vuln: command-injection
 var source = [ esl_symbolic.string("source0") ];
 module.exports(source);
