@@ -29,14 +29,12 @@
   cmdliner
   dune
   dune-site
-  explode_js-instrumentation
   extunix
   fpath
   mdx
   ocaml
   (owl (>= 1.1))
-  yojson
-  glob)
+  yojson)
  (tags
   ("symbolic execution" javascript exploit))
  (sites
@@ -49,8 +47,12 @@
  (depends
   dune
   dune-site
+  glob
   explode_js
-  jingoo)
+  jingoo
+  sqlite3
+  sqlite3_utils
+  tiny_httpd)
   (sites
    (share templates)
    (share static)))
