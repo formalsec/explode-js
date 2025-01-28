@@ -52,7 +52,7 @@ let run_single ~(workspace : Fpath.t) (test : Fpath.t) filename taint_summary =
     Replay.run ?original_file ~taint_summary test workspace sym_result
   in
   let report_path = Fpath.(workspace / "report.json") in
-  let report = Sym_result.to_json sym_result in
+  let report = Sym_exec.Symbolic_result.to_json sym_result in
   let* () =
     Bos.OS.File.writef ~mode:0o666 report_path "%a"
       (Yojson.pretty_print ~std:true)
@@ -72,7 +72,9 @@ let run ~workspace_dir ~taint_summary ~filename ~time_limit:_ =
       loop (sym_result :: results) remaning
   in
   let* results = loop [] symbolic_tests in
-  let results_json = `List (List.map Sym_result.to_json results) in
+  let results_json =
+    `List (List.map Sym_exec.Symbolic_result.to_json results)
+  in
   let results_report = Fpath.(workspace_dir / "report.json") in
   let* () =
     Bos.OS.File.writef ~mode:0o666 results_report "%a"
