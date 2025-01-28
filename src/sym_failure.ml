@@ -1,3 +1,5 @@
+open Ecma_sl_symbolic
+
 let ( let* ) = Result.bind
 
 module Json_util = Yojson.Basic.Util
@@ -17,22 +19,22 @@ let pp_model fmt { data; _ } = Smtml.Model.pp ~no_values:false fmt data
 
 type exploit =
   { mutable success : bool
-  ; mutable effect : Replay_effect.t option
+  ; mutable effect_ : Replay_effect.t option
   }
 
-let default_exploit () = { success = false; effect = None }
+let default_exploit () = { success = false; effect_ = None }
 
-let exploit_to_json { success; effect } =
+let exploit_to_json { success; effect_ } =
   `Assoc
     [ ("success", `Bool success)
     ; ( "effect"
-      , match effect with
+      , match effect_ with
         | None -> `Null
         | Some e -> `String (Fmt.str "%a" Replay_effect.pp e) )
     ]
 
 type t =
-  { ty : Sym_failure_type.t
+  { ty : Symbolic_error.t
   ; pc : Smtml.Expr.t list
   ; pc_path : Fpath.t
   ; model : model option
@@ -40,11 +42,11 @@ type t =
   }
 
 let pp fmt { ty; pc; model; _ } =
-  Fmt.pf fmt "@[<hov 1>((type %a)@;(pc %a)@;(model %a))@]" Sym_failure_type.pp
-    ty Smtml.Expr.pp_list pc (Fmt.option pp_model) model
+  Fmt.pf fmt "@[<hov 1>((type %a)@;(pc %a)@;(model %a))@]" Symbolic_error.pp ty
+    Smtml.Expr.pp_list pc (Fmt.option pp_model) model
 
 let to_json { ty; pc; pc_path; model; exploit } =
-  let ty = Sym_failure_type.to_json ty in
+  let ty = Symbolic_error.to_json ty in
   let remaining =
     `Assoc
       [ ("pc", `String (Fmt.str "%a" Smtml.Expr.pp_list pc))
@@ -62,11 +64,7 @@ let serialize =
   let mode = 0o666 in
   let next_int, _ = Ecma_sl.Base.make_counter 0 1 in
   fun workspace pc model ->
-    let f =
-      Fmt.kstr
-        Fpath.(add_seg (workspace / "test-suite"))
-        "witness-%d" (next_int ())
-    in
+    let f = Fmt.kstr Fpath.(add_seg workspace) "witness-%d" (next_int ()) in
     let pp_model fmt v =
       Yojson.pretty_print ~std:true fmt (Smtml.Model.to_json v)
     in
