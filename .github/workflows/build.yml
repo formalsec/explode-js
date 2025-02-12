@@ -11,7 +11,7 @@ on:
 jobs:
   build:
     env:
-      OCAML_COMPILER: 4.14
+      OCAML_COMPILER: 5.3
 
     strategy:
       fail-fast: false
@@ -21,9 +21,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
-          submodules: recursive
+
+      - name: Checkout Submodules
+        run: git submodule update --init vendor/ECMA-SL vendor/graphjs
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -37,8 +37,10 @@ jobs:
 
       - name: Install dependencies
         run: |
-          opam install ./vendor/ECMA-SL
-          opam install -y . --deps-only --with-test
+          opam install -y . ./vendor/ECMA-SL --deps-only
+          cd vendor/ECMA-SL && opam exec -- dune build @install -p ecma-sl
+          opam exec -- dune install -p ecma-sl
+          cd ../.. && opam exec -- dune build @install
 
       - name: Build
         run: opam exec -- dune build @install
