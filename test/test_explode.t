@@ -1,23 +1,25 @@
 Test eval explode :
   $ explode-js exploit test_sink_eval.js
-         eval : (#source : __$Str)
+         eval : source
   Found 1 problems!
     replaying : test_sink_eval.js...
       running : _results/test_sink_eval/test-suite/witness-0.json
        status : true ("success" in stdout)
       running : _results/test_sink_eval/test-suite/witness-1.json
        status : true ("success" in stdout)
+      running : _results/test_sink_eval/test-suite/witness-2.json
+       status : true ("success" in stdout)
 
 Test exec explode:
   $ explode-js exploit test_sink_exec.js
-         exec : s_concat(["git fetch ", (#remote : __$Str)])
+         exec : (str.++ ("git fetch ", remote))
   Found 1 problems!
     replaying : test_sink_exec.js...
       running : _results/test_sink_exec/test-suite/witness-0.json
        status : true (created file "success")
 Test readFile explode
   $ explode-js exploit test_sink_fs.js
-     readFile : (#source : __$Str)
+     readFile : source
   Found 1 problems!
     replaying : test_sink_fs.js...
       running : _results/test_sink_fs/test-suite/witness-0.json
@@ -65,13 +67,13 @@ Test polluted explode:
   Node.js v18.19.1
 
 Tests full:
-  $ explode-js run test_vfunexported.json
-  Genrating _results/symbolic_test_0_0.js
-         exec : (#x : __$Str)
+  $ explode-js run test_vfunexported.json --filename ./test_vfunexported.js
+  Genrating ./symbolic_test_0.js
+         exec : x
   Found 1 problems!
-    replaying : _results/symbolic_test_0_0.js...
-  Genrating _results/symbolic_test_0_0/literal_0_0.js
-      running : _results/symbolic_test_0_0/test-suite/witness-0.json
+    replaying : ./symbolic_test_0.js...
+  Genrating ./symbolic_test_0/literal_0.js
+      running : ./symbolic_test_0/test-suite/witness-0.json
        status : true (created file "success")
   $ explode-js run test_usecase_4.json
   Genrating _results/symbolic_test_0_0.js
