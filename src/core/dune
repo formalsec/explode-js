@@ -1,9 +1,4 @@
 (library
- (public_name explode_js.prelude)
- (name explode_js_prelude)
- (modules explode_js_prelude))
-
-(library
  (name explode_js)
  (modules
   cwe
