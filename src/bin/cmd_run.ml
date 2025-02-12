@@ -42,7 +42,7 @@ let get_tests workspace (config : Fpath.t) (filename : Fpath.t option) =
   let file = Option.map Fpath.to_string filename in
   let config = Fpath.to_string config in
   let output = Fpath.(to_string @@ (workspace / "symbolic_test")) in
-  Explode_js_instrumentation.Run.run ~mode:0o666 ?file ~config ~output ()
+  Explode_js_instrument.Run.run ~mode:0o666 ?file ~config ~output ()
 
 let run_single ~(workspace : Fpath.t) (test : Fpath.t) filename taint_summary =
   let original_file = Option.map Fpath.to_string filename in

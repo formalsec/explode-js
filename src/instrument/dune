@@ -1,6 +1,6 @@
 (library
- (public_name explode_js.instrumentation)
- (name explode_js_instrumentation)
+ (public_name explode_js.instrument)
+ (name explode_js_instrument)
  (modules
   model
   run
