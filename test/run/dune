@@ -1,0 +1,8 @@
+(cram
+ (deps
+  %{bin:explode-js}
+  test_vfunexported.js
+  test_vfunexported.json
+  test_usecase_4.js
+  test_usecase_4.json
+  (package ecma-sl)))
