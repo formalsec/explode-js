@@ -66,7 +66,7 @@ let full filename workspace_dir =
   match res with
   | Ok n -> n
   | Error err -> (
-    let open Explode_js_instrumentation in
+    let open Explode_js_instrument in
     match err with
     | #Instrument_result.err as error ->
       Format.eprintf "error: %a@." Instrument_result.pp error;
