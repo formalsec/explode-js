@@ -1,9 +1,9 @@
-[submodule "vendor/graphjs"]
-	path = vendor/graphjs
-	url = git@github.com:formalsec/graphjs.git
 [submodule "vendor/ECMA-SL"]
 	path = vendor/ECMA-SL
-	url = git@github.com:filipeom/ECMA-SL.git
+	url = https://github.com/formalsec/ECMA-SL.git
+[submodule "vendor/graphjs"]
+	path = vendor/graphjs
+	url = https://github.com/formalsec/graphjs.git
 [submodule "bench/datasets"]
 	path = bench/datasets
-	url = git@github.com:formalsec/explodejs-datasets.git
+	url = https://github.com/formalsec/explodejs-datasets.git
