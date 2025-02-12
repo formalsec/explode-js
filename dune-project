@@ -34,7 +34,8 @@
   mdx
   ocaml
   (owl (>= 1.1))
-  yojson)
+  yojson
+  z3)
  (tags
   ("symbolic execution" javascript exploit))
  (sites
@@ -45,6 +46,7 @@
  (synopsis "Explode-js runner")
  (description "explode_js-runner")
  (depends
+  core_unix
   dune
   dune-site
   glob
