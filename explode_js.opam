@@ -22,6 +22,7 @@ depends: [
   "ocaml"
   "owl" {>= "1.1"}
   "yojson"
+  "z3"
   "odoc" {with-doc}
 ]
 build: [
