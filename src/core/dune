@@ -18,7 +18,7 @@
   dune-site
   ecma-sl
   ecma-sl.symbolic
-  explode_js.instrumentation
+  explode_js.instrument
   explode_js.prelude
   fmt
   fpath
