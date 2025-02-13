@@ -1,0 +1,7 @@
+(library
+ (name auto_complete)
+ (public_name explode_js.parser)
+ (modules lexer parse parser token)
+ (libraries fmt sedlex)
+ (preprocess
+  (pps sedlex.ppx)))
