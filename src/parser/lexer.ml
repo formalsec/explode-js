@@ -40,7 +40,9 @@ let any_blank = [%sedlex.regexp? blank | newline]
 let rec token buf =
   match%sedlex buf with
   | Plus any_blank -> token buf
-  | intlit -> Num (Float.of_string @@ lexeme buf)
+  | intlit -> (
+    let intlit = lexeme buf in
+    match Float.of_string_opt intlit with Some n -> Num n | _ -> assert false )
   | "," -> Comma
   | ";" -> Semicolon
   | "{" -> L_brace
