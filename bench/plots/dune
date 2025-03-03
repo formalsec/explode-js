@@ -2,7 +2,7 @@
  (public_name explode_js.bench)
  (name explode_js_bench)
  (modules marker file)
- (libraries glob fpath))
+ (libraries bos dune-glob fpath))
 
 (executable
  (name fast_df)
