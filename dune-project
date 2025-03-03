@@ -46,10 +46,10 @@
  (synopsis "Explode-js runner")
  (description "explode_js-runner")
  (depends
-  core_unix
   dune
   dune-site
-  glob
+  dune-glob
+  extunix
   explode_js
   jingoo
   sqlite3

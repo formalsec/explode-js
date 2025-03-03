@@ -2,9 +2,7 @@ open Format
 open Vuln_intf
 
 let template0 : ('a, Format.formatter, unit) format =
-  "var esl_symbolic = require(\"esl_symbolic\");@\n\
-   // Vuln: %a@\n\
-   %a"
+  "var esl_symbolic = require(\"esl_symbolic\");@\n// Vuln: %a@\n%a"
 
 let template1 : ('a, Format.formatter, unit) format =
   "var esl_symbolic = require(\"esl_symbolic\");@\n\
