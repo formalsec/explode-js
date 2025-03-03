@@ -9,10 +9,10 @@ homepage: "https://github.com/explode-js/explode-js"
 doc: "https://url/to/documentation"
 bug-reports: "https://github.com/explode-js/explode-js/issues"
 depends: [
-  "core_unix"
   "dune" {>= "3.15"}
   "dune-site"
-  "glob"
+  "dune-glob"
+  "extunix"
   "explode_js"
   "jingoo"
   "sqlite3"

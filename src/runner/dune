@@ -20,8 +20,9 @@
   vulnerability)
  (libraries
   cmdliner
-  core_unix
+  bos
   dune-site
+  extunix
   explode_js
   fpath
   fmt

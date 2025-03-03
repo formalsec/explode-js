@@ -44,7 +44,13 @@ let work db ({ timestamp; time_limit; output_dir; filter; _ } : Run_metadata.t)
       if not (Sys.file_exists (Fpath.to_string exploit_tmpl)) then acc
       else
         let output_dir = Fpath.(output_dir / string_of_int vuln.id) in
-        Core_unix.mkdir_p (Fpath.to_string output_dir);
+        begin
+          match Bos.OS.Dir.create ~path:true output_dir with
+          | Ok _ -> ()
+          | Error (`Msg err) ->
+            Fmt.epr "could not create directory '%a': %s@." Fpath.pp output_dir
+              err
+        end;
         let raw =
           Run_action.run time_limit output_dir vuln.filename exploit_tmpl
         in
@@ -66,7 +72,7 @@ let work db ({ timestamp; time_limit; output_dir; filter; _ } : Run_metadata.t)
 
 let timestamp =
   let now = Unix.localtime @@ Unix.gettimeofday () in
-  int_of_string @@ Core_unix.strftime now "%Y%m%d%H%M%S"
+  int_of_string @@ ExtUnix.Specific.strftime "%Y%m%d%H%M%S" now
 
 let prepare_db db =
   let* () = Run_result.prepare_db db in
@@ -76,7 +82,7 @@ let main _jobs time_limit output filter index =
   Db.with_db "results.db" @@ fun db ->
   let* () = prepare_db db in
   let output_dir = Fpath.(output / Fmt.str "res-%d" timestamp) in
-  Core_unix.mkdir_p (Fpath.to_string output_dir);
+  let* _ = Bos.OS.Dir.create ~path:true output_dir in
   let metadata =
     { Run_metadata.timestamp; time_limit; output_dir; filter; index }
   in

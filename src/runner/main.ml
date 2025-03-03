@@ -70,7 +70,7 @@ let result =
       | `Parsing err -> Fmt.epr "parsing error: %s@." err
       | `Exn exn -> Fmt.epr "uncaught exception: %s@." (Printexc.to_string exn)
       | `Sqlite3 rc -> Fmt.epr "sqlite3 error: %s@." (Sqlite3.Rc.to_string rc)
-      );
+      | `Msg err -> Fmt.epr "err: %s@." err );
       Cmd.Exit.some_error )
   | Error e -> (
     match e with
