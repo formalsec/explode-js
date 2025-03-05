@@ -12,7 +12,7 @@ let rec program provider =
   let st = State.create provider in
   let rec loop acc =
     let* acc in
-    let token, _start, _stop = State.peek st in
+    let token, _pos = State.peek st in
     match token with
     | Token.Eof -> Ok (List.rev acc)
     | _ ->
@@ -22,40 +22,47 @@ let rec program provider =
   loop (Ok [])
 
 and stmt st =
-  let token, start, stop = State.peek st in
+  let token, pos = State.peek st in
   match token with
   | Var -> var_decl st
   | Semicolon ->
     let _ = State.consume st in
     stmt st
-  | _ ->
-    error "%a: unexpected token \"%a\"" pp_position (start, stop) Token.pp token
+  | _ -> (
+    match expr st with
+    | Ok _expr as result -> result
+    | Error _ ->
+      error "stmt: %a: unexpected token \"%a\"" pp_position pos Token.pp token )
 
 and var_decl st =
-  let token, start, stop = State.consume_and_peek st in
+  let token, pos = State.consume_and_peek st in
   match token with
   | Id x -> begin
-    let token, start, stop = State.consume_and_peek st in
+    let token, pos = State.consume_and_peek st in
     match token with
     | Eq ->
       let* e = expr st in
       Ok (Fmt.str "var %s = %s" x e)
     | Semicolon | Eof -> Ok (Fmt.str "var %s" x)
     | _ ->
-      error "%a: unexpected token \"%a\"" pp_position (start, stop) Token.pp
+      error "var_decl: %a: unexpected token \"%a\"" pp_position pos Token.pp
         token
   end
   | _ ->
-    error "%a: unexpected token \"%a\"" pp_position (start, stop) Token.pp token
+    error "var_decl: %a: unexpected token \"%a\"" pp_position pos Token.pp token
 
 and expr st =
-  let token, start, stop = State.consume_and_peek st in
+  let token, pos = State.consume_and_peek st in
   match token with
-  | Id x ->
-    let _ = State.consume st in
-    Ok x
+  | Id x -> begin
+    let token, _ = State.consume_and_peek st in
+    match token with Dot -> assert false | _ -> Ok x
+  end
   | Num f ->
     let _ = State.consume st in
     Ok (Fmt.str "%.12g" f)
+  | Eof ->
+    (* Expression cannot be Eof *)
+    Ok (Fmt.str "\"completed\"")
   | _ ->
-    error "%a: unexpected token \"%a\"" pp_position (start, stop) Token.pp token
+    error "expr: %a: unexpected token \"%a\"" pp_position pos Token.pp token

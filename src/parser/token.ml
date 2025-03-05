@@ -1,5 +1,6 @@
 type t =
   | Comma
+  | Dot
   | Eof
   | Eq
   | False
@@ -19,6 +20,7 @@ type t =
 let equal a b =
   match (a, b) with
   | Comma, Comma
+  | Dot, Dot
   | Eof, Eof
   | Eq, Eq
   | False, False
@@ -35,13 +37,14 @@ let equal a b =
     true
   | Id a, Id b -> String.equal a b
   | Num a, Num b -> Float.equal a b
-  | ( ( Comma | Eof | Eq | False | For | Function | True | Null | L_brace
+  | ( ( Comma | Dot | Eof | Eq | False | For | Function | True | Null | L_brace
       | L_paren | R_brace | R_paren | Semicolon | Var | Id _ | Num _ )
     , _ ) ->
     false
 
 let pp fmt = function
   | Comma -> Fmt.string fmt ","
+  | Dot -> Fmt.string fmt "."
   | Eof -> Fmt.string fmt "eof"
   | Eq -> Fmt.string fmt "="
   | False -> Fmt.string fmt "false"

@@ -43,6 +43,7 @@ let rec token buf =
   | intlit -> (
     let intlit = lexeme buf in
     match Float.of_string_opt intlit with Some n -> Num n | _ -> assert false )
+  | "." -> Dot
   | "," -> Comma
   | ";" -> Semicolon
   | "{" -> L_brace

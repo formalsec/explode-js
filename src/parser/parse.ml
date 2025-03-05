@@ -1,8 +1,8 @@
 let from_lexbuf lexbuf =
   let provider () =
     let token = Lexer.token lexbuf in
-    let start, stop = Sedlexing.lexing_positions lexbuf in
-    (token, start, stop)
+    let pos = Sedlexing.lexing_positions lexbuf in
+    (token, pos)
   in
   Parser.program provider
 
