@@ -15,9 +15,9 @@ let write_literal_tmpl ~mode map file module_data scheme =
   Fmt.epr "Genrating %a@." Fpath.pp file;
   OS.File.writef ~mode file "%s@\n%a@." module_data (Lit_tmpl.pp map) scheme
 
-let gen_symbolic_tmpls ?(mode = 0o644) ?file ~scheme_path ~output_dir () =
+let serialize_symbolic_tmpls ?(mode = 0o644) ?file ~scheme_path ~output_dir
+  schemes =
   let open Result in
-  let* schemes = Scheme.Parser.from_file scheme_path in
   let i = ref 0 in
   list_map
     (fun scheme ->
@@ -41,6 +41,11 @@ let gen_symbolic_tmpls ?(mode = 0o644) ?file ~scheme_path ~output_dir () =
       in
       Ok output_file )
     schemes
+
+let gen_symbolic_tmpls ?(mode = 0o644) ?file ~scheme_path ~output_dir () =
+  let open Result in
+  let* schemes = Scheme.Parser.from_file scheme_path in
+  serialize_symbolic_tmpls ~mode ?file ~scheme_path ~output_dir schemes
 
 let gen_literal_tmpls ?(mode = 0o644) ?file scheme_path witness output_dir =
   let open Result in
