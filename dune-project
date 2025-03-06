@@ -34,6 +34,7 @@
   mdx
   ocaml
   (owl (>= 1.1))
+  prelude
   yojson
   z3)
  (tags

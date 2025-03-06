@@ -21,6 +21,7 @@ depends: [
   "mdx"
   "ocaml"
   "owl" {>= "1.1"}
+  "prelude"
   "yojson"
   "z3"
   "odoc" {with-doc}

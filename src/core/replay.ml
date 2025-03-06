@@ -17,9 +17,13 @@ let setup_npm_dependencies () =
 
 let env testsuite =
   let ws = Unix.realpath @@ Fpath.to_string testsuite in
-  let sharejs = List.hd Sites.Share.nodejs in
+  let sharejs =
+    match Sites.Share.nodejs with
+    | hd :: _ -> hd
+    | [] -> assert false
+  in
   let node_path = OS.Env.opt_var "NODE_PATH" ~absent:"" in
-  let node_path = Fmt.str "%s:.:%s:%s" node_path ws sharejs in
+  let node_path = Fmt.str "%s:.:%s:%a" node_path ws Fpath.pp sharejs in
   String.Map.of_list [ ("NODE_PATH", node_path) ]
 
 let with_effects f =
@@ -44,51 +48,60 @@ let execute_witness ~env (test : Fpath.t) (witness : Fpath.t) =
     List.find_opt
       (function
         | Replay_effect.Stdout sub -> String.find_sub ~sub out |> Option.is_some
-        | File file -> Sys.file_exists file
+        | File file -> begin
+          match OS.File.exists file with
+          | Ok file_exists -> file_exists
+          | Error (`Msg err) -> Fmt.failwith "%s" err
+        end
         | File_access file ->
-          let stats = Unix.stat (Fpath.to_string file) in
-          stats.Unix.st_atime > stats.Unix.st_ctime
+          let { Unix.st_atime; st_ctime; _ } =
+            Unix.stat (Fpath.to_string file)
+          in
+          Float.Infix.(st_atime > st_ctime)
         | Error str ->
-          let sub = Format.sprintf "Error: %s" str in
+          let sub = Fmt.str "Error: %s" str in
           String.find_sub ~sub out |> Option.is_some )
       observable_effects )
 
-let generate_literal_test ?original_file taint_summary workspace witness =
-  match taint_summary with
+let generate_literal_test ?original_file scheme_path workspace witness =
+  match scheme_path with
   | None -> ()
-  | Some taint_summary ->
+  | Some scheme_path ->
     let output = Fpath.(workspace / "literal") in
     let output = Fpath.to_string output in
     let witness = Fpath.to_string witness in
     let _ =
-      Explode_js_instrument.Run.literal ~mode:0o666 ?file:original_file
-        taint_summary witness output
+      Explode_js_instrument.Util.gen_literal_tmpls ~mode:0o666
+        ?file:original_file scheme_path witness output
     in
     ()
 
-let run ?original_file ?taint_summary filename workspace
+let run ?original_file ?scheme_path filename workspace
   (sym_result : Sym_exec.Symbolic_result.t) =
   Logs.app (fun k -> k "  replaying : %a..." Fpath.pp filename);
   let* () = setup_npm_dependencies () in
   let* testsuite = OS.Dir.must_exist Fpath.(workspace / "test-suite") in
   let env = env testsuite in
   let failures = sym_result.failures in
-  list_iter failures ~f:(fun { Sym_failure.model; exploit; _ } ->
-    match model with
-    | None -> Ok ()
-    | Some { path = witness; _ } -> (
-      generate_literal_test ?original_file taint_summary workspace witness;
-      let+ effect_ = execute_witness ~env filename witness in
-      match effect_ with
-      | Some ((Stdout _ | File_access _ | Error _) as eff) ->
-        Logs.app (fun k -> k "     status : true %a" Replay_effect.pp eff);
-        exploit.success <- true;
-        exploit.effect_ <- Some eff;
-        ()
-      | Some (File file as eff) ->
-        ignore @@ OS.Path.delete (Fpath.v file);
-        Logs.app (fun k -> k "     status : true %a" Replay_effect.pp eff);
-        exploit.success <- true;
-        exploit.effect_ <- Some eff;
-        ()
-      | None -> Logs.app (fun k -> k "     status : false (no side effect).") ) )
+  list_iter
+    (fun { Sym_failure.model; exploit; _ } ->
+      match model with
+      | None -> Ok ()
+      | Some { path = witness; _ } -> (
+        generate_literal_test ?original_file scheme_path workspace witness;
+        let+ effect_ = execute_witness ~env filename witness in
+        match effect_ with
+        | Some ((Stdout _ | File_access _ | Error _) as eff) ->
+          Logs.app (fun k -> k "     status : true %a" Replay_effect.pp eff);
+          exploit.success <- true;
+          exploit.effect_ <- Some eff;
+          ()
+        | Some (File file as eff) ->
+          let _ = OS.Path.delete file in
+          Logs.app (fun k -> k "     status : true %a" Replay_effect.pp eff);
+          exploit.success <- true;
+          exploit.effect_ <- Some eff;
+          ()
+        | None -> Logs.app (fun k -> k "     status : false (no side effect).")
+        ) )
+    failures

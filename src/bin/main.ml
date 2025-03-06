@@ -9,10 +9,10 @@ let returncode =
       let open Explode_js_instrument in
       match err with
       | #Instrument_result.err as error ->
-        Format.eprintf "error: %a@." Instrument_result.pp error;
+        Fmt.epr "error: %a@." Instrument_result.pp error;
         Instrument_result.to_code error
       | `Status n ->
-        Format.eprintf "error: Failed during symbolic execution/confirmation@.";
+        Fmt.epr "error: Failed during symbolic execution/confirmation@.";
         n ) )
   | Error e -> (
     match e with
