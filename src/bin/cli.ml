@@ -5,7 +5,7 @@ let parse_fpath f str =
   let file = Fpath.v str in
   match f file with
   | Ok true -> `Ok file
-  | Ok false -> `Error (Format.asprintf "File '%s' not found!" str)
+  | Ok false -> `Error (Fmt.str "File '%s' not found!" str)
   | Error (`Msg err) -> `Error err
 
 let fpath = ((fun str -> `Ok (Fpath.v str)), Fpath.pp)
@@ -26,7 +26,7 @@ let input0 =
   Arg.(required & pos 0 (some non_dir_fpath) None & info [] ~doc ~docv)
 
 let filename =
-  let doc = "Overwrite input file in taint_summary" in
+  let doc = "Overwrite input file in scheme_path" in
   Arg.(value & opt (some fpath) None & info [ "filename" ] ~doc)
 
 let workspace_dir =
@@ -55,10 +55,10 @@ let info_run =
 
 let cmd_run =
   let+ workspace_dir
-  and+ taint_summary = input0
+  and+ scheme_path = input0
   and+ filename
   and+ time_limit in
-  Cmd_run.run ~workspace_dir ~taint_summary ~filename ~time_limit
+  Cmd_run.run ~workspace_dir ~scheme_path ~filename ~time_limit
 
 let info_exploit =
   let doc = "Explode.js single file symbolic confirmation" in
@@ -110,11 +110,11 @@ let cmd_instrument =
   in
   let+ debug
   and+ mode
-  and+ taint_summary = input0
+  and+ scheme_path = input0
   and+ file = filename
   and+ witness
   and+ output_file in
-  Cmd_instrument.run ~debug ~mode ~taint_summary ~file ~witness ~output_file
+  Cmd_instrument.run ~debug ~mode ~scheme_path ~file ~witness ~output_file
 
 let v :
   ( int

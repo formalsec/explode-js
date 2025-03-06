@@ -1,5 +1,3 @@
-include Stdlib.Result
-
 type err =
   [ `Msg of string
   | `Unknown_vuln_type of string
@@ -12,15 +10,14 @@ type err =
   ]
 
 let pp fmt = function
-  | `Msg s -> Format.pp_print_string fmt s
-  | `Unknown_vuln_type s ->
-    Format.fprintf fmt "Unknown vulnerability type: %s" s
-  | `Unknown_param_type s -> Format.fprintf fmt "Unknown parameter type: %s" s
-  | `Unknown_param s -> Format.fprintf fmt "Unknown parameter: %s" s
-  | `Expected_string -> Format.fprintf fmt "Expected a string"
-  | `Expected_list -> Format.fprintf fmt "Expected a list"
-  | `Expected_assoc -> Format.fprintf fmt "Expected an object"
-  | `Malformed_json s -> Format.fprintf fmt "Malformed summary: %s" s
+  | `Msg s -> Fmt.string fmt s
+  | `Unknown_vuln_type s -> Fmt.pf fmt "Unknown vulnerability type: %s" s
+  | `Unknown_param_type s -> Fmt.pf fmt "Unknown parameter type: %s" s
+  | `Unknown_param s -> Fmt.pf fmt "Unknown parameter: %s" s
+  | `Expected_string -> Fmt.pf fmt "Expected a string"
+  | `Expected_list -> Fmt.pf fmt "Expected a list"
+  | `Expected_assoc -> Fmt.pf fmt "Expected an object"
+  | `Malformed_json s -> Fmt.pf fmt "Malformed summary: %s" s
 
 let to_code = function
   | `Msg _ -> 1

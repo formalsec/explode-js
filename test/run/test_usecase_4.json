@@ -1,6 +1,6 @@
 [
   {
-    "filename" : "test_usecase_4.js",
+    "filename" : "./test_usecase_4.js",
     "vuln_type" : "prototype-pollution",
     "source" : "module.exports.set",
     "sink" : "obj[seg] = obj[seg] || {};",

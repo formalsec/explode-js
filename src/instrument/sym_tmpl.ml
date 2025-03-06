@@ -1,5 +1,4 @@
-open Format
-open Vuln_intf
+open Scheme
 
 let template0 : ('a, Format.formatter, unit) format =
   "var esl_symbolic = require(\"esl_symbolic\");@\n// Vuln: %a@\n%a"
@@ -21,9 +20,9 @@ let fresh_str =
     incr id;
     Fmt.str "x_%d" !id
 
-let array_iter x f arr = List.iteri (fun i v -> f (x ^ string_of_int i, v)) arr
+let array_iter x f arr = List.iteri (fun i v -> f (Fmt.str "%s%d" x i, v)) arr
 
-let rec pp_param (box : ('a, formatter, unit) format) fmt
+let rec pp_param (box : ('a, Format.formatter, unit) format) fmt
   ((x, ty) : string * param_type) =
   let rec pp_p fmt (x, ty) =
     match ty with
@@ -44,24 +43,26 @@ let rec pp_param (box : ('a, formatter, unit) format) fmt
   Fmt.pf fmt box x pp_p (x, ty)
 
 and pp_obj_props fmt props =
-  pp_print_list
-    ~pp_sep:(fun fmt () -> Fmt.pf fmt "@\n, ")
+  Fmt.list
+    ~sep:(fun fmt () -> Fmt.pf fmt "@\n, ")
     (pp_param "@[<hov 2>%s:@ %a@]")
     fmt props
 
 and pp_params_as_decl fmt (params : (string * param_type) list) =
-  pp_print_list
-    ~pp_sep:(fun fmt () -> Fmt.pf fmt ";@\n")
+  Fmt.list
+    ~sep:(fun fmt () -> Fmt.pf fmt ";@\n")
     (pp_param "@[<hov 2>var %s =@ %a@]")
     fmt params
 
 let pp_params_as_args fmt (args : (string * 'a) list) =
   let args = List.map fst args in
-  pp_print_list
-    ~pp_sep:(fun fmt () -> pp_print_string fmt ", ")
-    pp_print_string fmt args
+  Fmt.list ~sep:Fmt.comma Fmt.string fmt args
 
-let normalize = String.map (fun c -> match c with '.' | ' ' -> '_' | _ -> c)
+let normalize =
+  String.map (fun c ->
+    match c with
+    | '.' | ' ' -> '_'
+    | _ -> c )
 
 let ( let* ) v f = Option.bind v f
 
@@ -72,11 +73,11 @@ let pp fmt (v : t) =
     | None, Some "" -> ()
     | None, Some source -> Fmt.pf fmt "%s(%a);" source pp_params_as_args params
     | Some (Return ret), Some source ->
-      let var_aux = "ret_" ^ normalize source in
+      let var_aux = Fmt.str "ret_%s" (normalize source) in
       Fmt.pf fmt "var %s = %s(%a);@\n" var_aux source pp_params_as_args params;
       let source =
         let* ret_source = ret.source in
-        Some (var_aux ^ ret_source)
+        Some (String.cat var_aux ret_source)
       in
       pp_aux fmt { ret with source }
     | Some (Sequence cont), Some source ->

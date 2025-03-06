@@ -2,8 +2,10 @@ module Map = Map.Make (String)
 
 type t = Value.t Map.t
 
-let get m x =
-  match Map.find_opt x m with Some v -> v | None -> Value.Undefined
+let get map x =
+  match Map.find_opt x map with
+  | Some v -> v
+  | None -> Value.Undefined
 
 module Parser = struct
   module Json = Yojson.Basic

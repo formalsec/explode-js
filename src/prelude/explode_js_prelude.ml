@@ -1,4 +1,4 @@
-include Stdlib
+include Prelude
 
 module Result = struct
   include Result
@@ -7,7 +7,7 @@ module Result = struct
 
   let ( let+ ) v f = Result.map f v
 
-  let list_map ~f vs =
+  let list_map f vs =
     let rec loop acc = function
       | [] -> Ok (List.rev acc)
       | hd :: tl ->
@@ -16,7 +16,7 @@ module Result = struct
     in
     loop [] vs
 
-  let list_iter ~f vs =
+  let list_iter f vs =
     let rec loop = function
       | [] -> Ok ()
       | hd :: tl ->

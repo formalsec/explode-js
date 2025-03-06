@@ -50,12 +50,12 @@ let full filename workspace_dir =
       | `Exited n | `Signaled n ->
         Error (`Msg (Fmt.str "Graphjs exited with non-zero code: %d" n))
     in
-    let taint_summary = Fpath.(workspace_dir / "taint_summary.json") in
-    let* taint_summary_exists = Bos.OS.File.exists taint_summary in
-    if taint_summary_exists then
+    let scheme_path = Fpath.(workspace_dir / "scheme_path.json") in
+    let* scheme_path_exists = Bos.OS.File.exists scheme_path in
+    if scheme_path_exists then
       let explode_start = Unix.gettimeofday () in
       let result =
-        Cmd_run.run ~taint_summary ~filename:(Some filename) ~workspace_dir
+        Cmd_run.run ~scheme_path ~filename:(Some filename) ~workspace_dir
           ~time_limit:(Some 30.0)
       in
       let explode_time = Unix.gettimeofday () -. explode_start in
@@ -69,10 +69,10 @@ let full filename workspace_dir =
     let open Explode_js_instrument in
     match err with
     | #Instrument_result.err as error ->
-      Format.eprintf "error: %a@." Instrument_result.pp error;
+      Fmt.epr "error: %a@." Instrument_result.pp error;
       Instrument_result.to_code error
     | `Status n ->
-      Format.eprintf "error: Failed during symbolic execution/confirmation@.";
+      Fmt.epr "error: Failed during symbolic execution/confirmation@.";
       n )
 
 let run ~filename ~workspace_dir ~time_limit =

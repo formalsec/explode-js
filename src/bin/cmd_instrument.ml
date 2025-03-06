@@ -21,17 +21,21 @@ let instrument_conv =
       | Error (`Msg err) -> `Error err )
   , pp_instrument )
 
-let run ~debug ~mode ~taint_summary ~file ~witness ~output_file =
+let run ~debug ~mode ~scheme_path ~file ~witness ~output_file =
   if debug then Logs.set_level (Some Debug);
-  let taint_summary = Fpath.to_string taint_summary in
-  let file = Option.map Fpath.to_string file in
   match mode with
   | Symbolic -> (
-    match Run.run ?file ~config:taint_summary ~output:output_file () with
+    match
+      Util.gen_symbolic_tmpls ?file ~scheme_path ~output_dir:output_file ()
+    with
     | Error _ as e -> e
     | Ok _n -> Ok 0 )
   | Concrete -> (
-    let witness = Option.get witness in
-    match Run.literal ?file taint_summary witness output_file with
+    let witness =
+      match witness with
+      | Some wit -> wit
+      | None -> assert false
+    in
+    match Util.gen_literal_tmpls ?file scheme_path witness output_file with
     | Ok () -> Ok 0
     | Error _ as e -> e )
