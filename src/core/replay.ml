@@ -40,11 +40,18 @@ let execute_witness ~env (test : Fpath.t) (witness : Fpath.t) =
   with_effects @@ fun observable_effects ->
   Fmt.pr "    running : %a@." Fpath.pp witness;
   let cmd = node test witness in
-  let+ out, status = Cmd.(run_out ~env cmd |> out_string) in
-  ( match status with
-  | _, `Exited 0 -> ()
-  | _, `Exited _ | _, `Signaled _ ->
-    Logs.app (fun k -> k "unexpected node failure: %s" out) );
+  let err_fpath = Fpath.add_ext ".stderr" witness in
+  let err = Cmd.err_file err_fpath in
+  let out_fpath = Fpath.add_ext ".stdout" witness in
+  let* (), status = Cmd.(run_out ~env ~err cmd |> out_file out_fpath) in
+  let* err = OS.File.read err_fpath in
+  let+ out = OS.File.read out_fpath in
+  let () =
+    match status with
+    | _, `Exited 0 -> ()
+    | _, `Exited _ | _, `Signaled _ ->
+      Logs.app (fun k -> k "unexpected node failure: %s" err)
+  in
   List.find_opt
     (function
       | Replay_effect.Stdout sub -> String.find_sub ~sub out |> Option.is_some
@@ -58,7 +65,7 @@ let execute_witness ~env (test : Fpath.t) (witness : Fpath.t) =
         Float.Infix.(st_atime > st_ctime)
       | Error str ->
         let sub = Fmt.str "Error: %s" str in
-        String.find_sub ~sub out |> Option.is_some )
+        String.find_sub ~sub err |> Option.is_some )
     observable_effects
 
 let generate_literal_test ?original_file scheme_path workspace witness =
