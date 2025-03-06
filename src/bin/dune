@@ -4,6 +4,6 @@
  (name main)
  (flags
   (:standard -open Explode_js_prelude))
- (libraries bos cmdliner explode_js explode_js.instrument)
+ (libraries bos cmdliner extunix explode_js explode_js.instrument)
  (instrumentation
   (backend bisect_ppx)))
