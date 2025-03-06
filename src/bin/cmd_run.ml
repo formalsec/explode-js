@@ -11,6 +11,29 @@ let with_workspace workspace_dir scheme_path filename f =
   (* Create workspace_dir *)
   let* _ = Bos.OS.Dir.create ~path:true ~mode:0o777 workspace_dir in
   (* Copy sources and scheme_path *)
+  let* schemes = Explode_js_instrument.Scheme.Parser.from_file scheme_path in
+  let* () =
+    list_iter
+      (fun scheme ->
+        let dname = Fpath.parent scheme_path in
+        let fname = Explode_js_instrument.Scheme.filename scheme in
+        match fname with
+        | None -> Ok ()
+        | Some fname ->
+          let fpath = Fpath.(dname // fname) in
+          let fpath' = Fpath.(workspace_dir // fname) in
+          let dirs = Fpath.parent fpath' in
+          let* file_exists = Bos.OS.Dir.exists dirs in
+          let* () =
+            if not file_exists then begin
+              let+ _ = Bos.OS.Dir.create ~path:true dirs in
+              ()
+            end
+            else Ok ()
+          in
+          copy_file fpath fpath' )
+      schemes
+  in
   let* scheme_path =
     let file_base = Fpath.base scheme_path in
     let* () = copy_file scheme_path Fpath.(workspace_dir // file_base) in
@@ -33,21 +56,20 @@ let with_workspace workspace_dir scheme_path filename f =
       Ok (Some file_base)
   in
   (* Run in the workspace_dir *)
-  let f () = f (Fpath.v ".") scheme_path filename in
+  let f () = f (Fpath.v ".") scheme_path schemes filename in
   let* result = Bos.OS.Dir.with_current workspace_dir f () in
   result
 
-let get_tmpls workspace (scheme_path : Fpath.t) (file : Fpath.t option) =
+let get_tmpls workspace (scheme_path : Fpath.t) (file : Fpath.t option) schemes
+    =
   let output_dir = Fpath.(to_string @@ (workspace / "symbolic_test")) in
-  Explode_js_instrument.Util.gen_symbolic_tmpls ~mode:0o666 ?file ~scheme_path
-    ~output_dir ()
+  Explode_js_instrument.Util.serialize_symbolic_tmpls ~mode:0o666 ?file
+    ~scheme_path ~output_dir schemes
 
-let run_single ~(workspace : Fpath.t) (test : Fpath.t) original_file
-  scheme_path =
+let run_single ~(workspace : Fpath.t) (test : Fpath.t) original_file scheme_path
+    =
   let* sym_result = Sym_exec.from_file ~workspace test in
-  let* () =
-    Replay.run ?original_file ~scheme_path test workspace sym_result
-  in
+  let* () = Replay.run ?original_file ~scheme_path test workspace sym_result in
   let report_path = Fpath.(workspace / "report.json") in
   let report = Sym_exec.Symbolic_result.to_json sym_result in
   let* () =
@@ -59,8 +81,8 @@ let run_single ~(workspace : Fpath.t) (test : Fpath.t) original_file
 
 let run ~workspace_dir ~scheme_path ~filename ~time_limit:_ =
   with_workspace workspace_dir scheme_path filename
-  @@ fun workspace_dir scheme_path filename ->
-  let* symbolic_tests = get_tmpls workspace_dir scheme_path filename in
+  @@ fun workspace_dir scheme_path schemes filename ->
+  let* exploit_tmpls = get_tmpls workspace_dir scheme_path filename schemes in
   let rec loop results = function
     | [] -> Ok results
     | test :: remaning ->
@@ -68,7 +90,7 @@ let run ~workspace_dir ~scheme_path ~filename ~time_limit:_ =
       let* sym_result = run_single ~workspace test filename scheme_path in
       loop (sym_result :: results) remaning
   in
-  let* results = loop [] symbolic_tests in
+  let* results = loop [] exploit_tmpls in
   let results_json =
     `List (List.map Sym_exec.Symbolic_result.to_json results)
   in

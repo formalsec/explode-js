@@ -37,31 +37,29 @@ let with_effects f =
 
 let execute_witness ~env (test : Fpath.t) (witness : Fpath.t) =
   let open OS in
-  with_effects (fun observable_effects ->
-    Fmt.pr "    running : %a@." Fpath.pp witness;
-    let cmd = node test witness in
-    let+ out, status = Cmd.(run_out ~env cmd |> out_string) in
-    ( match status with
-    | _, `Exited 0 -> ()
-    | _, `Exited _ | _, `Signaled _ ->
-      Logs.app (fun k -> k "unexpected node failure: %s" out) );
-    List.find_opt
-      (function
-        | Replay_effect.Stdout sub -> String.find_sub ~sub out |> Option.is_some
-        | File file -> begin
-          match OS.File.exists file with
-          | Ok file_exists -> file_exists
-          | Error (`Msg err) -> Fmt.failwith "%s" err
-        end
-        | File_access file ->
-          let { Unix.st_atime; st_ctime; _ } =
-            Unix.stat (Fpath.to_string file)
-          in
-          Float.Infix.(st_atime > st_ctime)
-        | Error str ->
-          let sub = Fmt.str "Error: %s" str in
-          String.find_sub ~sub out |> Option.is_some )
-      observable_effects )
+  with_effects @@ fun observable_effects ->
+  Fmt.pr "    running : %a@." Fpath.pp witness;
+  let cmd = node test witness in
+  let+ out, status = Cmd.(run_out ~env cmd |> out_string) in
+  ( match status with
+  | _, `Exited 0 -> ()
+  | _, `Exited _ | _, `Signaled _ ->
+    Logs.app (fun k -> k "unexpected node failure: %s" out) );
+  List.find_opt
+    (function
+      | Replay_effect.Stdout sub -> String.find_sub ~sub out |> Option.is_some
+      | File file -> begin
+        match OS.File.exists file with
+        | Ok file_exists -> file_exists
+        | Error (`Msg err) -> Fmt.failwith "%s" err
+      end
+      | File_access file ->
+        let { Unix.st_atime; st_ctime; _ } = Unix.stat (Fpath.to_string file) in
+        Float.Infix.(st_atime > st_ctime)
+      | Error str ->
+        let sub = Fmt.str "Error: %s" str in
+        String.find_sub ~sub out |> Option.is_some )
+    observable_effects
 
 let generate_literal_test ?original_file scheme_path workspace witness =
   match scheme_path with
