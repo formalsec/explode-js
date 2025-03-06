@@ -258,12 +258,12 @@ Tests full:
     replaying : ./symbolic_test_0.js...
   Genrating ./symbolic_test_0/literal_0.js
       running : ./symbolic_test_0/test-suite/witness-0.json
-  $TESTCASE_ROOT/_results/run/symbolic_test_0.js:52
+  unexpected node failure: $TESTCASE_ROOT/_results/run/20250306T122008/symbolic_test_0.js:52
   if (({}).toString == "polluted") { throw Error("I pollute."); }
                                      ^
   
   Error: I pollute.
-      at Object.<anonymous> ($TESTCASE_ROOT/_results/run/symbolic_test_0.js:52:42)
+      at Object.<anonymous> ($TESTCASE_ROOT/_results/run/20250306T122008/symbolic_test_0.js:52:42)
       at Module._compile (node:internal/modules/cjs/loader:1356:14)
       at Module._extensions..js (node:internal/modules/cjs/loader:1414:10)
       at Module.load (node:internal/modules/cjs/loader:1197:32)
@@ -272,5 +272,5 @@ Tests full:
       at node:internal/main/run_main_module:28:49
   
   Node.js v18.19.1
-  unexpected node failure: 
-       status : false (no side effect).
+  
+       status : true (threw Error("I pollute."))
