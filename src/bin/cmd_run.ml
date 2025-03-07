@@ -84,17 +84,22 @@ let run_single ~(workspace : Fpath.t) (test : Fpath.t) original_file scheme_path
   Ok sym_result
 
 let run ~workspace_dir ~scheme_path ~filename ~time_limit:_ =
+  Logs.app (fun k -> k "── PHASE 1: TEMPLATE GENERATION ──");
+  Logs.app (fun k -> k "\u{2714} Loaded: %a" Fpath.pp scheme_path);
   with_workspace workspace_dir scheme_path filename
   @@ fun workspace_dir scheme_path schemes filename ->
   let* exploit_tmpls = get_tmpls workspace_dir scheme_path filename schemes in
-  let rec loop results = function
+  let n = List.length exploit_tmpls in
+  let rec loop i results = function
     | [] -> Ok results
     | test :: remaning ->
+      Logs.app (fun k -> k "\u{25C9} [%d/%d] Procesing %a" i n Fpath.pp test);
       let workspace = Fpath.(workspace_dir // rem_ext (base test)) in
       let* sym_result = run_single ~workspace test filename scheme_path in
-      loop (sym_result :: results) remaning
+      loop (succ i) (sym_result :: results) remaning
   in
-  let* results = loop [] exploit_tmpls in
+  Logs.app (fun k -> k "@\n── PHASE 2: ANALYSIS & VALIDATION ──");
+  let* results = loop 1 [] exploit_tmpls in
   let results_json =
     `List (List.map Sym_exec.Symbolic_result.to_json results)
   in

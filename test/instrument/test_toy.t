@@ -2,7 +2,8 @@ Testing toy example:
 
 Vulnerable function is exported:
   $ explode-js instrument --mode symbolic --filename toy/vfunexported.js toy/vfunexported.json -o -
-  Genrating -
+  ⚒ Generating 1 template(s):
+  ├── 📄 -
   let exec = require('child_process').exec;
   
   moduke.exports = function f(x) {
@@ -16,8 +17,8 @@ Vulnerable function is exported:
 
 Vulnerable function is returned by an exported function:
   $ explode-js instrument --mode symbolic toy/vfunretbyexport.json -o -
-  Genrating -
-  Genrating -
+  ⚒ Generating 2 template(s):
+  ├── 📄 -
   function f1(a) {
     return function f2(b) {
       if (b > 0) {
@@ -32,6 +33,7 @@ Vulnerable function is returned by an exported function:
   var ret_f1 = f1(a);
   var b = esl_symbolic.number("b");
   ret_f1(b);
+  ├── 📄 -
   function f1(a) {
     return function f2(b) {
       if (b > 0) {
@@ -49,7 +51,8 @@ Vulnerable function is returned by an exported function:
 
 Vulnerable function is a property of an exported object:
   $ explode-js instrument --mode symbolic --filename toy/vfunpropofexportedobj.js toy/vfunpropofexportedobj.json -o -
-  Genrating -
+  ⚒ Generating 1 template(s):
+  ├── 📄 -
   let Obj = (function () {
     function Obj(source) { this.source = source; }
   
@@ -73,7 +76,8 @@ Vulnerable function is a property of an exported object:
 
 Sequence of exported functions
   $ explode-js instrument --mode symbolic --filename toy/example-20.js toy/example-20.json -o -
-  Genrating -
+  ⚒ Generating 1 template(s):
+  ├── 📄 -
   var target = "";
   
   function f(x) {
@@ -92,7 +96,8 @@ Sequence of exported functions
 
 Vulnerability is in the top-level
   $ explode-js instrument --mode symbolic --filename toy/toplevel.js toy/toplevel.json -o -
-  Genrating -
+  ⚒ Generating 1 template(s):
+  ├── 📄 -
   // testing taint from parameter to eval function call
   // paremeter passed as argument to process.argv
   

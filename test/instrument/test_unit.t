@@ -1,6 +1,7 @@
 Test unit:
   $ explode-js instrument --mode symbolic -o - --filename unit/identity.js unit/any.json
-  Genrating -
+  ⚒ Generating 1 template(s):
+  ├── 📄 -
   module.exports = function identity(some_arg) {
     return some_arg
   }
@@ -10,7 +11,8 @@ Test unit:
   var some_arg = esl_symbolic.any("some_arg");
   module.exports(some_arg);
   $ explode-js instrument --mode symbolic -o - --filename unit/identity.js unit/array.json
-  Genrating -
+  ⚒ Generating 1 template(s):
+  ├── 📄 -
   module.exports = function identity(some_arg) {
     return some_arg
   }
@@ -20,7 +22,8 @@ Test unit:
   var some_arg = [ esl_symbolic.string("some_arg0") ];
   module.exports(some_arg);
   $ explode-js instrument --mode symbolic -o - --filename unit/identity.js unit/array2.json
-  Genrating -
+  ⚒ Generating 1 template(s):
+  ├── 📄 -
   module.exports = function identity(some_arg) {
     return some_arg
   }
@@ -32,7 +35,8 @@ Test unit:
       esl_symbolic.number("some_arg2") ];
   module.exports(some_arg);
   $ explode-js instrument --mode symbolic -o - --filename unit/identity.js unit/bool.json
-  Genrating -
+  ⚒ Generating 1 template(s):
+  ├── 📄 -
   module.exports = function identity(some_arg) {
     return some_arg
   }
@@ -42,7 +46,8 @@ Test unit:
   var some_arg = esl_symbolic.boolean("some_arg");
   module.exports(some_arg);
   $ explode-js instrument --mode symbolic -o - --filename unit/identity.js unit/function.json
-  Genrating -
+  ⚒ Generating 1 template(s):
+  ├── 📄 -
   module.exports = function identity(some_arg) {
     return some_arg
   }
@@ -52,7 +57,8 @@ Test unit:
   var some_arg = esl_symbolic.function("some_arg");
   module.exports(some_arg);
   $ explode-js instrument --mode symbolic -o - --filename unit/identity.js unit/lazy_object.json
-  Genrating -
+  ⚒ Generating 1 template(s):
+  ├── 📄 -
   module.exports = function identity(some_arg) {
     return some_arg
   }
@@ -62,7 +68,8 @@ Test unit:
   var some_arg = esl_symbolic.lazy_object();
   module.exports(some_arg);
   $ explode-js instrument --mode symbolic -o - --filename unit/identity.js unit/number.json
-  Genrating -
+  ⚒ Generating 1 template(s):
+  ├── 📄 -
   module.exports = function identity(some_arg) {
     return some_arg
   }
@@ -72,7 +79,8 @@ Test unit:
   var some_arg = esl_symbolic.number("some_arg");
   module.exports(some_arg);
   $ explode-js instrument --mode symbolic -o - --filename unit/identity.js unit/object.json
-  Genrating -
+  ⚒ Generating 1 template(s):
+  ├── 📄 -
   module.exports = function identity(some_arg) {
     return some_arg
   }
@@ -82,7 +90,8 @@ Test unit:
   var some_arg = {  };
   module.exports(some_arg);
   $ explode-js instrument --mode symbolic -o - --filename unit/identity.js unit/polluted_object2.json
-  Genrating -
+  ⚒ Generating 1 template(s):
+  ├── 📄 -
   module.exports = function identity(some_arg) {
     return some_arg
   }
@@ -93,7 +102,8 @@ Test unit:
   module.exports(some_arg);
   if (({}).toString == "polluted") { throw Error("I pollute."); }
   $ explode-js instrument --mode symbolic -o - --filename unit/identity.js unit/polluted_object3.json
-  Genrating -
+  ⚒ Generating 1 template(s):
+  ├── 📄 -
   module.exports = function identity(some_arg) {
     return some_arg
   }
@@ -104,7 +114,8 @@ Test unit:
   module.exports(some_arg);
   if (({}).toString == "polluted") { throw Error("I pollute."); }
   $ explode-js instrument --mode symbolic -o - --filename unit/identity.js unit/string.json
-  Genrating -
+  ⚒ Generating 1 template(s):
+  ├── 📄 -
   module.exports = function identity(some_arg) {
     return some_arg
   }
@@ -114,9 +125,8 @@ Test unit:
   var some_arg = esl_symbolic.string("some_arg");
   module.exports(some_arg);
   $ explode-js instrument --mode symbolic -o - --filename unit/identity.js unit/union.json
-  Genrating -
-  Genrating -
-  Genrating -
+  ⚒ Generating 3 template(s):
+  ├── 📄 -
   module.exports = function identity(some_arg) {
     return some_arg
   }
@@ -125,6 +135,7 @@ Test unit:
   // Vuln: command-injection
   var some_arg = esl_symbolic.string("some_arg");
   module.exports(some_arg);
+  ├── 📄 -
   module.exports = function identity(some_arg) {
     return some_arg
   }
@@ -133,6 +144,7 @@ Test unit:
   // Vuln: command-injection
   var some_arg = esl_symbolic.boolean("some_arg");
   module.exports(some_arg);
+  ├── 📄 -
   module.exports = function identity(some_arg) {
     return some_arg
   }
@@ -142,7 +154,8 @@ Test unit:
   var some_arg = esl_symbolic.number("some_arg");
   module.exports(some_arg);
   $ explode-js instrument --mode symbolic -o - --filename unit/identity.js unit/dynamic.json
-  Genrating -
+  ⚒ Generating 1 template(s):
+  ├── 📄 -
   module.exports = function identity(some_arg) {
     return some_arg
   }
