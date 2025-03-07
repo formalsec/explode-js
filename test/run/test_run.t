@@ -1,276 +1,39 @@
 Tests full:
   $ explode-js run test_vfunexported.json
-  Genrating ./symbolic_test_0.js
+  ── PHASE 1: TEMPLATE GENERATION ──
+  ✔ Loaded: test_vfunexported.json
+  ⚒ Generating 1 template(s):
+  ├── 📄 ./symbolic_test_0.js
+  
+  ── PHASE 2: ANALYSIS & VALIDATION ──
+  ◉ [1/1] Procesing ./symbolic_test_0.js
+  ├── Symbolic execution output:
   Exec failure: x
-  Found 1 problems!
-    replaying : ./symbolic_test_0.js...
-  Genrating ./symbolic_test_0/literal_0.js
-      running : ./symbolic_test_0/test-suite/witness-0.json
-       status : true (created file "./success")
+  ├── Symbolic execution stats: clock: 0.357199s | solver: 0.001722s
+  ├── ⚠ Detected 1 issue(s)!
+  │   ├── ↺ Replaying 1 test case(s)
+  │   │   ├── 📄 [1/1] Using test case: ./symbolic_test_0/test-suite/witness-0.json
+  │   │   │   ├── Node exited with 0
+  │   │   │   └── ✔ Status: Success (created file "./success")
   $ explode-js run test_usecase_4.json
-  Genrating ./symbolic_test_0.js
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
+  ── PHASE 1: TEMPLATE GENERATION ──
+  ✔ Loaded: test_usecase_4.json
+  ⚒ Generating 1 template(s):
+  ├── 📄 ./symbolic_test_0.js
+  
+  ── PHASE 2: ANALYSIS & VALIDATION ──
+  ◉ [1/1] Procesing ./symbolic_test_0.js
+  ├── Symbolic execution output:
   "Uncaught TypeError"
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
   "Uncaught TypeError"
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
   "Uncaught TypeError"
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
   "Uncaught TypeError"
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
   "Uncaught TypeError"
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
   "Uncaught TypeError"
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
-  - : app = { "type": symbol("normal"), "target": symbol("empty"),
-              "__completion__": true, "value": symbol("undefined"),  }
   Abort: "Uncaught Error: I pollute."
-  Found 1 problems!
-    replaying : ./symbolic_test_0.js...
-  Genrating ./symbolic_test_0/literal_0.js
-      running : ./symbolic_test_0/test-suite/witness-0.json
-  unexpected node failure: $TESTCASE_ROOT/_results/run/20250306T122008/symbolic_test_0.js:52
-  if (({}).toString == "polluted") { throw Error("I pollute."); }
-                                     ^
-  
-  Error: I pollute.
-      at Object.<anonymous> ($TESTCASE_ROOT/_results/run/20250306T122008/symbolic_test_0.js:52:42)
-      at Module._compile (node:internal/modules/cjs/loader:1356:14)
-      at Module._extensions..js (node:internal/modules/cjs/loader:1414:10)
-      at Module.load (node:internal/modules/cjs/loader:1197:32)
-      at Module._load (node:internal/modules/cjs/loader:1013:12)
-      at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:128:12)
-      at node:internal/main/run_main_module:28:49
-  
-  Node.js v18.19.1
-  
-       status : true (threw Error("I pollute."))
+  ├── Symbolic execution stats: clock: 7.546626s | solver: 6.631817s
+  ├── ⚠ Detected 1 issue(s)!
+  │   ├── ↺ Replaying 1 test case(s)
+  │   │   ├── 📄 [1/1] Using test case: ./symbolic_test_0/test-suite/witness-0.json
+  │   │   │   ├── Node exited with 1
+  │   │   │   └── ✔ Status: Success (threw Error("I pollute."))

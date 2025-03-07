@@ -8,16 +8,17 @@ let get_test_name prefix i =
   | _ -> Fmt.kstr Fpath.v "%s_%d.js" prefix i
 
 let write_symbolic_tmpl ~mode ~file module_data scheme =
-  Fmt.epr "Genrating %a@." Fpath.pp file;
+  Logs.app (fun k -> k "├── \u{1F4C4} %a" Fpath.pp file);
   OS.File.writef ~mode file "%s@\n%a@." module_data Sym_tmpl.pp scheme
 
 let write_literal_tmpl ~mode map file module_data scheme =
-  Fmt.epr "Genrating %a@." Fpath.pp file;
   OS.File.writef ~mode file "%s@\n%a@." module_data (Lit_tmpl.pp map) scheme
 
 let serialize_symbolic_tmpls ?(mode = 0o644) ?file ~scheme_path ~output_dir
   schemes =
   let open Result in
+  let n = List.length schemes in
+  Logs.app (fun k -> k "\u{2692} Generating %d template(s):" n);
   let i = ref 0 in
   list_map
     (fun scheme ->

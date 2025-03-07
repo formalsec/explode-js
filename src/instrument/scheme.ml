@@ -239,7 +239,6 @@ end = struct
     match Json.from_file ~fname fname with
     | exception Yojson.Json_error msg -> Error (`Malformed_json msg)
     | json ->
-      Logs.debug (fun m -> m "json of %s:@.%a" fname Json.pp json);
       let* vulns = list json in
       let+ vulns = list_map t_of_json vulns in
       List.concat_map unroll vulns

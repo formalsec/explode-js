@@ -44,6 +44,7 @@ let full filename workspace_dir =
     let* status = Graphjs.run ~file:filename ~output:workspace_dir in
     let graphjs_time = Unix.gettimeofday () -. graphjs_start in
     let _ = Bos.OS.File.writef graphjs_time_path "%f@." graphjs_time in
+    (* Use: Bos.OS.Cmd.success *)
     let* () =
       match status with
       | `Exited 0 -> Ok ()
@@ -86,5 +87,5 @@ let run ~filename ~workspace_dir ~time_limit =
   match res with
   | `Ok n -> Ok n
   | `Timeout ->
-    Logs.warn (fun m -> m "time limit reached");
+    Logs.warn (fun m -> m "Time limit reached");
     Ok 0
