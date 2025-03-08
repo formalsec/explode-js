@@ -1,11 +1,19 @@
 include Prelude
 
+module Option = struct
+  include Option
+
+  let[@inline] ( let* ) v f = Option.bind v f
+
+  let[@inline] ( let+ ) v f = Option.map f v
+end
+
 module Result = struct
   include Result
 
-  let ( let* ) v f = Result.bind v f
+  let[@inline] ( let* ) v f = Result.bind v f
 
-  let ( let+ ) v f = Result.map f v
+  let[@inline] ( let+ ) v f = Result.map f v
 
   let list_map f vs =
     let rec loop acc = function
@@ -29,7 +37,7 @@ end
 module List = struct
   include List
 
-  let ( let* ) v f = List.concat_map f v
+  let[@inline] ( let* ) v f = List.concat_map f v
 
-  let ( let+ ) v f = List.map f v
+  let[@inline] ( let+ ) v f = List.map f v
 end

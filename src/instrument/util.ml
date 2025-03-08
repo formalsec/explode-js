@@ -9,10 +9,12 @@ let get_test_name prefix i =
 
 let write_symbolic_tmpl ~mode ~file module_data scheme =
   Logs.app (fun k -> k "├── \u{1F4C4} %a" Fpath.pp file);
-  OS.File.writef ~mode file "%s@\n%a@." module_data Sym_tmpl.pp scheme
+  let test = Exploit_templates.Symbolic.render scheme in
+  OS.File.writef ~mode file "%s@\n%s@." module_data test
 
 let write_literal_tmpl ~mode map file module_data scheme =
-  OS.File.writef ~mode file "%s@\n%a@." module_data (Lit_tmpl.pp map) scheme
+  let test = Exploit_templates.Literal.render map scheme in
+  OS.File.writef ~mode file "%s@\n%s@." module_data test
 
 let serialize_symbolic_tmpls ?(mode = 0o644) ?file ~scheme_path ~output_dir
   schemes =
