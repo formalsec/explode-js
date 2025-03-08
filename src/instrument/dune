@@ -2,11 +2,11 @@
  (public_name explode_js.instrument)
  (name explode_js_instrument)
  (modules
+  exploit_templates
   instrument_result
-  lit_tmpl
   model
   scheme
-  sym_tmpl
+  template
   util
   value
   vuln_type)
