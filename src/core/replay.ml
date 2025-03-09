@@ -74,7 +74,7 @@ let generate_literal_test ?original_file scheme_path workspace witness =
     let output = Fpath.to_string output in
     let witness = Fpath.to_string witness in
     let _ =
-      Explode_js_instrument.Util.gen_literal_tmpls ~mode:0o666
+      Explode_js_instrument.Test.Literal.generate_all ~mode:0o666
         ?file:original_file scheme_path witness output
     in
     ()
