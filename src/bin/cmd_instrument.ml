@@ -26,7 +26,7 @@ let run ~debug ~mode ~scheme_path ~file ~witness ~output_file =
   match mode with
   | Symbolic -> (
     match
-      Util.gen_symbolic_tmpls ?file ~scheme_path ~output_dir:output_file ()
+      Test.Symbolic.generate_all ?file ~scheme_path ~output_dir:output_file ()
     with
     | Error _ as e -> e
     | Ok _n -> Ok 0 )
@@ -36,6 +36,6 @@ let run ~debug ~mode ~scheme_path ~file ~witness ~output_file =
       | Some wit -> wit
       | None -> assert false
     in
-    match Util.gen_literal_tmpls ?file scheme_path witness output_file with
+    match Test.Literal.generate_all ?file scheme_path witness output_file with
     | Ok () -> Ok 0
     | Error _ as e -> e )

@@ -67,8 +67,8 @@ let with_workspace workspace_dir scheme_path filename f =
 let get_tmpls workspace (scheme_path : Fpath.t) (file : Fpath.t option) schemes
     =
   let output_dir = Fpath.(to_string @@ (workspace / "symbolic_test")) in
-  Explode_js_instrument.Util.serialize_symbolic_tmpls ~mode:0o666 ?file
-    ~scheme_path ~output_dir schemes
+  Explode_js_instrument.Test.Symbolic.write_all ~mode:0o666 ?file ~scheme_path
+    ~output_dir schemes
 
 let run_single ~(workspace : Fpath.t) (test : Fpath.t) original_file scheme_path
     =
