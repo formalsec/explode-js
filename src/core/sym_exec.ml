@@ -24,6 +24,15 @@ let print_model fmt model =
 let print_report fmt report =
   Yojson.pretty_print ~std:true fmt (Symbolic_result.to_json report)
 
+let dummy_report input_file =
+  { Symbolic_result.filename = input_file
+  ; execution_time = 0.
+  ; solver_time = 0.
+  ; solver_queries = 0
+  ; num_failures = 1
+  ; failures = []
+  }
+
 let run_file ~workspace_dir input_file =
   Ecma_sl.Log.Config.log_warns := true;
   (* Ecma_sl.Log.Config.log_debugs := true; *)
@@ -32,11 +41,14 @@ let run_file ~workspace_dir input_file =
   let testsuite = Fpath.(workspace_dir / "test-suite") in
   let* _ = OS.Dir.create ~mode:0o777 ~path:true testsuite in
   let result, report =
-    run ~print_return_value:false ~no_stop_at_failure:false
-      ~callback_out:(fun _ _ -> ())
-      ~callback_err:(fun thread ty ->
-        Sym_path_resolver.solve ty testsuite thread )
-      input_file prog
+    try
+      run ~print_return_value:false ~no_stop_at_failure:false
+        ~callback_out:(fun _ _ -> ())
+        ~callback_err:(fun thread ty ->
+          Sym_path_resolver.solve ty testsuite thread )
+        input_file prog
+    with exn ->
+      (Error (`Failure (Printexc.to_string exn)), dummy_report input_file)
   in
   Logs.app (fun k ->
     k "├── Symbolic execution stats: clock: %fs | solver: %fs"

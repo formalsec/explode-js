@@ -8,16 +8,28 @@ type t =
   ; timestamp : int
   }
 
-let pp fmt { pkg; vuln; raw; control_path; exploit; _ } =
+let pp fmt ?progress { pkg; vuln; raw; control_path; exploit; _ } =
+  let pp_progress fmt v =
+    match v with
+    | None -> ()
+    | Some (curr, total) -> Fmt.pf fmt " (%a/%a)" Fmt.int curr Fmt.int total
+  in
   Fmt.pf fmt
-    "@[<v 2>Run %d: %s@%s@;File %a@;%a@;Control Path: %a@;Exploit: %a@]" vuln.id
-    pkg.package pkg.version Fpath.pp vuln.filename Run_proc_result.pp raw
-    Fmt.bool control_path Fmt.bool exploit
+    "@[<v 2>Run %d%a: %s@%s@;File %a@;%a@;Control Path: %a@;Exploit: %a@]"
+    vuln.id pp_progress progress pkg.package pkg.version Fpath.pp vuln.filename
+    Run_proc_result.pp raw Fmt.bool control_path Fmt.bool exploit
 
 let pp_csv fmt { pkg; vuln; raw; report; control_path; exploit; timestamp } =
   let report = String.escaped report in
   Fmt.pf fmt "%s|%s|%a|%a|%a|%a|%a|%a" pkg.package pkg.version
     Vulnerability.pp_csv vuln Run_proc_result.pp_csv raw Fmt.string report
+    Fmt.bool control_path Fmt.bool exploit Fmt.int timestamp
+
+let pp_csv_short fmt
+  { pkg; vuln; raw; report; control_path; exploit; timestamp } =
+  let report = String.escaped report in
+  Fmt.pf fmt "%s|%s|%a|%a|%a|%a|%a|%a" pkg.package pkg.version
+    Vulnerability.pp_csv vuln Run_proc_result.pp_csv_short raw Fmt.string report
     Fmt.bool control_path Fmt.bool exploit Fmt.int timestamp
 
 let to_jg { pkg; vuln; raw; timestamp; report; control_path; exploit } =
@@ -46,8 +58,17 @@ let to_csv_string results =
     (Fmt.list ~sep:(fun fmt () -> Fmt.pf fmt "@\n") pp_csv)
     results
 
-let to_csv results out_file =
-  let csv_string = to_csv_string results in
+let to_csv_string_short results =
+  Fmt.str
+    "package|version|id|cwe|filename|returncode|stdout|stderr|rtime|utime|stime|report|control_path|exploit|timestamp@\n\
+     %a"
+    (Fmt.list ~sep:(fun fmt () -> Fmt.pf fmt "@\n") pp_csv_short)
+    results
+
+let to_csv ?(short = false) results out_file =
+  let csv_string =
+    (if short then to_csv_string_short else to_csv_string) results
+  in
   Out_channel.with_open_text (Fpath.to_string out_file) @@ fun oc ->
   Out_channel.output_string oc csv_string
 
