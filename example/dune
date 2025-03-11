@@ -3,5 +3,5 @@
   %{bin:explode-js}
   (file exec.js)
   (package ecma-sl))
- (enabled_if false)
+ (enabled_if true)
  (files README.md))
