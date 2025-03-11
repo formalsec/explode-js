@@ -6,35 +6,50 @@ let set_time_limit time_limit =
   let time_limit = Some (Int64.of_int time_limit) in
   ExtUnix.Specific.setrlimit RLIMIT_CPU ~soft:time_limit ~hard:time_limit
 
-let with_ic fd f =
-  let ic = Unix.in_channel_of_descr fd in
-  Fun.protect ~finally:(fun () -> In_channel.close ic) (fun () -> f ic)
+let read_tmp_file file =
+  let file_data = In_channel.with_open_bin file In_channel.input_all in
+  Unix.unlink file;
+  file_data
 
 let int_of_status = function
   | Unix.WEXITED n -> n
   | WSIGNALED n -> n
   | WSTOPPED n -> n
 
-let run ?time_limit prog argv : Run_proc_result.t =
+let run ~time_limit prog argv : Run_proc_result.t =
   let start = Unix.gettimeofday () in
-  let stdout_read, stdout_write = Unix.pipe ~cloexec:false () in
-  let stderr_read, stderr_write = Unix.pipe ~cloexec:false () in
+  let stdout_file = Filename.temp_file "stdout" ".txt" in
+  let stderr_file = Filename.temp_file "stderr" ".txt" in
   let pid = Unix.fork () in
   if pid = 0 then begin
-    Unix.close stdout_read;
-    Unix.close stderr_read;
-    dup2 ~src:stdout_write ~dst:Unix.stdout;
-    dup2 ~src:stderr_write ~dst:Unix.stderr;
-    Option.iter set_time_limit time_limit;
+    ExtUnix.Specific.setpgid 0 0;
+    let stdout_fd = Unix.openfile stdout_file [ O_WRONLY; O_CREAT ] 0o666 in
+    let stderr_fd = Unix.openfile stderr_file [ O_WRONLY; O_CREAT ] 0o666 in
+    dup2 ~src:stdout_fd ~dst:Unix.stdout;
+    dup2 ~src:stderr_fd ~dst:Unix.stderr;
+    set_time_limit time_limit;
+    let _ = time_limit in
     Unix.execvp prog (Array.of_list argv)
   end
   else begin
-    Unix.close stdout_write;
-    Unix.close stderr_write;
-    let stdout = with_ic stdout_read In_channel.input_all in
-    let stderr = with_ic stderr_read In_channel.input_all in
-    let wpid, status, ruse = ExtUnix.Specific.wait4 [] pid in
+    let exception Sigchld in
+    let did_timeout = ref false in
+    begin
+      try
+        Sys.set_signal Sys.sigchld
+          (Signal_handle (fun (_ : int) -> raise Sigchld));
+        Unix.sleep time_limit;
+        did_timeout := true;
+        (* we kill the process group id (pgid) which should be equal to pid *)
+        Unix.kill (-pid) Sys.sigkill;
+        Sys.set_signal Sys.sigchld Signal_default
+      with Sigchld -> ()
+    end;
+    Sys.set_signal Sys.sigchld Signal_default;
+    let wpid, status, ruse = ExtUnix.Specific.wait4 [] (-pid) in
     assert (pid = wpid);
+    let stdout = read_tmp_file stdout_file in
+    let stderr = read_tmp_file stderr_file in
     { Run_proc_result.returncode = int_of_status status
     ; stdout
     ; stderr

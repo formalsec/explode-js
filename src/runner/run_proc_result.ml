@@ -24,3 +24,8 @@ let pp_csv fmt { returncode; stdout; stderr; rtime; utime; stime } =
   let stdout = String.escaped stdout in
   let stderr = String.escaped stderr in
   Fmt.pf fmt "%d|%s|%s|%f|%f|%f" returncode stdout stderr rtime utime stime
+
+let pp_csv_short fmt { returncode; rtime; utime; stime; _ } =
+  let stdout = "(truncated)" in
+  let stderr = "(truncated)" in
+  Fmt.pf fmt "%d|%s|%s|%f|%f|%f" returncode stdout stderr rtime utime stime

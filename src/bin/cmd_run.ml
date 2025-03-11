@@ -107,10 +107,14 @@ let run ~workspace_dir ~scheme_file ~original_file ~time_limit:_ =
     | (Explode_js_instrument.Test.Single_shot test, scheme) :: remaning ->
       Logs.app (fun k -> k "\u{25C9} [%d/%d] Procesing %a" i n Fpath.pp test);
       let workspace_dir = Fpath.(workspace_dir // rem_ext (base test)) in
-      let* sym_result =
-        run_single ~workspace_dir test orig_file scheme_file scheme
+      let results =
+        match run_single ~workspace_dir test orig_file scheme_file scheme with
+        | Ok sym_result -> sym_result :: results
+        | Error (`Msg err) ->
+          Logs.err (fun k -> k "run_single: %s" err);
+          results
       in
-      loop (succ i) (sym_result :: results) remaning
+      loop (succ i) results remaning
     | (Client_server { client = _; server }, scheme) :: remaning ->
       Logs.app (fun k -> k "\u{25C9} [%d/%d] Procesing %a" i n Fpath.pp server);
       let workspace_dir = Fpath.(workspace_dir // rem_ext (base server)) in
@@ -120,4 +124,4 @@ let run ~workspace_dir ~scheme_file ~original_file ~time_limit:_ =
   Logs.app (fun k -> k "@\n── PHASE 2: ANALYSIS & VALIDATION ──");
   let* results = loop 1 [] exploit_tmpls in
   let+ () = write_reports Fpath.(workspace_dir / "report.json") results in
-  0
+  Logs.err_count ()

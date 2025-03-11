@@ -51,7 +51,7 @@ let to_csv db timestamp _req =
     Run_result.select_db ~timestamp db
     |> List.sort (fun (r1 : Run_result.t) r2 -> compare r1.vuln.id r2.vuln.id)
   in
-  S.Response.make_string (Ok (Run_result.to_csv_string results))
+  S.Response.make_string (Ok (Run_result.to_csv_string_short results))
 
 let main addr port db_path =
   Db.with_db ~mode:`READONLY (Fpath.to_string db_path) @@ fun db ->
@@ -74,4 +74,6 @@ let main addr port db_path =
   S.Dir.add_dir_path ~config ~dir ~prefix:"static" server;
 
   Fmt.epr "listening on http://%s:%d@." (S.addr server) (S.port server);
-  match S.run server with Ok () -> Ok () | Error e -> Error (`Exn e)
+  match S.run server with
+  | Ok () -> Ok ()
+  | Error e -> Error (`Exn e)
