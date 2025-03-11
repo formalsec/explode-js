@@ -26,7 +26,7 @@ let run ?time_limit prog argv : Run_proc_result.t =
     dup2 ~src:stdout_write ~dst:Unix.stdout;
     dup2 ~src:stderr_write ~dst:Unix.stderr;
     Option.iter set_time_limit time_limit;
-    Unix.execv prog (Array.of_list argv)
+    Unix.execvp prog (Array.of_list argv)
   end
   else begin
     Unix.close stdout_write;
