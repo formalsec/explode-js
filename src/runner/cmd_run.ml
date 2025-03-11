@@ -27,8 +27,9 @@ let parse_report output_dir =
     in
     (Fmt.str "%a" (Json.pretty_print ~std:true) json, control_path, exploit)
 
-let work db ({ timestamp; time_limit; output_dir; filter; _ } : Run_metadata.t)
-  n i (pkg : Package.t) : Run_result.t list =
+let work run_mode db
+  ({ timestamp; time_limit; output_dir; filter; _ } : Run_metadata.t) n i
+  (pkg : Package.t) : Run_result.t list =
   let vulns =
     match filter with
     | None -> pkg.vulns
@@ -37,31 +38,65 @@ let work db ({ timestamp; time_limit; output_dir; filter; _ } : Run_metadata.t)
         (fun (v : Vulnerability.t) -> Explode_js.Cwe.equal cwe v.cwe)
         pkg.vulns
   in
-  (* TODO: find a better name for this later I can't think atm *)
-  let aux acc (vuln : Vulnerability.t) =
-    let output_dir = Fpath.(output_dir / string_of_int vuln.id) in
-    begin
-      match Bos.OS.Dir.create ~path:true output_dir with
-      | Ok _ -> ()
-      | Error (`Msg err) ->
-        Fmt.epr "could not create directory '%a': %s@." Fpath.pp output_dir err
-    end;
-    let raw = Run_action.full time_limit output_dir vuln.filename in
-    let report, control_path, exploit = parse_report output_dir in
-    let res =
-      { Run_result.pkg; vuln; raw; report; control_path; exploit; timestamp }
-    in
-    Fmt.epr "%a@." (Run_result.pp ~progress:(i, n)) res;
-    Run_result.to_db db res;
-    res :: acc
-  in
   List.fold_left
     (fun acc (vuln : Vulnerability.t) ->
-      (* let base_dir = Fpath.(parent (parent vuln.filename)) in *)
-      (* let exploit_tmpl = Fpath.(base_dir / "expected_output.json") in *)
-      (* if not (Sys.file_exists (Fpath.to_string exploit_tmpl)) then acc *)
-      (* else *)
-      aux acc vuln )
+      (* FIXME: Both cases share a lot of code *)
+      match run_mode with
+      | Run_mode.Run ->
+        let base_dir = Fpath.(parent (parent vuln.filename)) in
+        let taint_summary_file = Fpath.(base_dir / "expected_output.json") in
+        if not (Sys.file_exists (Fpath.to_string taint_summary_file)) then acc
+        else
+          let output_dir = Fpath.(output_dir / string_of_int vuln.id) in
+          begin
+            match Bos.OS.Dir.create ~path:true output_dir with
+            | Ok _ -> ()
+            | Error (`Msg err) ->
+              Fmt.epr "could not create directory '%a': %s@." Fpath.pp
+                output_dir err
+          end;
+          let raw =
+            Run_action.run time_limit output_dir vuln.filename
+              taint_summary_file
+          in
+          let report, control_path, exploit = parse_report output_dir in
+          let res =
+            { Run_result.pkg
+            ; vuln
+            ; raw
+            ; report
+            ; control_path
+            ; exploit
+            ; timestamp
+            }
+          in
+          Fmt.epr "%a@." (Run_result.pp ~progress:(i, n)) res;
+          Run_result.to_db db res;
+          res :: acc
+      | Full ->
+        let output_dir = Fpath.(output_dir / string_of_int vuln.id) in
+        begin
+          match Bos.OS.Dir.create ~path:true output_dir with
+          | Ok _ -> ()
+          | Error (`Msg err) ->
+            Fmt.epr "could not create directory '%a': %s@." Fpath.pp output_dir
+              err
+        end;
+        let raw = Run_action.full time_limit output_dir vuln.filename in
+        let report, control_path, exploit = parse_report output_dir in
+        let res =
+          { Run_result.pkg
+          ; vuln
+          ; raw
+          ; report
+          ; control_path
+          ; exploit
+          ; timestamp
+          }
+        in
+        Fmt.epr "%a@." (Run_result.pp ~progress:(i, n)) res;
+        Run_result.to_db db res;
+        res :: acc )
     [] vulns
 
 let timestamp =
@@ -72,7 +107,7 @@ let prepare_db db =
   let* () = Run_result.prepare_db db in
   Run_metadata.prepare_db db
 
-let main _jobs time_limit output filter index =
+let main _jobs time_limit output filter index run_mode =
   Db.with_db "results.db" @@ fun db ->
   let* () = prepare_db db in
   let output_dir = Fpath.(output / Fmt.str "res-%d" timestamp) in
@@ -84,5 +119,7 @@ let main _jobs time_limit output filter index =
   Run_metadata.to_db db metadata;
   let* pkgs = Json_index.Parse.from_file index in
   let num_pkgs = List.length pkgs in
-  let results = List.concat @@ List.mapi (work db metadata num_pkgs) pkgs in
+  let results =
+    List.concat @@ List.mapi (work run_mode db metadata num_pkgs) pkgs
+  in
   Ok (Run_result.to_csv ~short:true results Fpath.(output_dir / "results.csv"))
