@@ -157,6 +157,7 @@ let run_server ~workspace_dir server_file scheme
                 Explode_js_instrument.Test.Literal.generate_client workspace_dir
                   witness_file scheme !i
               in
+              Unix.sleepf 0.100;
               execute_witness ~env client_file witness_file
             in
             (* Don't need the child anymore, so clean it up. *)
