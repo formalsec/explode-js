@@ -51,7 +51,7 @@ let full input_file workspace_dir =
       | `Exited n | `Signaled n ->
         Error (`Msg (Fmt.str "Graphjs exited with non-zero code: %d" n))
     in
-    let scheme_file = Fpath.(workspace_dir / "scheme_path.json") in
+    let scheme_file = Fpath.(workspace_dir / "taint_summary.json") in
     let* scheme_file_exists = Bos.OS.File.exists scheme_file in
     if scheme_file_exists then
       let explode_start = Unix.gettimeofday () in

@@ -39,35 +39,26 @@ let work db ({ timestamp; time_limit; output_dir; filter; _ } : Run_metadata.t)
   in
   List.fold_left
     (fun acc (vuln : Vulnerability.t) ->
-      let base_dir = Fpath.(parent (parent vuln.filename)) in
-      let exploit_tmpl = Fpath.(base_dir / "expected_output.json") in
-      if not (Sys.file_exists (Fpath.to_string exploit_tmpl)) then acc
-      else
-        let output_dir = Fpath.(output_dir / string_of_int vuln.id) in
-        begin
-          match Bos.OS.Dir.create ~path:true output_dir with
-          | Ok _ -> ()
-          | Error (`Msg err) ->
-            Fmt.epr "could not create directory '%a': %s@." Fpath.pp output_dir
-              err
-        end;
-        let raw =
-          Run_action.run time_limit output_dir vuln.filename exploit_tmpl
-        in
-        let report, control_path, exploit = parse_report output_dir in
-        let res =
-          { Run_result.pkg
-          ; vuln
-          ; raw
-          ; report
-          ; control_path
-          ; exploit
-          ; timestamp
-          }
-        in
-        Fmt.epr "%a@." Run_result.pp res;
-        Run_result.to_db db res;
-        res :: acc )
+      (* let base_dir = Fpath.(parent (parent vuln.filename)) in *)
+      (* let exploit_tmpl = Fpath.(base_dir / "expected_output.json") in *)
+      (* if not (Sys.file_exists (Fpath.to_string exploit_tmpl)) then acc *)
+      (* else *)
+      let output_dir = Fpath.(output_dir / string_of_int vuln.id) in
+      begin
+        match Bos.OS.Dir.create ~path:true output_dir with
+        | Ok _ -> ()
+        | Error (`Msg err) ->
+          Fmt.epr "could not create directory '%a': %s@." Fpath.pp output_dir
+            err
+      end;
+      let raw = Run_action.full time_limit output_dir vuln.filename in
+      let report, control_path, exploit = parse_report output_dir in
+      let res =
+        { Run_result.pkg; vuln; raw; report; control_path; exploit; timestamp }
+      in
+      Fmt.epr "%a@." Run_result.pp res;
+      Run_result.to_db db res;
+      res :: acc )
     [] vulns
 
 let timestamp =

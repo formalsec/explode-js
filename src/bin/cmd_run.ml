@@ -7,11 +7,11 @@ let copy_file src dst =
   OS.File.write dst content
 
 let with_workspace workspace_dir scheme_path filename f =
-  let timestamp =
+  let _timestamp =
     let now = Unix.localtime @@ Unix.gettimeofday () in
     ExtUnix.Specific.strftime "%Y%m%dT%H%M%S" now
   in
-  let workspace_dir = Fpath.(workspace_dir / "run" / timestamp) in
+  let workspace_dir = Fpath.(workspace_dir / "run") in
   (* Create workspace_dir *)
   let* _ = Bos.OS.Dir.create ~path:true ~mode:0o777 workspace_dir in
   (* Copy sources and scheme_path *)
