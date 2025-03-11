@@ -49,8 +49,25 @@ type t =
 and cont =
   | Return of t
   | Sequence of t
+  | Client of
+      { request_ty : [ `GET | `POST ]
+      ; port : int
+      }
+
+let ty { ty; _ } = ty
 
 let filename { filename; _ } = filename
+
+let rec client { cont; _ } =
+  match cont with
+  | None -> `None
+  | Some (Client { request_ty; port }) -> `Client (request_ty, port)
+  | Some (Return cont | Sequence cont) -> client cont
+
+let needs_client scheme =
+  match client scheme with
+  | `None -> false
+  | `Client _ -> true
 
 (** [unroll_params params] performs type unrolling of union types *)
 let rec unroll_params (params : (string * param_type) list) :
@@ -86,7 +103,7 @@ let rec unroll (tmpl : t) : t list =
     { tmpl with params }
   in
   match tmpl.cont with
-  | None -> cs
+  | None | Some (Client _) -> cs
   | Some (Return cont) ->
     let* conf = unroll cont in
     let+ c = cs in
@@ -163,6 +180,10 @@ end = struct
     | `Int i -> Some i
     | `Null | _ -> None
 
+  let int = function
+    | `Int i -> Ok i
+    | _ -> Error (`Msg "expecting an integer")
+
   let list = function
     | `List lst -> Ok lst
     | _ -> Error `Expected_list
@@ -177,6 +198,13 @@ end = struct
     | Some v ->
       let+ v = f v in
       Some v
+
+  let request_ty_of_json json =
+    let* s = string json in
+    match s with
+    | "GET" -> Ok `GET
+    | "POST" -> Ok `POST
+    | _ -> Error (`Msg (Fmt.str "unexpected client request of type: %s" s))
 
   let rec t_of_json (json : Json.t) =
     let filename =
@@ -202,27 +230,7 @@ end = struct
           (fix_dynamic_prop k, ty) )
         params
     in
-    let+ cont =
-      (* Can only have one type of continuation at a time *)
-      (* FIXME: To Allow return(s?) I made this horrible nested match *)
-      match Json_util.member "return" json with
-      | `Null -> begin
-        match Json_util.member "returns" json with
-        | `Null -> begin
-          match Json_util.member "sequence" json with
-          | `Null -> Ok None
-          | tree ->
-            let+ tree = t_of_json tree in
-            Some (Sequence tree)
-        end
-        | tree ->
-          let+ tree = t_of_json tree in
-          Some (Return tree)
-      end
-      | tree ->
-        let+ tree = t_of_json tree in
-        Some (Return tree)
-    in
+    let+ cont = cont_of_json json in
     { filename
     ; ty
     ; source
@@ -233,6 +241,36 @@ end = struct
     ; params
     ; cont
     }
+
+  and cont_of_json json =
+    (* Can only have one type of continuation at a time *)
+    (* FIXME: To Allow return(s?) I made this horrible nested match *)
+    match Json_util.member "return" json with
+    | `Null -> begin
+      match Json_util.member "returns" json with
+      | `Null -> begin
+        match Json_util.member "sequence" json with
+        | `Null -> begin
+          match Json_util.member "client" json with
+          | `Null -> Ok None
+          | tree ->
+            let* request_ty =
+              Json_util.member "type" tree |> request_ty_of_json
+            in
+            let+ port = Json_util.member "port" tree |> int in
+            Some (Client { request_ty; port })
+        end
+        | tree ->
+          let+ tree = t_of_json tree in
+          Some (Sequence tree)
+      end
+      | tree ->
+        let+ tree = t_of_json tree in
+        Some (Return tree)
+    end
+    | tree ->
+      let+ tree = t_of_json tree in
+      Some (Return tree)
 
   let from_file fname =
     let fname = Fpath.to_string fname in

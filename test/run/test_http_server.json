@@ -1,0 +1,14 @@
+[
+  {
+    "filename" : "./test_http_server.js",
+    "vuln_type" : "path-traversal",
+    "source" : "http.createServer(function(request, response) {",
+    "sink" : "fs.readFile(path, function(_error, data) {",
+    "tainted_params" : [],
+    "params_types" : {},
+    "client" : {
+      "type" : "GET",
+      "port" : 8888
+    }
+  }
+]

@@ -18,21 +18,25 @@ let prog_of_js file =
   let+ () = OS.File.delete ast_file in
   Ecma_sl.Parsing.parse_prog program
 
-let pp_model fmt v = Yojson.pretty_print ~std:true fmt (Smtml.Model.to_json v)
+let print_model fmt model =
+  Yojson.pretty_print ~std:true fmt (Smtml.Model.to_json model)
 
-let from_file ~workspace filename =
+let print_report fmt report =
+  Yojson.pretty_print ~std:true fmt (Symbolic_result.to_json report)
+
+let run_file ~workspace_dir input_file =
   Ecma_sl.Log.Config.log_warns := true;
   (* Ecma_sl.Log.Config.log_debugs := true; *)
   Logs.app (fun k -> k "├── Symbolic execution output:");
-  let* prog = dispatch_file_ext prog_of_js filename in
-  let testsuite = Fpath.(workspace / "test-suite") in
+  let* prog = dispatch_file_ext prog_of_js input_file in
+  let testsuite = Fpath.(workspace_dir / "test-suite") in
   let* _ = OS.Dir.create ~mode:0o777 ~path:true testsuite in
   let result, report =
     run ~print_return_value:false ~no_stop_at_failure:false
       ~callback_out:(fun _ _ -> ())
       ~callback_err:(fun thread ty ->
         Sym_path_resolver.solve ty testsuite thread )
-      filename prog
+      input_file prog
   in
   Logs.app (fun k ->
     k "├── Symbolic execution stats: clock: %fs | solver: %fs"
