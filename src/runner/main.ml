@@ -44,11 +44,16 @@ let cli =
     let doc = "Path to database." in
     Arg.(value & opt fpath (Fpath.v "results.db") & info [ "db" ] ~doc)
   in
+  let run_mode =
+    let doc = "Run mode." in
+    Arg.(value & opt Run_mode.conv Run_mode.Full & info [ "run-mode" ] ~doc)
+  in
   let cmd_run =
     let doc = "Explode-js benchmark runner." in
     let info = Cmd.info "run" ~doc in
     Cmd.v info
-      Term.(const Cmd_run.main $ jobs $ timeout $ output $ filter $ index)
+      Term.(
+        const Cmd_run.main $ jobs $ timeout $ output $ filter $ index $ run_mode )
   in
   let cmd_web =
     let doc = "Explode-js benchmark webapp." in

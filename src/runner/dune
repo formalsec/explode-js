@@ -11,6 +11,7 @@
   package
   run_action
   run_metadata
+  run_mode
   run_proc
   run_proc_result
   run_result
