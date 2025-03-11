@@ -7,3 +7,9 @@
 [submodule "bench/datasets"]
 	path = bench/datasets
 	url = https://github.com/formalsec/explodejs-datasets.git
+[submodule "bench/fast"]
+	path = bench/fast
+	url = https://github.com/filipeom/fast.git
+[submodule "bench/NodeMedic"]
+	path = bench/NodeMedic
+	url = https://github.com/NodeMedicAnalysis/NodeMedic-FINE.git
