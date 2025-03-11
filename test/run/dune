@@ -1,6 +1,8 @@
 (cram
  (deps
   %{bin:explode-js}
+  test_http_server.js
+  test_http_server.json
   test_vfunexported.js
   test_vfunexported.json
   test_usecase_4.js
