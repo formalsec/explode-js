@@ -21,21 +21,25 @@ let instrument_conv =
       | Error (`Msg err) -> `Error err )
   , pp_instrument )
 
-let run ~debug ~mode ~scheme_path ~file ~witness ~output_file =
+let run ~debug ~mode ~scheme_file ~original_file ~witness_file ~output_path =
   if debug then Logs.set_level (Some Debug);
   match mode with
   | Symbolic -> (
     match
-      Test.Symbolic.generate_all ?file ~scheme_path ~output_dir:output_file ()
+      Test.Symbolic.generate_all ?original_file ~scheme_file
+        ~output_dir:output_path ()
     with
     | Error _ as e -> e
     | Ok _n -> Ok 0 )
   | Concrete -> (
-    let witness =
-      match witness with
+    let witness_file =
+      match witness_file with
       | Some wit -> wit
       | None -> assert false
     in
-    match Test.Literal.generate_all ?file scheme_path witness output_file with
+    match
+      Test.Literal.generate_all ?original_file ~output_dir:output_path
+        scheme_file witness_file
+    with
     | Ok () -> Ok 0
     | Error _ as e -> e )

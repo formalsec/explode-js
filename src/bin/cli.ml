@@ -20,12 +20,12 @@ let debug =
   let doc = "Debug mode." in
   Arg.(value & flag & info [ "debug" ] ~doc)
 
-let input0 =
+let input_file =
   let docv = "FILE" in
   let doc = "Name of the input file." in
   Arg.(required & pos 0 (some non_dir_fpath) None & info [] ~doc ~docv)
 
-let filename =
+let input_file_opt =
   let doc = "Overwrite input file in scheme_path" in
   Arg.(value & opt (some fpath) None & info [ "filename" ] ~doc)
 
@@ -55,10 +55,10 @@ let info_run =
 
 let cmd_run =
   let+ workspace_dir
-  and+ scheme_path = input0
-  and+ filename
+  and+ scheme_file = input_file
+  and+ original_file = input_file_opt
   and+ time_limit in
-  Cmd_run.run ~workspace_dir ~scheme_path ~filename ~time_limit
+  Cmd_run.run ~workspace_dir ~scheme_file ~original_file ~time_limit
 
 let info_exploit =
   let doc = "Explode.js single file symbolic confirmation" in
@@ -69,10 +69,10 @@ let info_exploit =
 
 let cmd_exploit =
   (* Term.(const Cmd_exploit.options $ input $ workspace_dir $ time_limit) *)
-  let+ filename = input0
+  let+ input_file
   and+ workspace_dir
   and+ time_limit in
-  Cmd_exploit.run ~filename ~workspace_dir ~time_limit
+  Cmd_exploit.run ~input_file ~workspace_dir ~time_limit
 
 let info_full =
   let doc = "Explode.js full analysis" in
@@ -82,10 +82,10 @@ let info_full =
   Cmd.info "full" ~doc ~sdocs ~man ~man_xrefs
 
 let cmd_full =
-  let+ filename = input0
+  let+ input_file
   and+ workspace_dir
   and+ time_limit in
-  Cmd_full.run ~filename ~workspace_dir ~time_limit
+  Cmd_full.run ~input_file ~workspace_dir ~time_limit
 
 let info_instrument =
   let doc = "Explode.js test instrumentator" in
@@ -100,21 +100,18 @@ let cmd_instrument =
     let doc = "Instrumentation mode." in
     Arg.(value & opt instrument_conv Symbolic & info [ "mode" ] ~doc)
   in
-  let witness =
-    let doc = "Witness file." in
-    Arg.(value & opt (some string) None & info [ "witness" ] ~doc)
-  in
-  let output_file =
-    let doc = "Output file." in
+  let output_path =
+    let doc = "Output path." in
     Arg.(value & opt string "symbolic_test" & info [ "output"; "o" ] ~doc)
   in
   let+ debug
   and+ mode
-  and+ scheme_path = input0
-  and+ file = filename
-  and+ witness
-  and+ output_file in
-  Cmd_instrument.run ~debug ~mode ~scheme_path ~file ~witness ~output_file
+  and+ scheme_file = input_file
+  and+ original_file = input_file_opt
+  and+ witness_file = input_file_opt
+  and+ output_path in
+  Cmd_instrument.run ~debug ~mode ~scheme_file ~original_file ~witness_file
+    ~output_path
 
 let v :
   ( int

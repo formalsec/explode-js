@@ -18,6 +18,7 @@
   dune-site
   ecma-sl
   ecma-sl.symbolic
+  extunix
   explode_js.instrument
   explode_js.prelude
   fmt

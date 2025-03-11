@@ -64,49 +64,60 @@ let with_workspace workspace_dir scheme_path filename f =
   let* result = Bos.OS.Dir.with_current workspace_dir f () in
   result
 
-let get_tmpls workspace (scheme_path : Fpath.t) (file : Fpath.t option) schemes
-    =
-  let output_dir = Fpath.(to_string @@ (workspace / "symbolic_test")) in
-  Explode_js_instrument.Test.Symbolic.write_all ~mode:0o666 ?file ~scheme_path
-    ~output_dir schemes
+let get_tmpls workspace_dir (scheme_file : Fpath.t)
+  (original_file : Fpath.t option) schemes =
+  let output_dir = Fpath.(to_string @@ (workspace_dir / "symbolic_test")) in
+  Explode_js_instrument.Test.Symbolic.write_all ~mode:0o666 ?original_file
+    ~scheme_file ~output_dir schemes
 
-let run_single ~(workspace : Fpath.t) (test : Fpath.t) original_file scheme_path
-    =
-  let* sym_result = Sym_exec.from_file ~workspace test in
-  let* () = Replay.run ?original_file ~scheme_path test workspace sym_result in
-  let report_path = Fpath.(workspace / "report.json") in
-  let report = Sym_exec.Symbolic_result.to_json sym_result in
+let write_report report_file result =
+  Bos.OS.File.writef ~mode:0o666 report_file "%a" Sym_exec.print_report result
+
+let run_single ~(workspace_dir : Fpath.t) (test_file : Fpath.t) original_file
+  scheme_file scheme =
+  let* res = Sym_exec.run_file ~workspace_dir test_file in
   let* () =
-    Bos.OS.File.writef ~mode:0o666 report_path "%a"
-      (Yojson.pretty_print ~std:true)
-      report
+    Replay.run_single ?original_file ~scheme_file ~scheme ~workspace_dir
+      test_file res
   in
-  Ok sym_result
+  let+ () = write_report Fpath.(workspace_dir / "report.json") res in
+  res
 
-let run ~workspace_dir ~scheme_path ~filename ~time_limit:_ =
+let run_server ~(workspace_dir : Fpath.t) (server_file : Fpath.t) scheme =
+  let* res = Sym_exec.run_file ~workspace_dir server_file in
+  let* () = Replay.run_server ~workspace_dir server_file scheme res in
+  let+ () = write_report Fpath.(workspace_dir / "report.json") res in
+  res
+
+let write_reports reports_file results =
+  let results = `List (List.map Sym_exec.Symbolic_result.to_json results) in
+  Bos.OS.File.writef ~mode:0o666 reports_file "%a"
+    (Yojson.pretty_print ~std:true)
+    results
+
+let run ~workspace_dir ~scheme_file ~original_file ~time_limit:_ =
   Logs.app (fun k -> k "── PHASE 1: TEMPLATE GENERATION ──");
-  Logs.app (fun k -> k "\u{2714} Loaded: %a" Fpath.pp scheme_path);
-  with_workspace workspace_dir scheme_path filename
-  @@ fun workspace_dir scheme_path schemes filename ->
-  let* exploit_tmpls = get_tmpls workspace_dir scheme_path filename schemes in
+  Logs.app (fun k -> k "\u{2714} Loaded: %a" Fpath.pp scheme_file);
+  with_workspace workspace_dir scheme_file original_file
+  @@ fun workspace_dir scheme_file schemes orig_file ->
+  let* exploit_tmpls = get_tmpls workspace_dir scheme_file orig_file schemes in
   let n = List.length exploit_tmpls in
   let rec loop i results = function
     | [] -> Ok results
-    | test :: remaning ->
+    | (Explode_js_instrument.Test.Single_shot test, scheme) :: remaning ->
       Logs.app (fun k -> k "\u{25C9} [%d/%d] Procesing %a" i n Fpath.pp test);
-      let workspace = Fpath.(workspace_dir // rem_ext (base test)) in
-      let* sym_result = run_single ~workspace test filename scheme_path in
+      let workspace_dir = Fpath.(workspace_dir // rem_ext (base test)) in
+      let* sym_result =
+        run_single ~workspace_dir test orig_file scheme_file scheme
+      in
+      loop (succ i) (sym_result :: results) remaning
+    | (Client_server { client = _; server }, scheme) :: remaning ->
+      Logs.app (fun k -> k "\u{25C9} [%d/%d] Procesing %a" i n Fpath.pp server);
+      let workspace_dir = Fpath.(workspace_dir // rem_ext (base server)) in
+      let* sym_result = run_server ~workspace_dir server scheme in
       loop (succ i) (sym_result :: results) remaning
   in
   Logs.app (fun k -> k "@\n── PHASE 2: ANALYSIS & VALIDATION ──");
   let* results = loop 1 [] exploit_tmpls in
-  let results_json =
-    `List (List.map Sym_exec.Symbolic_result.to_json results)
-  in
-  let results_report = Fpath.(workspace_dir / "report.json") in
-  let* () =
-    Bos.OS.File.writef ~mode:0o666 results_report "%a"
-      (Yojson.pretty_print ~std:true)
-      results_json
-  in
-  Ok 0
+  let+ () = write_reports Fpath.(workspace_dir / "report.json") results in
+  0
