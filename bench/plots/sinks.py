@@ -2,7 +2,7 @@ import os
 import csv
 import json
 
-input_csv = 'datasets/res-20241217164607/results.csv'
+input_csv = 'datasets/res-20250311193142/results.csv'
 
 def with_csv(filename, f):
     with open(filename, 'r') as csvfile:
@@ -79,7 +79,7 @@ def main():
 
     output_csv = os.path.join(os.path.dirname(input_csv), "sinks.csv")
     with open(output_csv, "w") as csvfile:
-        writer = csv.writer(csvfile)
+        writer = csv.writer(csvfile, delimiter="|")
         writer.writerows(n_rows)
 
 main()
