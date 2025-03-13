@@ -16,6 +16,8 @@ let with_workspace workspace_dir scheme_path filename f =
   let* _ = Bos.OS.Dir.create ~path:true ~mode:0o777 workspace_dir in
   (* Copy sources and scheme_path *)
   let* schemes = Explode_js_instrument.Scheme.Parser.from_file scheme_path in
+  (* List.iter (fun scheme -> *)
+  (*   Fmt.pr "SCHEME:@\n%a@." Explode_js_instrument.Scheme.pp scheme) schemes; *)
   let* () =
     list_iter
       (fun scheme ->
