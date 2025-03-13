@@ -37,6 +37,10 @@ let time_limit =
   let doc = "Maximum time limit for analysis" in
   Arg.(value & opt (some float) None & info [ "timeout" ] ~doc)
 
+let lazy_values =
+  let doc = "Lazy values" in
+  Arg.(value & opt bool true & info [ "lazy-values" ] ~doc)
+
 let sdocs = Manpage.s_common_options
 
 let info_run =
@@ -55,10 +59,12 @@ let info_run =
 
 let cmd_run =
   let+ workspace_dir
+  and+ lazy_values
   and+ scheme_file = input_file
   and+ original_file = input_file_opt
   and+ time_limit in
-  Cmd_run.run ~workspace_dir ~scheme_file ~original_file ~time_limit
+  Cmd_run.run ~lazy_values ~workspace_dir ~scheme_file ~original_file
+    ~time_limit
 
 let info_exploit =
   let doc = "Explode.js single file symbolic confirmation" in
@@ -70,9 +76,10 @@ let info_exploit =
 let cmd_exploit =
   (* Term.(const Cmd_exploit.options $ input $ workspace_dir $ time_limit) *)
   let+ input_file
+  and+ lazy_values
   and+ workspace_dir
   and+ time_limit in
-  Cmd_exploit.run ~input_file ~workspace_dir ~time_limit
+  Cmd_exploit.run ~lazy_values ~input_file ~workspace_dir ~time_limit
 
 let info_full =
   let doc = "Explode.js full analysis" in
@@ -83,9 +90,10 @@ let info_full =
 
 let cmd_full =
   let+ input_file
+  and+ lazy_values
   and+ workspace_dir
   and+ time_limit in
-  Cmd_full.run ~input_file ~workspace_dir ~time_limit
+  Cmd_full.run ~lazy_values ~input_file ~workspace_dir ~time_limit
 
 let info_instrument =
   let doc = "Explode.js test instrumentator" in
