@@ -9,6 +9,26 @@ type param_type =
       [ `Lazy | `Polluted of int | `Normal of (string * param_type) list ]
   | Union of param_type list
 
+let rec pp_param_type fmt = function
+  | Any -> Fmt.pf fmt "Any"
+  | Number -> Fmt.pf fmt "Number"
+  | String -> Fmt.pf fmt "String"
+  | Boolean -> Fmt.pf fmt "Boolean"
+  | Function -> Fmt.pf fmt "Function"
+  | Array types ->
+    Fmt.pf fmt "Array[%a]" (Fmt.list ~sep:Fmt.sp pp_param_type) types
+  | Object `Lazy -> Fmt.pf fmt "Object<Lazy>"
+  | Object (`Polluted n) -> Fmt.pf fmt "Object<Polluted %d>" n
+  | Object (`Normal fields) ->
+    let pp_field fmt (name, ty) = Fmt.pf fmt "%s: %a" name pp_param_type ty in
+    Fmt.pf fmt "Object{@[<hov 1>%a@]}"
+      (Fmt.list ~sep:(fun fmt () -> Fmt.pf fmt ";@ ") pp_field)
+      fields
+  | Union types ->
+    Fmt.pf fmt "@[<hov 1>Union[%a]@]"
+      (Fmt.list ~sep:(fun fmt () -> Fmt.pf fmt " |@ ") pp_param_type)
+      types
+
 let rec equal_param_type a b =
   match (a, b) with
   | Any, Any
@@ -54,6 +74,24 @@ and cont =
       ; port : int
       }
 
+let rec pp fmt { filename; params; cont; _ } =
+  Fmt.pf fmt "@[<hov 1>{ filename=%a;@ params=%a;@ cont=%a }@]"
+    (Fmt.option Fpath.pp) filename
+    (Fmt.list
+       ~sep:(fun fmt () -> Fmt.pf fmt ";@ ")
+       (fun fmt (s, t) -> Fmt.pf fmt "%s: %a" s pp_param_type t) )
+    params (Fmt.option pp_cont) cont
+
+and pp_cont fmt = function
+  | Return t -> Fmt.pf fmt "Return(%a)" pp t
+  | Sequence t -> Fmt.pf fmt "Sequence(%a)" pp t
+  | Client { request_ty; port } ->
+    let pp_request_ty fmt = function
+      | `GET -> Fmt.pf fmt "GET"
+      | `POST -> Fmt.pf fmt "POST"
+    in
+    Fmt.pf fmt "Client{ request_ty=%a; port=%d }" pp_request_ty request_ty port
+
 let ty { ty; _ } = ty
 
 let filename { filename; _ } = filename
@@ -83,10 +121,17 @@ let rec unroll_params (params : (string * param_type) list) :
           let* prps' = unroll_params prps in
           let+ params = acc in
           List.cons (x, Object (`Normal prps')) params
-        | Union tys ->
+        | Union tys -> begin
           let* ty = tys in
-          let+ params = acc in
-          List.cons (x, ty) params
+          match ty with
+          | Object (`Normal prps) ->
+            let* prps' = unroll_params prps in
+            let+ params = acc in
+            List.cons (x, Object (`Normal prps')) params
+          | _ ->
+            let+ params = acc in
+            List.cons (x, ty) params
+        end
         | _ ->
           let+ params = acc in
           List.cons param params
