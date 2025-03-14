@@ -1,11 +1,9 @@
 <h1 align="center", style="font-size: 32px">Automated Exploit Generation for Node.js Packages</h1>
 
-This artifact evaluates Explode.js, a novel tool for synthesizing exploits for Node.js applications. 
+This artifact evaluates Explode.js, a novel tool for synthesizing exploits for Node.js applications.
 By combining static analysis and symbolic execution, Explode.js generates functional exploits that confirm the existence of command injection, code injection, prototype pollution, and path traversal vulnerabilities.
 The repository includes all source code, reference datasets and instructions on how to build and run the experiments.
 These experiments result in the tables and plots presented in the paper, which can be used to validate the results.
-
-<br>
 
 # A. Getting Started
 
@@ -14,38 +12,41 @@ This section contains an introduction to the Explode.js tool, requirements, and 
 ## A.1. Description & Requirements
 
 #### A.1.1. How to access.
-The artifact is available as a persistent DOI at ~~TODO~~.
+The artifact is available as a persistent DOI at 10.5281/zenodo.15009157.
 
 #### A.1.2. Dependencies.
 The evaluation of this artifact does not depend on specific hardware.
-The software requirements to evaluate this artifact are:
-- Linux ~~(tested with Ubuntu 22.04 LTS and Debian 10/11, kernel 5.15.0, 5.10.0 and 4.19.0)~~
-- Docker ~~(tested with version 24.0.1 and 25.0.3)~~
+However for the evaluation is recommended following software and hardware
+specs.
 
-The repository contains a Docker image named ~~TODO~~, built in ~~Ubuntu 22.04 LTS~~, and alternatively, a Dockerfile that installs the necessary dependencies for the evaluation.
+- Linux (tested with Ubuntu Ubuntu 24.04.2 LTS and Debian 10/11)
+- Docker (tested with version 28.0.1)
+- 32GiB RAM
+- Stable internet connection (Explode-js requires npm install to validate exploits)
 
 #### A.1.3. Source Code and Benchmarks.
-All source code and reference benchmarks are included in the repository.
+All source code and reference benchmarks are included in the repository and
+respective docker images
 
 #### A.1.4. Time.
 We estimate that the time needed to run the artifact evaluation is as follows:
-- Getting started: ~~∼30 minutes~~.
-- Run the experiments: ~~∼24 compute hours and ∼2 human hours (non-sequential)~~.
+- Getting started: 30 minutes.
+- Run the experiments: XX compute hours.
 
 #### A.1.5. Artifact Structure.
 The artifact is organized as follows:
 
 ```
 Explode.js
-├── bench 
+├── bench
 │   ├── datasets                # Benchmarks to be evaluated
-│   │   ├── secbench-dataset 
-│   │   ├── vulcan-dataset 
-│   │   ├── collected-dataset 
-│   │   └── test-dataset 
+│   │   ├── secbench-dataset
+│   │   ├── vulcan-dataset
+│   │   ├── collected-dataset
+│   │   └── test-dataset
 │   ├── fast                    # Submodule with the FAST tool repository
 │   ├── NodeMedic               # Submodule with the NodeMedic-Fine tool repository
-│   └── plots                   # Scripts to run experiments and setup 
+│   └── plots                   # Scripts to run experiments and setup
 ├── example                     # Example programs for Explode.js
 ├── src                         # Source code of Explode.js
 ├── test                        # Unit tests of Explode.js
@@ -55,19 +56,73 @@ Explode.js
 └── README.md
 ```
 
-<br>
-
 ## A.2. Explode.js
 
 Explode.js’s leverages a novel exploit generation algorithm comprising two phases: static analysis and symbolic execution (SE).
 First, Explode.js computes an exploit template consisting of a chain of calls to the functions of the package with symbolic arguments.
 In this stage, Explode.js determines which functions need to be called to reach the targeted sensitive sink, the order in which they should be called, and the structure of their corresponding arguments.
-This information is organized in an intermediate representation called vulnerable interaction scheme (VIS), from which the tool subsequently creates the exploit template. 
+This information is organized in an intermediate representation called vulnerable interaction scheme (VIS), from which the tool subsequently creates the exploit template.
 
-~~TODO (if needed)~~
-This phase has N outputs:
-1) output-1
-2) output-N
+This phase has 3 outputs:
+
+1) output-1: VIS detection
+
+```sh
+[STEP 1] MDG: Generating...
+
+[STEP 1] MDG: Completed.
+[STEP 2] Queries: Importing the graph...
+[INFO] Stop running Neo4j local instance.
+[INFO] Import MDG to Neo4j.
+[INFO] Starting Neo4j
+[STEP 2] Queries: Imported
+[STEP 3] Queries: Traversing Graph...
+[INFO] Running injection query.
+[INFO] Reconstructing attacker-controlled data.
+[INFO] Assigning types to attacker-controlled data.
+[INFO] Assigning types to attacker-controlled data.
+[INFO] Assigning types to attacker-controlled data.
+[INFO] Assigning types to attacker-controlled data.
+[INFO] Assigning types to attacker-controlled data.
+[INFO] Assigning types to attacker-controlled data.
+[INFO] Assigning types to attacker-controlled data.
+[INFO] Assigning types to attacker-controlled data.
+[INFO] Assigning types to attacker-controlled data.
+[INFO] Assigning types to attacker-controlled data.
+[INFO] Assigning types to attacker-controlled data.
+[INFO] Assigning types to attacker-controlled data.
+[INFO] Running prototype pollution query.
+[INFO] Prototype Pollution - Reconstructing attacker-controlled data.
+[INFO] Detected 1 vulnerabilities.
+[STEP 3] Queries: Completed.
+── PHASE 1: TEMPLATE GENERATION ──
+✔ Loaded: _results/taint_summary.json
+⚒ Generating 1 template(s):
+├── 📄 ./symbolic_test_0.js
+
+```
+
+2-3) Symbolic execution and validation
+
+```sh
+── PHASE 2/3: ANALYSIS & VALIDATION ──
+◉ [1/1] Procesing ./symbolic_test_0.js
+├── Symbolic execution output:
+"Uncaught TypeError"
+"Uncaught TypeError"
+"File too big"
+Exec failure: (str.++
+               ((str.++
+                 ((str.++
+                   ((str.++ ((str.++ ("rsync -av /tmp/0 ", id)), "@")),
+                   host)), ":")), dstDir))
+├── Symbolic execution stats: clock: 30.982527s | solver: 30.500072s
+├── ⚠ Detected 1 issue(s)!
+│   ├── ↺ Replaying 2 test case(s)
+│   │   ├── 📄 [1/2] Using test case: ./symbolic_test_0/test-suite/witness-0.json
+│   │   │   ├── Node exited with 0
+│   │   │   └── ✔ Status: Success (created file "./success")
+```
 
 In the second phase, Explode.js symbolically executes the exploit template aiming to find a control path to the vulnerable sink.
 If such a path is found, the identified path constraints are extended with additional constraints to
@@ -76,46 +131,32 @@ Then, Explode.js uses an Satisfiability Modulo Theories (SMT) solver to generate
 If such inputs are found, the tool produces a functional exploit by replacing the symbolic variables in the exploit template with the corresponding concrete values.
 Currently, Explode.js can synthesize exploits for four types of vulnerabilities: path traversal (CWE-22), OS command injection (CWE-78), arbitrary code execution (CWE-94), and prototype pollution (CWE-1321).
 
-<br>
-
 ## A.3. Setup the Environment
 
 To setup the environment, you can opt to use a pre-built Docker image, or to build it using the Dockerfile.
 For both cases, ensure that you have the Docker service running in your machine.
-~~If you opt to use the pre-built image, it should take at most 10 minutes, otherwise, it should only take a few seconds.~~ <!-- Isto devia de ser ao contrário right? Leva tempo é a construir a imagem. -->
 To use the pre-built image, from the repository’s root folder, run:
 
 ```
-cd ???
 ./load_image.sh
 ```
 
 Alternatively, build the required docker image, by executing:
 
 ```
-cd ???
 ./build_image.sh
 ```
 
-All of the scripts in this guide execute Docker commands and should be run in the ~~`scripts`~~ folder of your machine.
-
-<br>
+All of the scripts in this guide execute Docker commands and should be run in the TODO folder of your machine.
 
 ## A.4. Basic Testing of Explode.js
 
-To test that the artifact is running as expected, run the following script, which runs Explode.js for the `examples/exec.js` file with a simple code injection vulnerability:
+To test that the artifact is running as expected, run the following command, which runs Explode.js for the `examples/running-example/index.js` file with the :
 
-~~TODO~~
-<!-- 
-Aqui temos de ver porque o exemplo que o Filipe tem involve primeiro correr o graphjs com
->> graphjs --with-types -f exec.js -o _results/run
-e depois correr o explode.js no resultado:
->> explode-js run --filename exec.js _results/run/taint_summary.json
-
-Se calhar é preferível ter um script que corre tudo e depois mostra os resultados?
--->
-
-<br>
+```sh
+./running-exampl.sh
+# <output truncated, see A.2>
+```
 
 ## A.5 Basic Testing of FAST
 
@@ -127,7 +168,7 @@ To test that FAST is running as expected, run the command:
 TODO: FAST cmd
 ```
 
-**[Expected Output]** 
+**[Expected Output]**
 If the test was successful, you should see the following output (here truncated for space).
 <!-- Adicionar uma frase sobre o resultado do FAST se for preciso -->
 
@@ -135,9 +176,9 @@ If the test was successful, you should see the following output (here truncated 
 TODO: FAST output
 ```
 
-**[Results]** 
+**[Results]**
 Besides the output, FAST should generate the following files in the ~~`directory`~~ directory.
-It also generates others, that are not relevant for this artifact. 
+It also generates others, that are not relevant for this artifact.
 
 ```
 TODO: NodeMedic results
@@ -154,7 +195,7 @@ To test that FAST is running as expected, run the command:
 TODO: NodeMedic cmd
 ```
 
-**[Expected Output]** 
+**[Expected Output]**
 If the test was successful, you should see the following output (here truncated for space).
 <!-- Adicionar uma frase sobre o resultado do NodeMedic-Fine se for preciso -->
 
@@ -162,9 +203,9 @@ If the test was successful, you should see the following output (here truncated 
 TODO: NodeMedic output
 ```
 
-**[Results]** 
+**[Results]**
 Besides the output, FAST should generate the following files in the ~~`directory`~~ directory.
-It also generates others, that are not relevant for this artifact. 
+It also generates others, that are not relevant for this artifact.
 
 ```
 TODO: NodeMedic results
@@ -207,7 +248,7 @@ It should also generate ~~2~~ plots:
 
 # B. Step-By-Step Instructions
 
-This section contains instructions to reproduce the experiments that support the claims of the paper. 
+This section contains instructions to reproduce the experiments that support the claims of the paper.
 These experiments result in the tables and plots presented in the paper, which can be used to validate the results.
 
 ## B.1. Major Claims
@@ -295,8 +336,8 @@ Run Explode.js in VulcaN for each vulnerability type
 ./run_nodemedic_dataset.sh -d secbench -v prototype-pollution
 ```
 
-Similarly to Sections A.4 and A.5, the results for each package will be located in the respective folder of the package. 
-For instance, the results for package ~~datasets/vulcan-dataset/CWE-22/374~~ will be located in ~~datasets/vulcan-dataset/CWE-22/374/tool_outputs~~. 
+Similarly to Sections A.4 and A.5, the results for each package will be located in the respective folder of the package.
+For instance, the results for package ~~datasets/vulcan-dataset/CWE-22/374~~ will be located in ~~datasets/vulcan-dataset/CWE-22/374/tool_outputs~~.
 
 **[Analysis Timeout]** The analysis of each package has a timeout of ~~5 minutes, defined in file `configs/config.ini`~~.
 This parameter can affect the results produced, since different machines may experience a different number of timeouts.
