@@ -16,6 +16,8 @@ let with_workspace workspace_dir scheme_path filename f =
   let* _ = Bos.OS.Dir.create ~path:true ~mode:0o777 workspace_dir in
   (* Copy sources and scheme_path *)
   let* schemes = Explode_js_instrument.Scheme.Parser.from_file scheme_path in
+  (* List.iter (fun scheme -> *)
+  (*   Fmt.pr "SCHEME:@\n%a@." Explode_js_instrument.Scheme.pp scheme) schemes; *)
   let* () =
     list_iter
       (fun scheme ->
@@ -73,9 +75,9 @@ let get_tmpls workspace_dir (scheme_file : Fpath.t)
 let write_report report_file result =
   Bos.OS.File.writef ~mode:0o666 report_file "%a" Sym_exec.print_report result
 
-let run_single ~(workspace_dir : Fpath.t) (test_file : Fpath.t) original_file
-  scheme_file scheme =
-  let* res = Sym_exec.run_file ~workspace_dir test_file in
+let run_single ~lazy_values ~(workspace_dir : Fpath.t) (test_file : Fpath.t)
+  original_file scheme_file scheme =
+  let* res = Sym_exec.run_file ~lazy_values ~workspace_dir test_file in
   let* () =
     Replay.run_single ?original_file ~scheme_file ~scheme ~workspace_dir
       test_file res
@@ -83,8 +85,9 @@ let run_single ~(workspace_dir : Fpath.t) (test_file : Fpath.t) original_file
   let+ () = write_report Fpath.(workspace_dir / "report.json") res in
   res
 
-let run_server ~(workspace_dir : Fpath.t) (server_file : Fpath.t) scheme =
-  let* res = Sym_exec.run_file ~workspace_dir server_file in
+let run_server ~lazy_values ~(workspace_dir : Fpath.t) (server_file : Fpath.t)
+  scheme =
+  let* res = Sym_exec.run_file ~lazy_values ~workspace_dir server_file in
   let* () = Replay.run_server ~workspace_dir server_file scheme res in
   let+ () = write_report Fpath.(workspace_dir / "report.json") res in
   res
@@ -95,7 +98,7 @@ let write_reports reports_file results =
     (Yojson.pretty_print ~std:true)
     results
 
-let run ~workspace_dir ~scheme_file ~original_file ~time_limit:_ =
+let run ~lazy_values ~workspace_dir ~scheme_file ~original_file ~time_limit:_ =
   Logs.app (fun k -> k "── PHASE 1: TEMPLATE GENERATION ──");
   Logs.app (fun k -> k "\u{2714} Loaded: %a" Fpath.pp scheme_file);
   with_workspace workspace_dir scheme_file original_file
@@ -108,7 +111,7 @@ let run ~workspace_dir ~scheme_file ~original_file ~time_limit:_ =
       Logs.app (fun k -> k "\u{25C9} [%d/%d] Procesing %a" i n Fpath.pp test);
       let workspace_dir = Fpath.(workspace_dir // rem_ext (base test)) in
       let results =
-        match run_single ~workspace_dir test orig_file scheme_file scheme with
+        match run_single ~lazy_values ~workspace_dir test orig_file scheme_file scheme with
         | Ok sym_result -> sym_result :: results
         | Error (`Msg err) ->
           Logs.err (fun k -> k "run_single: %s" err);
@@ -118,7 +121,7 @@ let run ~workspace_dir ~scheme_file ~original_file ~time_limit:_ =
     | (Client_server { client = _; server }, scheme) :: remaning ->
       Logs.app (fun k -> k "\u{25C9} [%d/%d] Procesing %a" i n Fpath.pp server);
       let workspace_dir = Fpath.(workspace_dir // rem_ext (base server)) in
-      let* sym_result = run_server ~workspace_dir server scheme in
+      let* sym_result = run_server ~lazy_values ~workspace_dir server scheme in
       loop (succ i) (sym_result :: results) remaning
   in
   Logs.app (fun k -> k "@\n── PHASE 2: ANALYSIS & VALIDATION ──");

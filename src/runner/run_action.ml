@@ -11,10 +11,12 @@ let run time_limit output_dir input_file scheme_file =
   in
   Run_proc.run ~time_limit "explode-js" argv
 
-let full time_limit output_dir input_file =
+let full ~lazy_values time_limit output_dir input_file =
   let argv =
     [ "explode-js"
     ; "full"
+    ; "--lazy-values"
+    ; Bool.to_string lazy_values
     ; "--workspace"
     ; Fpath.to_string output_dir
     ; Fpath.to_string input_file

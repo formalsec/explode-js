@@ -33,7 +33,7 @@ let dummy_report input_file =
   ; failures = []
   }
 
-let run_file ~workspace_dir input_file =
+let run_file ~lazy_values ~workspace_dir input_file =
   Ecma_sl.Log.Config.log_warns := true;
   (* Ecma_sl.Log.Config.log_debugs := true; *)
   Logs.app (fun k -> k "├── Symbolic execution output:");
@@ -42,7 +42,8 @@ let run_file ~workspace_dir input_file =
   let* _ = OS.Dir.create ~mode:0o777 ~path:true testsuite in
   let result, report =
     try
-      run ~print_return_value:false ~no_stop_at_failure:false
+      run ~lazy_values ~timeout:30 ~print_return_value:false
+        ~no_stop_at_failure:false
         ~callback_out:(fun _ _ -> ())
         ~callback_err:(fun thread ty ->
           Sym_path_resolver.solve ty testsuite thread )

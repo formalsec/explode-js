@@ -44,7 +44,7 @@ let execute_witness ~env (test_file : Fpath.t) (witness_file : Fpath.t) =
   let err_fpath = Fpath.add_ext ".stderr" witness_file in
   let err = Cmd.err_file err_fpath in
   let out_fpath = Fpath.add_ext ".stdout" witness_file in
-  let* (), status = Cmd.(run_out ~env ~err cmd |> out_file out_fpath) in
+  let result = Cmd.(run_out ~env ~err cmd |> out_file out_fpath) in
   let* err = OS.File.read err_fpath in
   let+ out = OS.File.read out_fpath in
   let visiable_effect = function
@@ -62,7 +62,9 @@ let execute_witness ~env (test_file : Fpath.t) (witness_file : Fpath.t) =
       String.find_sub ~sub err |> Option.is_some
   in
   let effect_ = List.find_opt visiable_effect potential_effects in
-  (status, effect_)
+  ( (let+ (), status = result in
+     status )
+  , effect_ )
 
 let generate_literal_test ?original_file workspace_dir scheme_file scheme
   witness_file i =
@@ -113,9 +115,15 @@ let run_single ?original_file ?scheme_file ?scheme ~workspace_dir input_file
               witness );
           generate_literal_test ?original_file workspace_dir scheme_file scheme
             witness !i;
-          let+ (_, status), effect_ = execute_witness ~env input_file witness in
-          Logs.app (fun k ->
-            k "│   │   │   ├── Node %a" OS.Cmd.pp_status status );
+          let+ status, effect_ = execute_witness ~env input_file witness in
+          begin
+            match status with
+            | Ok (_, status) ->
+              Logs.app (fun k ->
+                k "│   │   │   ├── Node %a" OS.Cmd.pp_status status )
+            | Error (`Msg err) ->
+              Logs.app (fun k -> k "│   │   │   ├── Node: %s" err)
+          end;
           check_effect exploit effect_ )
       failures
   end
@@ -165,11 +173,16 @@ let run_server ~workspace_dir server_file scheme
             let waited_pid, _status = Unix.waitpid [] ~-pid in
             (* Sanity check *)
             assert (waited_pid = pid);
-            let* (_, status), effect_ = result in
-            Logs.app (fun k ->
-              k "│   │   │   ├── Node %a" OS.Cmd.pp_status status );
-            check_effect exploit effect_;
-            Ok ()
+            let+ status, effect_ = result in
+            begin
+              match status with
+              | Ok (_, status) ->
+                Logs.app (fun k ->
+                  k "│   │   │   ├── Node %a" OS.Cmd.pp_status status )
+              | Error (`Msg err) ->
+                Logs.app (fun k -> k "│   │   │   ├── Node: %s" err)
+            end;
+            check_effect exploit effect_
           end )
       failures
   end
