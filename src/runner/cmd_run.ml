@@ -27,7 +27,7 @@ let parse_report output_dir =
     in
     (Fmt.str "%a" (Json.pretty_print ~std:true) json, control_path, exploit)
 
-let work run_mode db
+let work ~lazy_values run_mode db
   ({ timestamp; time_limit; output_dir; filter; _ } : Run_metadata.t) n i
   (pkg : Package.t) : Run_result.t list =
   let vulns =
@@ -82,7 +82,9 @@ let work run_mode db
             Fmt.epr "could not create directory '%a': %s@." Fpath.pp output_dir
               err
         end;
-        let raw = Run_action.full time_limit output_dir vuln.filename in
+        let raw =
+          Run_action.full ~lazy_values time_limit output_dir vuln.filename
+        in
         let report, control_path, exploit = parse_report output_dir in
         let res =
           { Run_result.pkg
@@ -107,7 +109,7 @@ let prepare_db db =
   let* () = Run_result.prepare_db db in
   Run_metadata.prepare_db db
 
-let main _jobs time_limit output filter index run_mode =
+let main lazy_values _jobs time_limit output filter index run_mode =
   Db.with_db "results.db" @@ fun db ->
   let* () = prepare_db db in
   let output_dir = Fpath.(output / Fmt.str "res-%d" timestamp) in
@@ -120,6 +122,7 @@ let main _jobs time_limit output filter index run_mode =
   let* pkgs = Json_index.Parse.from_file index in
   let num_pkgs = List.length pkgs in
   let results =
-    List.concat @@ List.mapi (work run_mode db metadata num_pkgs) pkgs
+    List.concat
+    @@ List.mapi (work ~lazy_values run_mode db metadata num_pkgs) pkgs
   in
   Ok (Run_result.to_csv ~short:true results Fpath.(output_dir / "results.csv"))
