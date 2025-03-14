@@ -1,0 +1,6 @@
+{
+  "main": "./index.js",
+  "dependencies": {
+    "fs-extra" : "11.3.0"
+  }
+}
