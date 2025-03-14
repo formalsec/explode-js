@@ -25,12 +25,11 @@ let pp_csv fmt { pkg; vuln; raw; report; control_path; exploit; timestamp } =
     Vulnerability.pp_csv vuln Run_proc_result.pp_csv raw Fmt.string report
     Fmt.bool control_path Fmt.bool exploit Fmt.int timestamp
 
-let pp_csv_short fmt
-  { pkg; vuln; raw; report; control_path; exploit; timestamp } =
-  let report = String.escaped report in
-  Fmt.pf fmt "%s|%s|%a|%a|%a|%a|%a|%a" pkg.package pkg.version
-    Vulnerability.pp_csv vuln Run_proc_result.pp_csv_short raw Fmt.string report
-    Fmt.bool control_path Fmt.bool exploit Fmt.int timestamp
+let pp_csv_short fmt { pkg; vuln; raw; control_path; exploit; timestamp; _ } =
+  Fmt.pf fmt "%s|%s|%a|%a|%a|%a|%a|%a|%a|%a" pkg.package pkg.version
+    Vulnerability.pp_csv vuln Fmt.int raw.returncode Fmt.bool control_path
+    Fmt.bool exploit Fmt.float raw.rtime Fmt.float raw.utime Fmt.float raw.stime
+    Fmt.int timestamp
 
 let to_jg { pkg; vuln; raw; timestamp; report; control_path; exploit } =
   Jingoo.Jg_types.(
@@ -60,7 +59,7 @@ let to_csv_string results =
 
 let to_csv_string_short results =
   Fmt.str
-    "package|version|id|cwe|filename|returncode|stdout|stderr|rtime|utime|stime|report|control_path|exploit|timestamp@\n\
+    "package|version|id|cwe|filename|returncode|control_path|exploit|rtime|utime|stime|timestamp@\n\
      %a"
     (Fmt.list ~sep:(fun fmt () -> Fmt.pf fmt "@\n") pp_csv_short)
     results
