@@ -48,12 +48,17 @@ let cli =
     let doc = "Run mode." in
     Arg.(value & opt Run_mode.conv Run_mode.Full & info [ "run-mode" ] ~doc)
   in
+  let lazy_values =
+    let doc = "Lazy values." in
+    Arg.(value & opt bool true & info [ "lazy-values" ] ~doc)
+  in
   let cmd_run =
     let doc = "Explode-js benchmark runner." in
     let info = Cmd.info "run" ~doc in
     Cmd.v info
       Term.(
-        const Cmd_run.main $ jobs $ timeout $ output $ filter $ index $ run_mode )
+        const Cmd_run.main $ lazy_values $ jobs $ timeout $ output $ filter
+        $ index $ run_mode )
   in
   let cmd_web =
     let doc = "Explode-js benchmark webapp." in
