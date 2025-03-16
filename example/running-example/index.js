@@ -19,7 +19,7 @@ var FileTransfer = function FileTransfer(options) {
   this.useTempFiles = options.useTempFiles || false
 };
 
-FileTransfer.prototype.getRemoteUploadData = function upload(data) {
+FileTransfer.prototype.remoteUploadData = function upload(data) {
   if (this.useTempFiles && data != "") {
     tmpfile = `/tmp/${Date.now()}`
     fs.writeFileSync(tmpfile, data)
