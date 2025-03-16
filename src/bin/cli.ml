@@ -41,6 +41,10 @@ let lazy_values =
   let doc = "Lazy values" in
   Arg.(value & opt bool true & info [ "lazy-values" ] ~doc)
 
+let proto_pollution =
+  let doc = "Turn prototype pollution heuristics on" in
+  Arg.(value & flag & info [ "proto-pollution" ] ~doc)
+
 let sdocs = Manpage.s_common_options
 
 let info_run =
@@ -60,11 +64,12 @@ let info_run =
 let cmd_run =
   let+ workspace_dir
   and+ lazy_values
+  and+ proto_pollution
   and+ scheme_file = input_file
   and+ original_file = input_file_opt
   and+ time_limit in
-  Cmd_run.run ~lazy_values ~workspace_dir ~scheme_file ~original_file
-    ~time_limit
+  Cmd_run.run ~lazy_values ~proto_pollution ~workspace_dir ~scheme_file
+    ~original_file ~time_limit
 
 let info_exploit =
   let doc = "Explode.js single file symbolic confirmation" in
@@ -90,10 +95,12 @@ let info_full =
 
 let cmd_full =
   let+ input_file
+  and+ proto_pollution
   and+ lazy_values
   and+ workspace_dir
   and+ time_limit in
-  Cmd_full.run ~lazy_values ~input_file ~workspace_dir ~time_limit
+  Cmd_full.run ~lazy_values ~proto_pollution ~input_file ~workspace_dir
+    ~time_limit
 
 let info_instrument =
   let doc = "Explode.js test instrumentator" in

@@ -35,7 +35,7 @@ let run_with_timeout limit f =
       | WSIGNALED _ | WSTOPPED _ -> `Timeout
   end
 
-let full ~lazy_values input_file workspace_dir =
+let full ~lazy_values ~proto_pollution input_file workspace_dir =
   let res =
     let graphjs_time_path = Fpath.(workspace_dir / "graphjs_time.txt") in
     let explode_time_path = Fpath.(workspace_dir / "explode_time.txt") in
@@ -56,7 +56,7 @@ let full ~lazy_values input_file workspace_dir =
     if scheme_file_exists then
       let explode_start = Unix.gettimeofday () in
       let result =
-        Cmd_run.run ~lazy_values ~workspace_dir ~scheme_file
+        Cmd_run.run ~lazy_values ~proto_pollution ~workspace_dir ~scheme_file
           ~original_file:(Some input_file) ~time_limit:(Some 30.0)
       in
       let explode_time = Unix.gettimeofday () -. explode_start in
@@ -76,9 +76,9 @@ let full ~lazy_values input_file workspace_dir =
       Fmt.epr "error: Failed during symbolic execution/confirmation@.";
       n )
 
-let run ~lazy_values ~input_file ~workspace_dir ~time_limit =
+let run ~lazy_values ~proto_pollution ~input_file ~workspace_dir ~time_limit =
   let* _ = Bos.OS.Dir.create ~path:true ~mode:0o777 workspace_dir in
-  let work () = full ~lazy_values input_file workspace_dir in
+  let work () = full ~lazy_values ~proto_pollution input_file workspace_dir in
   let res =
     match time_limit with
     | None -> `Ok (work ())

@@ -167,13 +167,14 @@ end = struct
 
   let param_type_of_string (ty : string) =
     match String.trim ty with
-    | "any" -> Ok Any
+    | "any" | "undefined" -> Ok Any
     | "number" -> Ok Number
     | "string" -> Ok String
     | "bool" | "boolean" -> Ok Boolean
     | "function" -> Ok Function
     | "array" -> Ok (Array [ String ])
     | "object" -> Ok (Object (`Normal []))
+    | "polluted_object1" -> Ok (Object (`Polluted 1))
     | "polluted_object2" -> Ok (Object (`Polluted 2))
     | "polluted_object3" -> Ok (Object (`Polluted 3))
     | "lazy_object" -> Ok (Object `Lazy)
