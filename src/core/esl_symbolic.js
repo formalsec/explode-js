@@ -27,10 +27,12 @@ function lazy_object() { return {}; }
 
 function polluted_object(depth) {
   switch (depth) {
+    case 1:
+      return { ["__proto__"]: { "polluted": "yes" } }
     case 2:
       return { ["__proto__"]: { "toString": "polluted" } }
     case 3:
-      return { "constructor": { "prototype": { "toString": "polluted" } } }
+      return { "constructor": { "prototype": { "polluted": "yes" } } }
     default:
   }
   return {}

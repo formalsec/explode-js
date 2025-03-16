@@ -83,15 +83,18 @@ let check_effect (exploit : Sym_failure.exploit) effect_ =
     Logs.app (fun k ->
       k "│   │   │   └── \u{2714} Status: Success %a" Replay_effect.pp eff );
     exploit.success <- true;
-    exploit.effect_ <- Some eff
+    exploit.effect_ <- Some eff;
+    true
   | Some (File file as eff) ->
     let _ = OS.Path.delete file in
     Logs.app (fun k ->
       k "│   │   │   └── \u{2714} Status: Success %a" Replay_effect.pp eff );
     exploit.success <- true;
-    exploit.effect_ <- Some eff
+    exploit.effect_ <- Some eff;
+    true
   | None ->
-    Logs.app (fun k -> k "│   │   │   └── \u{2716} Status: No side effect" )
+    Logs.app (fun k -> k "│   │   │   └── \u{2716} Status: No side effect" );
+    false
 
 let run_single ?original_file ?scheme_file ?scheme ~workspace_dir input_file
   (sym_result : Sym_exec.Symbolic_result.t) =
@@ -101,31 +104,35 @@ let run_single ?original_file ?scheme_file ?scheme ~workspace_dir input_file
   let i = ref 0 in
   let failures = sym_result.failures in
   let n = List.length failures in
-  if n = 0 then Ok ()
+  let found_witness = ref false in
+  if n = 0 then Ok false
   else begin
     Logs.app (fun k -> k "│   ├── \u{21BA} Replaying %d test case(s)" n);
-    list_iter
-      (fun { Sym_failure.model; exploit; _ } ->
-        incr i;
-        match model with
-        | None -> Ok ()
-        | Some { path = witness; _ } ->
-          Logs.app (fun k ->
-            k "│   │   ├── \u{1F4C4} [%d/%d] Using test case: %a" !i n Fpath.pp
-              witness );
-          generate_literal_test ?original_file workspace_dir scheme_file scheme
-            witness !i;
-          let+ status, effect_ = execute_witness ~env input_file witness in
-          begin
-            match status with
-            | Ok (_, status) ->
-              Logs.app (fun k ->
-                k "│   │   │   ├── Node %a" OS.Cmd.pp_status status )
-            | Error (`Msg err) ->
-              Logs.app (fun k -> k "│   │   │   ├── Node: %s" err)
-          end;
-          check_effect exploit effect_ )
-      failures
+    let* () =
+      list_iter
+        (fun { Sym_failure.model; exploit; _ } ->
+          incr i;
+          match model with
+          | None -> Ok ()
+          | Some { path = witness; _ } ->
+            Logs.app (fun k ->
+              k "│   │   ├── \u{1F4C4} [%d/%d] Using test case: %a" !i n
+                Fpath.pp witness );
+            generate_literal_test ?original_file workspace_dir scheme_file
+              scheme witness !i;
+            let+ status, effect_ = execute_witness ~env input_file witness in
+            begin
+              match status with
+              | Ok (_, status) ->
+                Logs.app (fun k ->
+                  k "│   │   │   ├── Node %a" OS.Cmd.pp_status status )
+              | Error (`Msg err) ->
+                Logs.app (fun k -> k "│   │   │   ├── Node: %s" err)
+            end;
+            if check_effect exploit effect_ then found_witness := true )
+        failures
+    in
+    Ok !found_witness
   end
 
 let run_server ~workspace_dir server_file scheme
@@ -182,7 +189,8 @@ let run_server ~workspace_dir server_file scheme
               | Error (`Msg err) ->
                 Logs.app (fun k -> k "│   │   │   ├── Node: %s" err)
             end;
-            check_effect exploit effect_
+            let _ = check_effect exploit effect_ in
+            ()
           end )
       failures
   end
