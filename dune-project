@@ -29,6 +29,7 @@
   cmdliner
   dune
   dune-site
+  dune-glob
   extunix
   fpath
   mdx
