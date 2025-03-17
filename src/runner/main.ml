@@ -1,6 +1,10 @@
 let cli =
   let open Cmdliner in
   let fpath = ((fun str -> `Ok (Fpath.v str)), Fpath.pp) in
+  let debug =
+    let doc = "Turn debug mode on." in
+    Arg.(value & flag & info [ "debug" ] ~doc)
+  in
   let jobs =
     let doc = "Number of threads to use." in
     let absent = Domain.recommended_domain_count () in
@@ -52,13 +56,17 @@ let cli =
     let doc = "Lazy values." in
     Arg.(value & opt bool true & info [ "lazy-values" ] ~doc)
   in
+  let proto_pollution =
+    let doc = "Turn prototype pollution heuristics on" in
+    Arg.(value & flag & info [ "proto-pollution" ] ~doc)
+  in
   let cmd_run =
     let doc = "Explode-js benchmark runner." in
     let info = Cmd.info "run" ~doc in
     Cmd.v info
       Term.(
-        const Cmd_run.main $ lazy_values $ jobs $ timeout $ output $ filter
-        $ index $ run_mode )
+        const Cmd_run.main $ debug $ lazy_values $ proto_pollution $ jobs
+        $ timeout $ output $ filter $ index $ run_mode )
   in
   let cmd_web =
     let doc = "Explode-js benchmark webapp." in
