@@ -57,3 +57,6 @@ COPY ./run-fast.py /home/explodejs/explode-js
 # Install 'fast'
 RUN python3 -m pip config set global.break-system-packages true
 RUN cd /home/explodejs/explode-js/fast && ./install.sh
+
+ENV FAST="/home/explodejs/explode-js/fast"
+ENV PYTHONPATH="$FAST:$PYTHONPATH"
