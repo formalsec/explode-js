@@ -102,6 +102,8 @@ def run_exploit(package, version, exploit_id, cwe, file, outputs):
         elapsed, code, stdout = timed_run(cmd, 600)
     except sp.TimeoutExpired:
         elapsed = TIMEOUT
+        code = None
+        stdout = "TIMEOUT"
 
     out = join_path(outputs, f'{exploit_id}_fast')
 
@@ -110,7 +112,7 @@ def run_exploit(package, version, exploit_id, cwe, file, outputs):
   
     os.makedirs(out)
 
-    time_file = join_path(out, 'stats.json')
+    stats_file = join_path(out, 'stats.json')
     stdout_file = join_path(out, 'fast-stdout.log')
 
     move_output_files(out)
@@ -124,7 +126,7 @@ def run_exploit(package, version, exploit_id, cwe, file, outputs):
     }
 
     dump_file(stdout_file, stdout)
-    dump_json(time_file, stats)
+    dump_json(stats_file, stats)
 
 def move_output_files(dest):
     pwd = os.getcwd()
