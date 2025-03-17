@@ -1,6 +1,10 @@
 open Syntax
 module Json = Yojson.Basic
 
+let set_debug () =
+  Logs.set_reporter (Logs_fmt.reporter ());
+  Logs.set_level (Some Debug)
+
 let parse_report output_dir =
   let report_path = Fpath.(output_dir / "run" / "report.json") in
   if not (Sys.file_exists (Fpath.to_string report_path)) then ("", false, false)
@@ -27,7 +31,7 @@ let parse_report output_dir =
     in
     (Fmt.str "%a" (Json.pretty_print ~std:true) json, control_path, exploit)
 
-let work ~lazy_values run_mode db
+let work ~proto_pollution ~lazy_values run_mode db
   ({ timestamp; time_limit; output_dir; filter; _ } : Run_metadata.t) n i
   (pkg : Package.t) : Run_result.t list =
   let vulns =
@@ -83,7 +87,8 @@ let work ~lazy_values run_mode db
               err
         end;
         let raw =
-          Run_action.full ~lazy_values time_limit output_dir vuln.filename
+          Run_action.full ~proto_pollution ~lazy_values time_limit output_dir
+            vuln.filename
         in
         let report, control_path, exploit = parse_report output_dir in
         let res =
@@ -109,7 +114,9 @@ let prepare_db db =
   let* () = Run_result.prepare_db db in
   Run_metadata.prepare_db db
 
-let main lazy_values _jobs time_limit output filter index run_mode =
+let main debug lazy_values proto_pollution _jobs time_limit output filter index
+  run_mode =
+  if debug then set_debug ();
   Db.with_db "results.db" @@ fun db ->
   let* () = prepare_db db in
   let output_dir = Fpath.(output / Fmt.str "res-%d" timestamp) in
@@ -123,6 +130,8 @@ let main lazy_values _jobs time_limit output filter index run_mode =
   let num_pkgs = List.length pkgs in
   let results =
     List.concat
-    @@ List.mapi (work ~lazy_values run_mode db metadata num_pkgs) pkgs
+    @@ List.mapi
+         (work ~proto_pollution ~lazy_values run_mode db metadata num_pkgs)
+         pkgs
   in
   Ok (Run_result.to_csv ~short:true results Fpath.(output_dir / "results.csv"))
