@@ -53,6 +53,7 @@
   extunix
   explode_js
   jingoo
+  logs
   sqlite3
   sqlite3_utils
   tiny_httpd)
