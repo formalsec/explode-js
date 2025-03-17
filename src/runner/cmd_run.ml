@@ -114,12 +114,16 @@ let prepare_db db =
   let* () = Run_result.prepare_db db in
   Run_metadata.prepare_db db
 
-let main debug lazy_values proto_pollution _jobs time_limit output filter index
-  run_mode =
+let main debug lazy_values proto_pollution _jobs time_limit output_dir filter
+  index run_mode =
   if debug then set_debug ();
   Db.with_db "results.db" @@ fun db ->
   let* () = prepare_db db in
-  let output_dir = Fpath.(output / Fmt.str "res-%d" timestamp) in
+  let output_dir =
+    match output_dir with
+    | None -> Fpath.(v "." / Fmt.str "res-%d" timestamp)
+    | Some output_dir -> output_dir
+  in
   let* _ = Bos.OS.Dir.create ~path:true output_dir in
   let metadata =
     { Run_metadata.timestamp; time_limit; output_dir; filter; index }

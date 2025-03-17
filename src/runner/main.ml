@@ -16,7 +16,7 @@ let cli =
   in
   let output =
     let doc = "Output directory to store results." in
-    Arg.(value & opt fpath (Fpath.v ".") & info [ "output" ] ~doc)
+    Arg.(value & opt (some fpath) None & info [ "output" ] ~doc)
   in
   let filter =
     let doc =
