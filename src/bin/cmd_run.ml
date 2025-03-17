@@ -17,15 +17,26 @@ let with_workspace ~proto_pollution workspace_dir scheme_path filename f =
   (* Copy sources and scheme_path *)
   let* schemes =
     let open Explode_js_instrument in
-    let+ initial = Scheme.Parser.from_file scheme_path in
-    if not proto_pollution then initial
-    else
-      match initial with
-      | [] ->
-        Scheme_pp.merge_heuristic2 None
-        :: Scheme.unroll (Scheme_pp.merge_heuristic None)
-        @ Scheme.unroll (Scheme_pp.set_heuristic None "module.exports")
-      | initial -> Scheme.unroll (Scheme_pp.merge_heuristic None) @ initial
+    let+ schemes0 = Scheme.Parser.from_file scheme_path in
+    if not proto_pollution then schemes0
+    else begin
+      let schemes1 =
+        match schemes0 with
+        | [] ->
+          Heuristics.Pollution.merge2 None
+          :: Scheme.unroll (Heuristics.Pollution.merge None)
+          @ Scheme.unroll (Heuristics.Pollution.set None "module.exports")
+        | vises -> Scheme.unroll (Heuristics.Pollution.merge None) @ vises
+      in
+      match filename with
+      | None -> schemes1
+      | Some filename ->
+        if Heuristics.Pollution.has_recursive filename then
+          Scheme.unroll
+            (Heuristics.Pollution.merge ~source:"module.exports.recursive" None)
+          @ schemes1
+        else schemes1
+    end
   in
   (* List.iter (fun scheme -> *)
   (*   Fmt.pr "SCHEME:@\n%a@." Explode_js_instrument.Scheme.pp scheme) schemes; *)

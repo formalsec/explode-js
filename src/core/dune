@@ -4,6 +4,7 @@
   cwe
   exploit_patterns
   graphjs
+  heuristics
   replay
   replay_effect
   site
@@ -16,6 +17,7 @@
  (libraries
   bos
   dune-site
+  dune-glob
   ecma-sl
   ecma-sl.symbolic
   extunix
