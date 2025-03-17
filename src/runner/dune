@@ -27,6 +27,7 @@
   explode_js
   fpath
   fmt
+  logs
   sqlite3
   sqlite3_utils
   jingoo
