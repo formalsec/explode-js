@@ -60,6 +60,9 @@ RUN opam init --disable-sandboxing --shell-setup -y \
     && echo "eval \$(opam env --switch=ecma-sl)" >> ~/.bash_profile
 
 RUN cd "${BASE}/explode-js/" && eval $(opam env --switch=ecma-sl) \
+  && opam install z3 -y --confirm-level=unsafe-yes
+
+RUN cd "${BASE}/explode-js/" && eval $(opam env --switch=ecma-sl) \
     && sudo apt update \
     && cd ./vendor/ECMA-SL && opam install -y . --deps-only --confirm-level=unsafe-yes \
     && dune build -p ecma-sl --profile release && dune install -p ecma-sl \
