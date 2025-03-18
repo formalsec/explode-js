@@ -32,3 +32,5 @@ runner run \
   ./index.json
 
 popd
+
+python table_explode-js.py

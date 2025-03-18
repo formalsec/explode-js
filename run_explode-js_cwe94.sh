@@ -9,5 +9,6 @@ runner run \
   --output CWE-94 \
   ./index.json
 
-# Generate some tables?
 popd
+
+python table_explode-js.py
