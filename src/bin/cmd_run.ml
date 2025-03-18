@@ -6,7 +6,8 @@ let copy_file src dst =
   let* content = OS.File.read src in
   OS.File.write dst content
 
-let with_workspace ~proto_pollution workspace_dir scheme_path filename f =
+let with_workspace ~proto_pollution workspace_dir scheme_path package_dir
+  filename f =
   let _timestamp =
     let now = Unix.localtime @@ Unix.gettimeofday () in
     ExtUnix.Specific.strftime "%Y%m%dT%H%M%S" now
@@ -14,6 +15,16 @@ let with_workspace ~proto_pollution workspace_dir scheme_path filename f =
   let workspace_dir = Fpath.(workspace_dir / "run") in
   (* Create workspace_dir *)
   let* _ = Bos.OS.Dir.create ~path:true ~mode:0o777 workspace_dir in
+  (* Copy package contents if they exist *)
+  let _ =
+    match package_dir with
+    | None -> Ok ()
+    | Some package_dir ->
+      let src_dir = Fpath.to_string package_dir in
+      let dst_dir = Fpath.to_string workspace_dir in
+      let _ = Fmt.kstr Unix.system "cp -r %s/. %s" src_dir dst_dir in
+      Ok ()
+  in
   (* Copy sources and scheme_path *)
   let* schemes =
     let open Explode_js_instrument in
@@ -120,11 +131,12 @@ let write_reports reports_file results =
     (Yojson.pretty_print ~std:true)
     results
 
-let run ~lazy_values ~proto_pollution ~workspace_dir ~scheme_file ~original_file
-  ~time_limit:_ =
+let run ~lazy_values ~proto_pollution ~enumerate_all ~workspace_dir ~package_dir
+  ~scheme_file ~original_file ~time_limit:_ =
   Logs.app (fun k -> k "── PHASE 1: TEMPLATE GENERATION ──");
   Logs.app (fun k -> k "\u{2714} Loaded: %a" Fpath.pp scheme_file);
-  with_workspace ~proto_pollution workspace_dir scheme_file original_file
+  with_workspace ~proto_pollution workspace_dir scheme_file package_dir
+    original_file
   @@ fun workspace_dir scheme_file schemes orig_file ->
   let* exploit_tmpls = get_tmpls workspace_dir scheme_file orig_file schemes in
   let n = List.length exploit_tmpls in
@@ -144,7 +156,8 @@ let run ~lazy_values ~proto_pollution ~workspace_dir ~scheme_file ~original_file
           Logs.err (fun k -> k "run_single: %s" err);
           (false, results)
       in
-      if found_witness then Ok results else loop (succ i) results remaning
+      if found_witness && not enumerate_all then Ok results
+      else loop (succ i) results remaning
     | (Client_server { client = _; server }, scheme) :: remaning ->
       Logs.app (fun k -> k "\u{25C9} [%d/%d] Procesing %a" i n Fpath.pp server);
       let workspace_dir = Fpath.(workspace_dir // rem_ext (base server)) in

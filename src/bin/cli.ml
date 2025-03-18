@@ -45,6 +45,14 @@ let proto_pollution =
   let doc = "Turn prototype pollution heuristics on" in
   Arg.(value & flag & info [ "proto-pollution" ] ~doc)
 
+let enumerate_all =
+  let doc = "Enumerate all possible exploits" in
+  Arg.(value & flag & info [ "enumerate-all" ] ~doc)
+
+let package_dir =
+  let doc = "Path to package under analysis" in
+  Arg.(value & opt (some fpath) None & info [ "package-dir" ] ~doc)
+
 let sdocs = Manpage.s_common_options
 
 let info_run =
@@ -63,13 +71,15 @@ let info_run =
 
 let cmd_run =
   let+ workspace_dir
+  and+ package_dir
   and+ lazy_values
   and+ proto_pollution
+  and+ enumerate_all
   and+ scheme_file = input_file
   and+ original_file = input_file_opt
   and+ time_limit in
-  Cmd_run.run ~lazy_values ~proto_pollution ~workspace_dir ~scheme_file
-    ~original_file ~time_limit
+  Cmd_run.run ~lazy_values ~proto_pollution ~enumerate_all ~workspace_dir
+    ~package_dir ~scheme_file ~original_file ~time_limit
 
 let info_exploit =
   let doc = "Explode.js single file symbolic confirmation" in
@@ -95,12 +105,14 @@ let info_full =
 
 let cmd_full =
   let+ input_file
+  and+ package_dir
   and+ proto_pollution
+  and+ enumerate_all
   and+ lazy_values
   and+ workspace_dir
   and+ time_limit in
-  Cmd_full.run ~lazy_values ~proto_pollution ~input_file ~workspace_dir
-    ~time_limit
+  Cmd_full.run ~lazy_values ~proto_pollution ~enumerate_all ~package_dir
+    ~input_file ~workspace_dir ~time_limit
 
 let info_instrument =
   let doc = "Explode.js test instrumentator" in

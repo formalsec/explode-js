@@ -77,7 +77,8 @@ let work ~proto_pollution ~lazy_values run_mode db
           Fmt.epr "%a@." (Run_result.pp ~progress:(i, n)) res;
           Run_result.to_db db res;
           res :: acc
-      | Full ->
+      | Full ty_ ->
+        let enumerate_all = Run_mode.dispatch_full ty_ in
         let output_dir = Fpath.(output_dir / string_of_int vuln.id) in
         begin
           match Bos.OS.Dir.create ~path:true output_dir with
@@ -87,8 +88,8 @@ let work ~proto_pollution ~lazy_values run_mode db
               err
         end;
         let raw =
-          Run_action.full ~proto_pollution ~lazy_values time_limit output_dir
-            vuln.filename
+          Run_action.full ~enumerate_all ~package_dir:vuln.package_dir
+            ~proto_pollution ~lazy_values time_limit output_dir vuln.filename
         in
         let report, control_path, exploit = parse_report output_dir in
         let res =
