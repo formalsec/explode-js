@@ -46,9 +46,9 @@ let work ~proto_pollution ~lazy_values run_mode db
     (fun acc (vuln : Vulnerability.t) ->
       (* FIXME: Both cases share a lot of code *)
       match run_mode with
-      | Run_mode.Run ->
+      | Run_mode.Run ty_ ->
         let base_dir = Fpath.(parent (parent vuln.filename)) in
-        let taint_summary_file = Fpath.(base_dir / "expected_output.json") in
+        let taint_summary_file = Fpath.(base_dir / Run_mode.dispatch ty_) in
         if not (Sys.file_exists (Fpath.to_string taint_summary_file)) then acc
         else
           let output_dir = Fpath.(output_dir / string_of_int vuln.id) in
