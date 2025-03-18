@@ -3,11 +3,11 @@
 This artifact evaluates Explode.js, a novel tool for synthesizing exploits for Node.js applications.
 By combining static analysis and symbolic execution, Explode.js generates functional exploits that confirm the existence of command injection, code injection, prototype pollution, and path traversal vulnerabilities.
 The repository includes all source code, reference datasets and instructions on how to build and run the experiments.
-These experiments result in the tables and plots presented in the paper, which can be used to validate the results.
+These experiments result in the tables presented in the paper, which can be used to validate the results.
 
 # A. Getting Started
 
-This section contains an introduction to the Explode.js tool, requirements, and setup and basic testing instructions to run the artifact.
+This section includes an introduction to the Explode.js tool, along with its requirements, setup instructions, and basic testing procedures for running the artifact.
 
 ## A.1. Description & Requirements
 
@@ -15,20 +15,20 @@ This section contains an introduction to the Explode.js tool, requirements, and 
 The artifact is available as a persistent DOI at [10.5281/zenodo.15009157](10.5281/zenodo.15009157).
 
 **Dependencies.**
-The evaluation of this artifact does not depend on specific hardware.
-However for the evaluation is recommended following software and hardware specs.
-- Linux (tested with Ubuntu 24.04.2 LTS and Debian 10/11)
-- Docker (tested with version 28.0.1)
-- 32GiB RAM
-- Stable internet connection (Explode-js requires npm install to validate exploits)
+The evaluation of this artifact does not depend on specific hardware. However, the following software and hardware specifications are recommended:
+
+- Linux (tested with Ubuntu Ubuntu 24.04.2 LTS and Debian 10/11);
+- Docker (tested with version 28.0.1);
+- 32GiB RAM;
+- Stable internet connection (Explode-js requires npm install to validate exploits).
 
 **Source Code and Benchmarks.**
 All source code and reference benchmarks are included in the repository and respective docker images.
 
 **Time.**
 We estimate that the time needed to run the artifact evaluation is as follows:
-- Getting started: 30 minutes.
-- Run the experiments: XX compute hours.
+- Getting started: 30 minutes (approximately).
+- Main experiments: XX hours (approximately).
 
 **Artifact Structure.**
 The artifact is organized as follows:
@@ -47,6 +47,7 @@ Explode.js
 │   ├── NodeMedic               # Submodule with the NodeMedic-Fine tool repository
 │   └── plots                   # Scripts to run experiments and setup
 ├── example                     # Example programs for Explode.js
+│   └── running-example         # Running example code
 ├── src                         # Source code of Explode.js
 ├── test                        # Unit tests of Explode.js
 ├── vendor                      # External dependencies of Explode.js
@@ -55,23 +56,22 @@ Explode.js
 └── README.md
 ```
 
-There are three Docker containers, `explode-js_image.tar.gz`, `fast_image.tar.gz`, and `nodemedic_image.tar.gz`, one for each of the tools under evaluation: Explode.js, FAST, and NodeMedic-Fine, respectively.
-The experiments for each tool must be executed within its designated Docker container.
+The artifact includes three Docker containers: `explode-js_image.tar.gz`, `fast_image.tar.gz`, and `nodemedic_image.tar.gz`. The first container corresponds to Explode.js, our tool, while the second and third correspond to FAST and NodeMedic-Fine, the main competing tools. Each tool's experiments should be executed with its designated Docker container.
 
 ## A.2. Getting Started with Explode.js
 
 **Setup.**
-To setup the environment, load the Explode.js Docker image `explode-js_image.tar.gz`, with the following command in the root of the artifact:
+To set up the environment, load the Explode.js Docker image, `explode-js_image.tar.gz`, using the following command in the root directory of the artifact:
 
 ```sh
 $ docker load < explode-js_image.tar.gz
 ```
 
 **Basic Testing.**
-To verify that the image is properly loaded and that the tool is running as expected, run Explode.js for the running example using the following command:
+To ensure that the image is loaded correctly and that the tool is functioning as expected, run Explode.js on the running example using the following commands:
 
 ```sh
-$ docker run --rm -it explode-js bash
+$ docker run --rm -it explode-js:latest bash
 $ cd explode-js/example
 $ explode-js full running-example/index.js
 ```
@@ -130,7 +130,7 @@ Exec failure: (str.++
 │   │   │   └── ✔ Status: Success (created file "./success")
 ```
 
-The generated exploit can be found in the file `[FIXME]`.
+The generated exploit can be found in the file `_results/run/symbolic_test_0/literal_1.js`.
 
 ## A.3. Getting Started with FAST
 
@@ -272,7 +272,7 @@ new PUT["exec"](x0,x1)();
 }
 ```
 
-# B. Step-By-Step Instructions
+# B. Main Experiments
 
 With this artifact, our goal is to demonstrate the following claims of the paper, each corresponding to one of its main research questions:
 
