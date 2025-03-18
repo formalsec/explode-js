@@ -1,0 +1,3 @@
+pin-depends: [
+  [ "extunix.dev" "git+https://github.com/ygrek/extunix.git#e90bd03bbcdf84ccba6b749f727d487f4161aff8" ]
+]

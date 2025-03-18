@@ -17,7 +17,7 @@ depends: [
   "dune" {>= "3.15"}
   "dune-site"
   "dune-glob"
-  "extunix"
+  "extunix" {= "dev"}
   "fpath"
   "mdx"
   "ocaml"
