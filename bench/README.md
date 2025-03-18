@@ -1,4 +1,4 @@
-Automated Exploit Generation for Node.js Packages
+# Automated Exploit Generation for Node.js Packages
 
 This artifact evaluates Explode.js, a novel tool for synthesizing exploits for Node.js applications.
 By combining static analysis and symbolic execution, Explode.js generates functional exploits that confirm the existence of command injection, code injection, prototype pollution, and path traversal vulnerabilities.
@@ -304,13 +304,13 @@ specifically those of Tables 3 and 6, which we reproduce below:
 
 **Table 3. [Effectiveness]**
 
-| CWE ID   |  TP |   E |  Total |
-|----------|-----|-----|--------|
-| CWE-22   |  97 |  84 |    166 |
-| CWE-78   | 111 |  70 |    169 |
-| CWE-94   |  24 |  11 |     54 |
-| CWE-1321 | 108 |  98 |    214 |
-| Total    | 340 | 263 |    603 |
+| CWE ID   |  Total |  TP (Explode-js) |   E (Explode-js) | TP (FAST) | E (FAST) | TP (NodeMedic) | E (NodeMedic) |
+|----------|--------|-----|-----|----|----|----|----|
+| CWE-22   |    166 |  97 |  84 | 6 | 0 | -- | -- |
+| CWE-78   |    169 | 111 |  70 | 106 | 66 | 51 | 49 |
+| CWE-94   |     54 |  24 |  11 | 7 | 3 | 17 | 5 |
+| CWE-1321 |    214 | 108 |  98 | 0 | 0 | -- | -- |
+| Total    |    603 | 340 | 263 | 119 | 69 | 68 | 44 |
 
 **Table 6. [Performance]**
 
