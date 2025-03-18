@@ -17,7 +17,7 @@ The artifact is available as a persistent DOI at [10.5281/zenodo.15009157](10.52
 **Dependencies.**
 The evaluation of this artifact does not depend on specific hardware.
 However for the evaluation is recommended following software and hardware specs.
-- Linux (tested with Ubuntu Ubuntu 24.04.2 LTS and Debian 10/11)
+- Linux (tested with Ubuntu 24.04.2 LTS and Debian 10/11)
 - Docker (tested with version 28.0.1)
 - 32GiB RAM
 - Stable internet connection (Explode-js requires npm install to validate exploits)
