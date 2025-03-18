@@ -61,14 +61,14 @@ The experiments for each tool must be executed within its designated Docker cont
 ## A.2. Getting Started with Explode.js
 
 **Setup.**
-To setup the environment, load the Explode.js Docker image `explode-js_image.tar.gz`, with the following command:
+To setup the environment, load the Explode.js Docker image `explode-js_image.tar.gz`, with the following command in the root of the artifact:
 
 ```sh
 $ docker load < explode-js_image.tar.gz
 ```
 
 **Basic Testing.**
-To verify that the image is properly loaded and that the tool is running as expected, run Explode.js for the [TODO] example using the following command:
+To verify that the image is properly loaded and that the tool is running as expected, run Explode.js for the running example using the following command:
 
 ```sh
 $ docker run --rm -it explode-js bash
@@ -150,7 +150,8 @@ $ docker run -it -h fast fast
 To ensure that the tool is running as expected, one can verify it by running FAST on the `thenify@3.3.0` package with the following command:
 
 ```sh
-$ cd explode-js && python3 run-fast.py datasets out --packages thenify
+$ cd explode-js
+$ python3 run-fast.py datasets out --packages thenify
 ```
 
 **Output.** The output of the previous command should be:
@@ -329,60 +330,62 @@ We have to do this separately for each tool.
 Load the Explode.js docker image as explained in section **A.2** and run the following commands:
 
 ```sh
-[FIXME]
+$ cd explode-js
+$ ./run_explode-js.sh
 ```
 
-This will take approximately `[FIXME]` hours.
-To determine if the execution was successful, check if `[FIXME]`.
+This will take approximately **10 hours**.
+To determine if the execution was successful, a table summarizing the results should be printed to the stdout at the end.
 
-The generated exploits are stored `[FIXME]`.
-To check the exploit generated for a specific package, say the `[FIXME]` package, see file `[FIXME]`.
+The generated exploits are stored in the output dirs in `bench/datasets/CWE-{22|78|94|1321}`
+To check the exploit generated for a specific package, say the `deep-get-set@1.1.1` (id 93) package, see file `bench/datasets/CWE-1321/93/run/symbolic_test_4/literal_1.js`.
 
-To generate the Explode.js results of Table 3, run in the folder `[FIXME]`:
+To generate the Explode.js results of Table 3, run:
 
 ```sh
-[FIXME]
+$ python table_explode-js.py
 ```
 
-To generate the Explode.js results of Table 6, run in the folder `[FIXME]`:
+To generate the Explode.js results of Table 6, run:
 
 ```sh
-[FIXME]
+$ python table_explode-js_time.py
 ```
 
 ### B.1.2. FAST
 
-Run the following command in the folder `[FIXME]`:
+Load the FAST docker image as explained in section **A.3** and run the following commands:
 
 ```sh
-[FIXME]
+$ cd explode-js
+$ python3 run-fast.py datasets/ out
 ```
 
 This will take approximately `[FIXME]` hours.
-To determine if the execution was successful, check if `[FIXME]`
+To determine if the execution was successful, a table summarizing the results should be printed to the stdout at the end.
 
 As stated before, FAST does not generate executable exploits; those have to be manually put together from the output trace information.
-We have done that for all the generated traces in the dataset, which can be consulted in the folder `[FIXME]`.
-To check the exploit generated for a specific package, say the `[FIXME]` package, see file `[FIXME]`.
+We have done that for all the generated traces in the dataset, which can be consulted in the folder `bench/datasets/fast-pocs`.
+To check the exploit generated for a specific package, say the `xopen@1.0.0` package, see file `bench/datasets/fast-pocs/xopen/poc.js`.
 
-To generate the FAST results of Table 3, run in the folder `[FIXME]`:
+To generate the FAST column results of Table 3, run:
 
 ```sh
-[FIXME]
+$ python3 table_fast.py
 ```
 
 To generate the FAST results of Table 6, run in the folder `[FIXME]`:
 
 ```sh
-[FIXME]
+$ python3 table_fast_time.py
 ```
 
 ### B.1.3. NodeMedic-Fine
 
-Run the following command in the folder `[FIXME]`:
+Run the following command in the root of the artifact:
 
 ```sh
-[FIXME]
+$ python3 run-NodeMedic.py bench/datasets out
 ```
 
 This will take approximately `[FIXME]` hours.
@@ -391,29 +394,49 @@ To determine if the execution was successful, check if `[FIXME]`.
 The generated exploits are stored `[FIXME]`.
 To check the exploit generated for a specific package, say the `[FIXME]` package, see file `[FIXME]`.
 
-To generate the NodeMedic-Fine results of Table 3, run in the folder `[FIXME]`:
+To generate the NodeMedic-Fine results of Table 3, run:
 
 ```sh
-[FIXME]
+$ python3 table_nodemedic.py
 ```
 
-To generate the NodeMedic-Fine results of Table 6, run in the folder `[FIXME]`:
+To generate the NodeMedic-Fine results of Table 6, run:
 
 ```sh
-[FIXME]
+$ python3 table_nodemedic_time.py
 ```
 
 ### B.1.4. Speed-up the Analysis
 
 For the sake of time, instead of confirming the results for the entire dataset, the reviewers can confirm the results for just one specific type of vulnerability.
 To this end, we it suffices to provide a flag indicating that vulnerability to the analysis script.
-For instance, if we wanted to confirm the results of Explode.js for just code-injection run the command:
+For instance, if we wanted to confirm the results of Explode.js for just path-traversal run the command:
 
 ```sh
-[FIXME]
+$ ./run_explode-js_cwe22.sh  # takes ~1.7h
+# Others CWEs:
+$ ./run_explode-js_cwe78.sh  # takes ~2.5h
+$ ./run_explode-js_cwe94.sh  # takes ~1h
+$ ./run_explode-js_cwe1321.sh  # takes ~5h
 ```
 
-The flags for the other types of vulnerabilities are: `command-injection`, `prototype-pollution`, and `path-traversal`.
+**FAST**: Fast includes a similar mechanism with:
+
+```sh
+$ python3 run-fast.py datasets/ out --cwes CWE-22
+$ python3 run-fast.py datasets/ out --cwes CWE-78
+$ python3 run-fast.py datasets/ out --cwes CWE-94
+$ python3 run-fast.py datasets/ out --cwes CWE-1321
+```
+
+**NodeMedic-Fine**:
+
+```sh
+$ python3 run-NodeMedic.py bench/datasets outputs --cwes CWE-22
+$ python3 run-NodeMedic.py bench/datasets outputs --cwes CWE-78
+$ python3 run-NodeMedic.py bench/datasets outputs --cwes CWE-94
+$ python3 run-NodeMedic.py bench/datasets outputs --cwes CWE-1321
+```
 
 ## Claim 2
 
