@@ -164,7 +164,9 @@ let select_db ?timestamp db =
             let cwe = Explode_js.Cwe.CWE_22 in
             let filename = Fpath.v filename in
             let lineno = "?" in
-            let vuln = { Vulnerability.cwe; filename; lineno; id } in
+            let vuln =
+              { Vulnerability.cwe; filename; package_dir = None; lineno; id }
+            in
             let raw =
               { Run_proc_result.returncode
               ; stdout

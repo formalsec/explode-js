@@ -50,7 +50,10 @@ let cli =
   in
   let run_mode =
     let doc = "Run mode." in
-    Arg.(value & opt Run_mode.conv Run_mode.Full & info [ "run-mode" ] ~doc)
+    Arg.(
+      value
+      & opt Run_mode.conv Run_mode.(Full Regular)
+      & info [ "run-mode" ] ~doc )
   in
   let lazy_values =
     let doc = "Lazy values." in
