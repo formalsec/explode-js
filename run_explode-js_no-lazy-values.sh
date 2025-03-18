@@ -9,5 +9,6 @@ runner run \
   --output no-lazy-values \
   ./index.json
 
-# Generate some tables?
 popd
+
+python table_explode-js2.py bench/datasets/no-lazy-values/results.csv

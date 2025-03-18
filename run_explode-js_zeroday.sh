@@ -9,3 +9,5 @@ runner run \
   ./index-zeroday.json
 
 popd
+
+python table_explode-js_zeroday.py
