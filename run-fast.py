@@ -135,7 +135,7 @@ def move_output_files(dest):
         if os.path.exists(out):
             shutil.move(out, dest)
 
-def benchmark(datasets, outputs, packages):
+def benchmark(datasets, outputs, packages, cwes):
     
     # Check if index.json exists and load
     index = join_path(datasets, 'index.json')
@@ -146,12 +146,17 @@ def benchmark(datasets, outputs, packages):
     data = load_json(index)
     if packages:
         data = list(filter(lambda pkg: pkg['package'] in packages, data))
+
+    if cwes:
+        data = list(filter(lambda pkg: pkg['vulns'][0]['cwe'] in cwes, data))
     
     # Make outputs directory
     os.makedirs(outputs, exist_ok=True)    
 
     # Run 
+    print(f'[*] {len(data)} package(s) selected for benchmarking')
     for exploit in data:
+        print(f'[-] Running: {exploit['package']}@{exploit['version']}')
         run_package(datasets, exploit, outputs)
 
 
@@ -261,7 +266,7 @@ def parse(outputs):
     pd.DataFrame(data).to_csv("fast-parsed-results.csv", index=False)
     del data['benchmark']
     table_pipes = tabulate(pd.DataFrame(data), headers="keys", tablefmt="pipe", showindex=False)
-    print(table_pipes)
+    print('\n' + table_pipes)
 
 
 def main():
@@ -269,16 +274,18 @@ def main():
     parser.add_argument('datasets', help='Path to the datasets')
     parser.add_argument('outputs', help='Path to save outputs')
     parser.add_argument('--packages', nargs="+", help="Package names for filtering")
+    parser.add_argument('--cwes', nargs="+", help="CWES for filtering")
     parser.add_argument('-parse-only', action="store_true", help="Only parse data without benchmarking")
     args = parser.parse_args()
 
     datasets = args.datasets
     outputs = args.outputs
     packages = args.packages
+    cwes = args.cwes
     parse_only = args.parse_only
 
     if not parse_only:
-        benchmark(datasets, outputs, packages)
+        benchmark(datasets, outputs, packages, cwes)
     
     parse(outputs)
 
