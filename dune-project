@@ -30,7 +30,8 @@
   dune
   dune-site
   dune-glob
-  extunix
+  (extunix
+   (= "dev"))
   fpath
   mdx
   ocaml
@@ -51,7 +52,8 @@
   dune
   dune-site
   dune-glob
-  extunix
+  (extunix
+   (= "dev"))
   explode_js
   jingoo
   logs
