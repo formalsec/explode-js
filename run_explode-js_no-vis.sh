@@ -10,4 +10,4 @@ runner run \
 
 popd
 
-python table_explode-js2.py bench/datasets/no-vis/results.csv
+python3 table_explode-js2.py bench/datasets/no-vis/results.csv

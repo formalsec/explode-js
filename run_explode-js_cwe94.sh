@@ -11,4 +11,4 @@ runner run \
 
 popd
 
-python table_explode-js.py
+python3 table_explode-js.py

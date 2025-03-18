@@ -343,13 +343,13 @@ To check the exploit generated for a specific package, say the `deep-get-set@1.1
 To generate the Explode.js results of Table 3, run:
 
 ```sh
-$ python table_explode-js.py
+$ python3 table_explode-js.py
 ```
 
 To generate the Explode.js results of Table 6, run:
 
 ```sh
-$ python table_explode-js_time.py
+$ python3 table_explode-js_time.py
 ```
 
 ### B.1.2. FAST
