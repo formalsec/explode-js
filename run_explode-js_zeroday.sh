@@ -10,4 +10,4 @@ runner run \
 
 popd
 
-python table_explode-js_zeroday.py
+python3 table_explode-js_zeroday.py
