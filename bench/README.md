@@ -1,7 +1,8 @@
 # Automated Exploit Generation for Node.js Packages
 
 This artifact evaluates Explode.js, a novel tool for synthesizing exploits for Node.js applications.
-By combining static analysis and symbolic execution, Explode.js generates functional exploits that confirm the existence of command injection, code injection, prototype pollution, and path traversal vulnerabilities.
+By combining static analysis and symbolic execution, Explode.js generates functional exploits
+that confirm the existence of command injection (CWE-78), code injection (CWE-94), prototype pollution (CWE-1321), and path traversal (CWE-22) vulnerabilities.
 The repository includes all source code, reference datasets and instructions on how to build and run the experiments.
 These experiments result in the tables presented in the paper, which can be used to validate the results.
 
@@ -135,21 +136,16 @@ The generated exploit can be found in the file `_results/run/symbolic_test_0/lit
 ## A.3. Getting Started with FAST
 
 **Setup.**
-To setup the environment, load the FAST Docker image `fast_image.tar.gz`, with the following command:
+To setup the environment, load the FAST Docker image, `fast_image.tar.gz`, using the following command in the root directory of the artifact:
 
 ```sh
 $ docker load < fast_image.tar.gz
 ```
-
-Then, to create and start container from the loaded image one can use:
-```sh
-$ docker run -it -h fast fast
-```
-
 **Basic Testing.**
-To ensure that the tool is running as expected, one can verify it by running FAST on the `thenify@3.3.0` package with the following command:
+To ensure that the image is loaded correctly and that the tool is functioning as expected, run FAST's running example (the package `thenify@3.3.0`) using the following commands:
 
 ```sh
+$ docker run --rm -it fast:latest bash
 $ cd explode-js
 $ python3 run-fast.py datasets out --packages thenify
 ```
@@ -165,11 +161,15 @@ Running: python3 -m simurun -t code_exec -X datasets/vulcan-dataset/CWE-94/GHSA-
 |----------|---------|-------|----------|-----------|-----------|------------|------------|----------|
 | thenify  | 3.3.0   | CWE-94| Exited 0 | 0.385258  | 26.0743   | 26.4596    | successful | failed   |
 ```
-The output table is also saved in `.csv` format as `fast-parsed-results.csv`.
+The output table is saved in `.csv` format as `fast-parsed-results.csv`.
 
-FAST does not generate exploits.
-Instead, it generates a trace with information regarding the inputs to activate the exploit.
-In this case, FAST generates the trace to stdout. Part of it is given below
+**Remark:**
+
+Importantly, FAST does not generate executable exploits. Instead, it produces a
+log containing information about the vulnerable package function and the
+inputs required to trigger the exploit.
+Below, we provide the relevant fragment of FAST's log for the current example,
+which can be found in the file `out/5_fast/fast-stdout.log`:
 
 ```
 Attack Path:
@@ -210,7 +210,8 @@ Line 17:
 --------------------------------------------------
 return eval(createWrapper($$__fn__$$.name, options))
 ```
-The full trace can be found in the saved stdout file: `out/5_fast/fast-stdout.log`. One can manually construct the exploit for the above example:
+
+Based on the provided log, one can manually construct the following exploit:
 
 ```js
 var thenify = require("thenify");
@@ -224,20 +225,17 @@ thenify.withCallback($$__fn__$$, options);
 ## A.4. Getting Started with *NodeMedic-Fine*
 
 **Setup.**
-To setup the environment, load the NodeMedic-Fine Docker image `nodemedic_image.tar.gz`, with the following command:
-
-```sh
-$ docker load < nodemedic_image.tar.gz
-```
-
-This script will build NodeMedic's official Docker image and install two Python modules necessary for generating the output.
+To setup the environment, install the scripts necessary dependencies and load
+the NodeMedic-Fine Docker image, `nodemedic_image.tar.gz`, with the following
+command:
 
 ```sh
 $ python3 -m pip install pandas~=2.2.3 tabulate~=0.9.0
+$ docker load < nodemedic_image.tar.gz
 ```
 
 **Basic Testing.**
-To verify that the image is properly loaded and that the tool is running as expected, run NodeMedic for the `ts-process-promises@1.0.2` example using the following command:
+To ensure that the image is loaded correctly and that the tool is functioning as expected, run NodeMedic's running example (the package `ts-process-promises@1.0.2`) using the following command:
 
 ```sh
 $ python3 run-NodeMedic.py bench/datasets out --packages ts-process-promises
@@ -277,7 +275,7 @@ new PUT["exec"](x0,x1)();
 With this artifact, our goal is to demonstrate the following claims of the paper, each corresponding to one of its main research questions:
 
 - **Claim 1** *(RQ1 - Section 6.1): Effectiveness in Exploit Generation.*
-Explode.js is more effective in generating exploits than its main competitor tools.
+Explode.js is more effective in generating exploits than its main competing tools (FAST[] and NodeMedic-Fine[]).
 
 - **Claim 2** *(RQ2 - Section 6.2): Exploit Generation in the Wild.*
 Explode.js is able to find new exploits for real-wold Node.js modules in the wild.
@@ -288,19 +286,22 @@ Explode.js is able to generate exploits in feasible time, but is less performant
 - **Claim 4** *(RQ4 - Section 6.4): Necessity of Explode.js Components.*
 The core techniques of Explode.js (VISes and lazy values) are key to its effectiveness.
 
-This section contains instructions to reproduce the experiments that support the claims of the paper.
-These experiments result in the tables and plots presented in the paper, which can be used to validate the results.
+This section provides instructions for reproducing the experiments that support the claims of the paper.
+These experiments result in the tables presented in the paper, which can be used to validate the results.
 
-**Timeouts.** The analysis of each package has a pre-defined timeout of 10 minutes.
-This parameter can affect the results produced, since different machines may experience a different number of timeouts.
-Consequently, there can be slight variations in the results, but all claims are expected to verified.
+**Timeouts.** For all experiments, the analysis of each package has a predefined timeout of 10 minutes.
+This parameter can affect the results produced, as different machines may experience varying numbers of timeouts.
+Consequently, there may be slight variations in the results, but all claims are expected to be verified.
 
 **Paper Discrepancies.** FIXME
 
 ## B.1. Claims 1 and 3
 
-The goal of this section is to confirm the results presented in Sections 6.1 and 6.2 of the paper;
-specifically those of Tables 3 and 6, which we reproduce below:
+The goal of this section is to confirm the results presented in Sections 6.1 and 6.3 of the paper;
+specifically those of Tables 3 and 6, which we reproduce below.
+
+To reproduce the results of these tables, one must first run Explode.js, FAST, and NodeMedic-Fine in the Vulcan and SecBench.js datasets.
+In the following, we explain how to do this separately for each tool.
 
 **Table 3. [Effectiveness]**
 
@@ -312,9 +313,17 @@ specifically those of Tables 3 and 6, which we reproduce below:
 | CWE-1321 |    214 | 108 |  98 | 0 | 0 | -- | -- |
 | Total    |    603 | 340 | 263 | 119 | 69 | 68 | 44 |
 
+Where:
+
+- Total indicates the total number of packages to be analyzed;
+- TP (Explode.js), TP (FAST), TP (NodeMedic) refer to the number of true vulnerabilities (true positives) detected by Explode.js, FAST, and NodeMedic, respectively;
+- E (Explode.js), E (FAST), E (NodeMedic) refer to the number of exploits generated by Explode.js, FAST, and NodeMedic, respectively.
+
+NodeMedic does not detect or generate exploits for CWE-22 and CWE-1321, which correspond to path traversal and prototype pollution vulnerabilities. Hence, the dashes in the tables indicate the absence of data for these cases.
+
 **Table 6. [Performance]**
 
-| CWE ID   | Static | Symbolic |  Total |
+| CWE ID   | Static (s) | Symbolic (s) |  Total (s) |
 |----------|--------|----------|--------|
 | CWE-22   | 29.106 |    2.462 | 31.568 |
 | CWE-78   | 33.976 |    6.545 | 40.521 |
@@ -322,23 +331,32 @@ specifically those of Tables 3 and 6, which we reproduce below:
 | CWE-1321 | 31.162 |   10.949 | 42.112 |
 | Total    |  32.45 |    7.278 | 39.728 |
 
-To reproduce the results of the tables above, one must first run Explode.js, FAST, and NodeMedic-Fine in the Vulcan and SecBench.js datasets.
-We have to do this separately for each tool.
+Where we place in each cell the average time that the respective tool took to
+analyze the vulnerabilities of the corresponding category.
+For example, in the cell (CWE-22, Explode.js), we place the average time that
+Explode.js took to analyze the packages with path traversal vulnerabilities (CWE-22).
+
 
 ### B.1.1. Explode.js
 
-Load the Explode.js docker image as explained in section **A.2** and run the following commands:
+Run the following commands:
 
 ```sh
+$ docker run --rm -it explode-js:latest bash
 $ cd explode-js
 $ ./run_explode-js.sh
 ```
 
-This will take approximately **10 hours**.
-To determine if the execution was successful, a table summarizing the results should be printed to the stdout at the end.
+This will take approximately **10 hours**. The execution was successful if a
+table summarizing the results is printed to stdout at the end.
 
-The generated exploits are stored in the output dirs in `bench/datasets/CWE-{22|78|94|1321}`
-To check the exploit generated for a specific package, say the `deep-get-set@1.1.1` (id 93) package, see file `bench/datasets/CWE-1321/93/run/symbolic_test_4/literal_1.js`.
+The generated exploits are stored in the output dirs in `bench/datasets/CWE-{22|78|94|1321}`.
+To check the exploit generated for a specific package, say the `deep-get-set@1.1.1` package,
+run the command:
+
+```sh
+<TODO>
+```
 
 To generate the Explode.js results of Table 3, run:
 
@@ -354,27 +372,27 @@ $ python3 table_explode-js_time.py
 
 ### B.1.2. FAST
 
-Load the FAST docker image as explained in section **A.3** and run the following commands:
+Run the following commands:
 
 ```sh
 $ cd explode-js
 $ python3 run-fast.py datasets/ out
 ```
 
-This will take approximately `[FIXME]` hours.
-To determine if the execution was successful, a table summarizing the results should be printed to the stdout at the end.
+This will take approximately `[FIXME]` hours. The execution was successful if a
+table summarizing the results is printed to stdout at the end.
 
-As stated before, FAST does not generate executable exploits; those have to be manually put together from the output trace information.
+As stated before, FAST does not generate executable exploits; those have to be manually put together from the output log information.
 We have done that for all the generated traces in the dataset, which can be consulted in the folder `bench/datasets/fast-pocs`.
 To check the exploit generated for a specific package, say the `xopen@1.0.0` package, see file `bench/datasets/fast-pocs/xopen/poc.js`.
 
-To generate the FAST column results of Table 3, run:
+To generate the FAST results of Table 3, run:
 
 ```sh
 $ python3 table_fast.py
 ```
 
-To generate the FAST results of Table 6, run in the folder `[FIXME]`:
+To generate the FAST results of Table 6, run:
 
 ```sh
 $ python3 table_fast_time.py
@@ -388,8 +406,8 @@ Run the following command in the root of the artifact:
 $ python3 run-NodeMedic.py bench/datasets out
 ```
 
-This will take approximately `[FIXME]` hours.
-To determine if the execution was successful, check if `[FIXME]`.
+This will take approximately `[FIXME]` hours. The execution was successful if a
+table summarizing the results is printed to stdout at the end.
 
 The generated exploits are stored `[FIXME]`.
 To check the exploit generated for a specific package, say the `[FIXME]` package, see file `[FIXME]`.
@@ -408,19 +426,27 @@ $ python3 table_nodemedic_time.py
 
 ### B.1.4. Speed-up the Analysis
 
-For the sake of time, instead of confirming the results for the entire dataset, the reviewers can confirm the results for just one specific type of vulnerability.
-To this end, we it suffices to provide a flag indicating that vulnerability to the analysis script.
-For instance, if we wanted to confirm the results of Explode.js for just path-traversal run the command:
+For the sake of time, instead of confirming the results for the entire dataset,
+the reviewers can verify the results for just one specific type of vulnerability.
+To this end, it is sufficient to run the main analysis script for that specific
+type of vulnerability. Below, we explain how to do this for each tool.
+
+**Explode.js** For Explode.js instead of running the command:
 
 ```sh
-$ ./run_explode-js_cwe22.sh  # takes ~1.7h
-# Others CWEs:
-$ ./run_explode-js_cwe78.sh  # takes ~2.5h
-$ ./run_explode-js_cwe94.sh  # takes ~1h
-$ ./run_explode-js_cwe1321.sh  # takes ~5h
+$ ./run_explode-js.sh`
 ```
 
-**FAST**: Fast includes a similar mechanism with:
+Run the command specific to the targeted vulnerability type:
+
+```sh
+$ ./run_explode-js_cwe22.sh
+$ ./run_explode-js_cwe78.sh
+$ ./run_explode-js_cwe94.sh
+$ ./run_explode-js_cwe1321.sh
+```
+
+**FAST**:
 
 ```sh
 $ python3 run-fast.py datasets/ out --cwes CWE-22
@@ -432,10 +458,8 @@ $ python3 run-fast.py datasets/ out --cwes CWE-1321
 **NodeMedic-Fine**:
 
 ```sh
-$ python3 run-NodeMedic.py bench/datasets outputs --cwes CWE-22
 $ python3 run-NodeMedic.py bench/datasets outputs --cwes CWE-78
 $ python3 run-NodeMedic.py bench/datasets outputs --cwes CWE-94
-$ python3 run-NodeMedic.py bench/datasets outputs --cwes CWE-1321
 ```
 
 ## Claim 2
@@ -449,10 +473,10 @@ specifically those of Table 5, which we reproduce below:
 
 To reproduce the results of the table above, we provide the set of packages for which Explode.js found
 new vulnerabilities in `[FIXME]` and a script to run Explode.js on these packages.
-To run Explode.js on the wild packages in which new vulnerabilities were found, load the
-Explode.js docker image and run:
+To run Explode.js on the wild packages in which new vulnerabilities were found, run:
 
 ```sh
+$ docker run --rm -it explode-js:latest bash
 $ cd explode-js
 $ ./run_explode-js_zeroday.sh
 ```
@@ -473,55 +497,73 @@ A table summarizing the results should be printed to the stdout.
 The goal of this section is to confirm the results presented in Section 6.4 of the paper;
 specifically those of Table 7, which we reproduce below:
 
+To reproduce the results of the table above, one must first run Explode.js without VISes and Lazy Values.
+
 **Table 7. [Explode.js Components]**
-
-**No lazy values**
-
-| CWE ID   |  TP |   E |  Total Vulns |
-|----------|-----|-----|--------|
-| CWE-22   |   3 |   1 |    166 |
-| CWE-78   |  57 |  46 |    169 |
-| CWE-94   |  17 |  10 |     54 |
-| CWE-1321 |  41 |  33 |    214 |
-| Total    | 118 |  90 |    603 |
 
 **No VIS**
 
-| CWE ID   |  TP |   E |  Total Vulns |
-|----------|-----|-----|--------|
-| CWE-22   |   0 |   0 |    166 |
-| CWE-78   |  60 |  44 |    169 |
-| CWE-94   |   8 |   1 |     54 |
-| CWE-1321 |  18 |   5 |    214 |
-| Total    |  86 |  50 |    603 |
+| CWE ID   | Total Vulns |  TP |   E |
+|----------|-------------|-----|-----|
+| CWE-22   |         166 |   0 |   0 |
+| CWE-78   |         169 |  60 |  44 |
+| CWE-94   |          54 |   8 |   1 |
+| CWE-1321 |         214 |  18 |   5 |
+| Total    |         603 |  86 |  50 |
 
-To reproduce the results of the table above, one must first run Explode.js without VISes and Lazy Values.
+**No lazy values**
 
-To execute Explode.js without VISes, load the Explode.js docker image and run:
+| CWE ID   |  Total Vulns |  TP |   E |
+|----------|--------------|-----|-----|
+| CWE-22   |          166 |   3 |   1 |
+| CWE-78   |          169 |  57 |  46 |
+| CWE-94   |           54 |  17 |  10 |
+| CWE-1321 |          214 |  41 |  33 |
+| Total    |          603 | 118 |  90 |
+
+Where:
+- Total indicates the total number of packages to be analyzed;
+- TP refers to the number of true vulnerabilities detected by Explode.js when  adapted with no VISes (first table) and no lazy values (second table) respectively, and
+- E refers to the number of exploits generated by Explode.js when adapted with no VISes (first table) and no lazy values (second table) respectively.
+
+### Claim 4.1: No VISes
+
+To execute Explode.js with no VISes, run:
 
 ```sh
+$ docker run --rm -it explode-js:latest bash
 $ cd explode-js
 $ ./run_explode-js_no-vis.sh
 ```
 
-This will take approximately **2 hours**.
-To determine if the execution was successful, a table summarizing the results should be printed at the end.
+This will take approximately **2 hours**. The execution was successful if a
+table summarizing the results is printed to stdout at the end.
 
-To execute Explode.js without Lazy Values, load the Explode.js docker image and run:
+After executing the scripts above, it is always possible to
+obtain the table with the corresponding results by running
+the command:
 
 ```sh
+$ python3 table_explode-js2.py ./bench/datasets/no-vis/results.csv
+```
+
+### Claim 4.1: No Lazy Values
+
+To execute Explode.js with no Lazy Values, run:
+
+```sh
+$ docker run --rm -it explode-js:latest bash
 $ cd explode-js
 $ ./run_explode-js_no-lazy-values.sh
 ```
 
-This will take approximately **8 hours**:
-To determine if the execution was successful, a table summarizing the results should be printed at the end.
+This will take approximately **8 hours**.  The execution was successful if a
+table summarizing the results is printed to stdout at the end.
 
-Both tables used to generate the results presented in Table 7 should be visable after the execution of the previous commands. However, to generate the results after running the previous commands, one must simply run:
+After executing the scripts above, it is always possible to
+obtain the table with the corresponding results by running
+the command:
 
 ```sh
-# For the No Lazy Values columns
 $ python3 table_explode-js2.py ./bench/datasets/no-lazy-values/results.csv
-# For the No VIS columns
-$ python3 table_explode-js2.py ./bench/datasets/no-vis/results.csv
 ```
