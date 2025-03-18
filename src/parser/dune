@@ -1,9 +1,9 @@
-(library
- (name auto_complete)
- (public_name explode_js.parser)
- (modules lexer parse parser state token)
- (libraries fmt prelude sedlex)
- (flags
-  (:standard -open Prelude))
- (preprocess
-  (pps sedlex.ppx)))
+; (library
+;  (name auto_complete)
+;  (public_name explode_js.parser)
+;  (modules lexer parse parser state token)
+;  (libraries fmt prelude sedlex)
+;  (flags
+;   (:standard -open Prelude))
+;  (preprocess
+;   (pps sedlex.ppx)))
