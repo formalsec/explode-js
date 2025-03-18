@@ -303,18 +303,30 @@ specifically those of Tables 3 and 6, which we reproduce below:
 
 **Table 3. [Effectiveness]**
 
-`[TODO]`
+| CWE ID   |  TP |   E |  Total |
+|----------|-----|-----|--------|
+| CWE-22   |  97 |  84 |    166 |
+| CWE-78   | 111 |  70 |    169 |
+| CWE-94   |  24 |  11 |     54 |
+| CWE-1321 | 108 |  98 |    214 |
+| Total    | 340 | 263 |    603 |
 
 **Table 6. [Performance]**
 
-`[TODO]`
+| CWE ID   | Static | Symbolic |  Total |
+|----------|--------|----------|--------|
+| CWE-22   | 29.106 |    2.462 | 31.568 |
+| CWE-78   | 33.976 |    6.545 | 40.521 |
+| CWE-94   | 42.947 |   11.926 | 54.873 |
+| CWE-1321 | 31.162 |   10.949 | 42.112 |
+| Total    |  32.45 |    7.278 | 39.728 |
 
 To reproduce the results of the tables above, one must first run Explode.js, FAST, and NodeMedic-Fine in the Vulcan and SecBench.js datasets.
 We have to do this separately for each tool.
 
 ### B.1.1. Explode.js
 
-Run the following command in the folder `[FIXME]`:
+Load the Explode.js docker image as explained in section **A.2** and run the following commands:
 
 ```sh
 [FIXME]
@@ -403,8 +415,6 @@ For instance, if we wanted to confirm the results of Explode.js for just code-in
 
 The flags for the other types of vulnerabilities are: `command-injection`, `prototype-pollution`, and `path-traversal`.
 
-<br>
-
 ## Claim 2
 
 The goal of this section is to confirm the results presented in Section 6.2 of the paper;
@@ -416,22 +426,24 @@ specifically those of Table 5, which we reproduce below:
 
 To reproduce the results of the table above, we provide the set of packages for which Explode.js found
 new vulnerabilities in `[FIXME]` and a script to run Explode.js on these packages.
-To run Explode.js on the wild packages in which new vulnerabilities were found, run:
+To run Explode.js on the wild packages in which new vulnerabilities were found, load the
+Explode.js docker image and run:
 
 ```sh
-[FIXME]
+$ cd explode-js
+$ ./run_explode-js_zeroday.sh
 ```
 
 The scripts output a version of the table above and the generated exploits can be found in the `FIXME` folder.
 To check the exploit generated for a specific package, say the `[FIXME]` package, see file `[FIXME]`.
 
-To generate Table 5, run in the folder `[FIXME]`:
+To generate Table 5, run:
 
 ```sh
-[FIXME]
+$ python3 table_explode-js_zeroday.py
 ```
 
-<br>
+A table summarizing the results should be printed to the stdout.
 
 ## Claim 4
 
@@ -440,31 +452,53 @@ specifically those of Table 7, which we reproduce below:
 
 **Table 7. [Explode.js Components]**
 
-`[TODO]`
+**No lazy values**
+
+| CWE ID   |  TP |   E |  Total Vulns |
+|----------|-----|-----|--------|
+| CWE-22   |   3 |   1 |    166 |
+| CWE-78   |  57 |  46 |    169 |
+| CWE-94   |  17 |  10 |     54 |
+| CWE-1321 |  41 |  33 |    214 |
+| Total    | 118 |  90 |    603 |
+
+**No VIS**
+
+| CWE ID   |  TP |   E |  Total Vulns |
+|----------|-----|-----|--------|
+| CWE-22   |   0 |   0 |    166 |
+| CWE-78   |  60 |  44 |    169 |
+| CWE-94   |   8 |   1 |     54 |
+| CWE-1321 |  18 |   5 |    214 |
+| Total    |  86 |  50 |    603 |
 
 To reproduce the results of the table above, one must first run Explode.js without VISes and Lazy Values.
-Importantly, you must have previously run Explode.js with lazy values and VISes as instructed in section B.1.
 
-To execute Explode.js without VISes run in the folder `[FIXME]`:
+To execute Explode.js without VISes, load the Explode.js docker image and run:
 
 ```sh
-[FIXME]
+$ cd explode-js
+$ ./run_explode-js_no-vis.sh
 ```
 
-This will take approximately `[FIXME]` hours.
-To determine if the execution was successful, check if `[FIXME]`.
+This will take approximately **2 hours**.
+To determine if the execution was successful, a table summarizing the results should be printed at the end.
 
-To execute Explode.js without Lazy Values, run in the folder `[FIXME]`:
+To execute Explode.js without Lazy Values, load the Explode.js docker image and run:
 
 ```sh
-[FIXME]
+$ cd explode-js
+$ ./run_explode-js_no-lazy-values.sh
 ```
 
-This will take approximately `[FIXME]` hours.
-To determine if the execution was successful, check if `[FIXME]`.
+This will take approximately **8 hours**:
+To determine if the execution was successful, a table summarizing the results should be printed at the end.
 
-To generate Table 7, run in the folder `[FIXME]`:
+Both tables used to generate the results presented in Table 7 should be visable after the execution of the previous commands. However, to generate the results after running the previous commands, one must simply run:
 
 ```sh
-[FIXME]
+# For the No Lazy Values columns
+$ python3 table_explode-js2.py ./bench/datasets/no-lazy-values/results.csv
+# For the No VIS columns
+$ python3 table_explode-js2.py ./bench/datasets/no-vis/results.csv
 ```
