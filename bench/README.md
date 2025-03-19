@@ -282,7 +282,7 @@ Consequently, there may be slight variations in the results, but all claims are 
 
 **Updated Results**: The results presented here do not precisely
 coincide with those in the paper's original submitted version because we
-continued to refined our tool to improve the effectiveness of the exploit generation mechanisms for path traversal
+continued to refine our tool to improve the effectiveness of the exploit generation mechanisms for path traversal
 (CWE-22) and code injection (CWE-94) vulnerabilities. As a result, in the
 Vulcan and SecBench.js datasets, the total number of vulnerabilities detected
 by Explode.js increased from 293 to 340, and the number of exploits generated
@@ -329,11 +329,11 @@ NodeMedic does not detect or generate exploits for CWE-22 and CWE-1321, which co
 
 | CWE ID   | Total (Explode.js) | Total (FAST) | Total (NodeMedic-Fine) |
 |----------|---------|----------|---------|
-| CWE-22   | 31.568s | 4.271 | -- |
-| CWE-78   | 40.521s | 20.405 | 39.311 |
-| CWE-94   | 54.873s | 5.939 | 18.824 |
-| CWE-1321 | 42.112s | 19.130 | -- |
-| Total    | 39.728s | 13.674 | 19.730 |
+| CWE-22   | 31.568s | 4.271s | -- |
+| CWE-78   | 40.521s | 20.405s | 39.311s |
+| CWE-94   | 54.873s | 5.939s | 18.824s |
+| CWE-1321 | 42.112s | 19.130s | -- |
+| Total    | 39.728s | 13.674s | 19.730s |
 
 Where we place in each cell the average time that the respective tool took to
 analyze the vulnerabilities of the corresponding category.
@@ -363,6 +363,9 @@ $ python3 retriever.py command-exists
 bench/datasets/CWE-78/134/run/./symbolic_test_0/literal_1.js
 bench/datasets/CWE-78/600/run/./symbolic_test_0/literal_1.js
 ```
+
+Which outputs the path to the file(s) storing the exploit(s).
+
 
 To generate the Explode.js results of Table 3, run:
 
