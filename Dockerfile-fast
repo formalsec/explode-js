@@ -52,6 +52,11 @@ RUN mkdir -p /home/explodejs/explode-js/datasets
 
 COPY --chown=explodejs:explodejs ./bench/fast /home/explodejs/explode-js/fast
 COPY --chown=explodejs:explodejs ./bench/datasets /home/explodejs/explode-js/datasets
+
+# Remove .git dirs
+RUN rm -rf /home/explodejs/explode-js/fast/.git \
+    && rm -rf /home/explodejs/explode-js/datasets/.git
+
 COPY ./run-fast.py /home/explodejs/explode-js
 COPY ./table_fast.py /home/explodejs/explode-js
 COPY ./table_fast_time.py /home/explodejs/explode-js
