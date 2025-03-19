@@ -152,10 +152,12 @@ def task_time_or_zero(json_obj):
     return json_obj.get("time", 0.0) if json_obj else 0.0
 
 def find_taint(content):
-    return bool(re.search(r".*Found the following input that causes a flow.*", content))
+    return "Found the following input that causes a flow" in content
+    # return bool(re.search(r".*Found the following input that causes a flow.*", content))
 
 def find_expl(content):
-    return bool(re.search(r".*Exploit\(s\) found for functions:.*", content))
+     return "Exploit(s) found for functions:" in content
+    # return bool(re.search(r".*Exploit\(s\) found for functions:.*", content))
 
 
 def __parse_results(results_file, stdout_file):
