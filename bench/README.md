@@ -298,8 +298,6 @@ These experiments result in the tables presented in the paper, which can be used
 This parameter can affect the results produced, as different machines may experience varying numbers of timeouts.
 Consequently, there may be slight variations in the results, but all claims are expected to be verified.
 
-**Paper Discrepancies.** FIXME
-
 ## B.1. Claims 1 and 3
 
 The goal of this section is to confirm the results presented in Sections 6.1 and 6.3 of the paper;
@@ -360,7 +358,9 @@ To check the exploit generated for a specific package, say the `command-exists@1
 run the command:
 
 ```sh
-$ python3 retreive.py bench/datasets/zeroday-output apptjs
+$ python3 retriever.py command-exists
+bench/datasets/CWE-78/134/run/./symbolic_test_0/literal_1.js
+bench/datasets/CWE-78/600/run/./symbolic_test_0/literal_1.js
 ```
 
 To generate the Explode.js results of Table 3, run:
@@ -474,7 +474,13 @@ specifically those of Table 5, which we reproduce below:
 
 **Table 5. [Explode.js in the Wild]**
 
-`[TODO]`
+| CWE ID   | Paths | Exploits |
+|----------|-------|----------|
+| CWE-22   |    88 |       70 |
+| CWE-78   |   151 |       51 |
+| CWE-94   |    45 |        2 |
+| CWE-1321 |     7 |        2 |
+| Total    |   291 |      125 |
 
 To reproduce the results of the table above, we provide the set of packages for which Explode.js found
 new vulnerabilities in `bench/datasets/zeroday` and a script to run Explode.js on these packages.
@@ -490,7 +496,14 @@ This will take approximately **1.5 hours**. The scripts prints to the stdout a v
 To check the exploit generated for a specific package, say the `aaptjs` package, run:
 
 ```sh
-$ python3 retreive.py bench/datasets/zeroday-output apptjs
+$ python3 retriever.py apptjs
+bench/datasets/zeroday-output/0/run/./symbolic_test_6/literal_1.js
+bench/datasets/zeroday-output/0/run/./symbolic_test_5/literal_1.js
+bench/datasets/zeroday-output/0/run/./symbolic_test_4/literal_1.js
+bench/datasets/zeroday-output/0/run/./symbolic_test_3/literal_1.js
+bench/datasets/zeroday-output/0/run/./symbolic_test_2/literal_1.js
+bench/datasets/zeroday-output/0/run/./symbolic_test_1/literal_1.js
+bench/datasets/zeroday-output/0/run/./symbolic_test_0/literal_1.js
 ```
 
 To generate Table 5, run:
