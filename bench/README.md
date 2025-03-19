@@ -3,8 +3,10 @@
 This artifact evaluates Explode.js, a novel tool for synthesizing exploits for Node.js applications.
 By combining static analysis and symbolic execution, Explode.js generates functional exploits
 that confirm the existence of command injection (CWE-78), code injection (CWE-94), prototype pollution (CWE-1321), and path traversal (CWE-22) vulnerabilities.
-The repository includes all source code, reference datasets and instructions on how to build and run the experiments.
-These experiments result in the tables presented in the paper, which can be used to validate the results.
+This repository includes the complete source code, reference datasets and detailed instructions for building and running the experiments that evaluate our tool.
+These experiments generate the results shown in the paper's tables.
+This artifact allows you to reproduce those results, and their validity can be
+confimed by comparing your findings with the paper's reported results.
 
 # A. Getting Started
 
@@ -12,7 +14,7 @@ This section includes an introduction to the Explode.js tool, along with its req
 
 ## A.1. Description & Requirements
 
-**How to access.**
+**How to Access.**
 The artifact is available as a persistent DOI at [10.5281/zenodo.15009157](10.5281/zenodo.15009157).
 
 **Dependencies.**
@@ -74,7 +76,7 @@ $ docker load < explode-js_image.tar.gz
 ```
 
 **Basic Testing.**
-To ensure that the image is loaded correctly and that the tool is functioning as expected, run Explode.js on the running example using the following commands:
+To ensure that the image is loaded correctly and that the tool is functioning as expected, execute Explode.js on the running example using the following commands:
 
 ```sh
 $ docker run --rm -it explode-js:latest bash
@@ -82,7 +84,7 @@ $ cd explode-js/example
 $ explode-js full running-example/index.js
 ```
 
-**Output.** The output of the previous command should be:
+**Output.** Running the command above generate an exploit for the vulnerability in the source code of the running example. The output of the previous command should be:
 
 ```
 [STEP 1] MDG: Generating...
@@ -208,17 +210,20 @@ sink(commandName, callback);
 ## A.4. Getting Started with *NodeMedic-Fine*
 
 **Setup.**
-To setup the environment, install the scripts necessary dependencies and load
+To setup the environment, install the necessary dependencies and load
 the NodeMedic-Fine Docker image, `nodemedic_image.tar.gz`, with the following
 command:
 
 ```sh
-$ python3 -m pip install pandas~=2.2.3 tabulate~=0.9.0
+# Create venv to avoid polluting the system environment
+$ python3 -m venv venv
+$ souce venv/bin/activate
+$ python3 -m pip install -r requirements.txt
 $ docker load < nodemedic_image.tar.gz
 ```
 
 **Basic Testing.**
-To ensure that the image is loaded correctly and that the tool is functioning as expected, run NodeMedic's running example (the package `ts-process-promises@1.0.2`) using the following command:
+To ensure that the image is loaded correctly and that the tool is functioning as expected, execute NodeMedic's running example (the package `ts-process-promises@1.0.2`) using the following command:
 
 ```sh
 $ python3 run-NodeMedic.py bench/datasets out --packages ts-process-promises
@@ -270,15 +275,14 @@ Explode.js is able to generate exploits in feasible time, but is less performant
 The core techniques of Explode.js (VISes and lazy values) are key to its effectiveness.
 
 This section provides instructions for reproducing the experiments that support the claims of the paper.
-These experiments result in the tables presented in the paper, which can be used to validate the results.
 
 **Timeouts.** For all experiments, the analysis of each package has a predefined timeout of 10 minutes.
 This parameter can affect the results produced, as different machines may experience varying numbers of timeouts.
 Consequently, there may be slight variations in the results, but all claims are expected to be verified.
 
-**Updated Results**: the results presented do not precisely
-coincide with those in the paper. We continued to work on the tool to improve
-the effectiveness of the exploit generation mechanisms for path traversal
+**Updated Results**: The results presented here do not precisely
+coincide with those in the paper's original submitted version because we
+continued to refined our tool to improve the effectiveness of the exploit generation mechanisms for path traversal
 (CWE-22) and code injection (CWE-94) vulnerabilities. As a result, in the
 Vulcan and SecBench.js datasets, the total number of vulnerabilities detected
 by Explode.js increased from 293 to 340, and the number of exploits generated
@@ -288,13 +292,16 @@ went from 172 to 263. However, these changes led to slight decreases in some cat
 - The number of identified vulnerabilities (true positives) dropped in all categories except CWE-22.
 
 Note that the main claim of the paper regarding the evaluation in these datasets
-remains unchanged: Explode.js is superior to the two competing tools overall and
+remains unchanged: Explode.js outperforms the two competing tools overall and
 in each vulnerability category, both in vulnerability detection and exploit generation.
 The advantage of Explode.js over the competing tools is particularly significant in the aspect of exploit generation, which is the main goal of the paper.
 
+We will update the results in the text, tables, and plots in the camera-ready
+version of the paper to reflect the new status of the tool.
+
 ## B.1. Claims 1 and 3
 
-The goal of this section is to confirm the results presented in Sections 6.1 and 6.3 of the paper;
+The goal of this section is to confirm the updated results presented in Sections 6.1 and 6.3 of the paper;
 specifically those of Tables 3 and 6, which we reproduce below.
 
 To reproduce the results of these tables, one must first run Explode.js, FAST, and NodeMedic-Fine in the Vulcan and SecBench.js datasets.
@@ -463,7 +470,7 @@ $ python3 run-NodeMedic.py bench/datasets outputs --cwes CWE-94
 
 ## Claim 2
 
-The goal of this section is to confirm the results presented in Section 6.2 of the paper;
+The goal of this section is to confirm the updated results presented in Section 6.2 of the paper;
 specifically those of Table 5, which we reproduce below:
 
 **Table 5. [Explode.js in the Wild]**
@@ -510,7 +517,7 @@ A table summarizing the results should be printed to the stdout.
 
 ## Claim 4
 
-The goal of this section is to confirm the results presented in Section 6.4 of the paper;
+The goal of this section is to confirm the updated results presented in Section 6.4 of the paper;
 specifically those of Table 7, which we reproduce below:
 
 To reproduce the results of the table above, one must first run Explode.js without VISes and Lazy Values.
