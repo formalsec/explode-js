@@ -67,5 +67,5 @@ RUN cd "${BASE}/explode-js/" && eval $(opam env --switch=ecma-sl) \
     && cd ./vendor/ECMA-SL && opam install -y . --deps-only --confirm-level=unsafe-yes \
     && dune build -p ecma-sl --profile release && dune install -p ecma-sl \
     && cd ../../ && opam install -y . --deps-only --confirm-level=unsafe-yes \
-    && dune build --profile release \
+    && dune build @install --profile release \
     && dune install

@@ -26,6 +26,7 @@
  (depends
   bos
   (bisect_ppx (and :with-test (>= 2.5.0)))
+  smtml
   cmdliner
   dune
   dune-site
@@ -35,7 +36,7 @@
   fpath
   mdx
   ocaml
-  (owl (>= 1.1))
+  ; (owl (>= 1.1))
   prelude
   yojson
   z3)
