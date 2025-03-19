@@ -49,6 +49,14 @@ WORKDIR /home/explodejs
 # Build graphjs and emca-sl
 COPY --chown=explodejs:explodejs . /home/explodejs/explode-js
 
+# Remove .git dirs
+RUN rm -rf /home/explodejs/explode-js/.git \
+    &&  rm -rf /home/explodejs/explode-js/vendor/graphjs/.git \
+    &&  rm -rf /home/explodejs/explode-js/vendor/ECMA-SL/.git \
+    &&  rm -rf /home/explodejs/explode-js/bench/datasets/.git \
+    &&  rm -rf /home/explodejs/explode-js/bench/fast/.git \
+    &&  rm -rf /home/explodejs/explode-js/bench/NodeMedic/.git
+
 RUN cd "${BASE}/explode-js/vendor/graphjs" \
     && sudo pip install --break-system-packages -r ./requirements.txt \
     && cd ./parser && sudo npm install && tsc
