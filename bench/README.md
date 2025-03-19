@@ -310,8 +310,10 @@ the effectiveness of the exploit generation mechanisms for path traversal
 Vulcan and SecBench.js datasets, the total number of vulnerabilities detected
 by Explode.js increased from 293 to 340, and the number of exploits generated
 went from 172 to 263. However, these changes led to slight decreases in some categories:
+
 - The number of exploits generated for CWE-72 vulnerabilities decreased from 75 to 70;
 - The number of identified vulnerabilities (true positives) dropped in all categories except CWE-22.
+
 Note that the main claim of the paper regarding the evaluation in these datasets
 remains unchanged: Explode.js is superior to the two competing tools overall and
 in each vulnerability category, both in vulnerability detection and exploit generation.
