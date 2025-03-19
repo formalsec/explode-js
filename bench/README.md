@@ -392,7 +392,7 @@ This will take approximately **7 hours**. The execution was successful if a
 table summarizing the results is printed to stdout at the end.
 
 As stated before, FAST does not generate executable exploits; those have to be manually put together from the output log information.
-We have done that for all the generated traces in the dataset, which can be consulted in the folder `bench/datasets/fast-pocs`.
+We have done that for all the generated logs in the dataset, which can be consulted in the folder `bench/datasets/fast-pocs`.
 To check the exploit generated for a specific package, say the `xopen@1.0.0` package, see file `bench/datasets/fast-pocs/xopen/poc.js`.
 
 To generate the FAST results of Table 3, run:
