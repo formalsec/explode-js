@@ -303,6 +303,20 @@ These experiments result in the tables presented in the paper, which can be used
 This parameter can affect the results produced, as different machines may experience varying numbers of timeouts.
 Consequently, there may be slight variations in the results, but all claims are expected to be verified.
 
+Discrepancies with respect to the paper: the results presented do not precisely
+coincide with those in the paper. We continued to work on the tool to improve
+the effectiveness of the exploit generation mechanisms for path traversal
+(CWE-22) and code injection (CWE-94) vulnerabilities. As a result, in the
+Vulcan and SecBench.js datasets, the total number of vulnerabilities detected
+by Explode.js increased from 293 to 340, and the number of exploits generated
+went from 172 to 263. However, these changes led to slight decreases in some categories:
+- The number of exploits generated for CWE-72 vulnerabilities decreased from 75 to 70;
+- The number of identified vulnerabilities (true positives) dropped in all categories except CWE-22.
+Note that the main claim of the paper regarding the evaluation in these datasets
+remains unchanged: Explode.js is superior to the two competing tools overall and
+in each vulnerability category, both in vulnerability detection and exploit generation.
+The advantage of Explode.js over the competing tools is particularly significant in the aspect of exploit generation, which is the main goal of the paper.
+
 ## B.1. Claims 1 and 3
 
 The goal of this section is to confirm the results presented in Sections 6.1 and 6.3 of the paper;
