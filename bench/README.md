@@ -520,10 +520,7 @@ A table summarizing the results should be printed to the stdout.
 
 ## Claim 4
 
-The goal of this section is to confirm the updated results presented in Section 6.4 of the paper;
-specifically those of Table 7, which we reproduce below:
-
-To reproduce the results of the table above, one must first run Explode.js without VISes and Lazy Values.
+The goal of this section is to confirm the updated results presented in Section 6.4 of the paper, specifically those in Table 7, which we reproduce in the tables below. To generate these tables, one must first run Explode.js without VISes or Lazy Values, as we explain below.
 
 **Table 7. [Explode.js Components]**
 
