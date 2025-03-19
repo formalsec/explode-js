@@ -477,7 +477,7 @@ specifically those of Table 5, which we reproduce below:
 `[TODO]`
 
 To reproduce the results of the table above, we provide the set of packages for which Explode.js found
-new vulnerabilities in `[FIXME]` and a script to run Explode.js on these packages.
+new vulnerabilities in `bench/datasets/zeroday` and a script to run Explode.js on these packages.
 To run Explode.js on the wild packages in which new vulnerabilities were found, run:
 
 ```sh
