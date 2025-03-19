@@ -276,7 +276,7 @@ These experiments result in the tables presented in the paper, which can be used
 This parameter can affect the results produced, as different machines may experience varying numbers of timeouts.
 Consequently, there may be slight variations in the results, but all claims are expected to be verified.
 
-Discrepancies with respect to the paper: the results presented do not precisely
+**Updated Results**: the results presented do not precisely
 coincide with those in the paper. We continued to work on the tool to improve
 the effectiveness of the exploit generation mechanisms for path traversal
 (CWE-22) and code injection (CWE-94) vulnerabilities. As a result, in the
@@ -433,7 +433,7 @@ type of vulnerability. Below, we explain how to do this for each tool.
 **Explode.js** For Explode.js instead of running the command:
 
 ```sh
-$ ./run_explode-js.sh`
+$ ./run_explode-js.sh
 ```
 
 Run the command specific to the targeted vulnerability type:
