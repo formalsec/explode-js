@@ -16,6 +16,11 @@ def parse_time(file):
     head = lines[0].rstrip()
     return float(head)
 
+def safe_div(a, b):
+    if b == 0:
+        return 0
+    return a / b
+
 def print_markdown_table(tbl):
     # Determine column widths
     col_widths = {
@@ -61,30 +66,30 @@ def main():
     cwe22_graphjs_times = list(map(static_time, cwe22_explode_times))
     cwe22_graphjs_times = list(map(parse_time, cwe22_graphjs_times))
     cwe22_explode_times = list(map(parse_time, cwe22_explode_times))
-    tbl["CWE-22"]["static"] = round((sum(cwe22_graphjs_times) / len(cwe22_graphjs_times)), 3)
-    tbl["CWE-22"]["symbolic"] = round((sum(cwe22_explode_times) / len(cwe22_explode_times)), 3)
+    tbl["CWE-22"]["static"] = round(safe_div(sum(cwe22_graphjs_times), len(cwe22_graphjs_times)), 3)
+    tbl["CWE-22"]["symbolic"] = round(safe_div(sum(cwe22_explode_times), len(cwe22_explode_times)), 3)
     cwe22_total_times = list(map(lambda t: t[0]+ t[1], zip(cwe22_graphjs_times, cwe22_explode_times)))
-    tbl["CWE-22"]["total"] = round((sum(cwe22_total_times) / len(cwe22_total_times)), 3)
+    tbl["CWE-22"]["total"] = round(safe_div(sum(cwe22_total_times), len(cwe22_total_times)), 3)
 
     cwe78_times = os.path.join(cwe78_path, "**", "explode_time.txt")
     cwe78_explode_times = glob.glob(cwe78_times, recursive=True)
     cwe78_graphjs_times = list(map(static_time, cwe78_explode_times))
     cwe78_graphjs_times = list(map(parse_time, cwe78_graphjs_times))
     cwe78_explode_times = list(map(parse_time, cwe78_explode_times))
-    tbl["CWE-78"]["static"] = round((sum(cwe78_graphjs_times) / len(cwe78_graphjs_times)), 3)
-    tbl["CWE-78"]["symbolic"] = round((sum(cwe78_explode_times) / len(cwe78_explode_times)), 3)
+    tbl["CWE-78"]["static"] = round(safe_div(sum(cwe78_graphjs_times), len(cwe78_graphjs_times)), 3)
+    tbl["CWE-78"]["symbolic"] = round(safe_div(sum(cwe78_explode_times), len(cwe78_explode_times)), 3)
     cwe78_total_times = list(map(lambda t: t[0]+ t[1], zip(cwe78_graphjs_times, cwe78_explode_times)))
-    tbl["CWE-78"]["total"] = round((sum(cwe78_total_times) / len(cwe78_total_times)), 3)
+    tbl["CWE-78"]["total"] = round(safe_div(sum(cwe78_total_times), len(cwe78_total_times)), 3)
 
     cwe94_times = os.path.join(cwe94_path, "**", "explode_time.txt")
     cwe94_explode_times = glob.glob(cwe94_times, recursive=True)
     cwe94_graphjs_times = list(map(static_time, cwe94_explode_times))
     cwe94_graphjs_times = list(map(parse_time, cwe94_graphjs_times))
     cwe94_explode_times = list(map(parse_time, cwe94_explode_times))
-    tbl["CWE-94"]["static"] = round((sum(cwe94_graphjs_times) / len(cwe94_graphjs_times)), 3)
-    tbl["CWE-94"]["symbolic"] = round((sum(cwe94_explode_times) / len(cwe94_explode_times)), 3)
+    tbl["CWE-94"]["static"] = round(safe_div(sum(cwe94_graphjs_times), len(cwe94_graphjs_times)), 3)
+    tbl["CWE-94"]["symbolic"] = round(safe_div(sum(cwe94_explode_times), len(cwe94_explode_times)), 3)
     cwe94_total_times = list(map(lambda t: t[0]+ t[1], zip(cwe94_graphjs_times, cwe94_explode_times)))
-    tbl["CWE-94"]["total"] = round((sum(cwe94_total_times) / len(cwe94_total_times)), 3)
+    tbl["CWE-94"]["total"] = round(safe_div(sum(cwe94_total_times), len(cwe94_total_times)), 3)
 
 
     cwe1321_times = os.path.join(cwe1321_path, "**", "explode_time.txt")
@@ -92,18 +97,18 @@ def main():
     cwe1321_graphjs_times = list(map(static_time, cwe1321_explode_times))
     cwe1321_graphjs_times = list(map(parse_time, cwe1321_graphjs_times))
     cwe1321_explode_times = list(map(parse_time, cwe1321_explode_times))
-    tbl["CWE-1321"]["static"] = round(round((sum(cwe1321_graphjs_times) / len(cwe1321_graphjs_times)), 3), 3)
-    tbl["CWE-1321"]["symbolic"] = round((sum(cwe1321_explode_times) / len(cwe1321_explode_times)), 3)
+    tbl["CWE-1321"]["static"] = round(round(safe_div(sum(cwe1321_graphjs_times),len(cwe1321_graphjs_times)), 3), 3)
+    tbl["CWE-1321"]["symbolic"] = round(safe_div(sum(cwe1321_explode_times), len(cwe1321_explode_times)), 3)
     cwe1321_total_times = list(map(lambda t: t[0]+ t[1], zip(cwe1321_graphjs_times, cwe1321_explode_times)))
-    tbl["CWE-1321"]["total"] = round((sum(cwe1321_total_times) / len(cwe1321_total_times)), 3)
+    tbl["CWE-1321"]["total"] = round(safe_div(sum(cwe1321_total_times), len(cwe1321_total_times)), 3)
 
 
     total_graphjs_time = cwe22_graphjs_times + cwe78_graphjs_times + cwe94_graphjs_times + cwe1321_graphjs_times
     total_explode_time = cwe22_explode_times + cwe78_explode_times + cwe94_explode_times + cwe1321_explode_times
-    tbl["Total"]["static"] = round((sum(total_graphjs_time) / len(total_graphjs_time)), 3)
-    tbl["Total"]["symbolic"] = round((sum(total_explode_time) / len(total_graphjs_time)), 3)
+    tbl["Total"]["static"] = round(safe_div(sum(total_graphjs_time),len(total_graphjs_time)), 3)
+    tbl["Total"]["symbolic"] = round(safe_div(sum(total_explode_time),len(total_graphjs_time)), 3)
     total_times = list(map(lambda t: t[0]+ t[1], zip(total_graphjs_time, total_explode_time)))
-    tbl["Total"]["total"] = round((sum(total_times) / len(total_times)), 3)
+    tbl["Total"]["total"] = round(safe_div(sum(total_times), len(total_times)), 3)
 
     print_markdown_table(tbl)
 
