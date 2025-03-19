@@ -58,13 +58,13 @@ def run_package(datasets, exploit, outputs):
     package = exploit['package']
     version = exploit['version']
     vulns = exploit['vulns']
-    
+
     for v in vulns:
         exploit_id = str(v['id'])
         cwe = v['cwe']
         cwe = 'CWE-1321' if cwe == 'CWE-471' else cwe
         filename = v['filename']
-        
+
         if filename not in ran_filenames:
             ran_filenames.append(filename)
             file = join_path(datasets, filename)
@@ -77,14 +77,14 @@ def run_tool(cmd, timeout):
     stdout = result.stdout
     stderr = result.stderr
     retcode = result.returncode
-    cmd_str = ' '.join(cmd) 
+    cmd_str = ' '.join(cmd)
     print(f'Running: {cmd_str}')
 
     if result.returncode != 0:
         print(f'Command failed: "{cmd_str}"')
         print(result.stderr)
         return retcode, stderr
-    
+
     return retcode, stdout
 
 def timed_run(cmd, timeout):
@@ -95,11 +95,12 @@ def timed_run(cmd, timeout):
     return elapsed, code, out
 
 def run_exploit(package, version, exploit_id, cwe, file, outputs):
-    
+
     t = CWE_MAPPING[cwe]
     cmd = ['python3', '-m', 'simurun', '-t', t, '-X', file]
     try:
-        elapsed, code, stdout = timed_run(cmd, 600)
+        # We set to 300 because it's faster for artifact evaluation
+        elapsed, code, stdout = timed_run(cmd, 300)
     except sp.TimeoutExpired:
         elapsed = TIMEOUT
         code = None
@@ -109,7 +110,7 @@ def run_exploit(package, version, exploit_id, cwe, file, outputs):
 
     if os.path.isdir(out):
         shutil.rmtree(out)
-  
+
     os.makedirs(out)
 
     stats_file = join_path(out, 'stats.json')
@@ -136,24 +137,24 @@ def move_output_files(dest):
             shutil.move(out, dest)
 
 def benchmark(datasets, outputs, packages, cwes):
-    
+
     # Check if index.json exists and load
     index = join_path(datasets, 'index.json')
     if not os.path.exists(index):
         sys.exit(f'\'index.json\' not found in {datasets}')
 
-    # Load index    
+    # Load index
     data = load_json(index)
     if packages:
         data = list(filter(lambda pkg: pkg['package'] in packages, data))
 
     if cwes:
         data = list(filter(lambda pkg: pkg['vulns'][0]['cwe'] in cwes, data))
-    
-    # Make outputs directory
-    os.makedirs(outputs, exist_ok=True)    
 
-    # Run 
+    # Make outputs directory
+    os.makedirs(outputs, exist_ok=True)
+
+    # Run
     print(f'[*] {len(data)} package(s) selected for benchmarking')
     for exploit in data:
         print(f'[-] Running: {exploit['package']}@{exploit['version']}')
@@ -161,7 +162,7 @@ def benchmark(datasets, outputs, packages, cwes):
 
 
 # PARSE -----------------------------------------------------------------------------
-    
+
 class Series:
     def __init__(self):
         self.package = []
@@ -202,12 +203,12 @@ def parse_results(series:Series, dir_path):
     total_time = stats['time']
     filename = stats['filename']
     cwe = stats['cwe']
-    
+
     if total_time == TIMEOUT:
         marker = 'Timeout'
     else:
         code = stats['exitcode']
-        marker = f'Exited {code}' 
+        marker = f'Exited {code}'
 
     if marker == "Timeout":
         series.package.append(package)
@@ -222,7 +223,7 @@ def parse_results(series:Series, dir_path):
         series.exploit.append("failed")
         return
 
-    
+
     eval_file = list(Path(dir_path).rglob("evaluation.ndjson"))[0]
     log_file = list(Path(dir_path).rglob("fast-stdout.log"))[0]
     solv_time = parse_solv_time(eval_file) if eval_file else None
@@ -249,7 +250,7 @@ def parse(outputs):
     results = list(Path(outputs).rglob("*_fast"))
     for result in results:
         parse_results(series, result)
-    
+
     data = {
         "package": series.package,
         "version": series.version,
@@ -262,7 +263,7 @@ def parse(outputs):
         "detection": series.detection,
         "exploit": series.exploit
     }
-    
+
     pd.DataFrame(data).to_csv("fast-parsed-results.csv", index=False)
     del data['benchmark']
     table_pipes = tabulate(pd.DataFrame(data), headers="keys", tablefmt="pipe", showindex=False)
@@ -286,7 +287,7 @@ def main():
 
     if not parse_only:
         benchmark(datasets, outputs, packages, cwes)
-    
+
     parse(outputs)
 
 if __name__ == '__main__':

@@ -53,14 +53,14 @@ def run_tool(cmd, timeout):
     stdout = result.stdout
     stderr = result.stderr
     retcode = result.returncode
-    cmd_str = ' '.join(cmd) 
+    cmd_str = ' '.join(cmd)
     print(f'Running: {cmd_str}')
 
     if result.returncode != 0:
         print(f'Command failed: "{cmd_str}"')
         print(result.stderr)
         return retcode, stderr
-    
+
     return retcode, stdout
 
 def timed_run(cmd, timeout):
@@ -76,9 +76,9 @@ def run_package__(package, version, cwe, outputs):
 
     if os.path.isdir(out):
         shutil.rmtree(out)
-  
+
     os.makedirs(out)
-    
+
     cmd = ['docker', 'run', '-it', '--rm',
             '-v', f'{out}:/nodetaint/analysisArtifacts:rw',
              'nodemedic-fine:latest',
@@ -86,7 +86,8 @@ def run_package__(package, version, cwe, outputs):
              f'--version={version}',
              '--mode=full']
     try:
-        elapsed, code, stdout = timed_run(cmd, 600)
+        # We set to 300 because it's faster for artifact evaluation
+        elapsed, code, stdout = timed_run(cmd, 300)
     except sp.TimeoutExpired:
         elapsed = TIMEOUT
         code = None
@@ -108,13 +109,13 @@ def run_package__(package, version, cwe, outputs):
     dump_json(stats_file, stats)
 
 def benchmark(datasets, outputs, packages, cwes):
-    
+
     # Check if index.json exists and load
     index = join_path(datasets, 'index.json')
     if not os.path.exists(index):
         sys.exit(f'\'index.json\' not found in {datasets}')
 
-    # Load index    
+    # Load index
     data = load_json(index)
     if packages:
         data = list(filter(lambda pkg: pkg['package'] in packages, data))
@@ -123,9 +124,9 @@ def benchmark(datasets, outputs, packages, cwes):
         data = list(filter(lambda pkg: pkg['vulns'][0]['cwe'] in cwes, data))
 
     # Make outputs directory
-    os.makedirs(outputs, exist_ok=True)    
+    os.makedirs(outputs, exist_ok=True)
 
-    # Run 
+    # Run
     print(f'[*] {len(data)} package(s) selected for benchmarking')
     for exploit in data:
         print(f'[-] Running: {exploit['package']}@{exploit['version']}')
@@ -133,7 +134,7 @@ def benchmark(datasets, outputs, packages, cwes):
 
 
 # PARSE -----------------------------------------------------------------------------
-    
+
 class Series:
     def __init__(self):
         self.package = []
@@ -160,24 +161,24 @@ def find_expl(content):
 def __parse_results(results_file, stdout_file):
     with open(results_file, "r") as f:
         json_data = json.load(f)
-    
+
     results = json_data.get("rows", [])
     assert len(results) == 1
     results = results[0]
     task_results = results.get("taskResults", {})
-    
+
     fuzz_time = task_time_or_zero(task_results.get("runInstrumented"))
     expl_time = sum(
         task_time_or_zero(task_results.get(task))
         for task in ["trivialExploit", "checkExploit", "smt"]
     )
-    
+
     with open(stdout_file, "r") as f:
         data = f.read()
-    
+
     has_taintpath = str(find_taint(data)).lower()
     has_exploit = str(find_expl(data)).lower()
-    
+
     return fuzz_time / 1000.0, expl_time / 1000.0, has_taintpath, has_exploit
 
 def parse_results(series:Series, dir_path):
@@ -191,12 +192,12 @@ def parse_results(series:Series, dir_path):
     version = stats['version']
     total_time = stats['time']
     cwe = stats['cwe']
-    
+
     if total_time == TIMEOUT:
         marker = 'Timeout'
     else:
         code = stats['exitcode']
-        marker = f'Exited {code}' 
+        marker = f'Exited {code}'
 
     if marker == "Timeout":
         series.package.append(package)
@@ -213,7 +214,7 @@ def parse_results(series:Series, dir_path):
     log_file = list(Path(dir_path).rglob("nodeMedic-stdout.log"))[0]
     results_file = list(Path(dir_path).rglob("results.json"))[0]
     fuzz_time, expl_time, has_taintpath, has_exploit = __parse_results(results_file, log_file)
-    
+
     series.package.append(package)
     series.version.append(version)
     series.cwe.append(cwe)
@@ -230,7 +231,7 @@ def parse(outputs):
     results = list(Path(outputs).rglob("*__nodeMedic"))
     for result in results:
         parse_results(series, result)
-    
+
     data = {
         "package": series.package,
         "version": series.version,
@@ -242,7 +243,7 @@ def parse(outputs):
         "taintpath": series.taintpath,
         "exploit": series.exploit
     }
-    
+
     pd.DataFrame(data).to_csv("nodeMedic-parsed-results.csv", index=False)
     table_pipes = tabulate(pd.DataFrame(data), headers="keys", tablefmt="pipe", showindex=False)
     print('\n' + table_pipes)
@@ -265,7 +266,7 @@ def main():
 
     if not parse_only:
         benchmark(datasets, outputs, packages, cwes)
-    
+
     parse(outputs)
 
 if __name__ == '__main__':
