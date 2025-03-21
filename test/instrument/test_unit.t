@@ -100,6 +100,7 @@ Test unit:
   // Vuln: prototype-pollution
   var some_arg = esl_symbolic.polluted_object(2);
   module.exports(some_arg);
+  if (({}).polluted == "yes") { throw Error("I pollute."); }
   if (({}).toString == "polluted") { throw Error("I pollute."); }
   $ explode-js instrument --mode symbolic -o - --filename unit/identity.js unit/polluted_object3.json
   ⚒ Generating 1 template(s):
@@ -112,6 +113,7 @@ Test unit:
   // Vuln: prototype-pollution
   var some_arg = esl_symbolic.polluted_object(3);
   module.exports(some_arg);
+  if (({}).polluted == "yes") { throw Error("I pollute."); }
   if (({}).toString == "polluted") { throw Error("I pollute."); }
   $ explode-js instrument --mode symbolic -o - --filename unit/identity.js unit/string.json
   ⚒ Generating 1 template(s):
