@@ -4,17 +4,17 @@ open Cmdliner.Term.Syntax
 let parse_fpath f str =
   let file = Fpath.v str in
   match f file with
-  | Ok true -> `Ok file
-  | Ok false -> `Error (Fmt.str "File '%s' not found!" str)
-  | Error (`Msg err) -> `Error err
+  | Ok true -> Ok file
+  | Ok false -> Error (`Msg (Fmt.str "File '%s' not found!" str))
+  | Error _ as err -> err
 
-let fpath = ((fun str -> `Ok (Fpath.v str)), Fpath.pp)
+let fpath = Arg.conv ((fun str -> Ok (Fpath.v str)), Fpath.pp)
 
-let _valid_fpath = (parse_fpath Bos.OS.Path.exists, Fpath.pp)
+let _valid_fpath = Arg.conv (parse_fpath Bos.OS.Path.exists, Fpath.pp)
 
-let non_dir_fpath = (parse_fpath Bos.OS.File.exists, Fpath.pp)
+let non_dir_fpath = Arg.conv (parse_fpath Bos.OS.File.exists, Fpath.pp)
 
-let _dir_fpath = (parse_fpath Bos.OS.Dir.exists, Fpath.pp)
+let _dir_fpath = Arg.conv (parse_fpath Bos.OS.Dir.exists, Fpath.pp)
 
 let debug =
   let doc = "Debug mode." in
@@ -131,11 +131,15 @@ let cmd_instrument =
     let doc = "Output path." in
     Arg.(value & opt string "symbolic_test" & info [ "output"; "o" ] ~doc)
   in
+  let witness_file =
+    let doc = "Concrete witness file." in
+    Arg.(value & opt (some fpath) None & info [ "witness" ] ~doc)
+  in
   let+ debug
   and+ mode
   and+ scheme_file = input_file
   and+ original_file = input_file_opt
-  and+ witness_file = input_file_opt
+  and+ witness_file
   and+ output_path in
   Cmd_instrument.run ~debug ~mode ~scheme_file ~original_file ~witness_file
     ~output_path

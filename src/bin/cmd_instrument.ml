@@ -14,12 +14,7 @@ let instrument_of_string s =
   | "concrete" -> Ok Concrete
   | _ -> Error (`Msg "unknown instrument type")
 
-let instrument_conv =
-  ( (fun s ->
-      match instrument_of_string s with
-      | Ok mode -> `Ok mode
-      | Error (`Msg err) -> `Error err )
-  , pp_instrument )
+let instrument_conv = Cmdliner.Arg.conv (instrument_of_string, pp_instrument)
 
 let run ~debug ~mode ~scheme_file ~original_file ~witness_file ~output_path =
   if debug then Logs.set_level (Some Debug);
