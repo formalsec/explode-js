@@ -108,9 +108,11 @@ let get_tmpls workspace_dir (scheme_file : Fpath.t)
 let write_report report_file result =
   Bos.OS.File.writef ~mode:0o666 report_file "%a" Sym_exec.print_report result
 
-let run_single ~lazy_values ~(workspace_dir : Fpath.t) (test_file : Fpath.t)
-  original_file scheme_file scheme =
-  let* res = Sym_exec.run_file ~lazy_values ~workspace_dir test_file in
+let run_single ~deterministic ~lazy_values ~(workspace_dir : Fpath.t)
+  (test_file : Fpath.t) original_file scheme_file scheme =
+  let* res =
+    Sym_exec.run_file ~deterministic ~lazy_values ~workspace_dir test_file
+  in
   let* found_witness =
     Replay.run_single ?original_file ~scheme_file ~scheme ~workspace_dir
       test_file res
@@ -118,9 +120,11 @@ let run_single ~lazy_values ~(workspace_dir : Fpath.t) (test_file : Fpath.t)
   let+ () = write_report Fpath.(workspace_dir / "report.json") res in
   (found_witness, res)
 
-let run_server ~lazy_values ~(workspace_dir : Fpath.t) (server_file : Fpath.t)
-  scheme =
-  let* res = Sym_exec.run_file ~lazy_values ~workspace_dir server_file in
+let run_server ~deterministic ~lazy_values ~(workspace_dir : Fpath.t)
+  (server_file : Fpath.t) scheme =
+  let* res =
+    Sym_exec.run_file ~deterministic ~lazy_values ~workspace_dir server_file
+  in
   let* () = Replay.run_server ~workspace_dir server_file scheme res in
   let+ () = write_report Fpath.(workspace_dir / "report.json") res in
   res
@@ -131,8 +135,8 @@ let write_reports reports_file results =
     (Yojson.pretty_print ~std:true)
     results
 
-let run ~lazy_values ~proto_pollution ~enumerate_all ~workspace_dir ~package_dir
-  ~scheme_file ~original_file ~time_limit:_ =
+let run ~deterministic ~lazy_values ~proto_pollution ~enumerate_all
+  ~workspace_dir ~package_dir ~scheme_file ~original_file ~time_limit:_ =
   Logs.app (fun k -> k "── PHASE 1: TEMPLATE GENERATION ──");
   Logs.app (fun k -> k "\u{2714} Loaded: %a" Fpath.pp scheme_file);
   with_workspace ~proto_pollution workspace_dir scheme_file package_dir
@@ -147,8 +151,8 @@ let run ~lazy_values ~proto_pollution ~enumerate_all ~workspace_dir ~package_dir
       let workspace_dir = Fpath.(workspace_dir // rem_ext (base test)) in
       let found_witness, results =
         match
-          run_single ~lazy_values ~workspace_dir test orig_file scheme_file
-            scheme
+          run_single ~deterministic ~lazy_values ~workspace_dir test orig_file
+            scheme_file scheme
         with
         | Ok (found_witness, sym_result) ->
           (found_witness, sym_result :: results)
@@ -161,7 +165,9 @@ let run ~lazy_values ~proto_pollution ~enumerate_all ~workspace_dir ~package_dir
     | (Client_server { client = _; server }, scheme) :: remaning ->
       Logs.app (fun k -> k "\u{25C9} [%d/%d] Procesing %a" i n Fpath.pp server);
       let workspace_dir = Fpath.(workspace_dir // rem_ext (base server)) in
-      let* sym_result = run_server ~lazy_values ~workspace_dir server scheme in
+      let* sym_result =
+        run_server ~deterministic ~lazy_values ~workspace_dir server scheme
+      in
       loop (succ i) (sym_result :: results) remaning
   in
   Logs.app (fun k -> k "@\n── PHASE 2: ANALYSIS & VALIDATION ──");

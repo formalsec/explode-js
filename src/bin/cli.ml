@@ -20,6 +20,10 @@ let debug =
   let doc = "Debug mode." in
   Arg.(value & flag & info [ "debug" ] ~doc)
 
+let deterministic =
+  let doc = "Deterministic output for tests." in
+  Arg.(value & flag & info [ "deterministic" ] ~doc)
+
 let input_file =
   let docv = "FILE" in
   let doc = "Name of the input file." in
@@ -72,14 +76,15 @@ let info_run =
 let cmd_run =
   let+ workspace_dir
   and+ package_dir
+  and+ deterministic
   and+ lazy_values
   and+ proto_pollution
   and+ enumerate_all
   and+ scheme_file = input_file
   and+ original_file = input_file_opt
   and+ time_limit in
-  Cmd_run.run ~lazy_values ~proto_pollution ~enumerate_all ~workspace_dir
-    ~package_dir ~scheme_file ~original_file ~time_limit
+  Cmd_run.run ~deterministic ~lazy_values ~proto_pollution ~enumerate_all
+    ~workspace_dir ~package_dir ~scheme_file ~original_file ~time_limit
 
 let info_exploit =
   let doc = "Explode.js single file symbolic confirmation" in
@@ -91,10 +96,12 @@ let info_exploit =
 let cmd_exploit =
   (* Term.(const Cmd_exploit.options $ input $ workspace_dir $ time_limit) *)
   let+ input_file
+  and+ deterministic
   and+ lazy_values
   and+ workspace_dir
   and+ time_limit in
-  Cmd_exploit.run ~lazy_values ~input_file ~workspace_dir ~time_limit
+  Cmd_exploit.run ~deterministic ~lazy_values ~input_file ~workspace_dir
+    ~time_limit
 
 let info_full =
   let doc = "Explode.js full analysis" in
@@ -106,13 +113,14 @@ let info_full =
 let cmd_full =
   let+ input_file
   and+ package_dir
+  and+ deterministic
   and+ proto_pollution
   and+ enumerate_all
   and+ lazy_values
   and+ workspace_dir
   and+ time_limit in
-  Cmd_full.run ~lazy_values ~proto_pollution ~enumerate_all ~package_dir
-    ~input_file ~workspace_dir ~time_limit
+  Cmd_full.run ~deterministic ~lazy_values ~proto_pollution ~enumerate_all
+    ~package_dir ~input_file ~workspace_dir ~time_limit
 
 let info_instrument =
   let doc = "Explode.js test instrumentator" in

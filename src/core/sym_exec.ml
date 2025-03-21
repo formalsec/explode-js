@@ -33,7 +33,7 @@ let dummy_report input_file =
   ; failures = []
   }
 
-let run_file ~lazy_values ~workspace_dir input_file =
+let run_file ~deterministic ~lazy_values ~workspace_dir input_file =
   Ecma_sl.Log.Config.log_warns := true;
   (* Ecma_sl.Log.Config.log_debugs := true; *)
   Logs.app (fun k -> k "├── Symbolic execution output:");
@@ -51,9 +51,10 @@ let run_file ~lazy_values ~workspace_dir input_file =
     with exn ->
       (Error (`Failure (Printexc.to_string exn)), dummy_report input_file)
   in
-  Logs.app (fun k ->
-    k "├── Symbolic execution stats: clock: %fs | solver: %fs"
-      report.execution_time report.solver_time );
+  if not deterministic then
+    Logs.app (fun k ->
+      k "├── Symbolic execution stats: clock: %fs | solver: %fs"
+        report.execution_time report.solver_time );
   match result with
   | Ok () ->
     assert (report.num_failures = 0);
