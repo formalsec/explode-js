@@ -5,8 +5,8 @@ def load_json(filename):
     with open(filename, 'r') as fd:
         return json.load(fd)
 
-def load_data(filename):
-    return pd.read_csv(filename)
+def load_data(filename, sep=','):
+    return pd.read_csv(filename, sep=sep)
 
 def recall(tp, fn):
     dem = tp + fn

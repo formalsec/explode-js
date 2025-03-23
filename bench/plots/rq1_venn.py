@@ -1,11 +1,11 @@
 import os
-import re
 import utils
 
 import matplotlib.pyplot as plt
+from matplotlib.patches import Patch
 from matplotlib_venn import venn3, venn2
 
-index = utils.load_json("explodejs-datasets/index.json")
+index = utils.load_json("datasets/index.json")
 index_by_file = {}
 for pkg in index:
     name_version = pkg["package"] + "_" + pkg["version"]
@@ -14,60 +14,48 @@ for pkg in index:
         short_filename = "/".join(filename.split("/")[:3])
         index_by_file[short_filename] = name_version
 
-nm_re = r"([a-zA-Z0-9-]+)-(\d+\.\d+\.\d+(?:-[a-zA-Z]+\.\d+)?)"
-
-def normalize_nm(path):
-    match = re.search(nm_re, path)
-    if match:
-        return match.group(1) + "_" + match.group(2)
-    # Should be unreachable
-    assert(False)
-
 def normalize_fast(path):
     path = os.path.splitext(path)[0] + ".js"
     split_path = path.split("/")
     path = "/".join(split_path[2:5])
     return index_by_file[path]
 
-def normalize_explode(path):
-    try:
-        return index_by_file[path]
-    except:
-        print(path)
-        return path
+def normalize(pair):
+    key = pair[0] + "_" + pair[1]
+    return key
 
 df_fast = utils.load_data("fast-vulcan-secbench-results.csv")
 df_nodemedic = utils.load_data("nodemedic-vulcan-secbench-results.csv")
-df_explode = utils.load_data("explode-vulcan-secbench-results.csv")
+df_explode = utils.load_data("explode-vulcan-secbench-results.csv", sep="|")
 
 df_fast_cwe_22 = df_fast[(df_fast['cwe'] == 'CWE-22') & (df_fast['exploit'] == 'successful')]
-df_explode_cwe_22 = df_explode[(df_explode['cwe'] == 'CWE-22') & (df_explode['control_path'] == 'true')]
+df_explode_cwe_22 = df_explode[(df_explode['cwe'] == 'CWE-22') & (df_explode['control_path'] == True)]
 
 df_fast_cwe_78 = df_fast[(df_fast['cwe'] == 'CWE-78') & (df_fast['exploit'] == 'successful')]
-df_nodemedic_cwe_78 = df_nodemedic[(df_nodemedic['cwe'] == 'CWE-78') & (df_nodemedic['exploit'] == True)]
-df_explode_cwe_78 = df_explode[(df_explode['cwe'] == 'CWE-78') & (df_explode['control_path'] == 'true')]
+df_nodemedic_cwe_78 = df_nodemedic[(df_nodemedic['cwe'] == 'CWE-78') & (df_nodemedic['taintpath'] == True)]
+df_explode_cwe_78 = df_explode[(df_explode['cwe'] == 'CWE-78') & (df_explode['control_path'] == True)]
 
 df_fast_cwe_94 = df_fast[(df_fast['cwe'] == 'CWE-94') & (df_fast['exploit'] == 'successful')]
-df_nodemedic_cwe_94 = df_nodemedic[(df_nodemedic['cwe'] == 'CWE-94') & (df_nodemedic['exploit'] == True)]
-df_explode_cwe_94 = df_explode[(df_explode['cwe'] == 'CWE-94') & (df_explode['control_path'] == 'true')]
+df_nodemedic_cwe_94 = df_nodemedic[(df_nodemedic['cwe'] == 'CWE-94') & (df_nodemedic['taintpath'] == True)]
+df_explode_cwe_94 = df_explode[(df_explode['cwe'] == 'CWE-94') & (df_explode['control_path'] == True)]
 
 df_fast_cwe_471 = df_fast[(df_fast['cwe'] == 'CWE-471') & (df_fast['exploit'] == 'successful')]
-df_explode_cwe_471 = df_explode[(df_explode['cwe'] == 'CWE-471') & (df_explode['control_path'] == 'true')]
+df_explode_cwe_471 = df_explode[(df_explode['cwe'] == 'CWE-1321') & (df_explode['control_path'] == True)]
 
 # Extract benchmark names for Venn diagram
 fast_cwe_22 = set(map(normalize_fast, df_fast_cwe_22['benchmark']))
-explode_cwe_22 = set(map(normalize_explode, df_explode_cwe_22['benchmark']))
+explode_cwe_22 = set(map(normalize, zip(df_explode_cwe_22['package'], df_explode_cwe_22['version'])))
 
 fast_cwe_78 = set(map(normalize_fast, df_fast_cwe_78['benchmark']))
-nodemedic_cwe_78 = set(map(normalize_nm, df_nodemedic_cwe_78['benchmark']))
-explode_cwe_78 = set(map(normalize_explode, df_explode_cwe_78['benchmark']))
+nodemedic_cwe_78 = set(map(normalize, zip(df_nodemedic_cwe_78['package'], df_nodemedic_cwe_78['version'])))
+explode_cwe_78 = set(map(normalize, zip(df_explode_cwe_78['package'], df_explode_cwe_78['version'])))
 
 fast_cwe_94 = set(map(normalize_fast, df_fast_cwe_94['benchmark']))
-nodemedic_cwe_94 = set(map(normalize_nm, df_nodemedic_cwe_94['benchmark']))
-explode_cwe_94 = set(map(normalize_explode, df_explode_cwe_94['benchmark']))
+nodemedic_cwe_94 = set(map(normalize, zip(df_nodemedic_cwe_94['package'], df_nodemedic_cwe_94['version'])))
+explode_cwe_94 = set(map(normalize, zip(df_explode_cwe_94['package'], df_explode_cwe_94['version'])))
 
 fast_cwe_471 = set(map(normalize_fast, df_fast_cwe_471['benchmark']))
-explode_cwe_471 = set(map(normalize_explode, df_explode_cwe_471['benchmark']))
+explode_cwe_471 = set(map(normalize, zip(df_explode_cwe_471['package'], df_explode_cwe_471['version'])))
 
 fontsize_title = 14
 width_edge = 1.5
@@ -126,6 +114,8 @@ for text in cwe22.subset_labels + cwe78.subset_labels + cwe94.subset_labels:
     if text:
         text.set_fontsize(12)
 
-plt.figlegend(['Detected by FAST', 'Detected by Explode-js', 'Detected by NodeMedic'], loc='lower center', ncol=3, fontsize=16)
+custom_handles = [Patch(facecolor=color, edgecolor='black', linewidth=1, alpha=0.5) for color in [color_fast, color_explode, color_nodemedic]]
+plt.figlegend(custom_handles, ['Detected by FAST', 'Detected by Explode-js', 'Detected by NodeMedic'],
+              loc='lower center', ncol=3, fontsize=16)
 plt.tight_layout(pad=5.0)#pad=1.0, rect=[0, 0.05, 1, 0.95])
 plt.savefig("rq1_venn.pdf")

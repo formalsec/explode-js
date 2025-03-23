@@ -1,11 +1,10 @@
-import sys
 import pandas as pd
 import matplotlib.pyplot as plt
 
 # CSV files
 csv_fast = "fast-vulcan-secbench-results.csv"
 csv_nodemedic = "nodemedic-vulcan-secbench-results.csv"
-csv_explode = "explode-vulcan-results.csv"
+csv_explode = "explode-vulcan-secbench-results.csv"
 
 # Upper bound of time to consider
 time_ub = 124
@@ -23,10 +22,10 @@ df_nodemedic_rows = len(df_nodemedic)
 df_nodemedic = df_nodemedic[df_nodemedic['total_time'] <= time_ub]
 df_nodemedic['cumulative_markers'] = [ (i / df_nodemedic_rows) * 100 for i in range(1, len(df_nodemedic) + 1) ]
 
-df_explode = pd.read_csv(csv_explode)
-df_explode = df_explode.sort_values(by="total_time")
+df_explode = pd.read_csv(csv_explode, sep="|")
+df_explode = df_explode.sort_values(by="rtime")
 df_explode_rows = len(df_explode)
-df_explode = df_explode[df_explode['total_time'] <= time_ub]
+df_explode = df_explode[df_explode['rtime'] <= time_ub]
 df_explode['cumulative_markers'] = [ (i / df_explode_rows) * 100 for i in range(1, len(df_explode) + 1) ]
 
 # Plot configuration
@@ -55,7 +54,7 @@ plt.step(
 )
 
 plt.step(
-    df_explode['total_time'],
+    df_explode['rtime'],
     df_explode['cumulative_markers'],
     where='post',
     label='Explode.js',
