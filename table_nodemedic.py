@@ -48,9 +48,9 @@ def main():
     csv_file = "./nodeMedic-parsed-results.csv"
     csv = parse_csv(csv_file)
     for row in csv[1:]:
-        ty = row[2]
-        tp = row[7]
-        e = row[8]
+        ty = row[3]
+        tp = row[6]
+        e = row[7]
         if tp == "true":
             tbl[ty]["tp"] += 1
         if e == "true":
