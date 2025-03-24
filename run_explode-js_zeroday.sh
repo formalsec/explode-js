@@ -1,5 +1,7 @@
 #!/bin/bash
 
+pgrep -f "neo4j" > /dev/null || neo4j start
+
 pushd bench/datasets
 
 runner run \

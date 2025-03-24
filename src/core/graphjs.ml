@@ -2,8 +2,8 @@ open Bos
 
 let cmd ~file ~output =
   Cmd.(
-    v "graphjs" % "--silent" % "--with-types" % "--dirty" % "-f" % p file % "-o"
-    % p output )
+    v "graphjs" % "--silent" % "--optimized-import" % "--with-types" % "--dirty"
+    % "-f" % p file % "-o" % p output )
 
 let run ~file ~output =
   let cmd = cmd ~file ~output in
