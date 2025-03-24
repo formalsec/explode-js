@@ -57,6 +57,10 @@ let package_dir =
   let doc = "Path to package under analysis" in
   Arg.(value & opt (some fpath) None & info [ "package-dir" ] ~doc)
 
+let optimized_import =
+  let doc = "Use optimized import heuristics in graphjs" in
+  Arg.(value & flag & info [ "optimized-import" ] ~doc)
+
 let sdocs = Manpage.s_common_options
 
 let info_run =
@@ -118,9 +122,10 @@ let cmd_full =
   and+ enumerate_all
   and+ lazy_values
   and+ workspace_dir
-  and+ time_limit in
+  and+ time_limit
+  and+ optimized_import in
   Cmd_full.run ~deterministic ~lazy_values ~proto_pollution ~enumerate_all
-    ~package_dir ~input_file ~workspace_dir ~time_limit
+    ~package_dir ~input_file ~workspace_dir ~time_limit ~optimized_import
 
 let info_instrument =
   let doc = "Explode.js test instrumentator" in
