@@ -21,8 +21,8 @@ let run ~debug ~mode ~scheme_file ~original_file ~witness_file ~output_path =
   match mode with
   | Symbolic -> (
     match
-      Test.Symbolic.generate_all ?original_file ~scheme_file
-        ~output_dir:output_path ()
+      Test.Symbolic.generate_all ?original_file ~proto_pollution:false
+        ~scheme_file ~output_dir:output_path ()
     with
     | Error _ as e -> e
     | Ok _n -> Ok 0 )
@@ -33,8 +33,8 @@ let run ~debug ~mode ~scheme_file ~original_file ~witness_file ~output_path =
       | None -> assert false
     in
     match
-      Test.Literal.generate_all ?original_file ~output_dir:output_path
-        scheme_file witness_file
+      Test.Literal.generate_all ?original_file ~proto_pollution:false
+        ~output_dir:output_path scheme_file witness_file
     with
     | Ok () -> Ok 0
     | Error _ as e -> e )
