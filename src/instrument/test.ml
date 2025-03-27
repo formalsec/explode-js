@@ -56,9 +56,10 @@ module Symbolic = struct
             (Single_shot output_file, scheme) )
       schemes
 
-  let generate_all ?(mode = 0o644) ?original_file ~scheme_file ~output_dir () =
+  let generate_all ?(mode = 0o644) ?original_file ~proto_pollution ~scheme_file
+    ~output_dir () =
     let open Result in
-    let* schemes = Scheme.Parser.from_file scheme_file in
+    let* schemes = Scheme.Parser.from_file ~proto_pollution scheme_file in
     write_all ~mode ?original_file ~scheme_file ~output_dir schemes
 end
 
@@ -86,11 +87,11 @@ module Literal = struct
     let+ () = Bos.OS.File.writef ~mode output_file "%s" test_data in
     output_file
 
-  let generate_all ?(mode = 0o644) ?original_file ~output_dir scheme_file
-    witness_file =
+  let generate_all ?(mode = 0o644) ?original_file ~proto_pollution ~output_dir
+    scheme_file witness_file =
     let open Result in
     let* model = Model.Parser.from_file witness_file in
-    let* schemes = Scheme.Parser.from_file scheme_file in
+    let* schemes = Scheme.Parser.from_file ~proto_pollution scheme_file in
     let i = ref 0 in
     list_iter
       (fun scheme ->

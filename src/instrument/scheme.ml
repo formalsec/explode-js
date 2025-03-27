@@ -108,7 +108,7 @@ let needs_client scheme =
   | `Client _ -> true
 
 (** [unroll_params params] performs type unrolling of union types *)
-let rec unroll_params (params : (string * param_type) list) :
+let rec unroll_params ~proto_pollution (params : (string * param_type) list) :
   (string * param_type) list list =
   let open List in
   let rec loop wl acc =
@@ -117,15 +117,21 @@ let rec unroll_params (params : (string * param_type) list) :
     | ((x, ty) as param) :: wl' ->
       let acc' =
         match ty with
+        | Any ->
+          (* Mega hack *)
+          let+ params = acc in
+          if proto_pollution && String.equal x "target" then
+            (x, Object (`Normal [])) :: params
+          else param :: params
         | Object (`Normal prps) ->
-          let* prps' = unroll_params prps in
+          let* prps' = unroll_params ~proto_pollution prps in
           let+ params = acc in
           List.cons (x, Object (`Normal prps')) params
         | Union tys -> begin
           let* ty = tys in
           match ty with
           | Object (`Normal prps) ->
-            let* prps' = unroll_params prps in
+            let* prps' = unroll_params ~proto_pollution prps in
             let+ params = acc in
             List.cons (x, Object (`Normal prps')) params
           | _ ->
@@ -141,25 +147,25 @@ let rec unroll_params (params : (string * param_type) list) :
   let+ params = loop params [ [] ] in
   List.rev params
 
-let rec unroll (tmpl : t) : t list =
+let rec unroll ~proto_pollution (tmpl : t) : t list =
   let open List in
   let cs =
-    let+ params = unroll_params tmpl.params in
+    let+ params = unroll_params ~proto_pollution tmpl.params in
     { tmpl with params }
   in
   match tmpl.cont with
   | None | Some (Client _) -> cs
   | Some (Return cont) ->
-    let* conf = unroll cont in
+    let* conf = unroll ~proto_pollution cont in
     let+ c = cs in
     { c with cont = Some (Return conf) }
   | Some (Sequence cont) ->
-    let* conf = unroll cont in
+    let* conf = unroll ~proto_pollution cont in
     let+ c = cs in
     { c with cont = Some (Sequence conf) }
 
 module Parser : sig
-  val from_file : Fpath.t -> (t list, [> Instrument_result.err ]) result
+  val from_file : proto_pollution:bool -> Fpath.t -> (t list, [> Instrument_result.err ]) result
 end = struct
   open Result
   module Json = Yojson.Basic
@@ -172,7 +178,7 @@ end = struct
     | "string" -> Ok String
     | "bool" | "boolean" -> Ok Boolean
     | "function" -> Ok Function
-    | "array" -> Ok (Array [ String ])
+    | "array" -> Ok (Array [ String; String ])
     | "object" -> Ok (Object (`Normal []))
     | "polluted_object1" -> Ok (Object (`Polluted 1))
     | "polluted_object2" -> Ok (Object (`Polluted 2))
@@ -318,12 +324,12 @@ end = struct
       let+ tree = t_of_json tree in
       Some (Return tree)
 
-  let from_file fname =
+  let from_file ~proto_pollution fname =
     let fname = Fpath.to_string fname in
     match Json.from_file ~fname fname with
     | exception Yojson.Json_error msg -> Error (`Malformed_json msg)
     | json ->
       let* vulns = list json in
       let+ vulns = list_map t_of_json vulns in
-      List.concat_map unroll vulns
+      List.concat_map (unroll ~proto_pollution) vulns
 end
