@@ -128,6 +128,11 @@ let rec unroll_params ~proto_pollution (params : (string * param_type) list) :
           let+ params = acc in
           List.cons (x, Object (`Normal prps')) params
         | Union tys -> begin
+          let tys =
+            if proto_pollution && List.mem (Array [ String ]) tys then
+              tys @ [ Array [ String; String ] ]
+            else tys
+          in
           let* ty = tys in
           match ty with
           | Object (`Normal prps) ->
@@ -138,6 +143,18 @@ let rec unroll_params ~proto_pollution (params : (string * param_type) list) :
             let+ params = acc in
             List.cons (x, ty) params
         end
+        | Array [ String ] ->
+          let lst1 =
+            let+ acc in
+            List.cons param acc
+          in
+          let lst2 =
+            if proto_pollution then
+              let+ acc in
+              List.cons (x, Array [ String; String ]) acc
+            else []
+          in
+          lst1 @ lst2
         | _ ->
           let+ params = acc in
           List.cons param params
@@ -165,7 +182,10 @@ let rec unroll ~proto_pollution (tmpl : t) : t list =
     { c with cont = Some (Sequence conf) }
 
 module Parser : sig
-  val from_file : proto_pollution:bool -> Fpath.t -> (t list, [> Instrument_result.err ]) result
+  val from_file :
+       proto_pollution:bool
+    -> Fpath.t
+    -> (t list, [> Instrument_result.err ]) result
 end = struct
   open Result
   module Json = Yojson.Basic
@@ -178,7 +198,7 @@ end = struct
     | "string" -> Ok String
     | "bool" | "boolean" -> Ok Boolean
     | "function" -> Ok Function
-    | "array" -> Ok (Array [ String; String ])
+    | "array" -> Ok (Array [ String ])
     | "object" -> Ok (Object (`Normal []))
     | "polluted_object1" -> Ok (Object (`Polluted 1))
     | "polluted_object2" -> Ok (Object (`Polluted 2))
