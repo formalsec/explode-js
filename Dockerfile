@@ -14,12 +14,13 @@ RUN apt-get update && \
 # Install Node.js
 RUN mkdir -p /etc/apt/keyrings \
     && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
-    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_21.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list \
+    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_23.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list \
     && apt update \
     && apt install nodejs -y
 
 # Install Neo4j
 ENV NEO4J_HOME="/var/lib/neo4j"
+# FIXME: Don't use apt-key. Follow the same approach as Node.js above
 RUN wget -O - https://debian.neo4j.com/neotechnology.gpg.key | apt-key add - && \
     echo 'deb https://debian.neo4j.com stable 5' | tee -a /etc/apt/sources.list.d/neo4j.list && \
     apt-get update && \
@@ -49,7 +50,7 @@ WORKDIR /home/explodejs
 # Build graphjs and emca-sl
 COPY --chown=explodejs:explodejs . /home/explodejs/explode-js
 
-# Remove .git dirs
+# Remove .git dirs to free some space
 RUN rm -rf /home/explodejs/explode-js/.git \
     &&  rm -rf /home/explodejs/explode-js/vendor/graphjs/.git \
     &&  rm -rf /home/explodejs/explode-js/vendor/ECMA-SL/.git \
