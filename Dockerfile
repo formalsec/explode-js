@@ -60,7 +60,7 @@ RUN rm -rf /home/explodejs/explode-js/.git \
 
 RUN cd "${BASE}/explode-js/vendor/graphjs" \
     && sudo pip install --break-system-packages -r ./requirements.txt \
-    && cd ./parser && sudo npm install && tsc
+    && cd ./parser && sudo npm install && npm exec tsc
 
 RUN opam init --disable-sandboxing --shell-setup -y \
     && opam switch create -y ecma-sl 5.3.0 \
