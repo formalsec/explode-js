@@ -14,7 +14,7 @@ let _valid_fpath = Arg.conv (parse_fpath Bos.OS.Path.exists, Fpath.pp)
 
 let non_dir_fpath = Arg.conv (parse_fpath Bos.OS.File.exists, Fpath.pp)
 
-let _dir_fpath = Arg.conv (parse_fpath Bos.OS.Dir.exists, Fpath.pp)
+let dir_fpath = Arg.conv (parse_fpath Bos.OS.Dir.exists, Fpath.pp)
 
 let debug =
   let doc = "Debug mode." in
@@ -32,6 +32,11 @@ let input_file =
 let input_file_opt =
   let doc = "Overwrite input file in scheme_path" in
   Arg.(value & opt (some fpath) None & info [ "filename" ] ~doc)
+
+let input_dir =
+  let docv = "DIR" in
+  let doc = "Name of the input directory containing the package." in
+  Arg.(value & pos 0 dir_fpath (Fpath.v "./") & info [] ~doc ~docv)
 
 let workspace_dir =
   let doc = "Directory to store intermediate results" in
@@ -157,6 +162,19 @@ let cmd_instrument =
   Cmd_instrument.run ~debug ~mode ~scheme_file ~original_file ~witness_file
     ~output_path
 
+let info_package =
+  let doc = "Explode.js full package analysis" in
+  let description = "Tries to blow stuff up" in
+  let man = [ `S Manpage.s_description; `P description ] in
+  let man_xrefs = [] in
+  Cmd.info "package" ~doc ~sdocs ~man ~man_xrefs
+
+let cmd_package =
+  let+ proto_pollution
+  and+ workspace_dir
+  and+ input_dir in
+  Cmd_package.run ~proto_pollution ~workspace_dir ~input_dir
+
 let v :
   ( int
   , [ `Expected_assoc
@@ -177,4 +195,5 @@ let v :
     ; Cmd.v info_run cmd_run
     ; Cmd.v info_full cmd_full
     ; Cmd.v info_instrument cmd_instrument
+    ; Cmd.v info_package cmd_package
     ]

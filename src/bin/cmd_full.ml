@@ -1,15 +1,6 @@
 open Explode_js
 open Result
 
-type options =
-  { filename : Fpath.t
-  ; workspace_dir : Fpath.t
-  ; time_limit : float option
-  }
-
-let options filename workspace_dir time_limit =
-  { filename; workspace_dir; time_limit }
-
 let run_with_timeout limit f =
   let exception Sigchld in
   let open Unix in
@@ -43,7 +34,7 @@ let full ~deterministic ~lazy_values ~proto_pollution ~enumerate_all package_dir
     (* 1. Run graphjs *)
     let graphjs_start = Unix.gettimeofday () in
     let* status =
-      Graphjs.run ~optimized_import ~file:input_file ~output:workspace_dir
+      Graphjs.run ~optimized_import ~file:input_file ~output:workspace_dir ()
     in
     let graphjs_time = Unix.gettimeofday () -. graphjs_start in
     let _ = Bos.OS.File.writef graphjs_time_path "%f@." graphjs_time in
