@@ -17,8 +17,9 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          submodules: true
+
+      - name: Checkout Submodules
+        run: git submodule update --init
 
       - name: Set Branch Name
         run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/docker/})" >> $GITHUB_ENV
