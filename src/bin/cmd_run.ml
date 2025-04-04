@@ -1,11 +1,6 @@
 open Explode_js
 open Result
 
-let copy_file src dst =
-  let open Bos in
-  let* content = OS.File.read src in
-  OS.File.write dst content
-
 let with_workspace ~proto_pollution workspace_dir scheme_path package_dir
   filename f =
   let _timestamp =
@@ -73,12 +68,12 @@ let with_workspace ~proto_pollution workspace_dir scheme_path package_dir
             end
             else Ok ()
           in
-          copy_file fpath fpath' )
+          Utils.copy_file fpath fpath' )
       schemes
   in
   let* scheme_path =
     let file_base = Fpath.base scheme_path in
-    let* () = copy_file scheme_path Fpath.(workspace_dir // file_base) in
+    let* () = Utils.copy_file scheme_path Fpath.(workspace_dir // file_base) in
     Ok file_base
   in
   (* Copy filename and package.json if they exist *)
@@ -87,13 +82,13 @@ let with_workspace ~proto_pollution workspace_dir scheme_path package_dir
     | None -> Ok None
     | Some file ->
       let file_base = Fpath.base file in
-      let* () = copy_file file Fpath.(workspace_dir // file_base) in
+      let* () = Utils.copy_file file Fpath.(workspace_dir // file_base) in
       let dir = Fpath.parent file in
       let pkg = Fpath.(dir / "package.json") in
       let* file_exists = Bos.OS.File.exists pkg in
       let* () =
         if not file_exists then Ok ()
-        else copy_file pkg Fpath.(workspace_dir / "package.json")
+        else Utils.copy_file pkg Fpath.(workspace_dir / "package.json")
       in
       Ok (Some file_base)
   in

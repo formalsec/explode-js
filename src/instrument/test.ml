@@ -14,7 +14,10 @@ let resolve_file dir scheme = function
   | Some f -> f
   | None -> (
     match Scheme.filename scheme with
-    | Some original_file -> Fpath.append dir original_file
+    | Some original_file ->
+      (* If path is relative, it is relative to the scheme dir *)
+      if Fpath.is_abs original_file then original_file
+      else Fpath.append dir original_file
     | None -> assert false )
 
 module Symbolic = struct
