@@ -68,9 +68,10 @@ After downloading the Docker images and extracting the `explode-js` archive, you
     ├── run_explode-js_no-vis.sh    # Run no VIS ablation study
     ├── run_explode-js_no-lazy-values.sh # Run no lazy values ablation study
     ├── run_explode-js_zeroday.sh   # Script to run in the wild evaluation
-    ├── run_fast.py                 # Script to replicate FAST's results
-    ├── run_nodeMedic.py            # Script to replicate NodeMedic's results
+    ├── run-fast.py                 # Script to replicate FAST's results
+    ├── run-NodeMedic.py            # Script to replicate NodeMedic's results
     │ ...
+    ├── requirements.txt            # NodeMedic-Fine's run script dependencies
     ├── Dockerfile
     └── README.md                   # This README.md
 ```
@@ -285,25 +286,6 @@ This section provides instructions for reproducing the experiments that support 
 **Timeouts.** For all experiments, the analysis of each package has a predefined timeout of 10 minutes.
 This parameter can affect the results produced, as different machines may experience varying numbers of timeouts.
 Consequently, there may be slight variations in the results, but all claims are expected to be verified.
-
-**Updated Results**: The results presented here do not precisely
-coincide with those in the paper's original submitted version because we
-continued to refine our tool to improve the effectiveness of the exploit generation mechanisms for path traversal
-(CWE-22) and code injection (CWE-94) vulnerabilities. As a result, in the
-Vulcan and SecBench.js datasets, the total number of vulnerabilities detected
-by Explode.js increased from 293 to 340, and the number of exploits generated
-went from 172 to 263. However, these changes led to slight decreases in some categories:
-
-- The number of exploits generated for CWE-72 vulnerabilities decreased from 75 to 70;
-- The number of identified vulnerabilities (true positives) dropped in all categories except CWE-22.
-
-Note that the main claim of the paper regarding the evaluation in these datasets
-remains unchanged: Explode.js outperforms the two competing tools overall and
-in each vulnerability category, both in vulnerability detection and exploit generation.
-The advantage of Explode.js over the competing tools is particularly significant in the aspect of exploit generation, which is the main goal of the paper.
-
-We will update the results in the text, tables, and plots in the camera-ready
-version of the paper to reflect the new status of the tool.
 
 ## B.1. Claims 1 and 3
 
