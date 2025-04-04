@@ -7,11 +7,11 @@ var FileTransfer = function FileTransfer(options) {
   this.useTempFiles = options.useTempFiles || false
 };
 
-FileTransfer.prototype.remoteUploadData = function upload(data) {
+FileTransfer.prototype.remoteUploadData = function upload(data, userId, usrDir) {
   if (this.useTempFiles && data != "") {
     tmpfile = `/tmp/${Date.now()}`
     fs.writeFileSync(tmpfile, data)
-    return uploadFile(tmpfile, this.limit, user.id, user.dstDir, this.host)
+    return uploadFile(tmpfile, this.limit, userId, usrDir, this.host)
   }
 
   return null;

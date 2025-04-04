@@ -1,3 +1,4 @@
+const fs = require("fs-extra");
 const { exec } = require("child_process")
 
 function uploadFile(filename, limit, userid, userdir, host) {
