@@ -287,6 +287,11 @@ This section provides instructions for reproducing the experiments that support 
 This parameter can affect the results produced, as different machines may experience varying numbers of timeouts.
 Consequently, there may be slight variations in the results, but all claims are expected to be verified.
 
+**Updated Results.** The results produced by the artifact are consistent with those in the final accepted version of the paper but differ slightly from those presented in the submitted version because we continued to refine our tool to improve the effectiveness of the exploit generation mechanisms for path traversal (CWE-22) and code injection (CWE-94) vulnerabilities. Specifically, the total number of vulnerabilities detected by Explode.js increased from 293 to **351**, and the number of exploits generated rose from 172 to **278**. The Readme file reproduces the main tables from the accepted paper, but we have also attached the final paper to our last comment in the hotcrp submission page for crosschecking.
+ 
+
+
+
 ## B.1. Claims 1 and 3
 
 The goal of this section is to confirm the updated results presented in Sections 6.1 and 6.3 of the paper;
