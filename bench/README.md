@@ -22,6 +22,7 @@ The evaluation of this artifact does not depend on specific hardware. However, t
 
 - Linux (tested with Ubuntu Ubuntu 24.04.2 LTS and Debian 10/11);
 - Docker (tested with version 28.0.1);
+- Python >= 3.11.11
 - 32GiB RAM;
 - Stable internet connection (Explode-js requires npm install to validate exploits).
 
@@ -34,37 +35,45 @@ We estimate that the time needed to run the artifact evaluation is as follows:
 - Main experiments: 34-48 hours (approximately).
 
 **Artifact Structure.**
-The artifact is organized as follows:
+
+The artifact includes three Docker containers: `explode-js_image.tar.gz`, `fast_image.tar.gz`, and `nodemedic_image.tar.gz`. The first container corresponds to Explode.js, our tool, while the second and third correspond to FAST and NodeMedic-Fine, the main competing tools. Each tool's experiments should be executed with its designated Docker container. Please ensure you download all three container images to your pc before proceeding.
+
+Along with the Docker images, the artifact includes the archive `explode-js.zip`, which contains the scripts required to run the experiments. Extract it using:
+
+```sh
+$ unzip explode-js.zip
+```
+
+After downloading the Docker images and extracting the `explode-js` archive, your directory structure should be organized as follows:
 
 ```
-Explode.js
-├── bench
-│   ├── datasets                # Benchmarks to be evaluated
-│   │   ├── secbench-dataset
-│   │   ├── vulcan-dataset
-│   │   ├── zeroday
-│   │   └── fast-pocs           # Manual PoC created for FAST
-│   ├── fast                    # Submodule with the FAST tool repository
-│   ├── NodeMedic               # Submodule with the NodeMedic-Fine tool repository
-│   └── plots                   # Scripts to run experiments and setup
-├── example                     # Example programs for Explode.js
-│   └── running-example         # Running example code
-├── run_explode-js.sh           # Script to replicate Explode.js's results
-├── run_explode-js_cwe{22|78|94|1321}.sh  # Run single categories
-├── run_explode-js_no-vis.sh    # Run no VIS ablation study
-├── run_explode-js_no-lazy-values.sh # Run no lazy values ablation study
-├── run_explode-js_zeroday.sh   # Script to run in the wild evaluation
-├── run_fast.py                 # Script to replicate FAST's results
-├── run_nodeMedic.py            # Script to replicate NodeMedic's results
+.
 ├── explode-js_image.tar.gz     # Explode.js's Docker image
 ├── fast_image.tar.gz           # FAST's Docker image
 ├── nodemedic_image.tar.gz      # NodeMedic's Docker image
-│ ...
-├── Dockerfile
-└── README.md                   # This README.md
+└── explode-js
+    ├── bench
+    │   ├── datasets                # Benchmarks to be evaluated
+    │   │   ├── secbench-dataset
+    │   │   ├── vulcan-dataset
+    │   │   ├── zeroday
+    │   │   └── fast-pocs           # Manual PoC created for FAST
+    │   ├── fast                    # Submodule with the FAST tool repository
+    │   ├── NodeMedic               # Submodule with the NodeMedic-Fine tool repository
+    │   └── plots                   # Scripts to run experiments and setup
+    ├── example                     # Example programs for Explode.js
+    │   └── command-injection       # Running example code
+    ├── run_explode-js.sh           # Script to replicate Explode.js's results
+    ├── run_explode-js_cwe{22|78|94|1321}.sh  # Run single categories
+    ├── run_explode-js_no-vis.sh    # Run no VIS ablation study
+    ├── run_explode-js_no-lazy-values.sh # Run no lazy values ablation study
+    ├── run_explode-js_zeroday.sh   # Script to run in the wild evaluation
+    ├── run_fast.py                 # Script to replicate FAST's results
+    ├── run_nodeMedic.py            # Script to replicate NodeMedic's results
+    │ ...
+    ├── Dockerfile
+    └── README.md                   # This README.md
 ```
-
-The artifact includes three Docker containers: `explode-js_image.tar.gz`, `fast_image.tar.gz`, and `nodemedic_image.tar.gz`. The first container corresponds to Explode.js, our tool, while the second and third correspond to FAST and NodeMedic-Fine, the main competing tools. Each tool's experiments should be executed with its designated Docker container.
 
 ## A.2. Getting Started with Explode.js
 
@@ -81,7 +90,7 @@ To ensure that the image is loaded correctly and that the tool is functioning as
 ```sh
 $ docker run --rm -it explode-js:latest bash
 $ cd explode-js/example
-$ explode-js full running-example/index.js
+$ explode-js full command-injection/index.js
 ```
 
 **Output.** Running the command above generate an exploit for the vulnerability in the source code of the running example. The output of the previous command should be:
@@ -125,17 +134,14 @@ $ explode-js full running-example/index.js
 "Uncaught TypeError"
 "Uncaught TypeError"
 "File too big"
-Exec failure: (str.++
-               ((str.++
-                 ((str.++
-                   ((str.++ ((str.++ ("rsync -av /tmp/0 ", id)), "@")),
-                   host)), ":")), dstDir))
-├── Symbolic execution stats: clock: 30.812713s | solver: 30.421486s
+Exec failure: (str.++ ("rsync -av /tmp/0 ", id, "@", host, ":", dstDir))
+├── Symbolic execution stats: clock: 30.529300s | solver: 30.169239s
 ├── ⚠ Detected 1 issue(s)!
 │   ├── ↺ Replaying 2 test case(s)
 │   │   ├── 📄 [1/2] Using test case: ./symbolic_test_0/test-suite/witness-0.json
 │   │   │   ├── Node exited with 0
 │   │   │   └── ✔ Status: Success (created file "./success")
+
 ```
 
 The generated exploit can be found in the file `_results/run/symbolic_test_0/literal_1.js`.
@@ -180,7 +186,7 @@ Importantly, FAST does not generate executable exploits. Instead, it produces a
 log containing information about the vulnerable package function and the
 inputs required to trigger the exploit.
 Below, we provide the relevant fragment of FAST's log for the current example,
-which can be found in the file `cat out/134_fast/fast-stdout.log`:
+which can be found in the file `cat out/134_fast/run_log.log`:
 
 ```
 ...
@@ -202,7 +208,7 @@ Based on the provided log, one can manually construct the following exploit:
 
 ```js
 var sink = require("command-exists");
-var commandName = "''; touch success #";
+var commandName = "''; touch exploited #";
 var callback = function(){};
 sink(commandName, callback);
 ```
@@ -210,14 +216,14 @@ sink(commandName, callback);
 ## A.4. Getting Started with *NodeMedic-Fine*
 
 **Setup.**
-To setup the environment, install the necessary dependencies and load
-the NodeMedic-Fine Docker image, `nodemedic_image.tar.gz`, with the following
-command:
+To setup the environment, install the necessary dependencies (e.g., ensure that python version 3.11 is installed and available) and load the NodeMedic-Fine Docker image, `nodemedic_image.tar.gz`, with the following commands:
 
 ```sh
+# Go into the explode-js directory
+$ cd explode-js
 # Create venv to avoid polluting the system environment
-$ python3 -m venv venv
-$ souce venv/bin/activate
+$ python3 -m venv venv # Please ensure you're running at least python 3.11
+$ source venv/bin/activate
 $ python3 -m pip install -r requirements.txt
 $ docker load < nodemedic_image.tar.gz
 ```
