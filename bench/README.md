@@ -15,7 +15,7 @@ This section includes an introduction to the Explode.js tool, along with its req
 ## A.1. Description & Requirements
 
 **How to Access.**
-The artifact is available as a persistent DOI at [10.5281/zenodo.15009157](10.5281/zenodo.15009157).
+The artifact is available as a persistent DOI at [10.5281/zenodo.15151280](10.5281/zenodo.15151280).
 
 **Dependencies.**
 The evaluation of this artifact does not depend on specific hardware. However, the following software and hardware specifications are recommended:
@@ -62,6 +62,7 @@ After downloading the Docker images and extracting the `explode-js` archive, you
     │   ├── NodeMedic               # Submodule with the NodeMedic-Fine tool repository
     │   └── plots                   # Scripts to run experiments and setup
     ├── example                     # Example programs for Explode.js
+    │   ├── package-example         # Package version of the running example
     │   └── command-injection       # Running example code
     ├── run_explode-js.sh           # Script to replicate Explode.js's results
     ├── run_explode-js_cwe{22|78|94|1321}.sh  # Run single categories
@@ -85,7 +86,7 @@ To set up the environment, load the Explode.js Docker image, `explode-js_image.t
 $ docker load < explode-js_image.tar.gz
 ```
 
-**Basic Testing.**
+**Basic Testing (File mode).**
 To ensure that the image is loaded correctly and that the tool is functioning as expected, execute Explode.js on the running example using the following commands:
 
 ```sh
@@ -94,9 +95,9 @@ $ cd explode-js/example
 $ explode-js full command-injection/index.js
 ```
 
-**Output.** Running the command above generate an exploit for the vulnerability in the source code of the running example. The output of the previous command should be:
+Running the command above generate an exploit for the vulnerability in the source code of the running example. The output of the previous command should be:
 
-```
+```sh
 [STEP 1] MDG: Generating...
 
 [STEP 1] MDG: Completed.
@@ -146,6 +147,40 @@ Exec failure: (str.++ ("rsync -av /tmp/0 ", id, "@", host, ":", dstDir))
 ```
 
 The generated exploit can be found in the file `_results/run/symbolic_test_0/literal_1.js`.
+
+**Basic Testing (Package mode).**
+Alternatively, one can run explode-js on a package by using the `explode-js package` command and providing the directory where the package is located. For instance, to run it on the `package-example` directory, simply run:
+
+```sh
+$ docker run --rm -it explode-js:latest bash # if not already in docker
+$ cd explode-js/example # if not already in 'explode-js/example'
+$ explode-js package package-example
+```
+Running the command above generates an exploit for the vulnerability in the package located inside the `package-example` dir. The output of the previous command should be:
+
+```sh
+── PHASE 0: VULNERABILITY DETECTION ──
+Detected 1 potential issue(s):
+├── Issue 0: command-injection @ /home/filipe/projects/explode-js/example/_results/run/index.js:10
+│   └── 10|  return exec(command);
+
+── PHASE 1: TEMPLATE GENERATION ──
+✔ Loaded: ./taint_summary.json
+⚒ Generating 1 template(s):
+├── 📄 ./symbolic_test_0.js
+
+── PHASE 2: ANALYSIS & VALIDATION ──
+◉ [1/1] Procesing ./symbolic_test_0.js
+├── Symbolic execution output:
+"File too big"
+Exec failure: (str.++ ("rsync -av /tmp/0 ", userId, "@", host, ":", usrDir))
+├── Symbolic execution stats: clock: 30.590970s | solver: 30.127096s
+├── ⚠ Detected 1 issue(s)!
+│   ├── ↺ Replaying 2 test case(s)
+│   │   ├── 📄 [1/2] Using test case: ./symbolic_test_0/test-suite/witness-0.json
+│   │   │   ├── Node exited with 0
+│   │   │   └── ✔ Status: Success (created file "./success")
+```
 
 ## A.3. Getting Started with FAST
 
@@ -283,14 +318,11 @@ The core techniques of Explode.js (VISes and lazy values) are key to its effecti
 
 This section provides instructions for reproducing the experiments that support the claims of the paper.
 
-**Timeouts.** For all experiments, the analysis of each package has a predefined timeout of 10 minutes.
+**Timeouts.** For all experiments, the analysis of each package has a predefined timeout of 5 minutes.
 This parameter can affect the results produced, as different machines may experience varying numbers of timeouts.
 Consequently, there may be slight variations in the results, but all claims are expected to be verified.
 
-**Updated Results.** The results produced by the artifact are consistent with those in the final accepted version of the paper but differ slightly from those presented in the submitted version because we continued to refine our tool to improve the effectiveness of the exploit generation mechanisms for path traversal (CWE-22) and code injection (CWE-94) vulnerabilities. Specifically, the total number of vulnerabilities detected by Explode.js increased from 293 to **351**, and the number of exploits generated rose from 172 to **278**. The Readme file reproduces the main tables from the accepted paper, but we have also attached the final paper to our last comment in the hotcrp submission page for crosschecking.
- 
-
-
+**Updated Results.** The results produced by the artifact are consistent with those in the final accepted version of the paper but differ slightly from those presented in the submitted version because we continued to refine our tool to improve the effectiveness of the exploit generation mechanisms for path traversal (CWE-22) and code injection (CWE-94) vulnerabilities. Specifically, the total number of vulnerabilities detected by Explode.js increased from 293 to 351, and the number of exploits generated rose from 172 to 278. The Readme file reproduces the main tables from the accepted paper, but we have also attached the final paper to our last comment in the hotcrp submission page for crosschecking.
 
 ## B.1. Claims 1 and 3
 
@@ -305,10 +337,10 @@ In the following, we explain how to do this separately for each tool.
 | CWE ID   |  Total |  TP (Explode-js) |   E (Explode-js) | TP (FAST) | E (FAST) | TP (NodeMedic) | E (NodeMedic) |
 |----------|--------|-----|-----|----|----|----|----|
 | CWE-22   |    166 |  97 |  84 | 6 | 0 | -- | -- |
-| CWE-78   |    169 | 111 |  70 | 108 | 66 | 51 | 49 |
-| CWE-94   |     54 |  24 |  11 | 7 | 3 | 17 | 5 |
-| CWE-1321 |    214 | 108 |  98 | 0 | 0 | -- | -- |
-| Total    |    603 | 340 | 263 | 119 | 69 | 68 | 44 |
+| CWE-78   |    169 | 112 |  70 | 108 | 66 | 51 | 49 |
+| CWE-94   |     54 |  24 |  13 | 7 | 3 | 17 | 5 |
+| CWE-1321 |    214 | 118 | 111 | 0 | 0 | -- | -- |
+| Total    |    603 | 351 | 278 | 119 | 69 | 68 | 44 |
 
 Where:
 
