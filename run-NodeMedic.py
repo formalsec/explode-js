@@ -129,7 +129,9 @@ def benchmark(datasets, outputs, packages, cwes):
     # Run
     print(f'[*] {len(data)} package(s) selected for benchmarking')
     for exploit in data:
-        print(f'[-] Running: {exploit['package']}@{exploit['version']}')
+        package = exploit['package']
+        version = exploit['version']
+        print(f'[-] Running: {package}@{version}')
         run_package(exploit, outputs)
 
 
