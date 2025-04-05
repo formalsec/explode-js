@@ -1,5 +1,6 @@
 import os
 import csv
+from table_nodemedic import fix_cwe_ty
 
 def parse_csv(fpath):
     if not os.path.exists(fpath):
@@ -57,8 +58,8 @@ def main():
     cwe1321_times = []
 
     for row in csv[1:]:
-        ty = row[2]
-        time = float(row[6])
+        ty = fix_cwe_ty(row[3])
+        time = float(row[5])
         match ty:
             case "CWE-22":
                 cwe22_times.append(time)
