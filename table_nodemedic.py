@@ -37,6 +37,15 @@ def print_markdown_table(tbl):
             e_w=col_widths["E"], total_w=col_widths["Total"]
         ))
 
+def fix_cwe_ty(ty):
+    # FIXME: I don't know why this happens, but 2 vulnerabilities reported by
+    # nodemedic have incorrect CWE types here. Look at index to see?
+    if ty == "CWE-22":
+        return "CWE-78"
+    if ty == "CWE-1321":
+        return "CWE-94"
+    return ty
+
 def main():
     tbl = {
         "CWE-22": { "tp" : 0, "e" : 0, "total" : 166 },
@@ -48,13 +57,15 @@ def main():
     csv_file = "./nodeMedic-parsed-results.csv"
     csv = parse_csv(csv_file)
     for row in csv[1:]:
-        ty = row[3]
+        ty = fix_cwe_ty(row[3])
         tp = row[6]
         e = row[7]
         if tp == "true":
             tbl[ty]["tp"] += 1
+            tbl["Total"]["tp"] += 1
         if e == "true":
             tbl[ty]["e"] += 1
+            tbl["Total"]["e"] += 1
 
     print_markdown_table(tbl)
 

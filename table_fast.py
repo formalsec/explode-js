@@ -52,6 +52,7 @@ def main():
         tp = row[9]
         if tp == "successful":
             tbl[ty]["tp"] += 1
+            tbl["Total"]["tp"] += 1
 
     print_markdown_table(tbl)
 
