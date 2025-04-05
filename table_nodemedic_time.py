@@ -17,7 +17,7 @@ def print_markdown_table(tbl):
     # Determine column widths
     col_widths = {
         "CWE ID": max(len(cwe) for cwe in tbl.keys()),
-        "Total": 6
+        "Total": 9
     }
 
     # Formatting template
@@ -25,7 +25,7 @@ def print_markdown_table(tbl):
 
     # Print header
     print(row_format.format(
-        cwe="CWE ID", total="Total",
+        cwe="CWE ID", total="Avg. Time",
         cwe_w=col_widths["CWE ID"], total_w=col_widths["Total"]
     ))
 
@@ -46,7 +46,7 @@ def main():
         "CWE-78": { "total" : 0. },
         "CWE-94": { "total" : 0. },
         "CWE-1321": { "total" : 0. },
-        "Total" : {  "total" : 0. }
+        "Global Avg." : {  "total" : 0. }
     }
 
     csv_file = "./nodeMedic-parsed-results.csv"
@@ -75,7 +75,7 @@ def main():
     tbl["CWE-94"]["total"] = round(safe_div(sum(cwe94_times),len(cwe94_times)), 3)
     tbl["CWE-1321"]["total"] = round(safe_div(sum(cwe1321_times),len(cwe1321_times)), 3)
     total_times = cwe22_times + cwe78_times + cwe94_times + cwe1321_times
-    tbl["Total"]["total"] = round(safe_div(sum(total_times),len(total_times)), 3)
+    tbl["Global Avg."]["total"] = round(safe_div(sum(total_times),len(total_times)), 3)
 
     print_markdown_table(tbl)
 

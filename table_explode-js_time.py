@@ -27,7 +27,7 @@ def print_markdown_table(tbl):
         "CWE ID": max(len(cwe) for cwe in tbl.keys()),
         "Static": 6,
         "Symbolic": 8,
-        "Total": 6
+        "Global Avg.": 9
     }
 
     # Formatting template
@@ -35,20 +35,20 @@ def print_markdown_table(tbl):
 
     # Print header
     print(row_format.format(
-        cwe="CWE ID", tp="Static", e="Symbolic", total="Total",
+        cwe="CWE ID", tp="Static", e="Symbolic", total="Avg. Time",
         cwe_w=col_widths["CWE ID"], tp_w=col_widths["Static"],
-        e_w=col_widths["Symbolic"], total_w=col_widths["Total"]
+        e_w=col_widths["Symbolic"], total_w=col_widths["Global Avg."]
     ))
 
     # Print separator
-    print("|" + "-" * (col_widths["CWE ID"] + 2) + "|" + "-" * (col_widths["Static"] + 2) + "|" + "-" * (col_widths["Symbolic"] + 2) + "|" + "-" * (col_widths["Total"] + 2) + "|")
+    print("|" + "-" * (col_widths["CWE ID"] + 2) + "|" + "-" * (col_widths["Static"] + 2) + "|" + "-" * (col_widths["Symbolic"] + 2) + "|" + "-" * (col_widths["Global Avg."] + 2) + "|")
 
     # Print rows
     for cwe, values in tbl.items():
         print(row_format.format(
             cwe=cwe, tp=values['static'], e=values['symbolic'], total=values['total'],
             cwe_w=col_widths["CWE ID"], tp_w=col_widths["Static"],
-            e_w=col_widths["Symbolic"], total_w=col_widths["Total"]
+            e_w=col_widths["Symbolic"], total_w=col_widths["Global Avg."]
         ))
 
 
@@ -59,7 +59,7 @@ def main():
         "CWE-78": { "static" : 0., "symbolic" : 0., "total" : 0. },
         "CWE-94": { "static" : 0., "symbolic" : 0., "total" : 0. },
         "CWE-1321": { "static" : 0., "symbolic" : 0., "total" : 0. },
-        "Total" : { "static" : 0., "symbolic": 0., "total" : 0. }
+        "Global Avg." : { "static" : 0., "symbolic": 0., "total" : 0. }
     }
     cwe22_times = os.path.join(cwe22_path, "**", "explode_time.txt")
     cwe22_explode_times = glob.glob(cwe22_times, recursive=True)
@@ -105,10 +105,10 @@ def main():
 
     total_graphjs_time = cwe22_graphjs_times + cwe78_graphjs_times + cwe94_graphjs_times + cwe1321_graphjs_times
     total_explode_time = cwe22_explode_times + cwe78_explode_times + cwe94_explode_times + cwe1321_explode_times
-    tbl["Total"]["static"] = round(safe_div(sum(total_graphjs_time),len(total_graphjs_time)), 3)
-    tbl["Total"]["symbolic"] = round(safe_div(sum(total_explode_time),len(total_graphjs_time)), 3)
+    tbl["Global Avg."]["static"] = round(safe_div(sum(total_graphjs_time),len(total_graphjs_time)), 3)
+    tbl["Global Avg."]["symbolic"] = round(safe_div(sum(total_explode_time),len(total_graphjs_time)), 3)
     total_times = list(map(lambda t: t[0]+ t[1], zip(total_graphjs_time, total_explode_time)))
-    tbl["Total"]["total"] = round(safe_div(sum(total_times), len(total_times)), 3)
+    tbl["Global Avg."]["total"] = round(safe_div(sum(total_times), len(total_times)), 3)
 
     print_markdown_table(tbl)
 

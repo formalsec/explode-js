@@ -359,7 +359,7 @@ NodeMedic does not detect or generate exploits for CWE-22 and CWE-1321, which co
 | CWE-78   | 40.521s | 20.405s | 39.311s |
 | CWE-94   | 54.873s | 5.939s | 18.824s |
 | CWE-1321 | 42.112s | 19.130s | -- |
-| Total    | 39.728s | 13.674s | 19.730s |
+| Global Average Time | 39.728s | 13.674s | 19.730s |
 
 Where we place in each cell the average time that the respective tool took to
 analyze the vulnerabilities of the corresponding category.
