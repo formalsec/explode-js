@@ -492,11 +492,27 @@ $ python3 run-fast.py datasets/ out --cwes CWE-94
 $ python3 run-fast.py datasets/ out --cwes CWE-1321
 ```
 
+And, subsequently:
+
+```sh
+$ python3 table_fast.py
+# Or
+$ python3 table_fast_time.py
+```
+
 **NodeMedic-Fine**:
 
 ```sh
 $ python3 run-NodeMedic.py bench/datasets outputs --cwes CWE-78
 $ python3 run-NodeMedic.py bench/datasets outputs --cwes CWE-94
+```
+
+And, subsequently:
+
+```sh
+$ python3 table_nodemedic.py
+# Or
+$ python3 table_nodemedic_time.py
 ```
 
 ## B.2. Claim 2
