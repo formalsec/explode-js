@@ -1,6 +1,15 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
+import matplotlib
+
+import matplotlib.font_manager as font_manager
+
+matplotlib.rcParams['pdf.fonttype'] = 42  # Type 42 = TrueType
+matplotlib.rcParams['ps.fonttype'] = 42
+
+plt.rcParams['font.family'] = 'Liberation Sans'
+
 # CSV files
 csv_fast = "fast-vulcan-secbench-results.csv"
 csv_nodemedic = "nodemedic-vulcan-secbench-results.csv"

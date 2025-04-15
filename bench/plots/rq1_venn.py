@@ -1,9 +1,17 @@
 import os
 import utils
 
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 from matplotlib_venn import venn3, venn2
+
+import matplotlib.font_manager as font_manager
+
+matplotlib.rcParams['pdf.fonttype'] = 42  # Type 42 = TrueType
+matplotlib.rcParams['ps.fonttype'] = 42
+
+plt.rcParams['font.family'] = 'Liberation Sans'
 
 index = utils.load_json("datasets/index.json")
 index_by_file = {}
