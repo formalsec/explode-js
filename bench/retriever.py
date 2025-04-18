@@ -9,9 +9,9 @@ def read_json(file):
 
 package = sys.argv[1]
 
-index = read_json("./bench/datasets/index.json")
+index = read_json("./datasets/index.json")
 
-zeroday_index = read_json("./bench/datasets/index-zeroday.json")
+zeroday_index = read_json("./datasets/index-zeroday.json")
 
 def search_index(index):
     results = []
@@ -50,9 +50,9 @@ if groundtruth == []:
     if zeroday_index == []:
         print(f"Could not find package: {package}", file=sys.stderr)
         sys.exit(1)
-    search_dir("bench/datasets/zeroday-output", zeroday)
+    search_dir("datasets/zeroday-output", zeroday)
 else:
-    search_dir("bench/datasets/CWE-22", groundtruth)
-    search_dir("bench/datasets/CWE-78", groundtruth)
-    search_dir("bench/datasets/CWE-94", groundtruth)
-    search_dir("bench/datasets/CWE-1321", groundtruth)
+    search_dir("datasets/CWE-22", groundtruth)
+    search_dir("datasets/CWE-78", groundtruth)
+    search_dir("datasets/CWE-94", groundtruth)
+    search_dir("datasets/CWE-1321", groundtruth)

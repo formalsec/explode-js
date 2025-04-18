@@ -1,10 +1,10 @@
 import os
 import glob
 
-cwe22_path = "./bench/datasets/CWE-22"
-cwe78_path = "./bench/datasets/CWE-78"
-cwe94_path = "./bench/datasets/CWE-94"
-cwe1321_path = "./bench/datasets/CWE-1321"
+cwe22_path = "./datasets/CWE-22"
+cwe78_path = "./datasets/CWE-78"
+cwe94_path = "./datasets/CWE-94"
+cwe1321_path = "./datasets/CWE-1321"
 
 def static_time(file):
     dir = os.path.dirname(file)

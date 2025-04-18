@@ -2,3 +2,5 @@ matplotlib
 matplotlib_venn
 latextable
 pandas
+tabulate==0.9.0
+pandas==2.2.3
