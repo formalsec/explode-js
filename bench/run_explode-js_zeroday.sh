@@ -2,7 +2,7 @@
 
 pgrep -f "neo4j" > /dev/null || neo4j start
 
-pushd bench/datasets
+pushd datasets
 
 runner run \
   --run-mode full-zeroday \

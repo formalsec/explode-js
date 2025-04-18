@@ -2,7 +2,7 @@
 
 pgrep -f "neo4j" > /dev/null || neo4j start
 
-pushd bench/datasets
+pushd datasets
 
 runner run \
   --run-mode run-no-vis \
@@ -12,4 +12,4 @@ runner run \
 
 popd
 
-python3 table_explode-js2.py bench/datasets/no-vis/results.csv
+python3 table_explode-js2.py datasets/no-vis/results.csv

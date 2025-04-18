@@ -2,13 +2,14 @@
 
 pgrep -f "neo4j" > /dev/null || neo4j start
 
-pushd bench/datasets
+pushd datasets
 
 runner run \
   --run-mode full \
+  --proto-pollution \
   --timeout 300 \
-  --filter CWE-22 \
-  --output CWE-22 \
+  --filter CWE-1321 \
+  --output CWE-1321 \
   ./index.json
 
 popd

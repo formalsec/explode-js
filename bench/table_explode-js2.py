@@ -1,34 +1,19 @@
 import os
 import csv
+import sys
 import json
 
-index_file = "./bench/datasets/index.json"
+index_file = "./datasets/index.json"
 
 def get_index():
     with open(index_file, "r") as fd:
         return json.load(fd)
-
-cwe22_file = "./bench/datasets/CWE-22/results.csv"
-cwe78_file = "./bench/datasets/CWE-78/results.csv"
-cwe94_file = "./bench/datasets/CWE-94/results.csv"
-cwe1321_file = "./bench/datasets/CWE-1321/results.csv"
 
 def parse_csv(fpath):
     if not os.path.exists(fpath):
         return []
     with open(fpath, newline='') as csvfile:
         return list(csv.reader(csvfile, delimiter="|"))
-
-def count(csv, ty, tbl):
-    for row in csv:
-        tp = row[6]
-        if tp == "true":
-            tbl[ty]["tp"] += 1
-            tbl["Total"]["tp"] += 1
-            e = row[7]
-            if e == "true":
-                tbl[ty]["e"] += 1
-                tbl["Total"]["e"] += 1
 
 def print_markdown_table(tbl):
     # Determine column widths
@@ -61,6 +46,9 @@ def print_markdown_table(tbl):
         ))
 
 def main():
+    if len(sys.argv) < 2:
+        print("ERROR: Please provided a csvfile")
+        return 1
     tbl = {
         "CWE-22": { "tp" : 0, "e" : 0, "total" : 166 },
         "CWE-78": { "tp" : 0, "e" : 0, "total" : 169 },
@@ -68,15 +56,27 @@ def main():
         "CWE-1321": { "tp" : 0, "e" : 0, "total" : 214 },
         "Total" : { "tp" : 0, "e": 0, "total" : 603 }
     }
-    cwe22 = parse_csv(cwe22_file)
-    count(cwe22, "CWE-22", tbl)
-    cwe78 = parse_csv(cwe78_file)
-    count(cwe78, "CWE-78", tbl)
-    cwe94 = parse_csv(cwe94_file)
-    count(cwe94, "CWE-94", tbl)
-    cwe1321 = parse_csv(cwe1321_file)
-    count(cwe1321, "CWE-1321", tbl)
+    # index = get_index()
+
+    results_file = sys.argv[1]
+    if not os.path.exists(results_file):
+        print(f"File {results_file} does not exist")
+        return 1
+    results = parse_csv(results_file)
+
+    for row in results:
+        ty = row[3]
+        tp = row[6]
+        if tp == "true":
+            tbl[ty]["tp"] += 1
+            tbl["Total"]["tp"] += 1
+            e = row[7]
+            if e == "true":
+                tbl[ty]["e"] += 1
+                tbl["Total"]["e"] += 1
+
     print_markdown_table(tbl)
+    return 0
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

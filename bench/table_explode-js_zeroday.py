@@ -2,8 +2,8 @@ import os
 import re
 import json
 
-index_file = "./bench/datasets/index-zeroday.json"
-output_dir = "./bench/datasets/zeroday-output"
+index_file = "./datasets/index-zeroday.json"
+output_dir = "./datasets/zeroday-output"
 
 def read_json(input_file):
     with open(input_file, "r") as fd:
