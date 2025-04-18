@@ -60,19 +60,19 @@ After downloading the Docker images and extracting the `explode-js` archive, you
     │   │   └── fast-pocs           # Manual PoC created for FAST
     │   ├── fast                    # Submodule with the FAST tool repository
     │   ├── NodeMedic               # Submodule with the NodeMedic-Fine tool repository
-    │   └── plots                   # Scripts to run experiments and setup
+    │   ├── plots                   # Scripts to run experiments and setup
+    │   ├── run_explode-js.sh       # Script to replicate Explode.js's results
+    │   ├── run_explode-js_cwe{22|78|94|1321}.sh # Run single categories
+    │   ├── run_explode-js_no-vis.sh             # Run no VIS ablation study
+    │   ├── run_explode-js_no-lazy-values.sh     # Run no lazy values ablation study
+    │   ├── run_explode-js_zeroday.sh            # Script to run in the wild evaluation
+    │   ├── run-fast.py             # Script to replicate FAST's results
+    │   ├── run-NodeMedic.py        # Script to replicate NodeMedic's results
+    │   └── requirements.txt        # NodeMedic-Fine's run script dependencies
     ├── example                     # Example programs for Explode.js
     │   ├── package-example         # Package version of the running example
     │   └── command-injection       # Running example code
-    ├── run_explode-js.sh           # Script to replicate Explode.js's results
-    ├── run_explode-js_cwe{22|78|94|1321}.sh  # Run single categories
-    ├── run_explode-js_no-vis.sh    # Run no VIS ablation study
-    ├── run_explode-js_no-lazy-values.sh # Run no lazy values ablation study
-    ├── run_explode-js_zeroday.sh   # Script to run in the wild evaluation
-    ├── run-fast.py                 # Script to replicate FAST's results
-    ├── run-NodeMedic.py            # Script to replicate NodeMedic's results
     │ ...
-    ├── requirements.txt            # NodeMedic-Fine's run script dependencies
     ├── Dockerfile
     └── README.md                   # This README.md
 ```
@@ -258,7 +258,7 @@ To setup the environment, install the necessary dependencies (e.g., ensure that 
 # Load NodeMedic's docker image
 $ docker load < nodemedic_image.tar.gz
 # Go into the explode-js directory
-$ cd explode-js
+$ cd explode-js/bench
 # Create venv to avoid polluting the system environment
 $ python3 -m venv venv # Please ensure you're running at least python 3.11
 $ source venv/bin/activate
@@ -269,7 +269,7 @@ $ python3 -m pip install -r requirements.txt
 To ensure that the image is loaded correctly and that the tool is functioning as expected, execute NodeMedic's running example (the package `ts-process-promises@1.0.2`) using the following command:
 
 ```sh
-$ python3 run-NodeMedic.py bench/datasets out --packages ts-process-promises
+$ python3 run-NodeMedic.py datasets out --packages ts-process-promises
 ```
 
 **Output.** The output of the previous command should be:
@@ -373,7 +373,7 @@ Run the following commands:
 
 ```sh
 $ docker run --rm -it explode-js:latest bash
-$ cd explode-js
+$ cd explode-js/bench
 $ ./run_explode-js.sh
 ```
 
@@ -386,8 +386,8 @@ run the command:
 
 ```sh
 $ python3 retriever.py command-exists
-bench/datasets/CWE-78/134/run/./symbolic_test_0/literal_1.js
-bench/datasets/CWE-78/600/run/./symbolic_test_0/literal_1.js
+datasets/CWE-78/134/run/./symbolic_test_0/literal_1.js
+datasets/CWE-78/600/run/./symbolic_test_0/literal_1.js
 ```
 
 Which outputs the path to the file(s) storing the exploit(s).
@@ -439,8 +439,8 @@ $ python3 table_fast_time.py
 Run the following command in the root of the artifact:
 
 ```sh
-$ cd explode-js
-$ python3 run-NodeMedic.py bench/datasets out && python3 table_nodemedic.py
+$ cd explode-js/bench
+$ python3 run-NodeMedic.py datasets out && python3 table_nodemedic.py
 ```
 
 This will take approximately **5 hours**. The execution was successful if a
@@ -503,8 +503,8 @@ $ python3 table_fast_time.py
 **NodeMedic-Fine**:
 
 ```sh
-$ python3 run-NodeMedic.py bench/datasets outputs --cwes CWE-78
-$ python3 run-NodeMedic.py bench/datasets outputs --cwes CWE-94
+$ python3 run-NodeMedic.py datasets outputs --cwes CWE-78
+$ python3 run-NodeMedic.py datasets outputs --cwes CWE-94
 ```
 
 And, subsequently:
@@ -536,7 +536,7 @@ To run Explode.js on the wild packages in which new vulnerabilities were found, 
 
 ```sh
 $ docker run --rm -it explode-js:latest bash
-$ cd explode-js
+$ cd explode-js/bench
 $ ./run_explode-js_zeroday.sh
 ```
 
@@ -545,13 +545,13 @@ To check the exploit generated for a specific package, say the `aaptjs` package,
 
 ```sh
 $ python3 retriever.py apptjs
-bench/datasets/zeroday-output/0/run/./symbolic_test_6/literal_1.js
-bench/datasets/zeroday-output/0/run/./symbolic_test_5/literal_1.js
-bench/datasets/zeroday-output/0/run/./symbolic_test_4/literal_1.js
-bench/datasets/zeroday-output/0/run/./symbolic_test_3/literal_1.js
-bench/datasets/zeroday-output/0/run/./symbolic_test_2/literal_1.js
-bench/datasets/zeroday-output/0/run/./symbolic_test_1/literal_1.js
-bench/datasets/zeroday-output/0/run/./symbolic_test_0/literal_1.js
+datasets/zeroday-output/0/run/./symbolic_test_6/literal_1.js
+datasets/zeroday-output/0/run/./symbolic_test_5/literal_1.js
+datasets/zeroday-output/0/run/./symbolic_test_4/literal_1.js
+datasets/zeroday-output/0/run/./symbolic_test_3/literal_1.js
+datasets/zeroday-output/0/run/./symbolic_test_2/literal_1.js
+datasets/zeroday-output/0/run/./symbolic_test_1/literal_1.js
+datasets/zeroday-output/0/run/./symbolic_test_0/literal_1.js
 ```
 
 To generate Table 5, run:
@@ -599,7 +599,7 @@ To execute Explode.js with no VISes, run:
 
 ```sh
 $ docker run --rm -it explode-js:latest bash
-$ cd explode-js
+$ cd explode-js/bench
 $ ./run_explode-js_no-vis.sh
 ```
 
@@ -611,7 +611,7 @@ obtain the table with the corresponding results by running
 the command:
 
 ```sh
-$ python3 table_explode-js2.py ./bench/datasets/no-vis/results.csv
+$ python3 table_explode-js2.py ./datasets/no-vis/results.csv
 ```
 
 ### B.3.2 Claim 4.2: No Lazy Values
@@ -620,7 +620,7 @@ To execute Explode.js with no Lazy Values, run:
 
 ```sh
 $ docker run --rm -it explode-js:latest bash
-$ cd explode-js
+$ cd explode-js/bench
 $ ./run_explode-js_no-lazy-values.sh
 ```
 
@@ -632,5 +632,5 @@ obtain the table with the corresponding results by running
 the command:
 
 ```sh
-$ python3 table_explode-js2.py ./bench/datasets/no-lazy-values/results.csv
+$ python3 table_explode-js2.py ./datasets/no-lazy-values/results.csv
 ```
