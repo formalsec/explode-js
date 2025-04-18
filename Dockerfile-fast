@@ -18,23 +18,8 @@ RUN mkdir -p /etc/apt/keyrings \
     && apt update \
     && apt install nodejs -y
 
-# Install Neo4j
-ENV NEO4J_HOME="/var/lib/neo4j"
-RUN wget -O - https://debian.neo4j.com/neotechnology.gpg.key | apt-key add - && \
-    echo 'deb https://debian.neo4j.com stable 5' | tee -a /etc/apt/sources.list.d/neo4j.list && \
-    apt-get update && \
-    apt-get install -y neo4j=1:5.9.0 && \
-    echo dbms.security.auth_enabled=false >> /etc/neo4j/neo4j.conf && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
-    chown -R neo4j:neo4j /var/lib/neo4j && \
-    chown -R neo4j:neo4j /var/log/neo4j && \
-    chmod -R g+rw /var/lib/neo4j && \
-    chmod -R g+rw /var/log/neo4j
-
 # Configure 'explodejs' user
 RUN useradd -ms /bin/bash explodejs && \
-    usermod -aG neo4j explodejs && \
     echo explodejs:explodejs | chpasswd && \
     cp /etc/sudoers /etc/sudoers.bak && \
     echo "explodejs ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
@@ -57,9 +42,9 @@ COPY --chown=explodejs:explodejs ./bench/datasets /home/explodejs/explode-js/dat
 RUN rm -rf /home/explodejs/explode-js/fast/.git \
     && rm -rf /home/explodejs/explode-js/datasets/.git
 
-COPY ./run-fast.py /home/explodejs/explode-js
-COPY ./table_fast.py /home/explodejs/explode-js
-COPY ./table_fast_time.py /home/explodejs/explode-js
+COPY ./bench/run-fast.py /home/explodejs/explode-js
+COPY ./bench/table_fast.py /home/explodejs/explode-js
+COPY ./bench/table_fast_time.py /home/explodejs/explode-js
 
 # Install 'fast'
 RUN python3 -m pip config set global.break-system-packages true
