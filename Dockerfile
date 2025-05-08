@@ -78,3 +78,8 @@ RUN cd "${BASE}/explode-js/" && eval $(opam env --switch=ecma-sl) \
     && cd ../../ && opam install -y . --deps-only --confirm-level=unsafe-yes \
     && dune build @install --profile release \
     && dune install
+
+# Cleanup unavailable resources
+RUN cd "${BASE}/explode-js/" && \
+  rm -rf /home/explodejs/explode-js/vendor/ECMA-SL/_build/default/JS-Interpreters/{ecmaref5,ecmaref6} && \
+  rm -rf /home/explodejs/explode-js/vendor/ECMA-SL/JS-Interpreters/{ecmaref5,ecmaref6}
