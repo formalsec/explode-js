@@ -15,7 +15,7 @@ This section includes an introduction to the Explode.js tool, along with its req
 ## A.1. Description & Requirements
 
 **How to Access.**
-The artifact is available as a persistent DOI at [10.5281/zenodo.15151280](10.5281/zenodo.15151280).
+The artifact is available as a persistent DOI at [10.5281/zenodo.15365110](https://zenodo.org/records/15365110).
 
 **Dependencies.**
 The evaluation of this artifact does not depend on specific hardware. However, the following software and hardware specifications are recommended:
