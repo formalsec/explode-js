@@ -1,0 +1,7 @@
+(mdx
+ (deps
+  %{bin:explode-js}
+  (file index.js)
+  (file utils.js)
+  (file package.json))
+ (files README.md))
