@@ -62,22 +62,15 @@ RUN cd "${BASE}/explode-js/vendor/graphjs" \
     && sudo pip install --break-system-packages -r ./requirements.txt \
     && cd ./parser && sudo npm install && npm exec tsc
 
-RUN opam init --disable-sandboxing --shell-setup -y \
+RUN opam init --bare --disable-sandboxing --shell-setup -y \
+    && sudo apt update \
     && opam switch create -y ecma-sl 5.3.0 \
     && eval $(opam env --switch=ecma-sl) \
     && opam update \
     && echo "eval \$(opam env --switch=ecma-sl)" >> ~/.bash_profile
 
 RUN cd "${BASE}/explode-js/" && eval $(opam env --switch=ecma-sl) \
-  && opam install z3 -y --confirm-level=unsafe-yes
-
-RUN cd "${BASE}/explode-js/" && eval $(opam env --switch=ecma-sl) \
-    && sudo apt update \
-    && cd ./vendor/ECMA-SL && opam install -y . --deps-only --confirm-level=unsafe-yes \
-    && dune build -p ecma-sl --profile release && dune install -p ecma-sl \
-    && cd ../../ && opam install -y . --deps-only --confirm-level=unsafe-yes \
-    && dune build @install --profile release \
-    && dune install
+  && ./setup.ml --skip-graphjs
 
 # Cleanup unavailable resources
 RUN cd "${BASE}/explode-js/" && \
