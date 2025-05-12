@@ -5,16 +5,19 @@
  (libraries bos dune-glob fpath))
 
 (executable
+ (enabled_if false)
  (name fast_df)
  (libraries explode_js.bench owl)
  (modules fast_df))
 
 (executable
+ (enabled_if false)
  (name nodemedic_df)
  (libraries explode_js.bench owl yojson)
  (modules nodemedic_df))
 
 (executable
+ (enabled_if false)
  (name explode_df)
  (libraries explode_js.bench owl yojson)
  (modules explode_df))
