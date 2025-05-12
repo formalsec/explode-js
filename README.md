@@ -51,18 +51,38 @@ For benchmarking and evaluation see [bench]
 [bench]: ./bench
 [examples]: ./example
 
-## Coding Practices
+### Publications
 
-In this project I adopted some practices that made some parts of the code more
-readable to me. So please use them:
+- [Explode.js]: Filipe Marques, Mafalda Ferreira, André Nascimento, Miguel Coimbra, Nuno Santos, Limin Jia, and José Fragoso Santos.
+_"Automated Exploit Generation for Node.js Packages"_, in
+Proceedings of the 46th ACM SIGPLAN Conference on Programming Language Design and Implementation (PLDI'25), 2025.
 
-#### File, Dir, and Path  Variable Naming
+[Explode.js]: https://syssec.dpss.inesc-id.pt/papers/marques_pldi25.pdf
 
-For **file** paths: `<something>_file`, e.g., `input_file`,
-`scheme_file`, `original_file`.
+### License
 
-For **dir** paths: `<something>_dir`, e.g., `nas_dir` or `workspace_dir`.
+See [LICENSE].
 
-For paths which may represent a **dir** or a **file**: `<something>_path`, e.g., `input_path`, `output_path`.
+    MIT License
 
-For the **data** of a file: `<something>_data`, e.g., `module_data`.
+    Copyright (c) 2024 Explode-js
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+[LICENSE]: ./LICENSE
