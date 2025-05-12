@@ -53,4 +53,4 @@ jobs:
         run: opam exec -- dune build @install
 
       - name: Test
-        run: opam exec -- dune runtest
+        run: opam exec -- dune runtest -j 1
