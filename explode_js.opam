@@ -20,7 +20,7 @@ depends: [
   "dune-glob"
   "extunix" {= "dev"}
   "fpath"
-  "mdx"
+  "mdx" {with-test}
   "ocaml"
   "prelude"
   "yojson"

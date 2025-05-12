@@ -34,7 +34,7 @@
   (extunix
    (= "dev"))
   fpath
-  mdx
+  (mdx :with-test)
   ocaml
   ; (owl (>= 1.1))
   prelude
