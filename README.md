@@ -57,7 +57,7 @@ For benchmarking and evaluation see [bench]
 _"Automated Exploit Generation for Node.js Packages"_, in
 Proceedings of the 46th ACM SIGPLAN Conference on Programming Language Design and Implementation (PLDI'25), 2025.
 
-[Explode.js]: https://syssec.dpss.inesc-id.pt/papers/marques_pldi25.pdf
+[Explode.js]: https://www.filipeom.dev/assets/pdf/marques_pldi25.pdf
 
 ### License
 
