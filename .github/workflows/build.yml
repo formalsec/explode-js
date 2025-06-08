@@ -47,7 +47,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          opam install -y . ./vendor/ECMA-SL --deps-only
+          opam install -y . ./vendor/ECMA-SL --deps-only --with-test
           cd vendor/ECMA-SL && opam exec -- dune build @install -p ecma-sl
           opam exec -- dune install -p ecma-sl
           cd ../.. && opam exec -- dune build @install
