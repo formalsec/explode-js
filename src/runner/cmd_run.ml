@@ -115,8 +115,8 @@ let prepare_db db =
   let* () = Run_result.prepare_db db in
   Run_metadata.prepare_db db
 
-let main debug lazy_values proto_pollution _jobs time_limit output_dir filter
-  index run_mode =
+let main ~debug ~lazy_values ~proto_pollution ~jobs:_ ~time_limit ~output_dir
+  ~filter ~run_mode ~index =
   if debug then set_debug ();
   Db.with_db "results.db" @@ fun db ->
   let* () = prepare_db db in
