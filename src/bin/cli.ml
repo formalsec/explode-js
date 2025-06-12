@@ -1,20 +1,20 @@
 open Cmdliner
 open Cmdliner.Term.Syntax
 
-let parse_fpath f str =
-  let file = Fpath.v str in
-  match f file with
+let real_fpath exists s =
+  let file = Fpath.v s in
+  match exists file with
   | Ok true -> Ok file
-  | Ok false -> Error (`Msg (Fmt.str "File '%s' not found!" str))
+  | Ok false -> Error (`Msg (Fmt.str "File '%s' not found!" s))
   | Error _ as err -> err
 
-let fpath = Arg.conv ((fun str -> Ok (Fpath.v str)), Fpath.pp)
+let fpath = Arg.conv (Fpath.of_string, Fpath.pp)
 
-let _valid_fpath = Arg.conv (parse_fpath Bos.OS.Path.exists, Fpath.pp)
+let _valid_fpath = Arg.conv (real_fpath Bos.OS.Path.exists, Fpath.pp)
 
-let non_dir_fpath = Arg.conv (parse_fpath Bos.OS.File.exists, Fpath.pp)
+let non_dir_fpath = Arg.conv (real_fpath Bos.OS.File.exists, Fpath.pp)
 
-let dir_fpath = Arg.conv (parse_fpath Bos.OS.Dir.exists, Fpath.pp)
+let dir_fpath = Arg.conv (real_fpath Bos.OS.Dir.exists, Fpath.pp)
 
 let debug =
   let doc = "Debug mode." in
@@ -103,7 +103,6 @@ let info_exploit =
   Cmd.info "exploit" ~doc ~sdocs ~man ~man_xrefs
 
 let cmd_exploit =
-  (* Term.(const Cmd_exploit.options $ input $ workspace_dir $ time_limit) *)
   let+ input_file
   and+ deterministic
   and+ lazy_values
