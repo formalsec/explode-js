@@ -18,6 +18,8 @@ type t =
   | Full of full_type
   | Run of run_type
 
+let default = Full Regular
+
 let pp fmt = function
   | Full Regular -> Fmt.string fmt "full"
   | Full Zeroday -> Fmt.string fmt "full-zeroday"

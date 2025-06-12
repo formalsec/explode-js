@@ -54,8 +54,9 @@ let to_csv db timestamp _req =
   S.Response.make_string (Ok (Run_result.to_csv_string_short results))
 
 let main addr port db_path =
+let main ~address ~port ~db_path =
   Db.with_db ~mode:`READONLY (Fpath.to_string db_path) @@ fun db ->
-  let server = S.create ~addr ~port () in
+  let server = S.create ~addr:address ~port () in
 
   (* Routes and handlers *)
   S.add_route_handler server S.Route.return (root db);
