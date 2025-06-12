@@ -93,7 +93,7 @@ let prepare_db db =
     |}
   |> Db.to_result
 
-let to_db db { pkg; vuln; raw; report; control_path; exploit; timestamp } =
+let insert_db db { pkg; vuln; raw; report; control_path; exploit; timestamp } =
   Db.exec_no_cursor db
     "INSERT INTO run_results VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
     ~ty:
