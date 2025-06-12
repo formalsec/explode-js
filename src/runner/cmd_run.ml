@@ -75,7 +75,7 @@ let work ~proto_pollution ~lazy_values run_mode db
             }
           in
           Fmt.epr "%a@." (Run_result.pp ~progress:(i, n)) res;
-          Run_result.to_db db res;
+          Run_result.insert_db db res;
           res :: acc
       | Full ty_ ->
         let enumerate_all = Run_mode.dispatch_full ty_ in
@@ -103,7 +103,7 @@ let work ~proto_pollution ~lazy_values run_mode db
           }
         in
         Fmt.epr "%a@." (Run_result.pp ~progress:(i, n)) res;
-        Run_result.to_db db res;
+        Run_result.insert_db db res;
         res :: acc )
     [] vulns
 
