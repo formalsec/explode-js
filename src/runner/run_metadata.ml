@@ -16,7 +16,11 @@ let pp fmt { timestamp; time_limit; output_dir; filter; index } =
 
 let to_jg { timestamp; time_limit; output_dir; filter; index } =
   let open Jingoo in
-  let filter = match filter with None -> "None" | Some f -> Cwe.to_string f in
+  let filter =
+    match filter with
+    | None -> "None"
+    | Some f -> Cwe.to_string f
+  in
   Jg_types.(
     Tobj
       [ ("timestamp", Tint timestamp)
@@ -40,7 +44,11 @@ let prepare_db db =
   |> Db.to_result
 
 let to_db db { timestamp; time_limit; output_dir; filter; index } =
-  let filter = match filter with None -> "None" | Some f -> Cwe.to_string f in
+  let filter =
+    match filter with
+    | None -> "None"
+    | Some f -> Cwe.to_string f
+  in
   Db.exec_no_cursor db "INSERT INTO run_metadata VALUES (?, ?, ?, ?, ?);"
     ~ty:Db.Ty.(p5 int int text text text)
     timestamp time_limit

@@ -142,4 +142,7 @@ let result =
   let id = Filename.(basename (dirname results_file)) in
   main results_file (Format.sprintf "explode-%s.csv" id)
 
-let () = match result with Ok () -> exit 0 | Error (`Msg err) -> failwith err
+let () =
+  match result with
+  | Ok () -> exit 0
+  | Error (`Msg err) -> failwith err

@@ -189,7 +189,9 @@ let parse_results series dir =
       series.exploit <- has_exploit :: series.exploit;
       Ok ()
   in
-  match result with Ok res -> res | Error (`Msg err) -> failwith err
+  match result with
+  | Ok res -> res
+  | Error (`Msg err) -> failwith err
 
 let main () =
   let open Owl in
@@ -224,4 +226,7 @@ let main () =
   let csv_output_path = "nodemedic-vulcan-zeroday.csv" in
   Ok (Dataframe.to_csv ~sep:',' df csv_output_path)
 
-let () = match main () with Ok () -> exit 0 | Error (`Msg err) -> failwith err
+let () =
+  match main () with
+  | Ok () -> exit 0
+  | Error (`Msg err) -> failwith err

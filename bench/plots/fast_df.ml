@@ -151,7 +151,9 @@ let parse_results series dir =
       series.exploit <- Option.value exp ~default:"failed" :: series.exploit;
       Ok ()
   in
-  match result with Ok res -> res | Error (`Msg err) -> failwith err
+  match result with
+  | Ok res -> res
+  | Error (`Msg err) -> failwith err
 
 let main () =
   let open Owl in
@@ -185,4 +187,7 @@ let main () =
   (* Ok (Dataframe.to_csv ~sep:',' df "fast-vulcan-secbench-results.csv") *)
   Ok (Dataframe.to_csv ~sep:',' df "fast-zeroday.csv")
 
-let () = match main () with Ok () -> exit 0 | Error (`Msg err) -> failwith err
+let () =
+  match main () with
+  | Ok () -> exit 0
+  | Error (`Msg err) -> failwith err

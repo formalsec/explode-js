@@ -1,6 +1,11 @@
 let ( let* ) = Result.bind
 
-let has_star str = String.exists (function '*' -> true | _ -> false) str
+let has_star str =
+  String.exists
+    (function
+      | '*' -> true
+      | _ -> false )
+    str
 
 let rec find_glob_parent p =
   let parent = Fpath.parent p in

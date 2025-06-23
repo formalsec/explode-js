@@ -53,7 +53,9 @@ let to_json { ty; pc; pc_path; model; exploit } =
       [ ("pc", `String (Fmt.str "%a" (Smtml.Expr.Set.pretty Smtml.Expr.pp) pc))
       ; ("pc_path", `String (Fpath.to_string pc_path))
       ; ( "model"
-        , match model with None -> `Null | Some model -> model_to_json model )
+        , match model with
+          | None -> `Null
+          | Some model -> model_to_json model )
       ; ("exploit", exploit_to_json exploit)
       ]
   in
