@@ -56,7 +56,9 @@ and expr st =
   match token with
   | Id x -> begin
     let token, _ = State.consume_and_peek st in
-    match token with Dot -> assert false | _ -> Ok x
+    match token with
+    | Dot -> assert false
+    | _ -> Ok x
   end
   | Num f ->
     let _ = State.consume st in

@@ -1,4 +1,5 @@
-(* LL(1) Parser state, keeps the next symbol in `lookahead` without consuming it *)
+(* LL(1) Parser state, keeps the next symbol in `lookahead` without consuming
+   it *)
 type 'a t =
   { mutable lookahead : 'a option
   ; provider : unit -> 'a
@@ -24,4 +25,3 @@ let consume state =
 let consume_and_peek state =
   let _ = consume state in
   peek state
-

@@ -34,4 +34,6 @@ let result =
   ()
 
 let () =
-  match result with Ok () -> () | Error err -> Fmt.failwith "error: %s" err
+  match result with
+  | Ok () -> ()
+  | Error err -> Fmt.failwith "error: %s" err
