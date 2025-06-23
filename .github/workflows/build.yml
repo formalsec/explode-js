@@ -31,9 +31,7 @@ jobs:
 
       - name: Checkout Submodules
         run: |
-          git submodule update --init vendor/graphjs
-          rm -rf vendor/ECMA-SL;
-          git clone git@github.com:formalsec/ECMA-SL.git vendor/ECMA-SL
+          git submodule update --init vendor/graphjs vendor/ECMA-SL
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
