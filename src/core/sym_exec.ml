@@ -1,6 +1,8 @@
 open Bos
 open Result
-include Ecma_sl_symbolic.Symbolic_interpreter.Make (Sym_failure) ()
+open Ecma_sl_symbolic
+module Symbolic_memory = Symbolic_memory.Make (Symbolic_object_default)
+include Symbolic_engine.Make (Symbolic_memory) (Sym_failure) ()
 
 let dispatch_file_ext on_js (file : Fpath.t) =
   if Fpath.has_ext ".js" file then on_js file
@@ -46,7 +48,9 @@ let run_file ~deterministic ~lazy_values ~workspace_dir input_file =
         ~no_stop_at_failure:false
         ~callback_out:(fun _ _ -> ())
         ~callback_err:(fun thread ty ->
-          Sym_path_resolver.solve ty testsuite thread )
+          let solver = Choice.solver thread in
+          let pc = Choice.pc thread in
+          Sym_path_resolver.solve solver pc ty testsuite )
         input_file prog
     with exn ->
       (Error (`Failure (Printexc.to_string exn)), dummy_report input_file)
