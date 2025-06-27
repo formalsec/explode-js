@@ -41,17 +41,6 @@ let setup_z3 () =
   Format.printf "Installing Z3 ...@.";
   on_fail (opam_install "z3") "Could not install z3 through opam!"
 
-let setup_ecmasl () =
-  Format.printf "Installing ECMA-SL ...@.";
-  with_dir "vendor/ECMA-SL" @@ fun () ->
-  on_fail
-    (opam_install ". --deps-only")
-    "Could not install ECMA-SL's dependencies";
-  on_fail
-    (opam_exec "dune build -p ecma-sl --profile release")
-    "Could not build ECMA-SL!";
-  on_fail (opam_exec "dune install -p ecma-sl") "Could not install ECMA-SL!"
-
 let setup_explodejs () =
   Format.printf "Installing Explode-js ...@.";
   on_fail
@@ -65,5 +54,4 @@ let setup_explodejs () =
 let () =
   if !skip_python then () else setup_graphjs ();
   setup_z3 ();
-  setup_ecmasl ();
   setup_explodejs ()

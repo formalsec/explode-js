@@ -12,7 +12,7 @@ depends: [
   "dune" {>= "3.15"}
   "dune-site"
   "dune-glob"
-  "extunix" {= "dev"}
+  "extunix" {= "0.4.3"}
   "explode_js"
   "jingoo"
   "logs"
@@ -39,5 +39,5 @@ build: [
 ]
 dev-repo: "git+https://github.com/explode-js/explode-js.git"
 pin-depends: [
-  [ "extunix.dev" "git+https://github.com/filipeom/extunix.git#ff54e8cc7ec9cdc7171861d74d85f326dbcec62e" ]
+  [ "extunix.0.4.3" "git+https://github.com/filipeom/extunix.git#ff54e8cc7ec9cdc7171861d74d85f326dbcec62e" ]
 ]
