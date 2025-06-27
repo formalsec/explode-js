@@ -26,17 +26,19 @@
  (depends
   bos
   (bisect_ppx (and :with-test (>= 2.5.0)))
-  smtml
   cmdliner
   dune
   dune-site
   dune-glob
-  (extunix
+  (ecma-sl
    (= "dev"))
+  (extunix
+   (= "0.4.3"))
   fpath
   (mdx :with-test)
   ocaml
   ; (owl (>= 1.1))
+  smtml
   prelude
   yojson
   z3)
@@ -54,7 +56,7 @@
   dune-site
   dune-glob
   (extunix
-   (= "dev"))
+   (= "0.4.3"))
   explode_js
   jingoo
   logs

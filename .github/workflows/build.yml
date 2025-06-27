@@ -31,7 +31,7 @@ jobs:
 
       - name: Checkout Submodules
         run: |
-          git submodule update --init vendor/graphjs vendor/ECMA-SL
+          git submodule update --init vendor/graphjs
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -44,11 +44,7 @@ jobs:
           ocaml-compiler: ${{ env.OCAML_COMPILER }}
 
       - name: Install dependencies
-        run: |
-          opam install -y . ./vendor/ECMA-SL --deps-only --with-test
-          cd vendor/ECMA-SL && opam exec -- dune build @install -p ecma-sl
-          opam exec -- dune install -p ecma-sl
-          cd ../.. && opam exec -- dune build @install
+        run: opam install -y . --deps-only --with-test
 
       - name: Build
         run: opam exec -- dune build @install

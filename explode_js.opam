@@ -13,15 +13,16 @@ bug-reports: "https://github.com/explode-js/explode-js/issues"
 depends: [
   "bos"
   "bisect_ppx" {with-test & >= "2.5.0"}
-  "smtml"
   "cmdliner"
   "dune" {>= "3.15"}
   "dune-site"
   "dune-glob"
-  "extunix" {= "dev"}
+  "ecma-sl" {= "dev"}
+  "extunix" {= "0.4.3"}
   "fpath"
   "mdx" {with-test}
   "ocaml"
+  "smtml"
   "prelude"
   "yojson"
   "z3"
@@ -44,3 +45,6 @@ build: [
   ["dune" "install" "-p" name "--create-install-files" name]
 ]
 dev-repo: "git+https://github.com/explode-js/explode-js.git"
+pin-depends: [
+  [ "ecma-sl.dev" "git+ssh://git@github.com/formalsec/ECMA-SL.git#3b37d0fb873ca823a1111033553f74cb896d935b" ]
+]
