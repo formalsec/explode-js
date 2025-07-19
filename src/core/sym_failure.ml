@@ -43,14 +43,13 @@ type t =
 
 let pp fmt { ty; pc; model; _ } =
   Fmt.pf fmt "@[<hov 1>((type %a)@;(pc %a)@;(model %a))@]" Symbolic_error.pp ty
-    (Smtml.Expr.Set.pretty Smtml.Expr.pp)
-    pc (Fmt.option pp_model) model
+    Smtml.Expr.Set.pp pc (Fmt.option pp_model) model
 
 let to_json { ty; pc; pc_path; model; exploit } =
   let ty = Symbolic_error.to_json ty in
   let remaining =
     `Assoc
-      [ ("pc", `String (Fmt.str "%a" (Smtml.Expr.Set.pretty Smtml.Expr.pp) pc))
+      [ ("pc", `String (Fmt.str "%a" Smtml.Expr.Set.pp pc))
       ; ("pc_path", `String (Fpath.to_string pc_path))
       ; ( "model"
         , match model with
@@ -80,9 +79,5 @@ let serialize =
         Ok (Some { data = m; path = model_path })
     in
     let pc_path = Fpath.(f + ".smtml") in
-    let* () =
-      Bos.OS.File.writef ~mode pc_path "%a"
-        (Smtml.Expr.Set.pretty Smtml.Expr.pp)
-        pc
-    in
+    let* () = Bos.OS.File.writef ~mode pc_path "%a" Smtml.Expr.Set.pp pc in
     Ok (pc_path, model)
