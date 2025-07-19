@@ -31,7 +31,7 @@
   dune-site
   dune-glob
   (ecma-sl
-   (= "dev"))
+   (= "1.4.0"))
   (extunix
    (= "0.4.3"))
   fpath
