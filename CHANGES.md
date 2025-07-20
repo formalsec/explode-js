@@ -1,3 +1,381 @@
-## 1.3.1
+# Changelog
 
-* Bring back raw HTTP-GET for path-traversal (abcaf20)
+## Unreleased
+
+- 2025-07-20 Use git-cliff for automatic changelog generation ([#69](https://github.com/formalsec/explode-js/issues/69))
+- 2025-07-19 Bump ecma-sl dev -> 1.4.0 ([#66](https://github.com/formalsec/explode-js/issues/66))
+- 2025-06-27 Manage ECMA-SL through an opam pin instead of a submodule
+- 2025-06-24 Add api to export outcomes and sinks from the runner's web UI
+- 2025-06-24 Clean the runner's cmdliner arguments definitions
+- 2025-06-24 Delete unused files
+- 2025-06-24 Format code
+- 2025-06-24 Promote tests
+- 2025-06-24 Use smtml sets instead of lists in exploit generation
+- 2025-06-24 Bring back ECMA-SL's development submodule
+- 2025-06-08 Only enable mdx for examples when `neo4j` binary is installed
+- 2025-06-08 Install test deps in CI
+- 2025-06-07 Don't use public version of ECMA-SL in CI
+- 2025-05-19 Update README.md
+
+## 1.3.1 - 2025-05-18
+
+- 2025-05-18 Add `CHANGES.md`
+- 2025-05-16 Bring back raw HTTP-GET for path-traversal
+- 2025-05-12 Update `bench/README.md` with fixed version
+- 2025-05-12 Improve README.md
+
+## 1.3.0 - 2025-05-12
+
+- 2025-05-12 Update build workflow
+- 2025-05-12 Update examples
+- 2025-05-12 Add setup script and update READM.md
+- 2025-05-12 Set mdx as a test dependency
+- 2025-05-12 Promote tests
+- 2025-05-12 Don't compile unused data-frame generators
+- 2025-05-12 Update explode-js's eval script with custom timeout
+- 2025-05-12 Update ECMA-SL submodule with public repo
+
+## 1.2.1 - 2025-05-08
+
+- 2025-05-08 Update Dockerfile
+
+## 1.2.0 - 2025-04-18
+
+- 2025-04-18 Update submodule `bench/datasets`
+- 2025-04-18 Update artifact README.md with new repo structure
+- 2025-04-18 Fix FAST's Dockerfile
+- 2025-04-18 Move benchmarking scripts into the appropriate `bench` dir
+- 2025-04-15 Update `bench/README.md`
+- 2025-04-15 Fix syntax error in run-fast.py script
+- 2025-04-15 Remove `.gitlab-ci.yml`
+- 2025-04-15 Update submodule `bench/datasets`
+- 2025-04-15 Fix font types in diagrams
+- 2025-04-05 Update `bench/dataset`
+- 2025-04-05 Change row name
+- 2025-04-05 Fix table_nodemedic_time.py
+- 2025-04-05 Fix README
+- 2025-04-04 Update docker-image workflow
+
+## 1.1.0 - 2025-04-04
+
+- 2025-04-04 Update `bench/README.md`
+- 2025-04-04 Fixes package running example
+- 2025-04-04 Bring back 'package' command
+- 2025-04-04 Add package-level example
+- 2025-04-04 Update README.md
+- 2025-04-04 Update `bench/README.md`
+- 2025-04-04 Fix typos and update artifact structure
+- 2025-04-04 Fix SyntaxError in `run-NodeMedic.py`
+- 2025-04-03 Promote tests
+- 2025-04-03 Upgrade node version to 23.x
+- 2025-04-03 Try another code-injection pattern
+- 2025-04-03 Promote tests
+- 2025-04-03 ECMA-SL is a private repo again
+- 2025-04-03 Only generate arrays with 2 strings when in proto pollution mode
+- 2025-04-03 Update submodule `vendor/ECMA-SL`
+- 2025-04-03 Update submodule `bench/datasets`
+- 2025-04-03 Update submodule `vendor/graphjs`
+- 2025-04-03 Always print function arguments in a single line
+- 2025-04-03 Wip
+- 2025-03-24 Don't use optimized import heuristics by default
+- 2025-03-24 Update graphjs to latest optimized version
+- 2025-03-23 Update plot scripts
+- 2025-03-23 Update `.gitignore` with evaluation artefacts
+- 2025-03-23 Fix NodeMedic table
+- 2025-03-21 Promote tests
+- 2025-03-21 Add `--deterministic` flag to make tool output deterministic
+- 2025-03-21 Disable problematic test
+- 2025-03-21 Fix instrumentation command again
+- 2025-03-21 Bring back CI
+- 2025-03-21 Add other vulnerability examples
+- 2025-03-21 Fix docker CI
+- 2025-03-21 Enable webpage
+- 2025-03-21 Add docker build CI
+- 2025-03-21 Update submodule `vendor/ECMA-SL`
+- 2025-03-19 Update results
+- 2025-03-19 Update README.md
+- 2025-03-19 Update README.md
+- 2025-03-19 Update README.md
+- 2025-03-19 Small tweaks
+- 2025-03-19 Update README.md
+- 2025-03-19 Update running example of FAST
+- 2025-03-19 Newlines
+- 2025-03-19 Paragraph
+- 2025-03-19 Update structure
+- 2025-03-19 Update `bench/datasets`
+- 2025-03-19 Remove git dirs in dockerfile
+- 2025-03-19 Add good boy retriever
+- 2025-03-19 Remove very old stuff
+- 2025-03-19 Update `bench/README.md`
+- 2025-03-19 Update `bench/README.md`
+- 2025-03-19 Add more scripts for nodemedic
+- 2025-03-19 Add more scripts to fast docker
+- 2025-03-19 Idk changes
+- 2025-03-19 Fix explode-js dockerfile
+- 2025-03-19 Avoid disaster
+- 2025-03-18 Update README.md
+- 2025-03-18 Update README.md
+- 2025-03-18 Minor fix in README.md
+- 2025-03-18 Update `bench/README.md`
+- 2025-03-18 Try another fix
+- 2025-03-18 Update python -> python3
+- 2025-03-18 Update README.md
+- 2025-03-18 Try to fix docker
+- 2025-03-18 Don't compile auto_complete parser
+- 2025-03-18 Update pinned depends
+- 2025-03-18 Update dockerfile
+- 2025-03-18 Update `bench/README.md`
+- 2025-03-18 Start updating bench/README.md
+- 2025-03-18 Update artifact README
+- 2025-03-18 Minor fix in fast Dockerfile
+- 2025-03-18 Allow cwe filtering + improve UI
+- 2025-03-18 Remove comment in nodeMedic-bench-install.sh
+- 2025-03-18 NodeMedic plot gen
+- 2025-03-18 Parse fast results
+- 2025-03-18 Print tables after run scripts
+- 2025-03-18 Update bench readme.md
+- 2025-03-18 Package mode
+- 2025-03-18 Update submodule `bench/datasets`
+- 2025-03-18 Fix no vis run script
+- 2025-03-18 Add zeroday run script
+- 2025-03-18 Rename scripts
+- 2025-03-18 Add run-no-vis mode to runner
+- 2025-03-18 Add helper scripts to run experiments by cwe
+- 2025-03-18 Output dir arugment in runner assume dirname
+- 2025-03-17 Update submodule `bench/fast`
+- 2025-03-17 More prototype pollution heuristics
+- 2025-03-17 Update `vendor/ECMA-SL` and `bench/dataset`
+- 2025-03-17 Add logs library to dunefile
+- 2025-03-17 Add prototype pollution heuristic and debug flags to runner
+- 2025-03-16 Rename running example function
+- 2025-03-16 Update submodules
+- 2025-03-16 Bring back prototype pollution heuristics
+- 2025-03-15 Add NodeMedic run script and Docker builder
+- 2025-03-14 Small fixes
+- 2025-03-14 Update readme and remove breaklines that hotcrp doesn't like
+- 2025-03-14 Update to the artifact README.md
+- 2025-03-14 Initial version of the artifact README.md
+- 2025-03-14 Update running example
+- 2025-03-14 Expose lazy values in runner
+- 2025-03-13 Add fast Dockerfile and run script
+- 2025-03-13 Bring back lazy-values option
+- 2025-03-13 Idk
+- 2025-03-13 Unfold recursive unions
+- 2025-03-13 Add one more command execution exploit pattern
+- 2025-03-11 Update submodule `bench/datasets`
+- 2025-03-11 Add run_mode argument to runner
+- 2025-03-11 Update `bench/datasets`
+- 2025-03-11 More bug fixes
+- 2025-03-11 Update submodule `vendor/ECMA-SL`
+- 2025-03-11 Bring back runner fixes
+- 2025-03-11 Add tool submodules
+- 2025-03-11 Disable website workflow
+- 2025-03-11 Update output in `example/READM.md`
+- 2025-03-11 Update submodule `vendor/graphjs`
+- 2025-03-11 Promote tests
+- 2025-03-11 Add 100ms delay before calling path-traversal client
+- 2025-03-11 Update `bench/datasets`
+- 2025-03-11 A lot of changes, for good or for worse
+- 2025-03-11 Improve instrumentation api
+- 2025-03-11 String templates instead of formatters
+- 2025-03-07 Update ECMA-SL submodule and improve tool output
+- 2025-03-06 Promote tests
+- 2025-03-06 Support multiple runs in the same directory ([#26](https://github.com/formalsec/explode-js/issues/26))
+- 2025-03-06 Fixes confirmation of effects on stderr ([#42](https://github.com/formalsec/explode-js/issues/42))
+- 2025-03-06 Fix run command ([#32](https://github.com/formalsec/explode-js/issues/32))
+- 2025-03-06 Use prelude and change names to reflect the concepts in the paper
+- 2025-03-05 Add dot token and more parser tests
+- 2025-03-05 Remove parser state to module
+- 2025-03-05 Use prelude
+- 2025-03-04 Update submodule `vendor/ECMA-SL`
+- 2025-03-03 Update submodule `vendor/ECMA-SL`
+- 2025-03-03 Disable CI to not waste org minutes
+- 2025-03-03 Update submodule `bench/datasets`
+- 2025-03-03 Remove dependencies `glob` and `core_unix`
+- 2025-02-13 Implement prototype LL(1) parser for JavaScript expressions
+- 2025-02-12 Move tests into a directory for the respective command of explode-js
+- 2025-02-12 Rename `Instrumentation` to `Instrument`
+- 2025-02-12 Organize code in `src` directory
+- 2025-02-12 Promote tests and disable mdx test
+- 2025-02-12 Add missing dependencies
+- 2025-02-12 Bring-back build workflow
+- 2025-02-12 Update submodules
+- 2025-02-12 Add example of a simple package with one require
+- 2025-02-12 Promote tests
+- 2025-02-12 Update OCaml compiler to 5.3 and ecma-sl to latest
+- 2025-02-12 Update `.gitignore`
+- 2025-02-12 Update dependencies
+- 2025-01-08 Add short evaluation section to `README.md`
+- 2025-01-08 Update `bench/README.md` with google sheet index link
+- 2025-01-08 Update `vendor/graphjs` submodule
+- 2024-12-19 Re-add bench/datasets submodule
+- 2024-12-19 Remove gitlab submodules
+- 2024-12-18 Fixes instrumentation of toplevel vulnerabilities ([#2](https://github.com/formalsec/explode-js/issues/2))
+- 2024-12-18 Cleanup instrumentation a little
+- 2024-12-17 Update submodule bench/datasets
+- 2024-12-17 Fixes `sinks.py` script
+- 2024-12-17 Dune fmt
+- 2024-12-17 Use `Explode_js_prelude` instead of `Ecma_sl.Syntax`
+- 2024-12-17 Create and use explode_js_prelude instead of instrumentation syntax
+- 2024-12-17 Fixes incorrectly flagged code injecion replay attacks
+- 2024-12-17 Hide utime and stime from results table
+- 2024-12-17 Fixes runner's parsing of explode-js analysis report
+- 2024-12-17 Add submodule bench/datasets
+- 2024-12-17 Remove submodule bench/explodejs-datasets
+- 2024-12-17 Remove submodule bench/datasets
+- 2024-12-17 Try to install npm dependencies when a `package.json` is found
+- 2024-12-17 Don't use tuples to pass function arguments
+- 2024-12-17 Improvements to the `run` command:
+- 2024-12-17 Fixes `instrument` command tests
+- 2024-12-17 Allow dune to run ocaml binaries in `bench/explodejs-datasets`
+- 2024-12-17 Remove instrumentation2 package
+- 2024-12-17 Move default workspace dir from `explode-out` to `_result`
+- 2024-12-11 Add script to filter sink expressions discovered in SE
+- 2024-12-11 Allow exporting csv's in the web ui
+- 2024-12-11 Fixes csv results file
+- 2024-12-10 Fixes pp of Run_result.t
+- 2024-12-10 Don't crash when report doesn't exist
+- 2024-12-10 Bump explodejs-datasets 5da253c3 -> c569d29d7
+- 2024-12-10 Refactor exploit generation mechanism
+- 2024-12-10 Move cwe module to explode-js lib
+- 2024-12-10 Sym_exec.from_file only receives filename and workspace_dir
+- 2024-12-10 Update dependencies
+- 2024-12-10 Move auxiliary bin modules into explode-js lib
+- 2024-12-10 Improve Web UI
+- 2024-12-10 Output reports in a single json
+- 2024-12-10 Aggregate symbolic tests results in global report
+- 2024-12-10 Symbolic result module
+- 2024-12-09 Create jekyll-gh-pages.yml
+- 2024-12-09 Use explicit error results in cmd_symbolic and cmd_replay
+- 2024-12-09 Use named arguments in cli commands
+- 2024-12-07 Serve the stdout and stderr of each run in the runner web UI
+- 2024-12-04 Update ocamlformat and format code
+- 2024-12-04 Start rewriting OCaml runner
+- 2024-12-04 Experimental plot stuff
+- 2024-12-04 Format code, update .gitignore and add .envrc
+- 2024-12-04 Update submodules
+- 2024-11-27 Update .gitignore
+- 2024-11-12 Add case study 2
+- 2024-11-12 Add case study 1
+- 2024-11-06 Add histogram with sampled reasons unknown for RQ1
+- 2024-11-04 Fix venn diagram
+- 2024-11-04 Serialize explode-js's dataframe with results date
+- 2024-11-04 Update explodejs-datasets submodule
+- 2024-11-04 Venn diagram
+- 2024-11-04 Move things around
+- 2024-11-04 Adds venn diagram with FAST and NodeMedic
+- 2024-11-04 Fix RQ1 and RQ4 tables
+- 2024-10-09 Update explodejs-datasets submodule
+- 2024-10-02 More tables
+- 2024-10-02 Split CDF into two plots
+- 2024-10-02 Add `Exploit` columns
+- 2024-10-01 Ctrl-C Ctrl-V
+- 2024-10-01 Change rtime to total_time and parse analysis phases for fast and
+- 2024-10-01 Fixes dockerfile installation and dependencies
+- 2024-10-01 Read files from index
+- 2024-10-01 Update explodejs-datasets submodule
+- 2024-10-01 Update graph pdf outputs
+- 2024-10-01 Use latextable to plot table 4
+- 2024-10-01 Change explode_df.total_time to explode_df.rtime
+- 2024-10-01 Rename cdf.py -> rq3_cdf.py
+- 2024-10-01 Update submodule for runner
+- 2024-09-30 Attempt to set a CWE to nodemedic's results
+- 2024-09-30 Update explodejs-datasets submodule
+- 2024-09-30 Extract more info from FAST
+- 2024-09-30 Use mutable datastructure to accumulate dataframes
+- 2024-09-30 Add file.mli
+- 2024-09-30 Improve marker interface
+- 2024-09-30 Move common functions into `Explode_js_bench` lib
+- 2024-09-30 Move OCaml runner into `bench/runner2`
+- 2024-09-30 Rename submodule code-vuln-runner to runner
+- 2024-09-30 Adds more datasets and a bench/README.md to document how to run
+- 2024-09-27 Don't compile cdf.ml
+- 2024-09-27 Fixes warning in explode_df.ml
+- 2024-09-27 Add serialized dataframes as .csv
+- 2024-09-27 Add df parsing and cdf function for explode
+- 2024-09-27 Cdf generation scripts
+- 2024-09-27 Update .gitignore
+- 2024-09-27 Add df parsing scripts
+- 2024-09-25 Update .gitignore
+- 2024-09-25 Add runner submodule
+- 2024-09-24 Removes unecessary libraries
+- 2024-09-24 Update datasets
+- 2024-09-24 POSIX timeouts
+- 2024-09-24 Run graphjs in 'dirty' mode
+- 2024-09-24 Improve time_limit semantics
+- 2024-09-23 Disable build workflow
+- 2024-09-23 Allow specifying time_limit and number of jobs in runner
+- 2024-09-23 Do timeout in another manner
+- 2024-09-23 Update datasets submodule
+- 2024-09-23 Install vim in docker
+- 2024-09-23 Update .gitmodules and ECMA-SL
+- 2024-09-23 Add missing depends and fix Dockerfile
+- 2024-09-22 Remove instrumentation2 dep
+- 2024-09-22 Update graphjs submodule
+- 2024-09-22 Run full cmd in runner
+- 2024-09-22 Update .gitignore
+- 2024-09-22 Separate execution times
+- 2024-09-22 Run graphjs in silent mode
+- 2024-09-22 Fixes Dockerfile
+- 2024-09-22 Bump ocaml 4.14 -> 5.1 in Dockerfile
+- 2024-09-22 Update datasets submodule
+- 2024-09-22 Threads!
+- 2024-09-22 Update .gitignore
+- 2024-09-22 Update running example
+- 2024-09-22 Integrate `graphjs` into explode in the `explode-js full` command
+- 2024-09-21 Remove unecessary smtml pin
+- 2024-09-19 Update graphjs submodule and add graphjs to bin site
+- 2024-09-19 Update ecma-sl submodule
+- 2024-09-16 Update graphjs remote url
+- 2024-09-16 Update ECMA-SL submodule to 4dc6ca8d3
+- 2024-09-16 Add permissions to checkout submodules
+- 2024-09-10 Use var instead of let ([#5](https://github.com/formalsec/explode-js/issues/5))
+- 2024-09-04 Add GitHub dependabot and build workflow
+- 2024-09-04 Update README.md
+- 2024-09-04 Add benchmarking submodule
+- 2024-09-04 Integrate instrumentation2 as a package of explode-js
+- 2024-08-16 Fix CI
+- 2024-08-14 Add LICENSE
+- 2024-07-18 Fix Dockerfile
+- 2024-07-17 Fix pp validation and add usecase test
+- 2024-07-17 Vendor instrumentation2 instead of pin
+- 2024-07-16 Fix typo in dependencies
+- 2024-07-16 Promote tests
+- 2024-07-16 Fixes prototype pollution validation ([#5](https://github.com/formalsec/explode-js/issues/5))
+- 2024-07-16 Bump instrumentation2 0.0.4 -> 0.0.5
+- 2024-07-02 Update ecma-sl due to missing z3 depedency
+- 2024-07-02 Serialize literal tests (Closes #2 and #3)
+- 2024-07-02 Update instrumentation2 pin
+- 2024-07-02 Migrate esl_symbolic.js to explode-js site and json witnesses
+- 2024-07-02 Add missing depends
+- 2024-07-02 Update smtml pin
+- 2024-07-01 Fixes path traversal effect validation for readFile exploits ([#6](https://github.com/formalsec/explode-js/issues/6))
+- 2024-07-01 Update CI
+- 2024-07-01 Better names for node's system package symbols ([#1](https://github.com/formalsec/explode-js/issues/1))
+- 2024-06-30 Bump instrumentation2 0.0.1 -> 0.0.2 ([#4](https://github.com/formalsec/explode-js/issues/4))
+- 2024-06-18 Don't overwrite NODE_PATH variable when replaying
+- 2024-06-18 Move setup.sh script to Dockerfile
+- 2024-06-18 Remove apt-get update from CI
+- 2024-06-11 Fixes README.md
+- 2024-06-08 Promote tests
+- 2024-06-08 Fixes timeout
+- 2024-06-07 Fix dependencies and dockerfile
+- 2024-06-07 Initial dockerfile
+- 2024-06-07 Promote tests
+- 2024-06-07 Removes pin depend on ECMA-SL
+- 2024-06-07 Adds ECMA-SL as a vendor dependency
+- 2024-06-07 Fix CI?
+- 2024-06-07 Add remaining commands
+- 2024-06-07 Pin latest ecma-sl version
+- 2024-06-03 Adds module interfaces
+- 2024-06-03 CI test
+- 2024-06-03 Ecmas-l explode testsuite
+- 2024-06-03 Binary application skeleton
+- 2024-06-02 Update README.md
+- 2024-05-31 Add Graph.js dependency
+- 2024-05-31 Pin ecma-sl
+- 2024-05-31 Bootstrap ocaml project
+- 2024-05-31 Move example to example/
+- 2024-05-11 Bigue bangue
+
+
