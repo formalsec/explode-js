@@ -1,0 +1,3 @@
+pin-depends: [
+  [ "ecma-sl.dev" "git+https://github.com/formalsec/ECMA-SL-pub.git#c39f85b80c9431461ac42200a4d28b22aed4bea2" ]
+]

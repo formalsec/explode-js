@@ -18,6 +18,8 @@ depends: [
   "dune" {>= "3.15"}
   "dune-site"
   "dune-glob"
+  "ppxlib" {= "0.35.0"}
+  "ecma-sl" {= "dev"}
   "extunix" {= "dev"}
   "fpath"
   "mdx" {with-test}
@@ -44,3 +46,6 @@ build: [
   ["dune" "install" "-p" name "--create-install-files" name]
 ]
 dev-repo: "git+https://github.com/explode-js/explode-js.git"
+pin-depends: [
+  [ "ecma-sl.dev" "git+https://github.com/formalsec/ECMA-SL-pub.git#c39f85b80c9431461ac42200a4d28b22aed4bea2" ]
+]

@@ -31,6 +31,10 @@
   dune
   dune-site
   dune-glob
+  (ppxlib
+   (= "0.35.0"))
+  (ecma-sl
+   (= "dev"))
   (extunix
    (= "dev"))
   fpath
