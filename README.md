@@ -4,11 +4,9 @@ Automatic exploit generation for Node.js applications.
 
 ### Build from source
 
-When building **Explode-js** from source, it is recommended that you first
-ensure the following:
+When building **Explode-js** from source, it is recommended that you first ensure the following:
 
-- Install [opam](https://opam.ocaml.org/doc/Install.html) and bootstrap
-the OCaml compiler:
+- Install [opam](https://opam.ocaml.org/doc/Install.html) and bootstrap the OCaml compiler:
 
 <!-- $MDX skip -->
 ```sh
@@ -16,8 +14,37 @@ $ opam init
 $ opam switch create 5.3.0 5.3.0
 ```
 
-- Setup a managed Python environment using either [direnv](https://direnv.net/) or
-[virtualenv](https://docs.python.org/3/library/venv.html).
+- Setup a managed Python environment using either [direnv](https://direnv.net/) or [virtualenv](https://docs.python.org/3/library/venv.html).
+
+- Install [neo4j](https://neo4j.com/docs/operations-manual/current/installation/). For ubuntu you can follow the instructions below:
+
+```sh
+# Download Neo4j GPG key and add it to apt
+$ wget -O - https://debian.neo4j.com/neotechnology.gpg.key | apt-key add -
+
+# Add Neo4j APT repository
+$ echo 'deb https://debian.neo4j.com stable 5' | tee -a /etc/apt/sources.list.d/neo4j.list
+
+# Update package list and install neo4j 5.26.4
+$ apt-get update && apt-get install -y neo4j=1:5.26.4 && \
+
+# Disable authentication for Neo4j (not recommended for production)
+echo dbms.security.auth_enabled=false >> /etc/neo4j/neo4j.conf
+
+# Set correct ownership for Neo4j data and log directories
+$ chown -R neo4j:neo4j /var/lib/neo4j && \
+  chown -R neo4j:neo4j /var/log/neo4j
+
+# Set group read/write permissions on data and log directories
+$ chmod -R g+rw /var/lib/neo4j && \
+  chmod -R g+rw /var/log/neo4j
+
+# Add your user to the neo4j group (don't run Neo4j as root)
+$ usermod -aG neo4j <YOUR USER>
+
+# Reboot or run to login into the neo4j group
+$ newgrp neo4j
+```
 
 Then, you can proceed with the installation of Explode-js:
 
@@ -26,10 +53,10 @@ Then, you can proceed with the installation of Explode-js:
 <!-- $MDX skip -->
 ```sh
 $ git clone https://github.com/formalsec/explode-js.git
-$ git submodule update --init
-# Or, if you only want to run explode-js and not the evaluation, use:
-# $ git submodule update --init bench/graphjs bench/ECMA-SL
+# Use the latest stable release
+$ git checkout v1.3.2
 $ cd explode-js
+$ git submodule update --init
 $ ./setup.ml
 ```
 
