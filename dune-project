@@ -34,6 +34,8 @@
    (= "1.4.0"))
   (extunix
    (= "0.4.3"))
+  (ppxlib
+   (= "0.35.0"))
   fpath
   (mdx :with-test)
   ocaml
@@ -57,6 +59,8 @@
   dune-glob
   (extunix
    (= "0.4.3"))
+  (ppxlib
+   (= "0.35.0"))
   explode_js
   jingoo
   logs

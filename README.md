@@ -2,9 +2,11 @@
 
 Automatic exploit generation for Node.js applications.
 
+## Build
+
 ### Build from source
 
-When building **Explode-js** from source, it is recommended that you first ensure the following:
+when building **explode-js** from source, it is recommended that you first ensure the following:
 
 - Install [opam](https://opam.ocaml.org/doc/Install.html) and bootstrap the OCaml compiler:
 
@@ -67,18 +69,34 @@ $ ./setup.ml
 $ dune runtest
 ```
 
-### Examples
+### Build using docker
+
+Building **explode-js** using Docker is only recommended for internal use, as it requires checking out the vendored development version of ECMA-SL.
+
+To install **explode-js**, run the following command:
+
+<!-- $MDX skip -->
+```sh
+# Checkout submodules
+$ git submodule update --init
+# Build the image
+$ docker build . -t explode-js:latest
+# Run the image
+$ docker run --rm -it explode-js:latest bash
+```
+
+## Examples
 
 For examples on how to run explode-js in different settings, see [examples].
 
-### Evaluation
+## Evaluation
 
 For benchmarking and evaluation see [bench]
 
 [bench]: ./bench
 [examples]: ./example
 
-### Publications
+## Publications
 
 - [Explode.js]: Filipe Marques, Mafalda Ferreira, André Nascimento, Miguel Coimbra, Nuno Santos, Limin Jia, and José Fragoso Santos.
 _"Automated Exploit Generation for Node.js Packages"_, in
@@ -86,7 +104,7 @@ Proceedings of the 46th ACM SIGPLAN Conference on Programming Language Design an
 
 [Explode.js]: https://www.filipeom.dev/assets/pdf/marques_pldi25.pdf
 
-### License
+## License
 
 See [LICENSE].
 

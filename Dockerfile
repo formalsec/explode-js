@@ -1,5 +1,4 @@
-ARG BASE_OS="ubuntu:24.04"
-FROM ${BASE_OS}
+FROM ubuntu:24.04
 
 ENV BASE=/home/explodejs
 ENV DEBIAN_FRONTEND=noninteractive
@@ -7,7 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update && \
-    apt-get install -y wget curl git unzip python3 python3-pip ca-certificates gnupg libgmp-dev graphviz sudo neovim && \
+    apt-get install -y wget curl git unzip python3 python3-pip ca-certificates gnupg libgmp-dev graphviz sudo neovim rsync && \
     echo "/usr/local/bin" | bash -c "sh <(curl -fsSL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)" && \
     pip install --break-system-packages --upgrade setuptools
 
@@ -54,9 +53,7 @@ COPY --chown=explodejs:explodejs . /home/explodejs/explode-js
 RUN rm -rf /home/explodejs/explode-js/.git \
     &&  rm -rf /home/explodejs/explode-js/vendor/graphjs/.git \
     &&  rm -rf /home/explodejs/explode-js/vendor/ECMA-SL/.git \
-    &&  rm -rf /home/explodejs/explode-js/bench/datasets/.git \
-    &&  rm -rf /home/explodejs/explode-js/bench/fast/.git \
-    &&  rm -rf /home/explodejs/explode-js/bench/NodeMedic/.git
+    &&  rm -rf /home/explodejs/explode-js/bench/datasets/.git
 
 RUN cd "${BASE}/explode-js/vendor/graphjs" \
     && sudo pip install --break-system-packages -r ./requirements.txt \
