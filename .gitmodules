@@ -10,3 +10,6 @@
 [submodule "bench/NodeMedic"]
 	path = bench/NodeMedic
 	url = https://github.com/NodeMedicAnalysis/NodeMedic-FINE.git
+[submodule "vendor/ECMA-SL"]
+	path = vendor/ECMA-SL
+	url = git@github.com:formalsec/ECMA-SL.git

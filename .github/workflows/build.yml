@@ -31,7 +31,7 @@ jobs:
 
       - name: Checkout Submodules
         run: |
-          git submodule update --init vendor/graphjs
+          git submodule update --init vendor/graphjs vendor/ECMA-SL
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
