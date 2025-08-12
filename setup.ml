@@ -44,7 +44,7 @@ let setup_z3 () =
 let setup_explodejs () =
   Format.printf "Installing Explode-js ...@.";
   on_fail
-    (opam_install ". --deps-only")
+    (opam_install ". --deps-only --with-test --with-doc")
     "Could not install Explode-js's dependencies";
   on_fail
     (opam_exec "dune build @install --profile release")
