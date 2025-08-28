@@ -1,0 +1,2351 @@
+[
+   {
+      "package": {
+         "raw": "snyk-php-plugin@1.9.4",
+         "name": "snyk-php-plugin",
+         "version": "1.9.4"
+      },
+      "id": "GHSA-69f9-h8f9-7vjf",
+      "description": "The Snyk php plugin is vulnerable to Code Injection when scanning an untrusted PHP project. The vulnerability can be triggered if Snyk test is run inside the untrusted project due to the improper handling of the current working directory name. Snyk recommends only scanning trusted projects.",
+      "summary": "OS Command Injection in Snyk php plugin",
+      "date": "2024-10-23T21:30:28Z",
+      "cve": "CVE-2024-48963",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "ggit@2.4.12",
+         "name": "ggit",
+         "version": "2.4.12"
+      },
+      "id": "GHSA-62cx-5xj4-wfm4",
+      "description": "All versions of the package ggit are vulnerable to Command Injection via the fetchTags(branch) API, which allows user input to specify the branch to be fetched and then concatenates this string along with a git command which is then passed to the unsafe exec() Node.js child process API.",
+      "summary": "ggit is vulnerable to Command Injection via the fetchTags(branch) API",
+      "date": "2024-10-08T06:30:47Z",
+      "cve": "CVE-2024-21532",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "@saltcorn/plugins-loader@1.0.0-beta.13",
+         "name": "plugins-loader",
+         "version": "1.0.0-beta.13",
+         "scope": "saltcorn"
+      },
+      "id": "GHSA-fm76-w8jw-xf8m",
+      "description": "### Summary\n\nWhen creating a new plugin using the `git` source, the user-controlled value `req.body.name` is used to build the plugin directory where the location will be cloned. The API used to execute the `git clone` command with the user-controlled data is `child_process.execSync`. Since the user-controlled data is not validated, a user with admin permission can add escaping characters and execute arbitrary commands, leading to a command injection vulnerability.\n\n### Details\n\nRelevant code from source (`req.body`) to sink (`child_process.execSync`).\n\n- file: https://github.com/saltcorn/saltcorn/blob/v1.0.0-beta.13/packages/server/routes/plugins.js#L1400\n\n```js\nrouter.post(\n  \"/\",\n  isAdmin,\n  error_catcher(async (req, res) => {\n    const plugin = new Plugin(req.body); // [1] \n      [...]\n      try {\n        await load_plugins.loadAndSaveNewPlugin( // [3] \n          plugin,\n          schema === db.connectObj.default_schema || plugin.source === \"github\"\n        );\n        [...]\n    }\n  })\n);\n```\n\n- file: https://github.com/saltcorn/saltcorn/blob/v1.0.0-beta.13/packages/saltcorn-data/models/plugin.ts#L44\n```js\nclass Plugin {\n  [...]\n  constructor(o: PluginCfg | PluginPack | Plugin) {\n    [...]\n    this.name = o.name; // [2] \n    [...]\n}\n```\n\n- file: https://github.com/saltcorn/saltcorn/blob/v1.0.0-beta.13/packages/server/load_plugins.js#L64-L65\n```js\nconst loadAndSaveNewPlugin = async (plugin, force, noSignalOrDB) => {\n  [...]\n  const loader = new PluginInstaller(plugin); // [4] \n  const res = await loader.install(force); // [7] \n  [...]\n};\n```\n\n- file: https://github.com/saltcorn/saltcorn/blob/v1.0.0-beta.13/packages/plugins-loader/plugin_installer.js#L41-L61\n```js\nclass PluginInstaller {\n  constructor(plugin, opts = {}) {\n    [...]\n    const tokens =\n      plugin.source === \"npm\"\n        ? plugin.location.split(\"/\")\n        : plugin.name.split(\"/\"); // [5] \n    [...]\n    this.tempDir = join(this.tempRootFolder, \"temp_install\", ...tokens); // [6] \n    [...]\n  }\n\n  \n  async install(force) {\n    [...]\n    if (await this.prepPluginsFolder(force, pckJSON)) { // [8] \n    [...]\n  }\n\n  async prepPluginsFolder(force, pckJSON) {\n    [...]\n    switch (this.plugin.source) {\n      [...]\n      case \"git\":\n        if (force || !(await pathExists(this.pluginDir))) { \n          await gitPullOrClone(this.plugin, this.tempDir); // [9] \n\t  [...]\n  }\n```\n\n- file: https://github.com/saltcorn/saltcorn/blob/v1.0.0-beta.13/packages/plugins-loader/download_utils.js#L112\n```js\nconst gitPullOrClone = async (plugin, pluginDir) => {\n  [...]\n  if (fs.existsSync(pluginDir)) {\n    execSync(`git ${setKey} -C ${pluginDir} pull`);\n  } else {\n    execSync(`git ${setKey} clone ${plugin.location} ${pluginDir}`); // [10] \n  }\n  [...]\n};\n```\n\n### PoC\n\n- check that the file will be created by the command `echo \"hello\">/tmp/HACKED` does not exists:\n```\ncat /tmp/HACKED\ncat: /tmp/HACKED: No such file or directory\n```\n- login with an admin account\n- visit `http://localhost:3000/plugins/new`\n- enter the following fields:\n\t- Name: `;echo \"hello\">/tmp/HACKED`\n\t- Source: `git`\n\t- other fields blank\n- click `Create`\n- you will get an error saying `ENOENT: no such file or directory,  ....` but the command `touch /tmp/HACKED` will be executed\n- to verify:\n```\ncat /tmp/HACKED\nhello\n```\n\n### Impact\n\nRemote code execution\n\n### Recommended Mitigation\n\nSanitize the `pluginDir` value before passing to `execSync`. Alternatively, use `child_process. execFileSync` API (docs: https://nodejs.org/api/child_process.html#child_processexecfilesyncfile-args-options)\n",
+      "summary": "@saltcorn/plugins-loader unsanitized plugin name leads to a remote code execution (RCE) vulnerability when creating plugins using git source",
+      "date": "2024-10-03T22:21:24Z",
+      "cve": null,
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "network@0.6.1",
+         "name": "network",
+         "version": "0.6.1"
+      },
+      "id": "GHSA-vvh2-82c7-ppfg",
+      "description": "Versions of the package network before 0.7.0 are vulnerable to Arbitrary Command Injection due to use of the `child_process` exec function without input sanitization. If (attacker-controlled) user input is given to the `mac_address_for` function of the package, it is possible for an attacker to execute arbitrary commands on the operating system that this package is being run on.",
+      "summary": "network Arbitrary Command Injection vulnerability",
+      "date": "2024-01-30T06:30:23Z",
+      "cve": "CVE-2024-21488",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "tts-api@2.1.4",
+         "name": "tts-api",
+         "version": "2.1.4"
+      },
+      "id": "GHSA-jx6q-fq9h-6g7q",
+      "description": "A vulnerability has been found in pedroetb tts-api up to 2.1.4 and classified as critical. This vulnerability affects the function onSpeechDone of the file app.js. The manipulation leads to os command injection. Upgrading to version 2.2.0 is able to address this issue. The patch is identified as 29d9c25415911ea2f8b6de247cb5c4607d13d434. It is recommended to upgrade the affected component. VDB-248278 is the identifier assigned to this vulnerability.",
+      "summary": "Pedroetb TTS-API OS Command Injection",
+      "date": "2023-12-19T15:30:29Z",
+      "cve": "CVE-2019-25158",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "openssl@2.0.0",
+         "name": "openssl",
+         "version": "2.0.0"
+      },
+      "id": "GHSA-75w2-qv55-x7fv",
+      "description": "The openssl (aka node-openssl) NPM package through 2.0.0 was characterized as \"a nonsense wrapper with no real purpose\" by its author, and accepts an opts argument that contains a verb field (used for command execution). NOTE: This vulnerability only affects products that are no longer supported by the maintainer.",
+      "summary": "openssl npm package vulnerable to command execution",
+      "date": "2023-11-23T21:30:18Z",
+      "cve": "CVE-2023-49210",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "chromedriver@119.0.0",
+         "name": "chromedriver",
+         "version": "119.0.0"
+      },
+      "id": "GHSA-hm92-vgmw-qfmx",
+      "description": "Versions of the package chromedriver before 119.0.1 are vulnerable to Command Injection when setting the chromedriver.path to an arbitrary system binary. This could lead to unauthorized access and potentially malicious actions on the host system.\n\n**Note:**\n\nAn attacker must have access to the system running the vulnerable chromedriver library to exploit it. The success of exploitation also depends on the permissions and privileges of the process running chromedriver. ",
+      "summary": "chromedriver Command Injection vulnerability",
+      "date": "2023-11-09T06:30:28Z",
+      "cve": "CVE-2023-26156",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "node-qpdf@1.0.3",
+         "name": "node-qpdf",
+         "version": "1.0.3"
+      },
+      "id": "GHSA-fpr8-4wvx-j9q3",
+      "description": "All versions of the package node-qpdf are vulnerable to Command Injection such that the package-exported method encrypt() fails to sanitize its parameter input, which later flows into a sensitive command execution API. As a result, attackers may inject malicious commands once they can specify the input pdf file path.",
+      "summary": "node-qpdf vulnerable to command injection ",
+      "date": "2023-10-14T06:30:54Z",
+      "cve": "CVE-2023-26155",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "systeminformation@5.21.6",
+         "name": "systeminformation",
+         "version": "5.21.6"
+      },
+      "id": "GHSA-gx6r-qc2v-3p3v",
+      "description": "### Impact\nSSID Command Injection Vulnerability\n\n### Patches\nProblem was fixed with a parameter check. Please upgrade to version >= 5.21.7, Version 4 was not affected\n\n### Workarounds\nIf you cannot upgrade, be sure to check or sanitize parameter strings that are passed to wifiConnections(), wifiNetworks() (string only)\n\n### References\nSee also https://systeminformation.io/security.html\n",
+      "summary": "systeminformation SSID Command Injection Vulnerability",
+      "date": "2023-09-21T17:15:53Z",
+      "cve": "CVE-2023-42810",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "find-exec@1.0.2",
+         "name": "find-exec",
+         "version": "1.0.2"
+      },
+      "id": "GHSA-95rp-6gqp-6622",
+      "description": "Older versions of the package are vulnerable to Command Injection as an attacker controlled parameter. As a result, attackers may run malicious commands.\n\nFor example:\n\n```\nconst find = require(\"find-exec\");\nfind(\"mplayer; touch hacked\")\n```\n\nThis creates a file named \"hacked\" on the filesystem.\n\nYou should never allow users to control commands to find, since this package attempts to run every command provided.\n\nThanks to @miguelafmonteiro for reporting.",
+      "summary": "Command Injection Vulnerability in find-exec",
+      "date": "2023-08-30T20:08:58Z",
+      "cve": "CVE-2023-40582",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "n158@1.4.1",
+         "name": "n158",
+         "version": "1.4.1"
+      },
+      "id": "GHSA-549h-r7g9-2qpf",
+      "description": "All versions of the package n158 are vulnerable to Command Injection due to improper input sanitization in the 'module.exports' function.\n\n**Note:**\n\nTo execute the code snippet and potentially exploit the vulnerability, the attacker needs to have the ability to run Node.js code within the target environment. This typically requires some level of access to the system or application hosting the Node.js environment.",
+      "summary": "n158 vulnerable to Command Injection due to improper input sanitization in the 'module.exports' function",
+      "date": "2023-05-27T06:30:41Z",
+      "cve": "CVE-2023-26127",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "keep-module-latest@1.0.1",
+         "name": "keep-module-latest",
+         "version": "1.0.1"
+      },
+      "id": "GHSA-wxrx-pc44-rcgc",
+      "description": "All versions of the package keep-module-latest are vulnerable to Command Injection due to missing input sanitization or other checks and sandboxes being employed to the installModule function.\n\n**Note:**\n\nTo execute the code snippet and potentially exploit the vulnerability, the attacker needs to have the ability to run Node.js code within the target environment. This typically requires some level of access to the system or application hosting the Node.js environment.",
+      "summary": "keep-module-latest vulnerable to Command Injection due to missing input sanitization ",
+      "date": "2023-05-27T06:30:41Z",
+      "cve": "CVE-2023-26128",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "broccoli-compass@0.2.4",
+         "name": "broccoli-compass",
+         "version": "0.2.4"
+      },
+      "id": "GHSA-wq8f-xmq3-5vq9",
+      "description": "broccoli-compass v0.2.4 was discovered to contain a remote code execution (RCE) vulnerability via the child_process function.",
+      "summary": "Remote code execution in broccoli-compass",
+      "date": "2023-04-24T18:30:31Z",
+      "cve": "CVE-2023-27848",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "@stoqey/gnuplot@0.0.3",
+         "name": "gnuplot",
+         "version": "0.0.3",
+         "scope": "stoqey"
+      },
+      "id": "GHSA-795w-7426-m94j",
+      "description": "An issue found in Stoqey gnuplot v.0.0.3 and earlier allows attackers to execute arbitrary code via the src/index.ts, plotCallack, child_process, and/or filePath parameter(s).",
+      "summary": "stoqey/gnuplot is vulnerable to command injection",
+      "date": "2023-03-10T18:30:22Z",
+      "cve": "CVE-2021-33360",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "versionn@1.0.6",
+         "name": "versionn",
+         "version": "1.0.6"
+      },
+      "id": "GHSA-fj78-2vc5-f6cm",
+      "description": "### Impact\n\nCommand Injection Vulnerability. All versions <1.1.0 are affected.\n \n### Patches\n\nPlease upgrade to versionn@1.1.0",
+      "summary": "Versionn Command Injection Vulnerability",
+      "date": "2023-02-22T00:05:05Z",
+      "cve": "CVE-2023-25805",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "semver-tags@0.4.10",
+         "name": "semver-tags",
+         "version": "0.4.10"
+      },
+      "id": "GHSA-8h3g-hcwp-6hxq",
+      "description": "All versions of the package semver-tags are vulnerable to Command Injection via the getGitTagsRemote function due to improper input sanitization.",
+      "summary": "semver-tags is vulnerable to Command Injection via the getGitTagsRemote function",
+      "date": "2023-02-06T06:30:25Z",
+      "cve": "CVE-2022-25853",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "create-choo-app3@1.6.4",
+         "name": "create-choo-app3",
+         "version": "1.6.4"
+      },
+      "id": "GHSA-rj7m-2p3g-fjxg",
+      "description": "All versions of the package create-choo-app3 are vulnerable to Command Injection via the devInstall function due to improper user-input sanitization.",
+      "summary": "create-choo-app3 is vulnerable to Command Injection via the devInstall function",
+      "date": "2023-02-06T06:30:25Z",
+      "cve": "CVE-2022-25855",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "mt7688-wiscan@0.8.2",
+         "name": "mt7688-wiscan",
+         "version": "0.8.2"
+      },
+      "id": "GHSA-5h8c-8ccp-8gmh",
+      "description": "Versions of the package mt7688-wiscan before 0.8.3 are vulnerable to Command Injection due to improper input sanitization in the 'wiscan.scan' function.",
+      "summary": "mt7688-wiscan is vulnerable to Command Injection due to improper input sanitization",
+      "date": "2023-02-01T06:30:30Z",
+      "cve": "CVE-2022-25916",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "smartctl@1.0.0",
+         "name": "smartctl",
+         "version": "1.0.0"
+      },
+      "id": "GHSA-69f2-4375-qv9h",
+      "description": "All versions of the package smartctl are vulnerable to Command Injection via the info method due to improper input sanitization.",
+      "summary": "Command injection in smartctl",
+      "date": "2023-01-26T21:30:27Z",
+      "cve": "CVE-2022-21810",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "puppet-facter@0.0.2",
+         "name": "puppet-facter",
+         "version": "0.0.2"
+      },
+      "id": "GHSA-g5qr-xgg7-8q2w",
+      "description": "All versions of the package puppet-facter are vulnerable to Command Injection via the getFact function due to improper input sanitization.",
+      "summary": "Command Injection in puppet-facter",
+      "date": "2023-01-26T21:30:25Z",
+      "cve": "CVE-2022-25350",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "create-choo-electron@2.0.0",
+         "name": "create-choo-electron",
+         "version": "2.0.0"
+      },
+      "id": "GHSA-j8wr-fwf2-vvr9",
+      "description": "All versions of the package create-choo-electron are vulnerable to Command Injection via the devInstall function due to improper user-input sanitization.",
+      "summary": "Command Injection in create-choo-electron",
+      "date": "2023-01-26T21:30:25Z",
+      "cve": "CVE-2022-25908",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "global-modules-path@2.3.1",
+         "name": "global-modules-path",
+         "version": "2.3.1"
+      },
+      "id": "GHSA-vvj3-85vf-fgmw",
+      "description": "Versions of the package global-modules-path before 3.0.0 are vulnerable to Command Injection due to missing input sanitization or other checks and sandboxes being employed to the getPath function.",
+      "summary": "global-modules-path Command Injection vulnerability",
+      "date": "2023-01-13T06:30:22Z",
+      "cve": "CVE-2022-21191",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "exec-local-bin@1.1.1",
+         "name": "exec-local-bin",
+         "version": "1.1.1"
+      },
+      "id": "GHSA-f259-h6m8-hm8m",
+      "description": "Versions of the package exec-local-bin before 1.2.0 are vulnerable to Command Injection via the `theProcess()` functionality due to improper user-input sanitization.",
+      "summary": "exec-local-bin vulnerable to Command Injection",
+      "date": "2023-01-06T06:30:25Z",
+      "cve": "CVE-2022-25923",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "window-control@1.4.4",
+         "name": "window-control",
+         "version": "1.4.4"
+      },
+      "id": "GHSA-9mjx-wfqp-j5ph",
+      "description": "window-control is an npm package that provides tools to manage window focus. Versions before 1.4.5 are vulnerable to Command Injection via the `sendKeys` function due to improper input sanitization.",
+      "summary": "window-control vulnerable to Command Injection due to improper input sanitization",
+      "date": "2023-01-04T18:30:59Z",
+      "cve": "CVE-2022-25926",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "p4@0.0.6",
+         "name": "p4",
+         "version": "0.0.6"
+      },
+      "id": "GHSA-jfm8-hwhg-r6gg",
+      "description": "The package p4 before 0.0.7 is vulnerable to Command Injection via the run() function due to improper input sanitization",
+      "summary": "p4 vulnerable to Command Injection due to improper input sanitization",
+      "date": "2022-12-20T06:30:36Z",
+      "cve": "CVE-2022-25171",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "font-converter@1.1.1",
+         "name": "font-converter",
+         "version": "1.1.1"
+      },
+      "id": "GHSA-g2c3-vwff-m3xr",
+      "description": "### Overview\nfont-converter is a FontForge wrapper that allows conversion between different font formats (TTF, WOFF, OTF)\n\nAll versions of this package are vulnerable to Arbitrary Command Injection due to missing sanitization of input that potentially flows into the `child_process.exec()` function.\n\n### PoC\n```js\nvar PUT = require('font-converter');\nvar x = \"$(touch success);# \";\ntry {\n    new PUT(x, x, x, x);\n} catch (e) {\n    console.log(e);\n}\n```",
+      "summary": "Font-Converter Vulnerable to Arbitrary Command Injection",
+      "date": "2022-08-29T20:06:54Z",
+      "cve": "CVE-2022-21165",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "@acrontum/filesystem-template@0.0.1",
+         "name": "filesystem-template",
+         "version": "0.0.1",
+         "scope": "acrontum"
+      },
+      "id": "GHSA-m2fc-9h5m-29cm",
+      "description": "The package @acrontum/filesystem-template before 0.0.2 is vulnerable to Arbitrary Command Injection due to the fetchRepo API missing sanitization of the href field of external input.",
+      "summary": "@acrontum/filesystem-template vulnerable to Command Injection due to fetchRepo API missing sanitization",
+      "date": "2022-08-06T00:00:51Z",
+      "cve": "CVE-2022-21186",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "bwm-ng@0.1.1",
+         "name": "bwm-ng",
+         "version": "0.1.1"
+      },
+      "id": "GHSA-8vw3-vxmj-h43w",
+      "description": "All versions of the package bwm-ng are vulnerable to Command Injection due to improper input sanitization in the 'check' function in the bwm-ng.js file. \n\n**Note:**\n\nTo execute the code snippet and potentially exploit the vulnerability, the attacker needs to have the ability to run Node.js code within the target environment. This typically requires some level of access to the system or application hosting the Node.js environment.",
+      "summary": "bwm-ng vulnerable to command injection",
+      "date": "2023-05-27T06:30:41Z",
+      "cve": "CVE-2023-26129",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "npos-tesseract@0.0.3",
+         "name": "npos-tesseract",
+         "version": "0.0.3"
+      },
+      "id": "GHSA-mpwp-pf96-9g4r",
+      "description": "A command injection vulnerability affects all versions of package npos-tesseract. The injection point is located in line 55 in lib/ocr.js.",
+      "summary": "npos-tesseract Command Injection vulnerability",
+      "date": "2022-08-03T00:00:57Z",
+      "cve": "CVE-2020-28453",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "snyk-gradle-plugin@4.4.0",
+         "name": "snyk-gradle-plugin",
+         "version": "4.4.0"
+      },
+      "id": "GHSA-qqqw-gm93-qf6m",
+      "description": "The Snyk gradle plugin is vulnerable to Code Injection when scanning an untrusted Gradle project. The vulnerability can be triggered if Snyk test is run inside the untrusted project due to the improper handling of the current working directory name. Snyk recommends only scanning trusted projects.",
+      "summary": "OS Command Injection in Snyk gradle plugin",
+      "date": "2024-10-23T21:30:28Z",
+      "cve": "CVE-2024-48964",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "cycle-import-check@1.3.1",
+         "name": "cycle-import-check",
+         "version": "1.3.1"
+      },
+      "id": "GHSA-995x-33wq-8gc9",
+      "description": "The package cycle-import-check before version 1.3.2 is vulnerable to Command Injection via the `writeFileToTmpDirAndOpenIt` function due to improper user-input sanitization.",
+      "summary": "cycle-import-check vulnerable to Command Injection",
+      "date": "2022-12-14T06:30:16Z",
+      "cve": "CVE-2022-24377",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "@zowe/imperative@5.7.0",
+         "name": "imperative",
+         "version": "5.7.0",
+         "scope": "zowe"
+      },
+      "id": "GHSA-6q8m-42qq-64r7",
+      "description": "A vulnerability in Imperative framework which allows already-privileged local actors to execute arbitrary shell commands via plugin install/update commands, or maliciously formed environment variables. Impacts Zowe CLI.",
+      "summary": "Imperative CLI vulnerable to Command Injection",
+      "date": "2023-03-01T09:30:29Z",
+      "cve": "CVE-2021-4326",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "hfs@0.52.9",
+         "name": "hfs",
+         "version": "0.52.9"
+      },
+      "id": "GHSA-5f4x-hwv2-w9w2",
+      "description": "rejetto HFS (aka HTTP File Server) 3 before 0.52.10 on Linux, UNIX, and macOS allows OS command execution by remote authenticated users (if they have Upload permissions). This occurs because a shell is used to execute df (i.e., with execSync instead of spawnSync in child_process in Node.js).",
+      "summary": "rejetto HFS vulnerable to OS Command Execution by remote authenticated users",
+      "date": "2024-07-05T00:31:07Z",
+      "cve": "CVE-2024-39943",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "renovate@37.198.3",
+         "name": "renovate",
+         "version": "37.198.3"
+      },
+      "id": "GHSA-rqgv-292v-5qgr",
+      "description": "### Summary\n\nAttackers with commit access to the default branch of a repo using Renovate could manipulate helmv3 registryAliases to execute arbitrary commands.\n\n### Details\n\nSince [#26848](https://github.com/renovatebot/renovate/pull/26848), `registryAliases` has become mergeable. This means that the helmv3 manager started honoring its value and uses a `helm repo add <key> <parameters>` command for each defined alias. See source code: https://github.com/renovatebot/renovate/blob/23f3df6216375cb5bcfe027b0faee304f877f891/lib/modules/manager/helmv3/artifacts.ts#L80\nThe key was not quoted, leading to the ability to use variable references (`$FOO`) in it and have them printed by Renovate on the pull request, or even running any shell commands.\n\n### PoC\n\nInside a repository where Renovate runs, add a Helm chart with an outdated dependency, for example:\n\ntest-chart/Chart.yaml:\n\n```\napiVersion: v2\nname: redis\nversion: 1.0.0\ndependencies:\n  - name: redis\n    version: 18.13.10\n    repository: oci://registry-1.docker.io/bitnamicharts\n```\n\ntest-chart/Chart.lock:\n\n```\ndependencies:\n- name: redis\n  repository: oci://registry-1.docker.io/bitnamicharts\n  version: 18.13.10\ndigest: sha256:11267bd32ea6c5c120ddebbb9f21e4a3c7700a961aa1a27ddb55df1fb8059a38\ngenerated: \"2024-02-16T13:31:20.807026334Z\"\n```\n\nThen add the following `renovate.json`:\n\n```json\n{\n  \"$schema\": \"https://docs.renovatebot.com/renovate-schema.json\",\n  \"extends\": [\n    \"config:base\"\n  ],\n  \"registryAliases\": {\n    \"foo/bar || sh -c 'ls /; exit 1' >&2\": \"registry.example.com/proxy\"\n  }\n}\n```\n\nOnce Renovate runs on the repository, it will create a pull request, and add a comment titled \"Artifact update problem\" containing the following text:\n\n```\nFile name: test-chart/Chart.lock\n\nCommand failed: helm repo add foo/bar || sh -c 'ls /; exit 1' >&2 registry.example.com/proxy --force-update\nError: \"helm repo add\" requires 2 arguments\n\nUsage:  helm repo add [NAME] [URL] [flags]\nbin\nboot\ndev\netc\ngo\nhome\nlib\nlib32\nlib64\nlibx32\nmedia\nmnt\nopt\nproc\nroot\nrun\nsbin\nsrv\nsys\ntmp\nusr\nvar\n```\n\nThis shows that the `ls` command executed successfully, and we can even see its output.\n\nNote that redirecting any output you want to see to stderr (`>&2`) and making sure the final command fails (`exit 1`) is required in this case, as Renovate only adds a comment if the command fails, and it contains only stderr (not stdout) output.\n\n### Impact\n\nAll Renovate versions from 37.158.0 up until 37.199.0 were affected. This vulnerability allows full access to Renovate's execution environment. The level of severity depends on how Renovate is deployed (Docker, Kubernetes, CI pipeline, ...) and whether Renovate is being offered to untrusted users/repositories.\n",
+      "summary": "Renovate vulnerable to arbitrary command injection via helmv3 manager and registryAliases",
+      "date": "2024-04-23T16:21:09Z",
+      "cve": null,
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "snowflake-sdk@1.6.20",
+         "name": "snowflake-sdk",
+         "version": "1.6.20"
+      },
+      "id": "GHSA-h53w-7qw7-vh5c",
+      "description": "### Issue\nSnowflake was informed via our bug bounty program of a command injection vulnerability in the Snowflake NodeJS driver via SSO browser URL authentication.\n\n### Impacted driver package: \nsnowflake-connector-nodejs\n\n### Impacted version range: \nbefore [Version 1.6.21](https://community.snowflake.com/s/article/Node-js-Driver-Release-Notes) \n\n### Attack Scenario\nIn order to exploit the potential for command injection, an attacker would need to be successful in (1) establishing a malicious resource and (2) redirecting users to utilize the resource. The attacker could set up a malicious, publicly accessible server which responds to the SSO URL with an attack payload. If the attacker then tricked a user into visiting the maliciously crafted connection URL, the user’s local machine would render the malicious payload, leading to a remote code execution. \n\nThis attack scenario can be mitigated through URL whitelisting as well as common anti-phishing resources.  \n\n### Solution\nOn April 18, 2023, Snowflake merged a patch that fixed a command injection vulnerability in the Snowflake NodeJS driver via SSO browser URL authentication. The vulnerability affected the Snowflake NodeJS driver before Version 1.6.21. We strongly recommend users upgrade to Version 1.6.21 as soon as possible via the following resources: [Snowflake NodeJS Driver](https://docs.snowflake.com/en/developer-guide/node-js/nodejs-driver)\n\n### Additional Information\nIf you discover a security vulnerability in one of our products or websites, please report the issue to HackerOne. For more information, please see our [Vulnerability Disclosure Policy](https://hackerone.com/snowflake?type=team).",
+      "summary": "Snowflake NodeJS Driver vulnerable to Command Injection",
+      "date": "2023-06-09T22:53:51Z",
+      "cve": "CVE-2023-34232",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "git-commit-info@2.0.1",
+         "name": "git-commit-info",
+         "version": "2.0.1"
+      },
+      "id": "GHSA-h42j-mrmp-9369",
+      "description": "Versions of the package git-commit-info before 2.0.2 are vulnerable to Command Injection such that the package-exported method gitCommitInfo() fails to sanitize its parameter commit, which later flows into a sensitive command execution API. As a result, attackers may inject arguments to the git binary.",
+      "summary": "git-commit-info vulnerable to Command Injection",
+      "date": "2023-06-28T06:30:22Z",
+      "cve": "CVE-2023-26134",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "wifey@2.0.7",
+         "name": "wifey",
+         "version": "2.0.7"
+      },
+      "id": "GHSA-xj9v-6q2f-vqhx",
+      "description": "All versions of the package wifey are vulnerable to Command Injection via the `connect()` function due to improper input sanitization.",
+      "summary": "wifey vulnerable to Command Injection due to improper input sanitization",
+      "date": "2023-01-09T06:30:26Z",
+      "cve": "CVE-2022-25890",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "simple-git@3.14.1",
+         "name": "simple-git",
+         "version": "3.14.1"
+      },
+      "id": "GHSA-9p95-fxvg-qgq2",
+      "description": "The package simple-git before 3.15.0 is vulnerable to Remote Code Execution (RCE) when enabling the `ext` transport protocol, which makes it exploitable via `clone()` method. This vulnerability exists due to an incomplete fix of [CVE-2022-24066](https://security.snyk.io/vuln/SNYK-JS-SIMPLEGIT-2434306).",
+      "summary": "simple-git vulnerable to Remote Code Execution when enabling the ext transport protocol",
+      "date": "2022-12-06T06:30:17Z",
+      "cve": "CVE-2022-25912",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "nadesiko3@3.3.68",
+         "name": "nadesiko3",
+         "version": "3.3.68"
+      },
+      "id": "GHSA-m8r5-7wf4-63mw",
+      "description": "OS command injection vulnerability in Nadesiko3 (PC Version) v3.3.68 and earlier allows a remote attacker to execute an arbitrary OS command when processing compression and decompression on the product.\n\nRelease notes for versions 3.3.62 and 3.3.69 both link to patches for this particular issue. The [JPCERT/CC](https://jvn.jp/en/jp/JVN56968681/index.html) advisory lists versions 3.3.68 and prior as vulnerable, and the most recent patch for this issue is tagged with version 3.3.69.",
+      "summary": "Nadesiko3 OS Command Injection vulnerability",
+      "date": "2022-12-05T06:30:22Z",
+      "cve": "CVE-2022-41642",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "nadesiko3@3.3.74",
+         "name": "nadesiko3",
+         "version": "3.3.74"
+      },
+      "id": "GHSA-7249-8x22-4rg4",
+      "description": "OS command injection vulnerability in Nako3edit, editor component of nadesiko3 (PC Version) v3.3.74 and earlier allows a remote attacker to obtain appkey of the product and execute an arbitrary OS command on the product.",
+      "summary": "nadesiko3 vulnerable to OS Command Injection",
+      "date": "2022-12-05T06:30:22Z",
+      "cve": "CVE-2022-42496",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "snyk@1.995.0",
+         "name": "snyk",
+         "version": "1.995.0"
+      },
+      "id": "GHSA-hpqj-7cj6-hfj8",
+      "description": "Snyk CLI before 1.996.0 allows arbitrary command execution, affecting Snyk IDE plugins and the snyk npm package. Exploitation could follow from the common practice of viewing untrusted files in the Visual Studio Code editor, for example. The original demonstration was with shell metacharacters in the vendor.json ignore field, affecting snyk-go-plugin before 1.19.1. This affects, for example, the Snyk TeamCity plugin (which does not update automatically) before 20220930.142957.",
+      "summary": "Snyk CLI affected by Command Injection vulnerability",
+      "date": "2022-10-04T00:00:22Z",
+      "cve": "CVE-2022-40764",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "matrix-appservice-irc@0.36.1",
+         "name": "matrix-appservice-irc",
+         "version": "0.36.1"
+      },
+      "id": "GHSA-5mvm-89c9-9gm5",
+      "description": "### Impact\nThe matrix-appservice-irc bridge up to version 3.0.3 contains a vulnerability which can lead to arbitrary IRC command execution as the puppeted user. The attacker can only inject commands executed as their own IRC user.\n\n### Patches\nThe vulnerability has been patched in matrix-appservice-irc version 3.0.4.\n\n### For more information\nIf you have any questions or comments about this advisory, please email us at [security at matrix.org](mailto:security@matrix.org).",
+      "summary": "Matrix IRC Bridge allows IRC command injection to own puppeted user",
+      "date": "2025-02-25T18:29:34Z",
+      "cve": "CVE-2025-27146",
+      "year": 2025
+   },
+   {
+      "package": {
+         "raw": "dawnsparks-node-tesseract@0.4.0",
+         "name": "dawnsparks-node-tesseract",
+         "version": "0.4.0"
+      },
+      "id": "GHSA-88qf-5f3v-pm6m",
+      "description": "dawnsparks-node-tesseract before 0.4.1 was discovered to contain a remote code execution (RCE) vulnerability via the child_process function.",
+      "summary": "Remote code execution in dawnsparks-node-tesseract",
+      "date": "2023-04-24T18:30:31Z",
+      "cve": "CVE-2023-29566",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "git-archive@0.1.4",
+         "name": "git-archive",
+         "version": "0.1.4"
+      },
+      "id": "GHSA-vqgr-mfxm-47f3",
+      "description": "All versions of package git-archive are vulnerable to Command Injection via the exports function.",
+      "summary": "git-archive vulnerable to Command Injection via exports function",
+      "date": "2022-07-26T00:01:06Z",
+      "cve": "CVE-2020-28422",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "ntesseract@0.2.8",
+         "name": "ntesseract",
+         "version": "0.2.8"
+      },
+      "id": "GHSA-w868-4576-rv24",
+      "description": "The package ntesseract before 0.2.9 is vulnerable to Command Injection via lib/tesseract.js.",
+      "summary": "ntesseract vulnerable to Command Injection",
+      "date": "2022-07-26T00:01:05Z",
+      "cve": "CVE-2020-28446",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "sonar-wrapper@0.1.3",
+         "name": "sonar-wrapper",
+         "version": "0.1.3"
+      },
+      "id": "GHSA-wr4v-3f2h-6hhh",
+      "description": "A command injection vulnerability affects all versions of package sonar-wrapper. The injection point is located in lib/sonarRunner.js.",
+      "summary": "sonar-wrapper Command Injection vulnerability",
+      "date": "2022-07-26T00:01:05Z",
+      "cve": "CVE-2020-28443",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "git-promise@1.0.0",
+         "name": "git-promise",
+         "version": "1.0.0"
+      },
+      "id": "GHSA-chj3-f7xw-367m",
+      "description": "All versions of package git-promise is vulnerable to Command Injection due to an inappropriate fix of a prior [vulnerability](https://security.snyk.io/vuln/SNYK-JS-GITPROMISE-567476) in this package. **Note:** Please note that the vulnerability will not be fixed. The README file was updated with a warning regarding this issue. \n### Credits\n @lirantal for discovering this vulnerability.",
+      "summary": "OS Command Injection in git-promise",
+      "date": "2022-06-11T00:00:18Z",
+      "cve": "CVE-2022-24376",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "s3-uploader@2.0.3",
+         "name": "s3-uploader",
+         "version": "2.0.3"
+      },
+      "id": "GHSA-gwp3-f7mr-qpfv",
+      "description": "OS command injection vulnerability in Turistforeningen node-s3-uploader through 2.0.3 for Node.js allows attackers to execute arbitrary commands via the metadata() function.",
+      "summary": "OS Command Injection in s3-uploader",
+      "date": "2022-06-03T00:00:59Z",
+      "cve": "CVE-2021-34084",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "proctree@0.1.1",
+         "name": "proctree",
+         "version": "0.1.1"
+      },
+      "id": "GHSA-cv76-rv4h-4mqc",
+      "description": "OS Command Injection vulnerability in allenhwkim proctree through 0.1.1 and commit 0ac10ae575459457838f14e21d5996f2fa5c7593 for Node.js, allows attackers to execute arbitrary commands via the fix function.",
+      "summary": "OS Command Injection in proctree",
+      "date": "2022-06-03T00:00:59Z",
+      "cve": "CVE-2021-34082",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "google-it@1.6.2",
+         "name": "google-it",
+         "version": "1.6.2"
+      },
+      "id": "GHSA-7xhv-mpjw-422f",
+      "description": "Google-it is a Node.js package which allows its users to send search queries to Google and receive the results in a JSON format. When using the 'Open in browser' option in versions up to 1.6.2, google-it will unsafely concat the result's link retrieved from google to a shell command, potentially exposing the server to RCE.",
+      "summary": "Command injection in google-it",
+      "date": "2022-06-03T00:00:59Z",
+      "cve": "CVE-2021-34083",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "ssl-utils@1.0.0",
+         "name": "ssl-utils",
+         "version": "1.0.0"
+      },
+      "id": "GHSA-552j-pv39-f3jf",
+      "description": "OS Command Injection vulnerability in es128 ssl-utils 1.0.0 for Node.js allows attackers to execute arbitrary commands via unsanitized shell metacharacters provided to the createCertRequest() and the createCert() functions.",
+      "summary": "OS Command injection in ssl-utils",
+      "date": "2022-06-03T00:00:58Z",
+      "cve": "CVE-2021-34080",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "gitsome@0.2.3",
+         "name": "gitsome",
+         "version": "0.2.3"
+      },
+      "id": "GHSA-9v73-x562-wv5x",
+      "description": "OS Command Injection vulnerability in bbultman gitsome through 0.2.3 allows attackers to execute arbitrary commands via a crafted tag name of the target git repository.",
+      "summary": "OS Command Injection in gitsome",
+      "date": "2022-06-03T00:00:58Z",
+      "cve": "CVE-2021-34081",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "lifion-verify-deps@1.1.0",
+         "name": "lifion-verify-deps",
+         "version": "1.1.0"
+      },
+      "id": "GHSA-rphm-c8gw-3r38",
+      "description": "lifion-verify-dependencies through 1.1.0 is vulnerable to OS command injection via a crafted dependency name on the scanned project's package.json file.",
+      "summary": "OS Command Injection in lifion-verify-deps",
+      "date": "2022-06-03T00:00:58Z",
+      "cve": "CVE-2021-34078",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "sharp@0.30.4",
+         "name": "sharp",
+         "version": "0.30.4"
+      },
+      "id": "GHSA-gp95-ppv5-3jc5",
+      "description": "There's a possible vulnerability in logic that is run only at `npm install` time when installing versions of `sharp` prior to the latest v0.30.5.\n\nThis is not part of any runtime code, does not affect Windows users at all, and is unlikely to affect anyone that already cares about the security of their build environment. However, out of an abundance of caution, I've created this advisory.\n\nIf an attacker has the ability to set the value of the `PKG_CONFIG_PATH` environment variable in a build environment then they might be able to use this to inject an arbitrary command at `npm install` time.\n\nI've used the Common Vulnerability Scoring System (CVSS) calculator to determine the maximum possible impact, which suggests a \"medium\" score of 5.9, but for most people the real impact will be dealing with the noise from automated security tooling that this advisory will bring.\n\n[`AV:L/AC:L/PR:H/UI:R/S:U/C:H/I:H/A:H/E:P/RL:O/RC:C/CR:X/IR:X/AR:X/MAV:X/MAC:X/MPR:X/MUI:R/MS:X/MC:X/MI:X/MA:X`](https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:L/AC:L/PR:H/UI:R/S:U/C:H/I:H/A:H/E:P/RL:O/RC:C/CR:X/IR:X/AR:X/MAV:X/MAC:X/MPR:X/MUI:R/MS:X/MC:X/MI:X/MA:X&version=3.1)\n\nThis problem was fixed in commit a6aeef6 and published as part of `sharp` v0.30.5.\n\nThank you very much to @dwisiswant0 for the responsible disclosure.\n\nRemember: if an attacker has control over environment variables in your build environment then you have a bigger problem to deal with than this issue.\n",
+      "summary": "sharp vulnerable to Command Injection in post-installation over build environment",
+      "date": "2022-06-01T19:58:29Z",
+      "cve": "CVE-2022-29256",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "chrome-launcher@0.13.1",
+         "name": "chrome-launcher",
+         "version": "0.13.1"
+      },
+      "id": "GHSA-gp2j-mg4w-2rh5",
+      "description": "chrome-launcher prior to 0.13.2 is subject to OS Command Injection via the `$HOME` environment variable in Linux operating systems. This issue is patched in version 0.13.2.",
+      "summary": "chrome-launcher subject to OS Command Injection",
+      "date": "2022-05-24T17:17:04Z",
+      "cve": "CVE-2020-7645",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "promise-probe@0.1.9",
+         "name": "promise-probe",
+         "version": "0.1.9"
+      },
+      "id": "GHSA-vmqq-7qvx-68qx",
+      "description": "promise-probe before 0.10.0 allows remote attackers to perform a command injection attack. The `file`, `outputFile` and `options` functions can be controlled by users without any sanitization.",
+      "summary": "promise-probe OS command injection vulnerability",
+      "date": "2022-05-24T17:09:13Z",
+      "cve": "CVE-2019-10791",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "tree-kill@1.2.1",
+         "name": "tree-kill",
+         "version": "1.2.1"
+      },
+      "id": "GHSA-j7fq-p9q7-5wfv",
+      "description": "A Code Injection exists in treekill and tree-kill on Windows which allows a remote code execution when an attacker is able to control the input into the command.\n\n### Steps To Reproduce:\nCreate the following PoC file:\n\n```js\nvar kill = require('treekill');\nkill('3333332 & echo \"HACKED\" > HACKED.txt & ');\n```\n\nExecute the following commands in terminal:\n\n```shell\nnpm i treekill # Install affected module\ndir # Check *HACKED.txt* doesn't exist\nnode poc.js #  Run the PoC\ndir # Now *HACKED.txt* exists :)\n```\n\nThe HACKED.txt has been created",
+      "summary": "Treekill Enables OS Command Injection",
+      "date": "2022-05-24T17:04:00Z",
+      "cve": "CVE-2019-15598",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "electron@1.3.15",
+         "name": "electron",
+         "version": "1.3.15"
+      },
+      "id": "GHSA-7fv9-m79r-j9x8",
+      "description": "Electron before 1.6.8 allows remote command execution because of a `nodeIntegration` bypass vulnerability. This also affects all applications that bundle Electron code equivalent to 1.6.8 or earlier. Bypassing the Same Origin Policy (SOP) is a precondition; however, recent Electron versions do not have strict SOP enforcement. Combining an SOP bypass with a privileged URL internally used by Electron, it was possible to execute native Node.js primitives in order to run OS commands on the user's host. Specifically, a `chrome-devtools://devtools/bundled/inspector.html` window could be used to eval a Node.js `child_process.execFile` API call.",
+      "summary": "Electron vulnerable to remote command execution",
+      "date": "2022-05-17T02:14:12Z",
+      "cve": "CVE-2017-12581",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "fs-git@1.0.1",
+         "name": "fs-git",
+         "version": "1.0.1"
+      },
+      "id": "GHSA-wp3j-gv53-4pg8",
+      "description": "fs-git is a file system like api for git repository. The fs-git version 1.0.1 module relies on child_process.exec, however, the buildCommand method used to construct exec strings does not properly sanitize data and is vulnerable to command injection across all methods that use it and call exec.",
+      "summary": "fs-git command injection vulnerability",
+      "date": "2022-05-13T01:41:14Z",
+      "cve": "CVE-2017-1000451",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "git-pull-or-clone@2.0.1",
+         "name": "git-pull-or-clone",
+         "version": "2.0.1"
+      },
+      "id": "GHSA-3x62-x456-q2vm",
+      "description": "The package git-pull-or-clone before 2.0.2 is vulnerable to Command Injection due to the use of the --upload-pack feature of git which is also supported for git clone. The source includes the use of the secure child process API spawn(). However, the outpath parameter passed to it may be a command-line argument to the git clone command and result in arbitrary command injection.\n## Credits\n\nCredit @lirantal for discovering this vulnerability.",
+      "summary": "OS Command Injection in git-pull-or-clone",
+      "date": "2022-05-03T00:00:46Z",
+      "cve": "CVE-2022-24437",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "npm-dependency-versions@0.3.0",
+         "name": "npm-dependency-versions",
+         "version": "0.3.0"
+      },
+      "id": "GHSA-m7xq-8jp8-rj2c",
+      "description": "The npm-dependency-versions package through 0.3.0 for Node.js allows command injection if an attacker is able to call dependencyVersions with a JSON object in which pkgs is a key, and there are shell metacharacters in a value.",
+      "summary": "Command injection in npm-dependency-versions",
+      "date": "2022-04-13T00:00:33Z",
+      "cve": "CVE-2022-29080",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "ungit@1.5.19",
+         "name": "ungit",
+         "version": "1.5.19"
+      },
+      "id": "GHSA-hf8c-xr89-vfm5",
+      "description": "The package ungit before 1.5.20 are vulnerable to Remote Code Execution (RCE) via argument injection. The issue occurs when calling the /api/fetch endpoint. User controlled values (remote and ref) are passed to the git fetch command. By injecting some git options it was possible to get arbitrary command execution.",
+      "summary": "Command Injection in ungit",
+      "date": "2022-03-22T00:00:41Z",
+      "cve": "CVE-2022-25766",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "simple-git@3.2.6",
+         "name": "simple-git",
+         "version": "3.2.6"
+      },
+      "id": "GHSA-3f95-r44v-8mrg",
+      "description": "The package simple-git before 3.3.0 is vulnerable to Command Injection via argument injection. When calling the .fetch(remote, branch, handlerFn) function, both the remote and branch parameters are passed to the git fetch subcommand. By injecting some git options, it was possible to get arbitrary command execution.",
+      "summary": "Command injection in simple-git",
+      "date": "2022-03-12T00:00:33Z",
+      "cve": "CVE-2022-24433",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "genieacs@1.2.7",
+         "name": "genieacs",
+         "version": "1.2.7"
+      },
+      "id": "GHSA-2877-693q-pj33",
+      "description": "In GenieACS 1.2.x before 1.2.8, the UI interface API is vulnerable to unauthenticated OS command injection via the ping host argument (lib/ui/api.ts and lib/ping.ts). The vulnerability arises from insufficient input validation combined with a missing authorization check.",
+      "summary": "OS Command Injection in GenieACS",
+      "date": "2022-03-07T00:00:40Z",
+      "cve": "CVE-2021-46704",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "npm-lockfile@2.0.4",
+         "name": "npm-lockfile",
+         "version": "2.0.4"
+      },
+      "id": "GHSA-cr6m-62pq-hmqh",
+      "description": "npm-lockfile safely generates an npm lockfile and output it to the filename of your choice. npm-lockfile before 2.0.4 does not santize unsafe external input and invoke sensitive command execution API with the input, causing command injection vulnerability. A fix was released in version 2.0.5.",
+      "summary": "OS Command injection in npm-lockfile",
+      "date": "2022-03-04T00:00:18Z",
+      "cve": "CVE-2022-0841",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "strapi@3.6.11",
+         "name": "strapi",
+         "version": "3.6.11"
+      },
+      "id": "GHSA-xrjf-phvv-r4vr",
+      "description": "When creating a strapi app using npxcreate-strapi-app, we can inject arbitrary commands through the template cli argument as per the code in this particular [link](https://github.com/strapi/strapi/blob/master/packages/generators/app/lib/utils/fetch-npm-template.js#L13), this happens due to improper sanitization of user input.",
+      "summary": "Command injection in strapi",
+      "date": "2022-02-27T00:00:15Z",
+      "cve": "CVE-2022-0764",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "install-package@0.4.0",
+         "name": "install-package",
+         "version": "0.4.0"
+      },
+      "id": "GHSA-6m4r-m3gc-h4r5",
+      "description": "install-package through 0.4.0 is vulnerable to Command Injection. It allows execution of arbitrary commands via the options argument.",
+      "summary": "OS Command Injection in install-package",
+      "date": "2022-02-10T23:48:06Z",
+      "cve": "CVE-2020-7629",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "op-browser@1.0.9",
+         "name": "op-browser",
+         "version": "1.0.9"
+      },
+      "id": "GHSA-3hq6-rmv7-39vh",
+      "description": "op-browser through 1.0.9 is vulnerable to Command Injection. It allows execution of arbitrary commands via the url function.",
+      "summary": "Injection in op-browser",
+      "date": "2022-02-10T23:45:28Z",
+      "cve": "CVE-2020-7625",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "karma-mojo@1.0.1",
+         "name": "karma-mojo",
+         "version": "1.0.1"
+      },
+      "id": "GHSA-pf8j-vhg8-xmc3",
+      "description": "karma-mojo through 1.0.1 is vulnerable to Command Injection. It allows execution of arbitrary commands via the config argument.",
+      "summary": "karma-mojo enables OS Command Injection",
+      "date": "2022-02-10T23:42:58Z",
+      "cve": "CVE-2020-7626",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "jscover@1.0.0",
+         "name": "jscover",
+         "version": "1.0.0"
+      },
+      "id": "GHSA-c5hm-xc74-pqrg",
+      "description": "jscover through 1.0.0 is vulnerable to Command Injection. It allows execution of arbitrary command via the source argument.",
+      "summary": "OS Command Injection in jscover",
+      "date": "2022-02-10T23:37:22Z",
+      "cve": "CVE-2020-7623",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "strong-nginx-controller@1.0.2",
+         "name": "strong-nginx-controller",
+         "version": "1.0.2"
+      },
+      "id": "GHSA-4v9w-pvwr-38h3",
+      "description": "strong-nginx-controller through 1.0.2 is vulnerable to Command Injection. It allows execution of arbitrary command as part of the '_nginxCmd()' function.",
+      "summary": "OS Command Injection in strong-nginx-controller",
+      "date": "2022-02-10T23:36:54Z",
+      "cve": "CVE-2020-7621",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "systeminformation@4.30.1",
+         "name": "systeminformation",
+         "version": "4.30.1"
+      },
+      "id": "GHSA-8j36-q8x7-pm6q",
+      "description": "This affects the package systeminformation before 4.30.2. The attacker can overwrite the properties and functions of an object, which can lead to executing OS commands.",
+      "summary": "OS Command Injection in systeminformation",
+      "date": "2022-02-09T23:14:11Z",
+      "cve": "CVE-2020-7778",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "push-dir@0.4.1",
+         "name": "push-dir",
+         "version": "0.4.1"
+      },
+      "id": "GHSA-926x-m6m5-3mmp",
+      "description": "push-dir through 0.4.1 allows execution of arbritary commands. Arguments provided as part of the variable `opt.branch` is not validated before being provided to the `git` command within [index.js#L139](https://github.com/L33T-KR3W/push-dir/blob/master/index.js#L139). This could be abused by an attacker to inject arbitrary commands.",
+      "summary": "push-dir Enables OS Command Injection",
+      "date": "2022-02-09T22:50:06Z",
+      "cve": "CVE-2019-10803",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "node-windows@1.0.0-beta.5",
+         "name": "node-windows",
+         "version": "1.0.0-beta.5"
+      },
+      "id": "GHSA-53xv-c2hx-5w6q",
+      "description": "lib/cmd.js in the node-windows package before 1.0.0-beta.6 for Node.js allows command injection via the PID parameter.",
+      "summary": "Command Injection in node-windows",
+      "date": "2022-01-05T20:39:21Z",
+      "cve": "CVE-2021-45459",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "github-todos@3.1.0",
+         "name": "github-todos",
+         "version": "3.1.0"
+      },
+      "id": "GHSA-792j-9wj3-j634",
+      "description": "naholyr github-todos 3.1.0 is vulnerable to command injection. The range argument for the _hook subcommand is concatenated without any validation, and is directly used by the exec function.",
+      "summary": "Command injection in github-todos",
+      "date": "2021-12-10T20:30:52Z",
+      "cve": "CVE-2021-44684",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "strapi@3.0.0-beta.17.7",
+         "name": "strapi",
+         "version": "3.0.0-beta.17.7"
+      },
+      "id": "GHSA-49vv-6q7q-w5cf",
+      "description": "The Strapi framework before 3.0.0-beta.17.8 is vulnerable to Remote Code Execution in the Install and Uninstall Plugin components of the Admin panel, because it does not sanitize the plugin name, and attackers can inject arbitrary shell commands to be executed by the execa function.",
+      "summary": "OS Command Injection in Strapi",
+      "date": "2021-12-10T17:22:12Z",
+      "cve": "CVE-2019-19609",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "fsa@0.5.1",
+         "name": "fsa",
+         "version": "0.5.1"
+      },
+      "id": "GHSA-3p94-vj97-fm4q",
+      "description": "fsa through 0.5.1 is vulnerable to Command Injection. The first argument of 'execGitCommand()', located within 'lib/rep.js#63' can be controlled by users without any sanitization to inject arbitrary commands.",
+      "summary": "OS Command Injection in fsa",
+      "date": "2021-12-09T19:56:44Z",
+      "cve": "CVE-2020-7615",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "heroku-addonpool@0.1.15",
+         "name": "heroku-addonpool",
+         "version": "0.1.15"
+      },
+      "id": "GHSA-3q9x-w53p-jg53",
+      "description": "heroku-addonpool through 0.1.15 is vulnerable to Command Injection. The second parameter of the exported function `HerokuAddonPool(id, app, opt)` can be controlled by users without any sanitization.\n\n**PoC**\n```js\nvar Root = require(\"heroku-addonpool\");\nvar root = Root(\"sss\", \"& touch JHU\", {});\nroot.setup();\n```",
+      "summary": "OS Command Injection in heroku-addonpool",
+      "date": "2021-12-09T19:52:03Z",
+      "cve": "CVE-2020-7634",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "git-it-electron@1.0.0",
+         "name": "git-it-electron",
+         "version": "1.0.0"
+      },
+      "id": "GHSA-wjqc-j537-j9gj",
+      "description": "Git-it through 4.4.0 allows OS command injection at the Branches Aren't Just For Birds challenge step. During the verification process, it attempts to run the reflog command followed by the current branch name (which is not sanitized for execution).",
+      "summary": "Command injection in git-it-electron",
+      "date": "2021-12-08T00:01:44Z",
+      "cve": "CVE-2021-44685",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "docker-cli-js@2.8.0",
+         "name": "docker-cli-js",
+         "version": "2.8.0"
+      },
+      "id": "GHSA-ff45-7prw-58vj",
+      "description": "# Withdrawn\n\nAfter reviewing this CVE, and [this response from the maintainer](https://github.com/Quobject/docker-cli-js/issues/22#issuecomment-967760940), we have withdrawn this advisory.\n\n# Original CVE description\n\nThis affects all versions of package docker-cli-js. If the command parameter of the Docker.command method can at least be partially controlled by a user, they will be in a position to execute any arbitrary OS commands on the host system. ",
+      "summary": "OS Command injection in docker-cli-js",
+      "date": "2021-12-02T17:51:22Z",
+      "cve": "CVE-2021-23732",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "aaptjs@1.3.1",
+         "name": "aaptjs",
+         "version": "1.3.1"
+      },
+      "id": "GHSA-4qwq-q4pr-rr7r",
+      "description": "aaptjs is a node wraper for aapt. An issue was discovered in the packageCmd function in shenzhim aaptjs 1.3.1, allows attackers to execute arbitrary code via the filePath parameters.",
+      "summary": "Vulnerability in packageCmd function leads to arbitrary code execution via filePath parameters",
+      "date": "2021-11-02T15:42:38Z",
+      "cve": "CVE-2020-36378",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "aaptjs@1.3.1",
+         "name": "aaptjs",
+         "version": "1.3.1"
+      },
+      "id": "GHSA-9cq3-fj2h-ggj5",
+      "description": "Aaptjs is a node wraper for aapt. An issue was discovered in the remove function in shenzhim aaptjs 1.3.1, allows attackers to execute arbitrary code via the filePath parameters.",
+      "summary": "Vulnerability in remove function leads to arbitrary code execution via filePath parameters",
+      "date": "2021-11-02T15:42:31Z",
+      "cve": "CVE-2020-36379",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "aaptjs@1.3.1",
+         "name": "aaptjs",
+         "version": "1.3.1"
+      },
+      "id": "GHSA-r496-7hgp-53wf",
+      "description": "aaptjs is a node wraper for aapt. An issue was discovered in the dump function in shenzhim aaptjs 1.3.1, allows attackers to execute arbitrary code via the filePath parameters.",
+      "summary": "Vulnerability in dump function leads to arbitrary code execution via filePath parameters",
+      "date": "2021-11-02T15:42:24Z",
+      "cve": "CVE-2020-36377",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "aaptjs@1.3.1",
+         "name": "aaptjs",
+         "version": "1.3.1"
+      },
+      "id": "GHSA-4g7x-7vgq-3j28",
+      "description": "aaptjs is a node wraper for aapt. An issue was discovered in the list function in shenzhim aaptjs 1.3.1, allows attackers to execute arbitrary code via the filePath parameters.",
+      "summary": "Vulnerability in list function leads to arbitrary code execution via filePath parameters",
+      "date": "2021-11-02T15:42:16Z",
+      "cve": "CVE-2020-36376",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "aaptjs@1.3.1",
+         "name": "aaptjs",
+         "version": "1.3.1"
+      },
+      "id": "GHSA-7fw7-gh23-f832",
+      "description": "aaptjs is a node wraper for aapt. An issue was discovered in the singleCrunch function in shenzhim aaptjs 1.3.1, allows attackers to execute arbitrary code via the filePath parameters.",
+      "summary": "Vulnerability in singleCrunch function leads to arbitrary code execution via filePath parameters",
+      "date": "2021-11-01T19:19:29Z",
+      "cve": "CVE-2020-36381",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "opencv@6.0.0",
+         "name": "opencv",
+         "version": "6.0.0"
+      },
+      "id": "GHSA-mc7w-4cjf-c973",
+      "description": "utils/find-opencv.js in node-opencv (aka OpenCV bindings for Node.js) prior to 6.1.0 is vulnerable to Command Injection. It does not validate user input allowing attackers to execute arbitrary commands.",
+      "summary": "OS Command Injection in node-opencv",
+      "date": "2021-10-12T22:06:57Z",
+      "cve": "CVE-2019-10061",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "ssh2@1.3.0",
+         "name": "ssh2",
+         "version": "1.3.0"
+      },
+      "id": "GHSA-652h-xwhf-q4h6",
+      "description": "ssh2 is client and server modules written in pure JavaScript for node.js. In ssh2 before version 1.4.0 there is a command injection vulnerability. The issue only exists on Windows. This issue may lead to remote code execution if a client of the library calls the vulnerable method with untrusted input. This is fixed in version 1.4.0.",
+      "summary": "OS Command Injection in ssh2",
+      "date": "2021-09-21T16:50:46Z",
+      "cve": "CVE-2020-26301",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "rebber@5.2.0",
+         "name": "rebber",
+         "version": "5.2.0"
+      },
+      "id": "GHSA-2c83-wfv3-q25f",
+      "description": "### Impact\n\nA Remote Command Execution vulnerability was found in the rebber module,\nwhich allowed execution of arbitrary commands. The reported problem came\nfrom CodeBlocks, which could be escaped to insert malicious LaTeX.\n\nAnyone using `rebber` without sanitation of code content or a custom\nmacro is impacted by this vulnerability. Here is an example of a Markdown\ncontent that will exploit the vulnerability:\n\n````markdown\n```\n\\end{CodeBlock}\n\n\\immediate\\write18{COMMAND > outputrce}\n\\input{outputrce}\n\n\\begin{CodeBlock}{text}\n```\n````\n\nWill insert into the generated LaTeX the result of executing\n`COMMAND` on the system.\n\n### Patches\n\nThe vulnerability has been patched in version 5.2.1.\nIf impacted, you should update to this version as soon as possible.\n\n### Workarounds\n\nIt is possible to mitigate the vulnerability without upgrading by using a\ncustom code macro. Please make sure this custom macro escapes your\nclosing LaTeX sequence. For the example above, use:\n\n```javascript\nconst escaped = content.replace(new RegExp('\\\\\\\\end\\\\s*{CodeBlock}', 'g'), '')\n```\n\n### For more information\n\nIf you have any questions or comments about this advisory, open an issue in [ZMarkdown](https://github.com/zestedesavoir/zmarkdown/issues).",
+      "summary": "Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection') in ZMarkdown",
+      "date": "2021-09-07T23:07:56Z",
+      "cve": null,
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "@npmcli/git@2.0.7",
+         "name": "git",
+         "version": "2.0.7",
+         "scope": "npmcli"
+      },
+      "id": "GHSA-hxwm-x553-x359",
+      "description": "### Summary\nThere exists a command injection vulnerability in `npmcli/git` versions <2.0.8 which may result in arbitrary shell command execution due to improper argument sanitization when `npmcli/git` is used to execute Git commands based on user controlled input. \n\nThe impact of this issue is possible Arbitrary Command Injection when `npmcli/git` is run with untrusted (user controlled) Git command arguments. \n\n### Impact\n\nArbitrary Command Injection\n\n### Details\n\n`npmcli/git` prior to release `2.0.8` passed user controlled input as arguments to a shell command without properly sanitizing this input. Passing unsanitized input to a shell can lead to arbitrary command injection. For example passing `git+https://github.com/npm/git; echo hello world` would trigger the shell execution of `echo hello world`.  \n\nThis issue was remediated by no longer running `npmcli/git` git commands through an intermediate shell.\n\n### Patches\n\nThis issue has been patched in release `2.0.8`\n\n### Acknowledgements\n\nThis report was reported to us by @tyage (Ierae Security) through the [GitHub Bug Bounty Program](https://bounty.github.com).\n",
+      "summary": "Arbitrary Command Injection due to Improper Command Sanitization",
+      "date": "2021-08-05T17:07:39Z",
+      "cve": null,
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "gitlogplus@3.1.7",
+         "name": "gitlogplus",
+         "version": "3.1.7"
+      },
+      "id": "GHSA-3fxp-vwxm-2r5p",
+      "description": "All versions of package gitlogplus are vulnerable to Command Injection via the main functionality, as options attributes are appended to the command to be executed without sanitization.",
+      "summary": "Command injection in gitlogplus",
+      "date": "2021-07-26T21:23:35Z",
+      "cve": "CVE-2021-23412",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "locutus@2.0.11",
+         "name": "locutus",
+         "version": "2.0.11"
+      },
+      "id": "GHSA-h86x-mv66-gr5q",
+      "description": "php/exec/escapeshellarg in Locutus PHP through 2.0.11 allows an attacker to achieve code execution.",
+      "summary": "OS Command Injection in Locutus",
+      "date": "2021-07-26T21:21:43Z",
+      "cve": "CVE-2020-13619",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "reg-keygen-git-hash-plugin@0.10.15",
+         "name": "reg-keygen-git-hash-plugin",
+         "version": "0.10.15"
+      },
+      "id": "GHSA-49q3-8867-5wmp",
+      "description": "### Impact\n\n`reg-keygen-git-hash-plugin` through 0.10.15 allow remote attackers to execute of arbitrary commands.\n\n### Patches\n\nUpgrade to version 0.10.16 or later.\n\n### For more information\n\nIf you have any questions or comments about this advisory:\n- Open an issue in [reg-viz/reg-suit](https://github.com/reg-viz/reg-suit)\n",
+      "summary": "Remote Command Execution in reg-keygen-git-hash-plugin",
+      "date": "2021-06-08T18:47:06Z",
+      "cve": "CVE-2021-32673",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "@backstage/techdocs-common@0.6.3",
+         "name": "techdocs-common",
+         "version": "0.6.3",
+         "scope": "backstage"
+      },
+      "id": "GHSA-pwhf-39xg-4rxw",
+      "description": "### Impact\n\nA malicious internal actor is able to upload documentation content with malicious scripts. These scripts would normally be sanitized by the TechDocs frontend, but by tricking a user to visit the content via the TechDocs API, the content sanitazion will be bypassed. If the TechDocs API is hosted on the same origin as the Backstage app or other backend plugins, this may give access to sensitive data.\n\nThe ability to upload malicious content may be limited by internal code review processes, unless the chosen TechDocs deployment method is to use an object store and the actor has access to upload files directly to that store.\n\n### Patches\n\nThe vulnerability is patched in the `0.6.4` release of `@backstage/techdocs-common`.\n\n### For more information\n\nIf you have any questions or comments about this advisory:\n\n* Open an issue in the [Backstage repository](https://github.com/backstage/backstage)\n* Visit our chat, linked to in [Backstage README](https://github.com/backstage/backstage)",
+      "summary": "Script injection",
+      "date": "2021-06-04T19:09:35Z",
+      "cve": "CVE-2021-32660",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "@backstage/plugin-techdocs@0.9.4",
+         "name": "plugin-techdocs",
+         "version": "0.9.4",
+         "scope": "backstage"
+      },
+      "id": "GHSA-gg96-f8wr-p89f",
+      "description": "### Impact\n\nA malicious internal actor can potentially upload documentation content with malicious scripts by embedding the script within an `object` element. This may give access to sensitive data when other users visit that same documentation page.\n\nThe ability to upload malicious content may be limited by internal code review processes, unless the chosen TechDocs deployment method is to use an object store and the actor has access to upload files directly to that store.\n\n### Patches\n\nThe vulnerability is patched in the `0.9.5` release of `@backstage/plugin-techdocs`.\n\n### For more information\n\nIf you have any questions or comments about this advisory:\n\n* Open an issue in the [Backstage repository](https://github.com/backstage/backstage)\n* Visit our chat, linked to in [Backstage README](https://github.com/backstage/backstage)\n",
+      "summary": "Script injection",
+      "date": "2021-06-04T19:09:26Z",
+      "cve": "CVE-2021-32661",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "@floffah/build@0.4.0",
+         "name": "build",
+         "version": "0.4.0",
+         "scope": "floffah"
+      },
+      "id": "GHSA-jcgr-9698-82jx",
+      "description": "### Impact\nIf you are using the esbuild target or command you are at risk of code/option injection. Attackers can use the command line option to maliciously change your settings in order to damage your project.\n\n### Patches\nThe problem has been patched in v1.0.0 as it uses a proper method to pass configs to esbuild/estrella.\n\n### Workarounds\nThere is no work around. You should update asap.\n\n### Notes\nThis notice is mainly just to make sure people update to the latest version. This isn't that bad, but should encourage you to update.",
+      "summary": "Improper Neutralization of Special Elements used in a Command ('Command Injection') in @floffah/build",
+      "date": "2021-05-28T15:53:40Z",
+      "cve": null,
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "devcert@1.1.1",
+         "name": "devcert",
+         "version": "1.1.1"
+      },
+      "id": "GHSA-4228-7qvx-f4rq",
+      "description": "A command injection vulnerability in the `devcert` module may lead to remote code execution when users of the module pass untrusted input to the `certificateFor` function.",
+      "summary": "Injection and Command Injection in devcert",
+      "date": "2021-05-18T01:41:56Z",
+      "cve": "CVE-2020-8186",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "mversion@1.13.0",
+         "name": "mversion",
+         "version": "1.13.0"
+      },
+      "id": "GHSA-6m8p-4fxj-pgc2",
+      "description": "The issue occurs because tagName user input is formatted inside the exec function is executed without any checks.",
+      "summary": "OS Command Injection in mversion",
+      "date": "2021-05-17T21:01:08Z",
+      "cve": "CVE-2020-7688",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "pomelo-monitor@0.3.7",
+         "name": "pomelo-monitor",
+         "version": "0.3.7"
+      },
+      "id": "GHSA-4j54-mxf6-wxx2",
+      "description": "pomelo-monitor through 0.3.7 is vulnerable to Command Injection.It allows injection of arbitrary commands as part of 'pomelo-monitor' params.",
+      "summary": "OS Command Injection in pomelo-monitor",
+      "date": "2021-05-10T18:37:16Z",
+      "cve": "CVE-2020-7620",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "get-git-data@1.3.1",
+         "name": "get-git-data",
+         "version": "1.3.1"
+      },
+      "id": "GHSA-wj6h-7chw-x4h2",
+      "description": "get-git-data through 1.3.1 is vulnerable to Command Injection. It is possible to inject arbitrary commands as part of the arguments provided to get-git-data.",
+      "summary": "Command injection in get-git-data",
+      "date": "2021-05-10T15:59:14Z",
+      "cve": "CVE-2020-7619",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "ng-packagr@10.1.0",
+         "name": "ng-packagr",
+         "version": "10.1.0"
+      },
+      "id": "GHSA-qm28-7hqv-wg5j",
+      "description": "The package ng-packagr before 10.1.1 are vulnerable to Command Injection via the styleIncludePaths option.",
+      "summary": "OS Command Injection in ng-packagr",
+      "date": "2021-05-07T16:47:32Z",
+      "cve": "CVE-2020-7735",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "pulverizr@0.7.0",
+         "name": "pulverizr",
+         "version": "0.7.0"
+      },
+      "id": "GHSA-fmf5-j5j9-99pp",
+      "description": "pulverizr through 0.7.0 allows execution of arbitrary commands. Within `lib/job.js`, the variable `filename` can be controlled by the attacker. This function uses the variable &quot;filename&quot; to construct the argument of the exec call without any sanitization. In order to successfully exploit this vulnerability, an attacker will need to create a new file with the same name as the attack command.",
+      "summary": "OS Command Injection in pulverizr",
+      "date": "2021-05-07T16:20:44Z",
+      "cve": "CVE-2020-7604",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "node-prompt-here@1.0.1",
+         "name": "node-prompt-here",
+         "version": "1.0.1"
+      },
+      "id": "GHSA-f8fh-8rgm-227h",
+      "description": "node-prompt-here through 1.0.1 allows execution of arbitrary commands. The `runCommand()` is called by `getDevices()` function in file `linux/manager.js`, which is required by the `index. process.env.NM_CLI` in the file `linux/manager.js`. This function is used to construct the argument of function `execSync()`, which can be controlled by users without any sanitization.",
+      "summary": "OS Command Injection in node-prompt-here",
+      "date": "2021-05-07T16:16:16Z",
+      "cve": "CVE-2020-7602",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "closure-compiler-stream@0.1.15",
+         "name": "closure-compiler-stream",
+         "version": "0.1.15"
+      },
+      "id": "GHSA-m647-5wf9-3jp3",
+      "description": "closure-compiler-stream through 0.1.15 allows execution of arbitrary commands. The argument `options` of the exports function in `index.js` can be controlled by users without any sanitization.",
+      "summary": "OS Command Injection in closure-compiler-stream",
+      "date": "2021-05-07T16:16:06Z",
+      "cve": "CVE-2020-7603",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "gulp-scss-lint@1.0.0",
+         "name": "gulp-scss-lint",
+         "version": "1.0.0"
+      },
+      "id": "GHSA-g4hj-r7r3-9rwv",
+      "description": "gulp-scss-lint through 1.0.0 allows execution of arbitrary commands. It is possible to inject arbitrary commands to the &quot;exec&quot; function located in &quot;src/command.js&quot; via the provided options.",
+      "summary": "OS Command Injection in gulp-scss-lint",
+      "date": "2021-05-07T16:15:37Z",
+      "cve": "CVE-2020-7601",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "gulp-tape@1.0.0",
+         "name": "gulp-tape",
+         "version": "1.0.0"
+      },
+      "id": "GHSA-x67x-98x7-wv26",
+      "description": "gulp-tape through 1.0.0 allows execution of arbitrary commands. It is possible to inject arbitrary commands as part of `gulp-tape` options.",
+      "summary": "OS Command Injection in gulp-tape",
+      "date": "2021-05-07T16:14:56Z",
+      "cve": "CVE-2020-7605",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "gulp-styledocco@0.0.3",
+         "name": "gulp-styledocco",
+         "version": "0.0.3"
+      },
+      "id": "GHSA-h33p-5j96-w8qh",
+      "description": "gulp-styledocco through 0.0.3 allows execution of arbitrary commands. The argument `options` of the exports function in `index.js` can be controlled by users without any sanitization.",
+      "summary": "OS Command Injection in gulkp-styledocco",
+      "date": "2021-05-07T16:14:48Z",
+      "cve": "CVE-2020-7607",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "docker-compose-remote-api@0.1.4",
+         "name": "docker-compose-remote-api",
+         "version": "0.1.4"
+      },
+      "id": "GHSA-q6pj-jh94-5fpr",
+      "description": "docker-compose-remote-api through 0.1.4 allows execution of arbitrary commands. Within `index.js` of the package, the function `exec(serviceName, cmd, fnStdout, fnStderr, fnExit)` uses the variable `serviceName` which can be controlled by users without any sanitization.",
+      "summary": "OS Command Injection in docker-compose-remote-api",
+      "date": "2021-05-07T16:14:39Z",
+      "cve": "CVE-2020-7606",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "picotts@0.1.1",
+         "name": "picotts",
+         "version": "0.1.1"
+      },
+      "id": "GHSA-wq7q-5v6j-xfv6",
+      "description": "This affects all versions up to and including version 0.1.1 of package picotts. If attacker-controlled user input is given to the say function, it is possible for an attacker to execute arbitrary commands. This is due to use of the child_process exec function without input sanitization.",
+      "summary": "Command Injection in picotts",
+      "date": "2021-05-07T16:06:11Z",
+      "cve": "CVE-2021-23378",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "rpi@0.0.3",
+         "name": "rpi",
+         "version": "0.0.3"
+      },
+      "id": "GHSA-vf26-7gjf-f92r",
+      "description": "rpi through 0.0.3 allows execution of arbritary commands. The variable pinNumbver in function GPIO within src/lib/gpio.js is used as part of the arguement of exec function without any sanitization.",
+      "summary": "OS Command Injection in rpi",
+      "date": "2021-04-13T15:23:29Z",
+      "cve": "CVE-2019-10796",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "compile-sass@1.0.4",
+         "name": "compile-sass",
+         "version": "1.0.4"
+      },
+      "id": "GHSA-79qm-h35f-hr77",
+      "description": "compile-sass prior to 1.0.5 allows execution of arbritary commands. The function &quot;setupCleanupOnExit(cssPath)&quot; within &quot;dist/index.js&quot; is executed as part of the &quot;rm&quot; command without any sanitization.",
+      "summary": "OS Command Injection in compile-sass",
+      "date": "2021-04-13T15:23:13Z",
+      "cve": "CVE-2019-10799",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "serial-number@1.3.0",
+         "name": "serial-number",
+         "version": "1.3.0"
+      },
+      "id": "GHSA-3fw4-4h3m-892h",
+      "description": "serial-number through 1.3.0 allows execution of arbritary commands. The &quot;cmdPrefix&quot; argument in serialNumber function is used by the &quot;exec&quot; function without any validation.",
+      "summary": "OS Command Injection in serial-number",
+      "date": "2021-04-13T15:22:19Z",
+      "cve": "CVE-2019-10804",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "launchpad@0.7.5",
+         "name": "launchpad",
+         "version": "0.7.5"
+      },
+      "id": "GHSA-7h8x-wmq2-7mff",
+      "description": "All versions of package launchpad are vulnerable to Command Injection via stop.",
+      "summary": "Command injection in launchpad",
+      "date": "2021-04-13T15:20:20Z",
+      "cve": "CVE-2021-23330",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "nuance-gulp-build-common@0.0.1",
+         "name": "nuance-gulp-build-common",
+         "version": "0.0.1"
+      },
+      "id": "GHSA-8695-fr6h-9fq8",
+      "description": "All versions of package nuance-gulp-build-common are vulnerable to Command Injection via the index.js file.\n\n**PoC:** \n```js\nvar a = require(\"nuance-gulp-build-common\")\na.run(\"touch JHU\")\n```",
+      "summary": "Command Injection in nuance-gulp-build-common",
+      "date": "2021-04-13T15:19:23Z",
+      "cve": "CVE-2020-28430",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "network-manager@1.0.2",
+         "name": "network-manager",
+         "version": "1.0.2"
+      },
+      "id": "GHSA-ph32-23p8-9rw5",
+      "description": "network-manager through 1.0.2 allows remote attackers to execute arbitrary commands via the \"execSync()\" argument.",
+      "summary": "Improper Input Validation in network-manager",
+      "date": "2021-04-13T15:17:45Z",
+      "cve": "CVE-2019-10786",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "freediskspace@0.1.2",
+         "name": "freediskspace",
+         "version": "0.1.2"
+      },
+      "id": "GHSA-4gfq-6m28-m5mg",
+      "description": "This affects all versions of package freediskspace. The vulnerability arises out of improper neutralization of arguments in line 71 of freediskspace.js.",
+      "summary": "Improper neutralization of arguments in freediskspace",
+      "date": "2021-04-13T15:16:11Z",
+      "cve": "CVE-2020-7775",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "gitlog@4.0.3",
+         "name": "gitlog",
+         "version": "4.0.3"
+      },
+      "id": "GHSA-67mm-m3wx-j7fr",
+      "description": "The gitlog function in src/index.ts in gitlog before 4.0.4 has a command injection vulnerability.",
+      "summary": "Command injection in gitlog",
+      "date": "2021-04-13T15:15:29Z",
+      "cve": "CVE-2021-26541",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "systeminformation@4.34.23",
+         "name": "systeminformation",
+         "version": "4.34.23"
+      },
+      "id": "GHSA-jff2-qjw8-5476",
+      "description": "### Impact\ncommand injection vulnerability\n\n### Patches\nProblem was fixed with a parameter check. Please upgrade to version >= 5.6.4\n\n### Workarounds\nIf you cannot upgrade, be sure to check or sanitize service parameters that are passed to si.inetLatency(), si.inetChecksite(), si.services(), si.processLoad() ... do only allow strings, reject any arrays. String sanitation works as expected.",
+      "summary": "Command Injection Vulnerability in systeminformation",
+      "date": "2021-04-06T17:30:14Z",
+      "cve": "CVE-2021-21388",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "@prisma/sdk@2.19.0",
+         "name": "sdk",
+         "version": "2.19.0",
+         "scope": "prisma"
+      },
+      "id": "GHSA-pxcc-hj8w-fmm7",
+      "description": "### Impact\n\nAs of today, we are not aware of any Prisma users or external consumers of the `@prisma/sdk` package who are affected by this security vulnerability.\n\nThis issue may lead to remote code execution if a client of the library calls the vulnerable method with untrusted input.\n\nIt only affects the `getPackedPackage` function and this function is not advertised and only used for tests & building our CLI, no malicious code was found after checking our codebase.\n\n### Patches\n\nFixed in \n- @prisma/sdk@2.20.0 (latest channel)\n- @prisma/sdk@2.20.0-dev.29 (dev channel)\n\nPull Request closing this vulnerability [https://github.com/prisma/prisma/pull/6245](https://github.com/prisma/prisma/pull/6245)\n\n### Acknowledgements\n\nThis issue was discovered and reported by GitHub Engineer [@erik-krogh (Erik Krogh Kristensen)](https://github.com/erik-krogh).\n\n### For more information\n\nIf you have any questions or comments about this advisory:\n\n- Create a discussion in [the Prisma repository](https://github.com/prisma/prisma/discussions)\n- Email us at security@prisma.io",
+      "summary": "Command injection vulnerability in @prisma/sdk in getPackedPackage function",
+      "date": "2021-04-06T17:25:12Z",
+      "cve": "CVE-2021-21414",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "fs-path@0.0.24",
+         "name": "fs-path",
+         "version": "0.0.24"
+      },
+      "id": "GHSA-8mrf-64fw-2x75",
+      "description": "fs-path node module before 0.0.25 is vulnerable to command injection by way of user-supplied inputs via the `copy`, `copySync`, `remove`, and `removeSync` methods.",
+      "summary": "Command injection in fs-path",
+      "date": "2021-03-25T21:06:41Z",
+      "cve": "CVE-2020-8298",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "kill-process-on-port@1.0.2",
+         "name": "kill-process-on-port",
+         "version": "1.0.2"
+      },
+      "id": "GHSA-5wqj-f379-6jh4",
+      "description": "All versions of package kill-process-on-port are vulnerable to Command Injection via a.getProcessPortId.",
+      "summary": "Command injection in kill-process-on-port",
+      "date": "2021-03-19T21:19:47Z",
+      "cve": "CVE-2020-28426",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "madge@4.0.0",
+         "name": "madge",
+         "version": "4.0.0"
+      },
+      "id": "GHSA-753c-phhg-cj29",
+      "description": "This affects the package madge before 4.0.1. It is possible to specify a custom Graphviz path via the graphVizPath option parameter which, when the .image(), .svg() or .dot() functions are called, is executed by the childprocess.exec function.\n\n### PoC\n```js\nconst madge = require('madge'); \nmadge('..', {graphVizPath: \"touch HELLO;\"}) .then((res) => res.svg()) .then((writtenImagePath) => { console.log('Image written to ' + writtenImagePath); });\n```",
+      "summary": "Madge vulnerable to command injection",
+      "date": "2021-03-12T23:01:49Z",
+      "cve": "CVE-2021-23352",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "systeminformation@4.34.23",
+         "name": "systeminformation",
+         "version": "4.34.23"
+      },
+      "id": "GHSA-2m8v-572m-ff2v",
+      "description": "### Impact\ncommand injection vulnerability\n\n### Patches\nProblem was fixed with a parameter check. Please upgrade to version >= 5.3.1\n\n### Workarounds\nIf you cannot upgrade, be sure to check or sanitize service parameters that are passed to si.inetLatency(), si.inetChecksite(), si.services(), si.processLoad() ... do only allow strings, reject any arrays. String sanitation works as expected.",
+      "summary": "Command Injection Vulnerability",
+      "date": "2021-02-16T16:51:04Z",
+      "cve": "CVE-2021-21315",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "samba-client@3.4.0",
+         "name": "samba-client",
+         "version": "3.4.0"
+      },
+      "id": "GHSA-r3j7-x2g5-9gx6",
+      "description": "The samba-client package before 4.0.0 for Node.js allows command injection because of the use of process.exec.",
+      "summary": "Command injection in samba-client",
+      "date": "2021-02-11T20:47:27Z",
+      "cve": "CVE-2021-27185",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "async-git@1.13.1",
+         "name": "async-git",
+         "version": "1.13.1"
+      },
+      "id": "GHSA-6c3f-p5wp-34mh",
+      "description": "The async-git package before 1.13.2 for Node.js allows OS Command Injection via shell metacharacters, as demonstrated by git.reset and git.tag. This issue may lead to remote code execution if a client of the library calls the vulnerable method with untrusted input. Ensure to sanitize untrusted user input before passing it to one of the vulnerable functions as a workaround or update async-git to version 1.13.1.",
+      "summary": "OS Command Injection in async-git",
+      "date": "2021-01-29T18:14:00Z",
+      "cve": "CVE-2021-3190",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "@graphql-tools/git-loader@6.2.5",
+         "name": "git-loader",
+         "version": "6.2.5",
+         "scope": "graphql-tools"
+      },
+      "id": "GHSA-vhhw-xjvf-wprr",
+      "description": "This affects the package @graphql-tools/git-loader before 6.2.6. The use of exec and execSync in packages/loaders/git/src/load-git.ts allows arbitrary command injection.",
+      "summary": "Command Injection in @graphql-tools/git-loader",
+      "date": "2021-01-29T18:13:14Z",
+      "cve": "CVE-2021-23326",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "node-notifier@5.4.5",
+         "name": "node-notifier",
+         "version": "5.4.5"
+      },
+      "id": "GHSA-5fw9-fq32-wv5p",
+      "description": "This affects the package node-notifier before 8.0.1. It allows an attacker to run arbitrary commands on Linux machines due to the options params not being sanitised when being passed an array.",
+      "summary": "OS Command Injection in node-notifier",
+      "date": "2020-12-21T16:04:07Z",
+      "cve": "CVE-2020-7789",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "systeminformation@4.31.0",
+         "name": "systeminformation",
+         "version": "4.31.0"
+      },
+      "id": "GHSA-m57p-p67h-mq74",
+      "description": "### Impact\ncommand injection vulnerability\n\n### Patches\nProblem was fixed with a shell string sanitation fix. Please upgrade to version >= 4.31.1\n\n### Workarounds\nIf you cannot upgrade, be sure to check or sanitize service parameter strings that are passed to si.inetLatency()\n\n### For more information\nIf you have any questions or comments about this advisory:\n* Open an issue in [systeminformation](https://github.com/sebhildebrandt/systeminformation/issues/new?template=bug_report.md)",
+      "summary": "Command Injection Vulnerability in systeminformation",
+      "date": "2020-12-16T19:25:00Z",
+      "cve": "CVE-2020-26274",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "systeminformation@4.30.4",
+         "name": "systeminformation",
+         "version": "4.30.4"
+      },
+      "id": "GHSA-4v2w-h9jm-mqjg",
+      "description": "### Impact\ncommand injection vulnerability by prototype pollution\n\n### Patches\nProblem was fixed with a rewrite of shell sanitations to avoid prototyper pollution problems. Please upgrade to version >= 4.30.2\n\n### Workarounds\nIf you cannot upgrade, be sure to check or sanitize service parameter strings that are passed to si.inetChecksite()\n\n### For more information\nIf you have any questions or comments about this advisory:\n\n* Open an issue in [systeminformation](https://github.com/sebhildebrandt/systeminformation/issues/new?template=bug_report.md)",
+      "summary": "Prototype Pollution in systeminformation",
+      "date": "2020-11-27T16:07:15Z",
+      "cve": "CVE-2020-26245",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "systeminformation@4.26.1",
+         "name": "systeminformation",
+         "version": "4.26.1"
+      },
+      "id": "GHSA-fj59-f6c3-3vw4",
+      "description": "### Impact\ncommand injection vulnerability\n\n### Patches\nProblem was fixed with a shell string sanitation fix. Please upgrade to version >= 4.26.2\n\n### Workarounds\nIf you cannot upgrade, be sure to check or sanitize service parameter strings that are passed to `is.services()`, `is.inetChecksite()`, `si.inetLatency()`, `si.networkStats()`, `is.services()` and `si.processLoad()`\n\n### References\n_Are there any links users can visit to find out more?_\n\n### For more information\nIf you have any questions or comments about this advisory:\n* Open an issue in [systeminformation](https://github.com/sebhildebrandt/systeminformation)",
+      "summary": "Command Injection in systeminformation",
+      "date": "2020-10-27T20:40:00Z",
+      "cve": "CVE-2020-26300",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "systeminformation@4.27.10",
+         "name": "systeminformation",
+         "version": "4.27.10"
+      },
+      "id": "GHSA-94xh-2fmc-xf5j",
+      "description": "### Impact\ncommand injection vulnerability\n\n### Patches\nProblem was fixed with a shell string sanitation fix. Please upgrade to version >= 4.27.11\n\n### Workarounds\nIf you cannot upgrade, be sure to check or sanitize service parameter strings that are passed to si.inetChecksite()\n\n### References\n_Are there any links users can visit to find out more?_\n\n### For more information\nIf you have any questions or comments about this advisory:\n* Open an issue in [systeminformation](https://github.com/sebhildebrandt/systeminformation/issues/new?template=bug_report.md)",
+      "summary": "systeminformation command injection vulnerability",
+      "date": "2020-10-27T20:30:20Z",
+      "cve": "CVE-2020-7752",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "entitlements@1.2.0",
+         "name": "entitlements",
+         "version": "1.2.0"
+      },
+      "id": "GHSA-g8vp-6hv4-m67c",
+      "description": "Versions of `entitlements` prior to 1.3.0 are vulnerable to Command Injection. The package does not validate input on the `entitlements` function  and concatenates it to an exec call, allowing attackers to run arbitrary commands in the system.\n\n\n## Recommendation\n\nUpgrade to version 1.3.0 or later.",
+      "summary": "Command Injection in entitlements",
+      "date": "2020-09-11T21:23:29Z",
+      "cve": null,
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "wxchangba@1.0.3",
+         "name": "wxchangba",
+         "version": "1.0.3"
+      },
+      "id": "GHSA-j6v9-xgvh-f796",
+      "description": "All versions of `wxchangba` are vulnerable to Command Injection. The package does not validate user input on the `reqPostMaterial` function, passing contents of the `file` parameter to an exec call. This may allow attackers to run arbitrary commands in the system.\n\n\n## Recommendation\n\nNo fix is currently available. Consider using an alternative module until a fix is made available.",
+      "summary": "Command Injection in wxchangba",
+      "date": "2020-09-11T21:11:34Z",
+      "cve": null,
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "soletta-dev-app@0.0.7",
+         "name": "soletta-dev-app",
+         "version": "0.0.7"
+      },
+      "id": "GHSA-8mgg-5x65-m4m4",
+      "description": "All versions of `soletta-dev-app` are vulnerable to Command Injection. The package does not validate user input on the `/api/service/status` API endpoint, passing contents of the `service` query parameter to an exec call. This may allow attackers to run arbitrary commands in the system.\n\n\n## Recommendation\n\nNo fix is currently available. Consider using an alternative module until a fix is made available.",
+      "summary": "Command Injection in soletta-dev-app",
+      "date": "2020-09-11T21:08:19Z",
+      "cve": null,
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "traceroute@1.0.0",
+         "name": "traceroute",
+         "version": "1.0.0"
+      },
+      "id": "GHSA-rjvj-673q-4hfw",
+      "description": "All versions of `traceroute` are vulnerable to Command Injection. The package fails to sanitize input and passes it directly to an `exec` call, which may allow attackers to execute arbitrary code in the system. The `trace` function is vulnerable and can be abused if the `host` value is controlled by an attacker.\n\n\n## Recommendation\n\nNo fix is currently available. Consider using an alternative package until a fix is made available.",
+      "summary": "Command Injection in traceroute",
+      "date": "2020-09-04T17:54:31Z",
+      "cve": null,
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "meta-git@1.1.7",
+         "name": "meta-git",
+         "version": "1.1.7"
+      },
+      "id": "GHSA-qcff-ffx3-m25c",
+      "description": "All versions of `meta-git` are vulnerable to Command Injection. The package fails to sanitize input and passes it directly to an `exec` call, which may allow attackers to execute arbitrary code in the system. The `clone` command is vulnerable through the branch name.\n\n\n## Recommendation\n\nNo fix is currently available. Consider using an alternative package until a fix is made available.",
+      "summary": "Command Injection in meta-git",
+      "date": "2020-09-04T17:31:44Z",
+      "cve": null,
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "giting@0.0.8",
+         "name": "giting",
+         "version": "0.0.8"
+      },
+      "id": "GHSA-7r9x-hr76-jr96",
+      "description": "All versions of `gitting` are vulnerable to Command Injection. The package fails to sanitize input and passes it directly to an `exec` call, which may allow attackers to execute arbitrary code in the system. The `pull` function is vulnerable through the `branch` variable.\n\n\n## Recommendation\n\nNo fix is currently available. Consider using an alternative package until a fix is made available.",
+      "summary": "Command Injection in giting",
+      "date": "2020-09-04T17:26:18Z",
+      "cve": null,
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "plotter@0.5.0",
+         "name": "plotter",
+         "version": "0.5.0"
+      },
+      "id": "GHSA-65xx-c85x-wg76",
+      "description": "All versions of `plotter` are vulnerable to Command Injection. The package fails to sanitize plot titles, which may allow attackers to execute arbitrary code in the system if the title value is supplied by a user. The following proof-of-concept creates a `testing` file in the current directory:\n\n```\nvar plot = require('plotter').plot;\n\nconst title = 'Example \"\\nset title system(\"touch testing\")#';\n\nplot({\ndata: [ 3, 1, 2, 3, 4 ],\nfilename: 'output.pdf',\nstyle: 'linespoints',\ntitle: title,\nlogscale: true,\nxlabel: 'time',\nylabel: 'length of string',\nformat: 'pdf'\n});\n\n```\n\n\n## Recommendation\n\nNo fix is currently available. Consider using an alternative package until a fix is made available.",
+      "summary": "Command Injection in plotter",
+      "date": "2020-09-04T17:20:52Z",
+      "cve": null,
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "gnuplot@0.3.1",
+         "name": "gnuplot",
+         "version": "0.3.1"
+      },
+      "id": "GHSA-cfwc-xjfp-44jg",
+      "description": "All versions of `gnuplot` are vulnerable to Command Injection. The package fails to sanitize plot titles, which may allow attackers to execute arbitrary code in the system if the title value is supplied by a user. The following proof-of-concept creates a `testing` file in the current directory:\n\n```\nvar gnuplot = require('gnuplot');\n\nconst title = '\"\\nset title system(\"touch testing\")\\n#';\n\ngnuplot()\n.set('term png')\n.set('output \"out.png\"')\n.set(`title \"${title}\"`)\n.set('xrange [-10:10]')\n.set('yrange [-2:2]')\n.set('zeroaxis')\n.plot('(x/4)**2, sin(x), 1/x')\n.end();\n```\n\n\n## Recommendation\n\nNo fix is currently available. Consider using an alternative package until a fix is made available.",
+      "summary": "Command Injection in gnuplot",
+      "date": "2020-09-04T17:19:48Z",
+      "cve": null,
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "treekill@1.0.0",
+         "name": "treekill",
+         "version": "1.0.0"
+      },
+      "id": "GHSA-533p-g2hq-qr26",
+      "description": "All versions of `treekill` are vulnerable to Command Injection. The package fails to sanitize values passed to the  `kill` function. If this value is user-controlled it  may allow attackers to run arbitrary commands in the server. The issue only affects Windows systems.\n\n\n## Recommendation\n\nNo fix is currently available. Consider using an alternative package until a fix is made available.",
+      "summary": "Command Injection in treekill",
+      "date": "2020-09-04T17:16:35Z",
+      "cve": null,
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "strapi@3.0.0-beta.17.7",
+         "name": "strapi",
+         "version": "3.0.0-beta.17.7"
+      },
+      "id": "GHSA-9p2w-rmx4-9mw7",
+      "description": "Versions of `strapi` before 3.0.0-beta.17.8 are vulnerable to Command Injection. The package fails to sanitize plugin names in the `/admin/plugins/install/` route. This may allow an authenticated attacker with admin privileges to run arbitrary commands in the server.\n\n\n## Recommendation\n\nUpgrade to version 3.0.0-beta.17.8 or later",
+      "summary": "Command Injection in strapi",
+      "date": "2020-09-04T16:54:02Z",
+      "cve": null,
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "pullit@1.3.0",
+         "name": "pullit",
+         "version": "1.3.0"
+      },
+      "id": "GHSA-8px5-63x9-5c7p",
+      "description": "Versions of `pullit` prior to 1.4.0 are vulnerable to Command Injection. The package does not validate input on git branch names  and concatenates it to an exec call, allowing attackers to run arbitrary commands in the system.\n\n## Recommendation\n\nUpgrade to version 1.4.0 or later.\n\n## Credits\n\nThis vulnerability was discovered by @lirantal",
+      "summary": "pullit vulnerable to command injection",
+      "date": "2020-09-03T16:47:30Z",
+      "cve": "CVE-2018-25083",
+      "year": 2018
+   },
+   {
+      "package": {
+         "raw": "priest-runner@0.3.12",
+         "name": "priest-runner",
+         "version": "0.3.12"
+      },
+      "id": "GHSA-9px9-f7jw-fwhj",
+      "description": "All versions of `priest-runner` are vulnerable to Command Injection. The package fails to sanitize input and passes it directly to a `spawn` call, which may allow attackers to execute arbitrary code in the system. The `PriestController.prototype.createChild ` function is vulnerable since the `spawn` parameters come from a POST request body.\n\n\n## Recommendation\n\nNo fix is currently available. Consider using an alternative package until a fix is made available.",
+      "summary": "Command Injection in priest-runner",
+      "date": "2020-09-03T15:49:37Z",
+      "cve": null,
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "addax@1.0.6",
+         "name": "addax",
+         "version": "1.0.6"
+      },
+      "id": "GHSA-4q8f-5xxj-946r",
+      "description": "Versions of `addax` prior to 1.1.0 are vulnerable to Command Injection. The package does not validate user input on the `presignPath` function which receives input directly from the API endpoint. Exploiting the vulnerability requires authentication. This may allow attackers to run arbitrary commands in the system.\n\n\n## Recommendation\n\nUpgrade to version 1.1.0 or later.",
+      "summary": "Command Injection in addax",
+      "date": "2020-09-03T02:40:51Z",
+      "cve": null,
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "node-wifi@2.0.11",
+         "name": "node-wifi",
+         "version": "2.0.11"
+      },
+      "id": "GHSA-4x6x-782q-jfc4",
+      "description": "Versions of `node-wifi` prior to 2.0.12 are vulnerable to Command Injection. The package fails to sanitize user input, allowing attackers to inject commands through the `ssid` variable and possibly achieving Remote Code Execution on the system.\n\n\n## Recommendation\n\nNo fix is currently available. Consider using an alternative package until a fix is made available.",
+      "summary": "Command Injection in node-wifi",
+      "date": "2020-09-03T02:38:47Z",
+      "cve": null,
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "cocos-utils@1.0.0",
+         "name": "cocos-utils",
+         "version": "1.0.0"
+      },
+      "id": "GHSA-rffp-mc78-wjf7",
+      "description": "All versions of `cocos-utils` are vulnerable to Remote Code Execution. The `unzip()` function concatenates user input to `exec()` which may allow attackers to execute arbitrary commands  on the server.\n\n\n## Recommendation\n\nNo fix is currently available. Consider using an alternative module until a fix is made available.",
+      "summary": "Command Injection in cocos-utils",
+      "date": "2020-09-02T18:26:48Z",
+      "cve": null,
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "tomato@0.0.7",
+         "name": "tomato",
+         "version": "0.0.7"
+      },
+      "id": "GHSA-wqhw-frpx-5mmp",
+      "description": "All versions of `tomato` are vulnerable to Command Injection. The /api/exec endpoint does not validate user input allowing attackers to run arbitrary commands in the system.\n\n\n## Recommendation\n\nNo fix is currently available. Consider using an alternative module until a fix is made available.",
+      "summary": "Command Injection in tomato",
+      "date": "2020-09-02T16:01:33Z",
+      "cve": null,
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "bestzip@2.1.6",
+         "name": "bestzip",
+         "version": "2.1.6"
+      },
+      "id": "GHSA-4qqc-mp5f-ccv4",
+      "description": "Versions of `bestzip` prior to 2.1.7 are vulnerable to Command Injection. The package fails to sanitize input rules and passes it directly to an `exec` call on the `zip` function . This may allow attackers to execute arbitrary code in the system as long as the values of `destination` is user-controlled. This only affects users with a native `zip` command available. The following examples demonstrate the issue from the CLI and also programatically:\n- `bestzip test.zip 'sourcefile; mkdir folder'`\n- `zip({ source: 'sourcefile', destination: './test.zip; mkdir folder' })`",
+      "summary": "Command Injection in bestzip",
+      "date": "2020-09-02T15:05:51Z",
+      "cve": null,
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "samsung-remote@1.2.5",
+         "name": "samsung-remote",
+         "version": "1.2.5"
+      },
+      "id": "GHSA-xhjx-mfr6-9rr4",
+      "description": "Versions of `samsung-remote` before 1.3.5 are vulnerable to command injection. This vulnerability is exploitable if user input is passed into the `ip` option of the package constructor.\n\n\n## Recommendation\n\nUpdate to version 1.3.5 or later.",
+      "summary": "Command Injection in samsung-remote",
+      "date": "2020-09-01T21:20:28Z",
+      "cve": null,
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "ascii-art@1.4.2",
+         "name": "ascii-art",
+         "version": "1.4.2"
+      },
+      "id": "GHSA-9hqj-38j2-5jgm",
+      "description": "Versions of `ascii-art` before 1.4.4 are vulnerable to command injection. This is exploitable when user input is passed into the argument of the `ascii-art preview` command. \n\n\nExample Proof of concept:\n`ascii-art preview 'doom\"; touch /tmp/malicious; echo \"'`\n\nGiven that the input is passed on the command line and none of the api methods are vulnerable to this,  the likely exploitation vector is when the ascii-art comment is being called programmatically using something like `execFile`.\n\n\n## Recommendation\n\nUpdate to version 1.4.4 or later.",
+      "summary": "Command Injection in ascii-art",
+      "date": "2020-09-01T21:19:23Z",
+      "cve": null,
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "windows-cpu@0.1.4",
+         "name": "windows-cpu",
+         "version": "0.1.4"
+      },
+      "id": "GHSA-63m4-fhf2-cmf7",
+      "description": "Version of `windows-cpu` before 0.1.5 will execute arbitrary code passed into the first argument of the `findLoad` method, resulting in remote code execution.\n\n## Proof of Concept\n\n```js\nvar win = require('windows-cpu');\nwind.findLoad('foo & calc.exe');\n```\n\n\n## Recommendation\n\nUpdate to version 0.1.5 or later.",
+      "summary": "Command Execution in windows-cpu",
+      "date": "2020-09-01T16:43:55Z",
+      "cve": "CVE-2017-1000219",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "ungit@0.8.4",
+         "name": "ungit",
+         "version": "0.8.4"
+      },
+      "id": "GHSA-vjfr-p6hp-jqqw",
+      "description": "Versions of `ungit` prior to 0.9.0 are affected by a command injection vulnerability in the `url` parameter.\n\n\n## Recommendation\n\nUpdate version 0.9.0 or later.",
+      "summary": "Command Injection in ungit",
+      "date": "2020-08-31T23:00:10Z",
+      "cve": "CVE-2015-4130",
+      "year": 2015
+   },
+   {
+      "package": {
+         "raw": "standard-version@8.0.0",
+         "name": "standard-version",
+         "version": "8.0.0"
+      },
+      "id": "GHSA-7xcx-6wjh-7xp2",
+      "description": "# GitHub Security Lab (GHSL) Vulnerability Report: `GHSL-2020-111`\n\nThe [GitHub Security Lab](https://securitylab.github.com) team has identified a potential security vulnerability in [standard-version](https://github.com/conventional-changelog/standard-version).\n\n## Summary\n\nThe `standardVersion` function has a command injection vulnerability. Clients of the `standard-version` library are unlikely to be aware of this, so they might unwittingly write code that contains a vulnerability.\n\n## Product\nStandard Version\n \n## Tested Version\nCommit [2f04ac8](https://github.com/conventional-changelog/standard-version/tree/2f04ac8fc1c134a1981c23a093d4eece77d0bbb9/)\n\n## Details\n\n### Issue 1: Command injection in `standardVersion`\n\nThe following proof-of-concept illustrates the vulnerability. First install Standard Version and create an empty git repo to run the PoC in:\n\n```\nnpm install standard-version\ngit init\necho \"foo\" > foo.txt # the git repo has to be non-empty\ngit add foo.txt\ngit commit -am \"initial commit\"\n```\n\nNow create a file with the following contents:\n\n```\nvar fs = require(\"fs\");\n// setting up a bit of environment\nfs.writeFileSync(\"package.json\", '{\"name\": \"foo\", \"version\": \"1.0.0\"}');\n\nconst standardVersion = require('standard-version')\n\nstandardVersion({\n  noVerify: true,\n  infile: 'foo.txt',\n  releaseCommitMessageFormat: \"bla `touch exploit`\"\n})\n```\n\nand run it:\n\n```\nnode test.js\n```\n\nNotice that a file named `exploit` has been created.\n\nThis vulnerability is similar to command injection vulnerabilities that have been found in other Javascript libraries. Here are some examples:\n[CVE-2020-7646](https://github.com/advisories/GHSA-m8xj-5v73-3hh8),\n[CVE-2020-7614](https://github.com/advisories/GHSA-426h-24vj-qwxf),\n[CVE-2020-7597](https://github.com/advisories/GHSA-5q88-cjfq-g2mh),\n[CVE-2019-10778](https://github.com/advisories/GHSA-4gp3-p7ph-x2jr),\n[CVE-2019-10776](https://github.com/advisories/GHSA-84cm-v6jp-gjmr),\n[CVE-2018-16462](https://github.com/advisories/GHSA-9jm3-5835-537m),\n[CVE-2018-16461](https://github.com/advisories/GHSA-7g2w-6r25-2j7p),\n[CVE-2018-16460](https://github.com/advisories/GHSA-cfhg-9x44-78h2),\n[CVE-2018-13797](https://github.com/advisories/GHSA-pp57-mqmh-44h7),\n[CVE-2018-3786](https://github.com/advisories/GHSA-c9j3-wqph-5xx9),\n[CVE-2018-3772](https://github.com/advisories/GHSA-wjr4-2jgw-hmv8),\n[CVE-2018-3746](https://github.com/advisories/GHSA-3pxp-6963-46r9),\n[CVE-2017-16100](https://github.com/advisories/GHSA-jcw8-r9xm-32c6),\n[CVE-2017-16042](https://github.com/advisories/GHSA-qh2h-chj9-jffq).\n\nWe have written a [CodeQL](https://codeql.com) query, which automatically detects this vulnerability. You can see the results of the query on the `standard-version` project [here](https://lgtm.com/query/237522640229151035/).\n\n#### Impact\n\nThis issue may lead to remote code execution if a client of the library calls the vulnerable method with untrusted input.\n\n#### Remediation\n\nWe recommend not using an API that can interpret a string as a shell command. For example, use [`child_process.execFile`](https://nodejs.org/api/child_process.html#child_process_child_process_execfile_file_args_options_callback) instead of [`child_process.exec`](https://nodejs.org/api/child_process.html#child_process_child_process_exec_command_options_callback).\n\n## Credit\n\nThis issue was discovered and reported by GitHub Engineer [@erik-krogh (Erik Krogh Kristensen)](https://github.com/erik-krogh).\n\n## Contact\n\nYou can contact the GHSL team at `securitylab@github.com`, please include `GHSL-2020-111` in any communication regarding this issue.\n\n## Disclosure Policy\n\nThis report is subject to our [coordinated disclosure policy](https://securitylab.github.com/disclosures#policy).",
+      "summary": "Command Injection in standard-version",
+      "date": "2020-07-13T21:34:59Z",
+      "cve": null,
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "limdu@0.9.4",
+         "name": "limdu",
+         "version": "0.9.4"
+      },
+      "id": "GHSA-77qv-gh6f-pgh4",
+      "description": "### Impact\nThe `trainBatch` function has a command injection vulnerability. Clients of the Limdu library are unlikely to be aware of this, so they might unwittingly write code that contains a vulnerability.\n\n### Patches\nPatched in version 0.9.5.\n\n### Workarounds\nDo not use trainBatch with classifiers that rely on shell execution, such as SVM Perf, SVM Linear or Adaboost\n\n### References\nNo",
+      "summary": "Command Injection in Limdu",
+      "date": "2020-06-22T15:24:06Z",
+      "cve": "CVE-2020-4066",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "mversion@1.13.0",
+         "name": "mversion",
+         "version": "1.13.0"
+      },
+      "id": "GHSA-qjg4-w4c6-f6c6",
+      "description": "### Impact\nThis issue may lead to remote code execution if a client of the library calls the vulnerable method with untrusted input.\n\n### Patches\nPatched by version 2.0.0. Previous releases are deprecated in npm.\n\n### Workarounds\nMake sure to escape git commit messages when using the commitMessage option for the update function.",
+      "summary": "Command injection in mversion",
+      "date": "2020-06-18T19:23:17Z",
+      "cve": "CVE-2020-4059",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "dns-sync@0.2.0",
+         "name": "dns-sync",
+         "version": "0.2.0"
+      },
+      "id": "GHSA-wh69-wc6q-7888",
+      "description": "dns-sync through 0.2.0 allows execution of arbitrary commands . This issue may lead to remote code execution if a client of the library calls the vulnerable method with untrusted input.",
+      "summary": "Command injection in node-dns-sync",
+      "date": "2020-05-28T18:42:59Z",
+      "cve": "CVE-2020-11079",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "npm-programmatic@0.0.12",
+         "name": "npm-programmatic",
+         "version": "0.0.12"
+      },
+      "id": "GHSA-426h-24vj-qwxf",
+      "description": "All versions of `npm-programmatic ` are vulnerable to Command Injection. The package fails to sanitize input rules and passes it directly to an `exec` call on the `install`, `uninstall` and `list` functions . This may allow attackers to execute arbitrary code in the system if the package name passed to the function is user-controlled.\n\n\n## Recommendation\n\nNo fix is currently available. Consider using an alternative package until a fix is made available.",
+      "summary": "Command Injection in npm-programmatic",
+      "date": "2020-04-23T20:09:09Z",
+      "cve": "CVE-2020-7614",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "devcert-sanscache@0.4.6",
+         "name": "devcert-sanscache",
+         "version": "0.4.6"
+      },
+      "id": "GHSA-4gp3-p7ph-x2jr",
+      "description": "devcert-sanscache before 0.4.7 allows remote attackers to execute arbitrary code or cause a Command Injection via the exec function. The variable `commonName` controlled by user input is used as part of the `exec` function without any sanitization.",
+      "summary": "OS Command Injection in devcert-sanscache",
+      "date": "2020-04-14T23:09:00Z",
+      "cve": "CVE-2019-10778",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "codecov@3.6.4",
+         "name": "codecov",
+         "version": "3.6.4"
+      },
+      "id": "GHSA-5q88-cjfq-g2mh",
+      "description": "codecov-node npm module before 3.6.5 allows remote attackers to execute arbitrary commands.The value provided as part of the gcov-root argument is executed by the exec function within lib/codecov.js. This vulnerability exists due to an incomplete fix of CVE-2020-7596.",
+      "summary": "codecov NPM module allows remote attackers to execute arbitrary commands",
+      "date": "2020-02-19T17:29:39Z",
+      "cve": "CVE-2020-7597",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "aws-lambda@1.0.4",
+         "name": "aws-lambda",
+         "version": "1.0.4"
+      },
+      "id": "GHSA-934x-72xh-5hrg",
+      "description": "In aws-lambda versions prior to version 1.0.5, the \"config.FunctioName\" is used to construct the argument used within the \"exec\" function without any sanitization. It is possible for a user to inject arbitrary commands to the \"zipCmd\" used within \"config.FunctionName\".",
+      "summary": "OS command injection in aws-lambda",
+      "date": "2020-02-14T23:09:45Z",
+      "cve": "CVE-2019-10777",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "git-diff-apply@0.22.1",
+         "name": "git-diff-apply",
+         "version": "0.22.1"
+      },
+      "id": "GHSA-84cm-v6jp-gjmr",
+      "description": "In \"index.js\" file line 240, the run command executes the git command with a user controlled variable called remoteUrl. This affects git-diff-apply all versions prior to 0.22.2.",
+      "summary": "OS command injection in git-diff-apply",
+      "date": "2020-02-14T23:09:24Z",
+      "cve": "CVE-2019-10776",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "fs-path@0.0.24",
+         "name": "fs-path",
+         "version": "0.0.24"
+      },
+      "id": "GHSA-gc94-6w89-hpqr",
+      "description": "All versions of `fs-path` are vulnerable to command injection is unsanitized user input is passed in.\n\n\n## Recommendation\n\nNo fix is currently available for this vulnerability. It is our recommendation to not install or use this module until a fix is available.",
+      "summary": "Command Injection in fs-path",
+      "date": "2019-06-12T16:37:07Z",
+      "cve": null,
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "opencv@6.0.0",
+         "name": "opencv",
+         "version": "6.0.0"
+      },
+      "id": "GHSA-f698-m2v9-5fh3",
+      "description": "Versions of `opencv`prior to 6.1.0 are vulnerable to Command Injection. The utils/ script find-opencv.js does not validate user input allowing attackers to execute arbitrary commands.\n\n\n## Recommendation\n\nUpgrade to version 6.1.0.\n",
+      "summary": "Command Injection in opencv",
+      "date": "2019-06-04T20:11:44Z",
+      "cve": null,
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "fs-git@1.0.1",
+         "name": "fs-git",
+         "version": "1.0.1"
+      },
+      "id": "GHSA-qr32-j4j6-3m7r",
+      "description": "Affected versions of `fs-git` do not sanitize strings passed into the `buildCommand` method, resulting in arbitrary code execution.\n\n\n## Recommendation\n\nUpdate to version 1.0.2 or later. ",
+      "summary": "Command Injection in fs-git",
+      "date": "2019-05-29T20:23:00Z",
+      "cve": "CVE-2017-16087",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "kill-port@1.3.1",
+         "name": "kill-port",
+         "version": "1.3.1"
+      },
+      "id": "GHSA-pmv6-gf98-p3r5",
+      "description": "Versions of `kill-port` prior to 1.3.2 are vulnerable to Command Injection. The package does not validate user input on the `kill` function. This may allow attackers to run arbitrary commands in the system if user input (such as the port number) is passed directly to the function.\n\n\n## Recommendation\n\nUpgrade to version 1.3.2 or later.",
+      "summary": "Command Injection in kill-port",
+      "date": "2019-03-25T16:17:18Z",
+      "cve": "CVE-2019-5414",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "shell-quote@1.6.0",
+         "name": "shell-quote",
+         "version": "1.6.0"
+      },
+      "id": "GHSA-qg8p-v9q4-gh34",
+      "description": "Affected versions of `shell-quote` do not properly escape command line arguments, which may result in command injection if the library is used to escape user input destined for use as command line arguments.\n\n\n\n## Proof of Concept:\n\nThe following characters are not escaped properly: `>`,`;`,`{`,`}`\n\nBash has a neat but not well known feature known as \"Bash Brace Expansion\", wherein a sub-command can be executed without spaces by running it between a set of `{}` and using the `,` instead of ` ` to seperate arguments. Because of this, full command injection is possible even though it was initially thought to be impossible. \n\n```\n   const quote = require('shell-quote').quote;\n   console.log(quote(['a;{echo,test,123,234}']));\n   // Actual                    \"a;{echo,test,123,234}\"\n   // Expected                  \"a\\;\\{echo,test,123,234\\}\"\n   // Functional Equivalent     \"a; echo 'test' '123' '1234'\"\n```\n\n\n\n## Recommendation\n\nUpdate to version 1.6.1 or later.",
+      "summary": "Potential Command Injection in shell-quote",
+      "date": "2019-02-18T23:58:29Z",
+      "cve": "CVE-2016-10541",
+      "year": 2016
+   },
+   {
+      "package": {
+         "raw": "Haraka@2.8.8",
+         "name": "Haraka",
+         "version": "2.8.8"
+      },
+      "id": "GHSA-w5m8-5v9m-xhx5",
+      "description": "Haraka version 2.8.8 and earlier comes with a plugin for processing attachments for zip files. Versions 2.8.8 and earlier can be vulnerable to command injection.",
+      "summary": "Critical severity vulnerability that affects Haraka",
+      "date": "2019-02-12T17:26:10Z",
+      "cve": "CVE-2016-1000282",
+      "year": 2016
+   },
+   {
+      "package": {
+         "raw": "react-dev-utils@1.0.3",
+         "name": "react-dev-utils",
+         "version": "1.0.3"
+      },
+      "id": "GHSA-29gp-92wp-94q8",
+      "description": "`react-dev-utils` on Windows is vulnerable to remote code execution.\n\n\n## Recommendation\n\nUpdate to one of the following versions, depending on the release line that you are using.\n- 1.0.4\n- 2.0.2\n- 3.1.2\n- 4.2.2\n- 5.0.2\n- 6.0.0-next.a671462c",
+      "summary": "react-dev-utils on Windows vulnerable to Remote Code Execution",
+      "date": "2019-01-04T17:41:20Z",
+      "cve": "CVE-2018-6342",
+      "year": 2018
+   },
+   {
+      "package": {
+         "raw": "egg-scripts@2.8.0",
+         "name": "egg-scripts",
+         "version": "2.8.0"
+      },
+      "id": "GHSA-c9j3-wqph-5xx9",
+      "description": "Versions of `egg-scripts` before 2.8.1 are vulnerable to command injection. This is only exploitable if a malicious argument is provided on the command line.\n\n\nExample:\n`eggctl start --daemon --stderr='/tmp/eggctl_stderr.log; touch /tmp/malicious'`\n\n\n## Recommendation\n\nUpdate to version 2.8.1 or later.",
+      "summary": "Command Injection in egg-scripts",
+      "date": "2018-09-17T20:43:34Z",
+      "cve": "CVE-2018-3786",
+      "year": 2018
+   },
+   {
+      "package": {
+         "raw": "printer@0.0.1",
+         "name": "printer",
+         "version": "0.0.1"
+      },
+      "id": "GHSA-5c8j-xr24-2665",
+      "description": "Versions 0.0.1 and earlier of `printer` are affected by a command injection vulnerability resulting from a failure to sanitize command arguments properly in the `printDirect()` function. \n\n\n\n## Recommendation\n\nUpdate to version 0.0.2 or later.",
+      "summary": "Potential Command Injection in printer",
+      "date": "2017-11-28T22:44:52Z",
+      "cve": "CVE-2014-3741",
+      "year": 2014
+   },
+   {
+      "package": {
+         "raw": "codem-transcode@0.4.4",
+         "name": "codem-transcode",
+         "version": "0.4.4"
+      },
+      "id": "GHSA-rph7-j9qr-h8q8",
+      "description": "When the ffprobe functionality is enabled on the server, HTTP POST requests can be made to /probe. These requests are passed to the ffprobe binary on the server. Through this HTTP endpoint it is possible to send a malformed source file name to ffprobe that results in arbitrary command execution.\n\n### Mitigating Factors:\nThe ffprobe functionality is not enabled by default. In addition, exploitation opportunities are limited in a standard configuration because the server binds to the local interface by default.\n\n\n## Recommendation\n\nAn updated and patched version of the module (version 0.5.0) is available via npm. Users who have enabled the ffprobe functionality are especially encouraged to upgrade..",
+      "summary": "Potential Command Injection in codem-transcode",
+      "date": "2017-11-28T22:20:17Z",
+      "cve": "CVE-2013-7377",
+      "year": 2013
+   },
+   {
+      "package": {
+         "raw": "create-git@1.0.0-1",
+         "name": "create-git",
+         "version": "1.0.0-1"
+      },
+      "id": "SNYK-JS-CREATEGIT-1022150",
+      "description": "create-git is a generator to initialize a project with git.\nAffected versions of this package are vulnerable to Command Injection. User-provided input was not properly sanitised before being used as part of an exec() call.\n",
+      "summary": "Command Injection  Affecting create-git package, versions <1.0.0-2",
+      "date": "26 Oct 2020",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "shell-quote@1.7.2",
+         "name": "shell-quote",
+         "version": "1.7.2"
+      },
+      "id": "GHSA-g4rg-993r-mgx7",
+      "description": "The shell-quote package before 1.7.3 for Node.js allows command injection. An attacker can inject unescaped shell metacharacters through a regex designed to support Windows drive letters. If the output of this package is passed to a real shell as a quoted argument to a command with `exec()`, an attacker can inject arbitrary commands. This is because the Windows drive letter regex character class is `[A-z]` instead of the correct `[A-Za-z]`. Several shell metacharacters exist in the space between capital letter Z and lower case letter a, such as the backtick character.",
+      "summary": "Improper Neutralization of Special Elements used in a Command in Shell-quote",
+      "date": "2022-05-24T19:18:27Z",
+      "cve": "CVE-2021-42740",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "aaptjs@1.3.2",
+         "name": "aaptjs",
+         "version": "1.3.2"
+      },
+      "id": "SNYK-JS-AAPTJS-6038595",
+      "description": "aaptjs is an A node wraper for aapt\nAffected versions of this package are vulnerable to Command Injection due to improper input sanitization via the add function when using pipe (|) after the zip file value.\n",
+      "summary": "Command Injection  Affecting aaptjs package, versions *",
+      "date": "29 Oct 2023",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "tree-kill@1.2.1",
+         "name": "tree-kill",
+         "version": "1.2.1"
+      },
+      "id": "GHSA-884p-74jh-xrg2",
+      "description": "Versions of `tree-kill` prior to 1.2.2 are vulnerable to Command Injection. The package fails to sanitize values passed to the  `kill` function. If this value is user-controlled it  may allow attackers to run arbitrary commands in the server. The issue only affects Windows systems.\n\n\n## Recommendation\n\nUpgrade to version 1.2.2 or later.",
+      "summary": "Command Injection in tree-kill",
+      "date": "2020-09-04T16:57:20Z",
+      "cve": "CVE-2019-15599",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "is-http2@1.2.0",
+         "name": "is-http2",
+         "version": "1.2.0"
+      },
+      "id": "GHSA-2275-rpf5-xv8h",
+      "description": "All versions of the package is-http2 are vulnerable to Command Injection due to missing input sanitization or other checks, and sandboxes being employed to the isH2 function.",
+      "summary": "is-http2 vulnerable to Improper Input Validation",
+      "date": "2023-02-01T06:30:30Z",
+      "cve": "CVE-2022-25906",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "sketchsvg@0.0.1",
+         "name": "sketchsvg",
+         "version": "0.0.1"
+      },
+      "id": "GHSA-6722-xvq8-3254",
+      "description": "All versions of the package sketchsvg are vulnerable to Arbitrary Code Injection when invoking `shell.exec` without sanitization nor parametrization while concatenating the current directory as part of the command string.",
+      "summary": "SketchSVG Arbitrary Code Injection vulnerability",
+      "date": "2023-03-06T06:30:18Z",
+      "cve": "CVE-2023-26107",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "@pendo324/get-process-by-name@1.0.1",
+         "name": "get-process-by-name",
+         "version": "1.0.1",
+         "scope": "pendo324"
+      },
+      "id": "GHSA-qhxv-296x-hjv7",
+      "description": "All versions of package @pendo324/get-process-by-name are vulnerable to Arbitrary Code Execution due to improper sanitization of getProcessByName function.",
+      "summary": "@pendo324/get-process-by-name are vulnerable to Arbitrary Code Execution",
+      "date": "2022-08-29T20:06:55Z",
+      "cve": "CVE-2022-25644",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "pdf-image@2.0.0",
+         "name": "pdf-image",
+         "version": "2.0.0"
+      },
+      "id": "GHSA-rv7p-mmwq-x674",
+      "description": "Lack of input validation in pdf-image npm package version &lt;= 2.0.0 may allow an attacker to run arbitrary code if PDF file path is constructed based on untrusted user input.",
+      "summary": "Improper Input Validation and Code Injection in pdf-image",
+      "date": "2021-05-10T18:46:58Z",
+      "cve": "CVE-2020-8132",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "logkitty@0.7.0",
+         "name": "logkitty",
+         "version": "0.7.0"
+      },
+      "id": "GHSA-v8v8-6859-qxm4",
+      "description": "Lack of output sanitization allowed an attack to execute arbitrary shell commands via the logkitty npm package before version 0.7.1.",
+      "summary": "Arbitrary shell command execution in logkitty",
+      "date": "2020-06-05T14:47:02Z",
+      "cve": "CVE-2020-8149",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "dns-sync@0.1.0",
+         "name": "dns-sync",
+         "version": "0.1.0"
+      },
+      "id": "GHSA-jcw8-r9xm-32c6",
+      "description": "Affected versions of `dns-sync` have an arbitrary command execution vulnerability in the `resolve()` method. \n\n\n\n## Recommendation\n\n- Use an alternative dns resolver\n- Do not allow untrusted input into `dns-sync.resolve()`",
+      "summary": "Command Injection in dns-sync",
+      "date": "2018-07-18T18:28:02Z",
+      "cve": "CVE-2017-16100",
+      "year": 2017
+   }
+]

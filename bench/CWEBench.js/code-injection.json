@@ -1,0 +1,1105 @@
+[
+   {
+      "package": {
+         "raw": "lodash@4.17.20",
+         "name": "lodash",
+         "version": "4.17.20"
+      },
+      "id": "GHSA-35jh-r3h4-6jhm",
+      "description": "`lodash` versions prior to 4.17.21 are vulnerable to Command Injection via the template function.",
+      "summary": "Command Injection in lodash",
+      "date": "2021-05-06T16:05:51Z",
+      "cve": "CVE-2021-23337",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "node-rules@4.0.2",
+         "name": "node-rules",
+         "version": "4.0.2"
+      },
+      "id": "GHSA-8whr-v3gm-w8h9",
+      "description": "Versions of `node-rules` prior to 5.0.0 are vulnerable to Command Injection. The package fails to sanitize input rules and passes it directly to an `eval` call when using the `fromJSON` function. This may allow attackers to execute arbitrary code in the system if the rules are user-controlled.\n\n\n## Recommendation\n\nUpgrade to version 5.0.0 or later.",
+      "summary": "Command Injection in node-rules",
+      "date": "2020-09-03T15:51:04Z",
+      "cve": null,
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "dot@1.1.2",
+         "name": "dot",
+         "version": "1.1.2"
+      },
+      "id": "GHSA-4859-gpc7-4j66",
+      "description": "All versions of dot are vulnerable to Command Injection. The template compilation may execute arbitrary commands if an attacker can inject code in the template or if a Prototype Pollution-like vulnerability can be exploited to alter an Object's prototype.",
+      "summary": "Command Injection in dot",
+      "date": "2019-06-05T21:24:29Z",
+      "cve": null,
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "json@9.0.6",
+         "name": "json",
+         "version": "9.0.6"
+      },
+      "id": "GHSA-3c6g-pvg8-gqw2",
+      "description": "This affects the package json before 10.0.0. It is possible to inject arbritary commands using the parseLookup function.",
+      "summary": "trentm/json vulnerable to command injection",
+      "date": "2021-05-06T18:11:21Z",
+      "cve": "CVE-2020-7712",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "@hoppscotch/cli@0.7.0",
+         "name": "cli",
+         "version": "0.7.0",
+         "scope": "hoppscotch"
+      },
+      "id": "GHSA-qmmm-73r2-f8xr",
+      "description": "### Observations\n\nThe Hoppscotch desktop app takes multiple precautions to be secure against arbitrary JavaScript and system command execution. It does not render user-controlled HTML or Markdown, uses Tauri instead of Electron, and sandboxes pre-request scripts with a simple yet secure implementation using web workers.\n\nUnfortunately, web workers are not available in a pure Node.js application like Hoppscotch CLI. That is why the [@hoppscotch/js-sandbox](https://github.com/hoppscotch/hoppscotch/tree/main/packages/hoppscotch-js-sandbox) package also provides a Javascript sandbox that uses the Node.js `vm` module. However, the `vm` module is not safe for sandboxing untrusted Javascript code, as stated [in the documentation](https://nodejs.org/api/vm.html#vm-executing-javascript). This is because [code inside the vm context can break out](https://thegoodhacker.com/posts/the-unsecure-node-vm-module/) if it can get a hold of any reference to an object created outside of the vm.\n\nIn the case of @hoppscotch/js-sandbox, multiple references to external objects are passed into the vm context to allow pre-request scripts interactions with environment variables and more. But this also allows the pre-request script to escape the sandbox.\n[packages/hoppscotch-js-sandbox/src/pre-request/node-vm/index.ts](https://github.com/hoppscotch/hoppscotch/blob/faab1d20fde9a6be660db40fc73dcf28f9038008/packages/hoppscotch-js-sandbox/src/pre-request/node-vm/index.ts#L23-L31)\n```js\nconst { pw, updatedEnvs } = getPreRequestScriptMethods(envs)\n\n// Expose pw to the context\ncontext.pw = pw\ncontext.atob = atob\ncontext.btoa = btoa\n\n// Run the pre-request script in the provided context\nrunInContext(preRequestScript, context)\n```\n\n### Exploitation\n\nAn attacker can use the exposed `pw` object reference to escape the sandbox and execute arbitrary system commands using the `child_process` Node.js module. This PoC pre-request script executes the `id > /tmp/pwnd` system command as soon as a request is sent.\n```js\noutside = pw.constructor.constructor('return this')()\noutside.process.mainModule.require('child_process').execSync('id > /tmp/pwnd')\n```\nAn attacker who wants to run arbitrary code on the machine of a victim can create a Hoppscotch collection containing a request with a malicious pre-request script and share it with a victim, using the JSON export feature. The victim then has to run the collection with the Hoppscotch CLI. Then the malicious pre-request script executes.\n\n### Impact\n\nThis attack gives an attacker arbitrary command execution on the machine of a victim Hoppscotch CLI user. For the attack to succeed, an attacker has to lure the victim into downloading a malicious Hoppscotch collection and running it with the Hoppscotch CLI.\n\nThis issue does not impact Hoppscotch Web or Desktop, as they use the safe web worker sandboxing approach.\n\n### Recommendations\n\nHoppscotch CLI and other tools that rely on @hoppscotch/js-sandbox but don't have access to a browser cannot use the web worker sandbox. For these, you can look into other safe JavaScript sandboxing libraries. We think that [isolated-vm](https://github.com/laverdet/isolated-vm) looks promising. We discourage the use of [vm2](https://github.com/patriksimek/vm2), which is deprecated because it has arbitrary bypasses. Alternatively, you can introduce an `--enable-scripting` flag for the CLI and disable scripting by default. Or you can change the threat model and educate users that they should not run untrusted collections as it can lead to RCE.\n\n\n### Differences from existing CVEs\n- [nvd.nist.gov/vuln/detail/CVE-2023-37466](https://nvd.nist.gov/vuln/detail/CVE-2023-37466) : This CVE is regarding an escape of vm2 which we do not even use.",
+      "summary": "@hoppscotch/cli affected by Sandbox Escape in @hoppscotch/js-sandbox leads to RCE",
+      "date": "2024-04-22T18:38:11Z",
+      "cve": "CVE-2024-34347",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "vm2@3.9.19",
+         "name": "vm2",
+         "version": "3.9.19"
+      },
+      "id": "GHSA-g644-9gfx-q4q4",
+      "description": "In vm2 for versions up to 3.9.19, Node.js custom inspect function allows attackers to escape the sandbox and run arbitrary code.\n\n### Impact\nRemote Code Execution, assuming the attacker has arbitrary code execution primitive inside the context of vm2 sandbox.\n\n### Patches\nNone.\n\n### Workarounds\nNone.\n\n### References\nPoC is to be disclosed on or after the 5th of September.\n\n### Similarity with [CVE-2023-37466](https://nvd.nist.gov/vuln/detail/CVE-2023-37466)\nWhile this advisory might look similar to [CVE-2023-37466](https://nvd.nist.gov/vuln/detail/CVE-2023-37466), it is a completely different way of escaping the sandbox.\n\n### For more information\nIf you have any questions or comments about this advisory:\n\n- Open an issue in [VM2](https://github.com/patriksimek/vm2)\n\nThanks to [Xion](https://twitter.com/0x10n) (SeungHyun Lee) of [KAIST Hacking Lab](https://kaist-hacking.github.io/) for disclosing this vulnerability.",
+      "summary": "vm2 Sandbox Escape vulnerability",
+      "date": "2023-07-13T17:01:58Z",
+      "cve": "CVE-2023-37903",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "jsonpath-plus@10.2.0",
+         "name": "jsonpath-plus",
+         "version": "10.2.0"
+      },
+      "id": "GHSA-hw8r-x6gr-5gjp",
+      "description": "Versions of the package jsonpath-plus before 10.3.0 are vulnerable to Remote Code Execution (RCE) due to improper input sanitization. An attacker can execute aribitrary code on the system by exploiting the unsafe default usage of eval='safe' mode.\n\n**Note:**\n\nThis is caused by an incomplete fix for CVE-2024-21534.",
+      "summary": "JSONPath Plus allows Remote Code Execution",
+      "date": "2025-02-15T06:30:51Z",
+      "cve": "CVE-2025-1302",
+      "year": 2025
+   },
+   {
+      "package": {
+         "raw": "mongoose@8.9.4",
+         "name": "mongoose",
+         "version": "8.9.4"
+      },
+      "id": "GHSA-vg7j-7cwx-8wgw",
+      "description": "Mongoose versions prior to 8.9.5, 7.8.4, and 6.13.6 are vulnerable to improper use of the `$where` operator. This vulnerability arises from the ability of the `$where` clause to execute arbitrary JavaScript code in MongoDB queries, potentially leading to code injection attacks and unauthorized access or manipulation of database data.\n\nNOTE: this issue exists because of an incomplete fix for CVE-2024-53900.",
+      "summary": "Mongoose search injection vulnerability",
+      "date": "2025-01-15T06:30:49Z",
+      "cve": "CVE-2025-23061",
+      "year": 2025
+   },
+   {
+      "package": {
+         "raw": "systeminformation@5.23.6",
+         "name": "systeminformation",
+         "version": "5.23.6"
+      },
+      "id": "GHSA-cvv5-9h9w-qp2m",
+      "description": "### Summary\nThe SSID is not sanitized when before it is passed as a parameter to cmd.exe in the `getWindowsIEEE8021x` function. This means that malicious content in the SSID can be executed as OS commands. \n\n### Details\nI have exploited this vulnerability in a Windows service using version 5.22.11 of the module, to escalate privileges (in an environment where I am authorized to do so). However, as far as I can see from the code, it is still present in master branch at time of writing, on line [403/404 of network.js](https://github.com/sebhildebrandt/systeminformation/blob/3a92931c7d46605ffddc1aacb97a9727273b2888/lib/network.js#L403).\n\nThe SSID is obtained from `netsh wlan show interface ...` in `getWindowsWirelessIfaceSSID`, and then passed to `cmd.exe /d /s /c \"netsh wlan show profiles ...` in `getWindowsIEEE8021x`, without sanitization.\n\n### PoC\nFirst, the command injection payload should be included in the connected Wi-Fi SSID. For example create hotspot on mobile phone or other laptop, set SSID to payload, connect to it with victim Windows system. Two example SSID's to demonstrate exploitation are below.\n\nDemonstration to run ping command indefinitely:\n```\na\" | ping /t 127.0.0.1 &\n```\n\nRun executable with privileges of the user in which vulnerable function is executed. Chosen executable should should be placed in (assuming system drive is C): `C:\\a\\a.exe`.\n```\na\" | %SystemDrive%\\a\\a.exe &\n```\n\nThen, the vulnerable function can be executed on the victim system, for example, using:\n```\nconst si = require('systeminformation');\nsi.networkInterfaces((net) => { console.log(net) });\n```\n\nNow the chosen command, `PING.exe` or `a.exe` will be run through the cmd.exe command line.\n\n### Impact\nThis vulnerability may enable an attacker, depending on how the package is used, to perform remote code execution or local privilege escalation.\n\n",
+      "summary": "Systeminformation has command injection vulnerability in getWindowsIEEE8021x (SSID)",
+      "date": "2024-12-20T19:13:23Z",
+      "cve": "CVE-2024-56334",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "angular-expressions@1.4.2",
+         "name": "angular-expressions",
+         "version": "1.4.2"
+      },
+      "id": "GHSA-5462-4vcx-jh7j",
+      "description": "### Impact\n\nAn attacker can write a malicious expression that escapes the sandbox to execute arbitrary code on the system.\n\nExample of vulnerable code:\n\n```js\nconst expressions = require(\"angular-expressions\");\nconst result = expressions.compile(\"__proto__.constructor\")({}, {});\n// result should be undefined, however for versions <=1.4.2, it returns an object.\n```\n\nWith a more complex (undisclosed) payload, one can get full access to Arbitrary code execution on the system.\n\n### Patches\n\nThe problem has been patched in version 1.4.3 of angular-expressions.\n\n### Workarounds\n\nThere is one workaround if it not possible for you to update : \n\n* Make sure that you use the compiled function with just one argument : ie this is not vulnerable : \n    `const result = expressions.compile(\"__proto__.constructor\")({});` : in this case you lose the feature of locals if you need it.\n\n### Credits\n\nCredits go to [JorianWoltjer](https://github.com/JorianWoltjer) who has found the issue and reported it to use. https://jorianwoltjer.com/",
+      "summary": "Angular Expressions - Remote Code Execution when using locals",
+      "date": "2024-12-10T16:54:50Z",
+      "cve": "CVE-2024-54152",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "hull.js@1.0.6",
+         "name": "hull.js",
+         "version": "1.0.6"
+      },
+      "id": "GHSA-q849-wxrc-vqrp",
+      "description": "Versions of the library from 0.2.2 to 1.0.9 are vulnerable to the arbitrary code execution due to unsafe usage of `new Function(...)` in the module that handles points format. Applications passing the 3rd parameter to the `hull` function without sanitising may be impacted. The vulnerability has been fixed in version 1.0.10, please update the library. Check project homepage on GitHub to see how to fetch the latest version: https://github.com/andriiheonia/hull?tab=readme-ov-file#npm-package",
+      "summary": "hull.js Code Injection Vulnerability",
+      "date": "2024-12-02T20:11:39Z",
+      "cve": null,
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "lilconfig@3.1.0",
+         "name": "lilconfig",
+         "version": "3.1.0"
+      },
+      "id": "GHSA-fq9m-v26v-2m4f",
+      "description": "Versions of the package lilconfig from 3.1.0 and before 3.1.1 are vulnerable to Arbitrary Code Execution due to the insecure usage of eval in the dynamicImport function. An attacker can exploit this vulnerability by passing a malicious input through the defaultLoaders function.",
+      "summary": "lilconfig Code Injection vulnerability",
+      "date": "2024-10-31T06:30:45Z",
+      "cve": "CVE-2024-21537",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "@cyclonedx/cdxgen@11.1.6",
+         "name": "cdxgen",
+         "version": "11.1.6",
+         "scope": "cyclonedx"
+      },
+      "id": "GHSA-hxf3-vgpm-fv9p",
+      "description": "CycloneDX cdxgen prior to 11.1.7, when run against an untrusted codebase, may execute code contained within build-related files such as build.gradle.kts, a similar issue to CVE-2022-24441. cdxgen is used by, for example, OWASP dep-scan. NOTE: this has been characterized as a design limitation, rather than an implementation mistake.",
+      "summary": "CycloneDX cdxgen may execute code contained within build-related files",
+      "date": "2024-10-28T00:30:48Z",
+      "cve": "CVE-2024-50611",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "@ifnotnowwhen/promptr@6.0.7",
+         "name": "promptr",
+         "version": "6.0.7",
+         "scope": "ifnotnowwhen"
+      },
+      "id": "GHSA-hwxp-6qf7-q3rc",
+      "description": "A remote command execution (RCE) vulnerability in promptr v6.0.7 allows attackers to execute arbitrary commands via a crafted URL.",
+      "summary": "Remote command execution in promptr",
+      "date": "2024-09-25T18:31:21Z",
+      "cve": "CVE-2024-46489",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "@blakeembrey/template@1.1.0",
+         "name": "template",
+         "version": "1.1.0",
+         "scope": "blakeembrey"
+      },
+      "id": "GHSA-q765-wm9j-66qj",
+      "description": "### Impact\n\nIt is possible to inject and run code within the template if the attacker has access to write the template name.\n\n```js\nconst { template } = require('@blakeembrey/template');\n\ntemplate(\"Hello {{name}}!\", \"exploit() {} && ((()=>{ console.log('success'); })()) && function pwned\");\n```\n\n### Patches\n\nUpgrade to 1.2.0.\n\n### Workarounds\n\nDon't pass untrusted input as the template display name, or don't use the display name feature.\n\n### References\n\nFixed by removing in https://github.com/blakeembrey/js-template/commit/b8d9aa999e464816c6cfb14acd1ad0f5d1e335aa.",
+      "summary": "@blakeembrey/template vulnerable to code injection when attacker controls template input",
+      "date": "2024-09-03T19:42:25Z",
+      "cve": "CVE-2024-45390",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "squirrelly@9.0.0",
+         "name": "squirrelly",
+         "version": "9.0.0"
+      },
+      "id": "GHSA-w5pw-gmcw-rfc8",
+      "description": "squirrellyjs squirrelly v9.0.0 was discovered to contain a code injection vulnerability via the component `options.varName`. The issue was fixed in version 9.1.0.",
+      "summary": "squirrelly Code Injection vulnerability",
+      "date": "2024-08-21T18:31:28Z",
+      "cve": "CVE-2024-40453",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "@mongodb-js/connection-form@1.20.0",
+         "name": "connection-form",
+         "version": "1.20.0",
+         "scope": "mongodb-js"
+      },
+      "id": "GHSA-jxr4-4prv-mh83",
+      "description": "MongoDB Compass may be susceptible to code injection due to insufficient sandbox protection settings with the usage of ejson shell parser in Compass' connection handling. This issue affects MongoDB Compass versions prior to version 1.42.2.",
+      "summary": "ejson shell parser in MongoDB Compass maybe bypassed",
+      "date": "2024-07-01T15:32:47Z",
+      "cve": "CVE-2024-6376",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "js-deobfuscator@1.0.20",
+         "name": "js-deobfuscator",
+         "version": "1.0.20"
+      },
+      "id": "GHSA-9p6p-8v9r-8c9m",
+      "description": "javascript-deobfuscator removes common JavaScript obfuscation techniques. Crafted payloads targeting expression simplification can lead to code execution. This issue has been patched in version 1.1.0.\n",
+      "summary": "javascript-deobfuscator crafted payload can lead to code execution",
+      "date": "2024-06-04T15:13:54Z",
+      "cve": "CVE-2024-36120",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "pug@3.0.2",
+         "name": "pug",
+         "version": "3.0.2"
+      },
+      "id": "GHSA-3965-hpx2-q597",
+      "description": "Pug through 3.0.2 allows JavaScript code execution if an application accepts untrusted input for the name option of the `compileClient`, `compileFileClient`, or `compileClientWithDependenciesTracked` function. NOTE: these functions are for compiling Pug templates into JavaScript, and there would typically be no reason to allow untrusted callers.",
+      "summary": "Pug allows JavaScript code execution if an application accepts untrusted input",
+      "date": "2024-05-24T14:45:02Z",
+      "cve": "CVE-2024-36361",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "flowise@1.8.0",
+         "name": "flowise",
+         "version": "1.8.0"
+      },
+      "id": "GHSA-6wp6-22x5-rr3w",
+      "description": "An issue in FlowiseAI Inc Flowise prior to v1.8.1 allows a remote attacker to execute arbitrary code via a crafted script to the api/v1 component.",
+      "summary": "Flowise vulnerable to code injection via api/v1",
+      "date": "2024-04-29T18:30:45Z",
+      "cve": "CVE-2024-31621",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "mysql2@3.9.6",
+         "name": "mysql2",
+         "version": "3.9.6"
+      },
+      "id": "GHSA-4rch-2fh8-94vw",
+      "description": "Versions of the package mysql2 before 3.9.7 are vulnerable to Arbitrary Code Injection due to improper sanitization of the timezone parameter in the readCodeFor function by calling a native MySQL Server date/time function.",
+      "summary": "MySQL2 for Node Arbitrary Code Injection",
+      "date": "2024-04-23T06:30:47Z",
+      "cve": "CVE-2024-21511",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "mysql2@3.9.3",
+         "name": "mysql2",
+         "version": "3.9.3"
+      },
+      "id": "GHSA-fpw7-j2hg-69v5",
+      "description": "Versions of the package mysql2 before 3.9.4 are vulnerable to Remote Code Execution (RCE) via the `readCodeFor` function due to improper validation of the `supportBigNumbers` and `bigNumberStrings` values.",
+      "summary": "mysql2 Remote Code Execution (RCE) via the readCodeFor function",
+      "date": "2024-04-11T06:30:35Z",
+      "cve": "CVE-2024-21508",
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "@budibase/server@2.19.6",
+         "name": "server",
+         "version": "2.19.6",
+         "scope": "budibase"
+      },
+      "id": "GHSA-4g2x-vq5p-5vj6",
+      "description": "### Impact\nPreviously, budibase used a library called `vm2` for code execution inside the Budibase builder and apps, such as the UI below for configuring bindings in the design section.\n\n![Screenshot 2024-03-01 at 13 50 16](https://github.com/Budibase/budibase/assets/11256663/5f049b64-cd99-48fd-a184-644cd312c82e)\n\nDue to a [vulnerability in vm2](https://github.com/advisories/GHSA-cchq-frgv-rjh5), any environment that executed the code server side (automations and column formulas) was susceptible to this vulnerability, allowing users to escape the sandbox provided by `vm2`, and to expose server side variables such as `process.env`. It's recommended by the authors of `vm2` themselves that you should move to another solution for remote JS execution due to this vulnerability.\n\n### Patches\nWe moved our entire JS sandbox infrastructure over to `isolated-vm`, a much more secure and recommended library for remote code execution in 2.20.0. This also comes with a performance benefit in the way we cache and execute your JS server side. The budibase cloud platform has been patched already and is not running `vm2`, but self host users will need to manage the updates by themselves.\n\nIf you are a self hosted user, you can take the following steps to reproduce the exploit and to verify if your installation is currently affected.\n\nCreate a new formula column on one of your tables in the data section with the following configuration.\n![Screenshot 2024-03-01 at 14 04 28](https://github.com/Budibase/budibase/assets/11256663/0f8bc19b-9e44-4e95-ab4e-6ef6278eea34)\n\nAdd the following JS function to the formula and save.\n![Screenshot 2024-03-01 at 14 05 19](https://github.com/Budibase/budibase/assets/11256663/1d0c9705-1a88-49b0-93e0-f385a04b5c25)\n\nIf your installation is vulnerable, when the formula evaluates you will be able to see the printed `process.env` in your new formula field. If not, your installation is not affected.\n\n### Workarounds\nThere is no workaround at this time for any budibase app that uses JS. You must fully migrate post version 2.20.0 to patch the vulnerability.\n\n### References\n- https://github.com/advisories/GHSA-cchq-frgv-rjh5\n",
+      "summary": "Budibase affected by VM2 Constructor Escape Vulnerability",
+      "date": "2024-03-01T20:09:00Z",
+      "cve": null,
+      "year": 2024
+   },
+   {
+      "package": {
+         "raw": "fsevents@1.2.10",
+         "name": "fsevents",
+         "version": "1.2.10"
+      },
+      "id": "GHSA-8r6j-v8pm-fqw3",
+      "description": "fsevents before 1.2.11 depends on the https://fsevents-binaries.s3-us-west-2.amazonaws.com URL, which might allow an adversary to execute arbitrary code if any JavaScript project (that depends on fsevents) distributes code that was obtained from that URL at a time when it was controlled by an adversary.",
+      "summary": "Code injection in fsevents",
+      "date": "2023-10-06T21:30:49Z",
+      "cve": "CVE-2023-45311",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "@frangoteam/fuxa@1.1.13",
+         "name": "fuxa",
+         "version": "1.1.13",
+         "scope": "frangoteam"
+      },
+      "id": "GHSA-r87q-fq37-pvr6",
+      "description": "A remote command execution (RCE) vulnerability in the /api/runscript endpoint of FUXA 1.1.13 allows attackers to execute arbitrary commands via a crafted POST request.",
+      "summary": "A remote command execution (RCE) vulnerability in the /api/runscript endpoint of FUXA",
+      "date": "2023-09-18T21:30:42Z",
+      "cve": "CVE-2023-33831",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "electron@22.3.18",
+         "name": "electron",
+         "version": "22.3.18"
+      },
+      "id": "GHSA-7x97-j373-85x5",
+      "description": "### Impact\nApps that are launched as command line executables are impacted.  E.g. if your app exposes itself in the path as `myapp --help`\n\nSpecifically this issue can only be exploited if the following conditions are met:\n* Your app is launched with an attacker-controlled working directory\n* The attacker has the ability to write files to that working directory\n\nThis makes the risk quite low, in fact normally issues of this kind are considered outside of our threat model as similar to Chromium we exclude [Physically Local Attacks](https://github.com/electron/electron/security/advisories/GHSA-7x97-j373-85x5#:~:text=Physically%20Local%20Attacks) but given the ability for this issue to bypass certain protections like ASAR Integrity it is being treated with higher importance.  Please bear this in mind when reporting similar issues in the future.\n\n### Workarounds\nThere are no app side workarounds, you must update to a patched version of Electron.\n\n### Fixed Versions\n* `26.0.0-beta.13`\n* `25.5.0`\n* `24.7.1`\n* `23.3.13`\n* `22.3.19`\n\n### For more information\nIf you have any questions or comments about this advisory, email us at [security@electronjs.org](mailto:security@electronjs.org)",
+      "summary": "Electron vulnerable to out-of-package code execution when launched with arbitrary cwd",
+      "date": "2023-09-06T19:51:33Z",
+      "cve": "CVE-2023-39956",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "vm2@3.9.19",
+         "name": "vm2",
+         "version": "3.9.19"
+      },
+      "id": "GHSA-cchq-frgv-rjh5",
+      "description": "In vm2 for versions up to 3.9.19, `Promise` handler sanitization can be bypassed, allowing attackers to escape the sandbox and run arbitrary code.\n\n### Impact\nRemote Code Execution, assuming the attacker has arbitrary code execution primitive inside the context of vm2 sandbox.\n\n### Patches\nNone.\n\n### Workarounds\nNone.\n\n### References\nPoC - https://gist.github.com/leesh3288/f693061e6523c97274ad5298eb2c74e9\n\n### For more information\n\nIf you have any questions or comments about this advisory:\n\n- Open an issue in [VM2](https://github.com/patriksimek/vm2)\n\nThanks to [Xion](https://twitter.com/0x10n) (SeungHyun Lee) of [KAIST Hacking Lab](https://kaist-hacking.github.io/) for disclosing this vulnerability.",
+      "summary": "vm2 Sandbox Escape vulnerability",
+      "date": "2023-07-13T17:02:02Z",
+      "cve": "CVE-2023-37466",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "snyk@1.1063.0",
+         "name": "snyk",
+         "version": "1.1063.0"
+      },
+      "id": "GHSA-4vrv-93c7-m92j",
+      "description": "The package snyk before 1.1064.0 is vulnerable to Code Injection when analyzing a project. An attacker who can convince a user to scan a malicious project can include commands in a build file such as build.gradle or gradle-wrapper.jar, which will be executed with the privileges of the application. This vulnerability may be triggered when running the the CLI tool directly, or when running a scan with one of the IDE plugins that invoke the Snyk CLI. Successful exploitation of this issue would likely require some level of social engineering - to coerce an untrusted project to be downloaded and analyzed via the Snyk CLI or opened in an IDE where a Snyk IDE plugin is installed and enabled. Additionally, if the IDE has a Trust feature then the target folder must be marked as ‘trusted’ in order to be vulnerable.\n\n**NOTE:** This issue is independent of the one reported in [CVE-2022-40764](https://security.snyk.io/vuln/SNYK-JS-SNYK-3037342), and upgrading to a fixed version for this addresses that issue as well.\n\nThe affected IDE plugins and versions are: \n- VS Code - Affected: <=1.8.0, Fixed: 1.9.0 \n- IntelliJ - Affected: <=2.4.47, Fixed: 2.4.48 \n- Visual Studio - Affected: <=1.1.30, Fixed: 1.1.31 \n- Eclipse - Affected: <=v20221115.132308, Fixed: All subsequent versions \n- Language Server - Affected: <=v20221109.114426, Fixed: All subsequent versions",
+      "summary": "snyk Code Injection vulnerability",
+      "date": "2023-07-06T19:24:04Z",
+      "cve": "CVE-2022-24441",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "@backstage/plugin-scaffolder-backend@1.14.0",
+         "name": "plugin-scaffolder-backend",
+         "version": "1.14.0",
+         "scope": "backstage"
+      },
+      "id": "GHSA-wg6p-jmpc-xjmr",
+      "description": "The Backstage scaffolder-backend plugin uses a templating library that requires a sandbox, as it by design allows for code injection. The library used for this sandbox so far has been `vm2`, but in light of several past vulnerabilities and existing vulnerabilities  that may not have a fix, the plugin has switched to using a different sandbox library.\n\n### Impact\n\nA malicious actor with write access to a registered scaffolder template could manipulate the template in a way that allows for remote code execution on the scaffolder-backend instance. This was only exploitable in the template YAML definition itself and not by user input data.\n\n### Patches\n\nThis is vulnerability is fixed in version 1.15.0 of `@backstage/plugin-scaffolder-backend`.\n\n### Workarounds\n\nNote that the [Backstage Threat Model](https://backstage.io/docs/overview/threat-model) states that scaffolder templates are considered to be a sensitive area that with the recommendation that you control access and perform manual reviews of changes to the scaffolder templates. The exploit is of a nature where it is easily discoverable in manual review.",
+      "summary": "Backstage Scaffolder plugin has insecure sandbox",
+      "date": "2023-06-21T22:00:30Z",
+      "cve": "CVE-2023-35926",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "nuxt@3.4.2",
+         "name": "nuxt",
+         "version": "3.4.2"
+      },
+      "id": "GHSA-gc34-5v43-h7v8",
+      "description": "he Nuxt dev server between versions 3.4.0 and 3.4.3 is vulnerable to code injection when it is exposed publicly.",
+      "summary": "nuxt Code Injection vulnerability",
+      "date": "2023-06-13T18:30:40Z",
+      "cve": "CVE-2023-3224",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "jsreport@3.11.2",
+         "name": "jsreport",
+         "version": "3.11.2"
+      },
+      "id": "GHSA-g7rj-q722-245g",
+      "description": "jsreport prior to 3.11.3 had a version of vm2 vulnerable to CVE-2023-29017 hard coded in the package.json of the jsreport-core component. An attacker can use this vulnerability to obtain the authority of the jsreport playground server, or construct a malicious webpage/html file and send it to the user to attack the installed jsreport client.",
+      "summary": "jsreport vulnerable to code injection",
+      "date": "2023-05-08T18:30:17Z",
+      "cve": "CVE-2023-2583",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "@builder.io/qwik@0.20.1",
+         "name": "qwik",
+         "version": "0.20.1",
+         "scope": "builder.io"
+      },
+      "id": "GHSA-9wf9-qvvp-2929",
+      "description": "Code Injection in GitHub repository builderio/qwik prior to 0.21.0. The Function deserializer can be accessed using the pureServerFunction feature. This allows any Javascript code to be run by node.js.",
+      "summary": "builderio/qwik is vulnerable to code injection",
+      "date": "2023-03-09T00:30:18Z",
+      "cve": "CVE-2023-1283",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "eta@1.14.2",
+         "name": "eta",
+         "version": "1.14.2"
+      },
+      "id": "GHSA-mf6x-hrgr-658f",
+      "description": "Versions of the package eta before 2.0.0 are vulnerable to Remote Code Execution (RCE) by overwriting template engine configuration variables with view options received from The Express render API. **Note:** This is exploitable only for users who are rendering templates with user-defined data.",
+      "summary": "Eta vulnerable to Code Injection via templates rendered with user-defined data",
+      "date": "2023-01-30T06:30:27Z",
+      "cve": "CVE-2022-25967",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "electerm@1.0.32",
+         "name": "electerm",
+         "version": "1.0.32"
+      },
+      "id": "GHSA-x73w-g8hx-v7rp",
+      "description": "An issue was discovered in Electerm 1.3.22, allows attackers to execute arbitrary code via unverified request to electerms service.",
+      "summary": "Code injection in electerm",
+      "date": "2023-01-20T21:30:32Z",
+      "cve": "CVE-2020-23256",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "vm2@3.9.9",
+         "name": "vm2",
+         "version": "3.9.9"
+      },
+      "id": "GHSA-4w2j-2rg4-5mjw",
+      "description": "The package vm2 before 3.9.10 is vulnerable to Arbitrary Code Execution due to the usage of prototype lookup for the WeakMap.prototype.set method. Exploiting this vulnerability leads to access to a host object and a sandbox compromise.",
+      "summary": "vm2 vulnerable to Arbitrary Code Execution",
+      "date": "2022-12-21T06:30:29Z",
+      "cve": "CVE-2022-25893",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "octocat.js@1.0.0",
+         "name": "octocat.js",
+         "version": "1.0.0"
+      },
+      "id": "GHSA-r4jg-5v89-9v62",
+      "description": "## Withdrawn\n\nThis advisory has been withdrawn because it is a test.\n\n## Original Description\n\n### Impact\nUsers can include their own images for accessories via provided URLs. These URLs are not validated and can result in execution of injected code.\n\n### Patches\nThis vulnerability was fixed in version 1.2 of octocat.js\n\n### Workarounds\nDirectly exposing rendered images to a website can introduce the vulnerability to users. To avoid, writing an image to disk then using that image in an image element in HTML mitigates the risk.\n\n### References\nTo render the file correctly, see documentation at `readme.md`\n\n### For more information\nIf you have any questions or comments about this advisory:\n* Open an issue in [the octo.js repository](http://github.com/octocademy/octocat.js/issues)\n",
+      "summary": "Withdrawn: Octocat.js vulnerable to code injection",
+      "date": "2022-11-08T20:48:49Z",
+      "cve": "CVE-2022-39390",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "mdx-mermaid@1.2.3",
+         "name": "mdx-mermaid",
+         "version": "1.2.3"
+      },
+      "id": "GHSA-rvgm-35jw-q628",
+      "description": "### Impact\n\nArbitary javascript injection\n\nModify any mermaid code blocks with the following code and the code inside will execute when the component is loaded by MDXjs\n\n```\n` + (function () {\n  // Put Javascript code here\n  return ''\n}()) + `\n```\n\nThe block below shows a valid mermaid code block\n\n````md\n```mermaid\ngraph TD;\n    A-->B;\n    A-->C;\n    B-->D;\n    C-->D;\n```\n````\n\nThe same block but with the exploit added\n\n````md\n```mermaid\n` + (function () {\n  alert('vulnerable')\n  return ''\n}()) + `\ngraph TD;\n    A-->B;\n    A-->C;\n    B-->D;\n    C-->D;\n```\n````\n\n### Patches\n1.3.0 and 2.0.0-rc2\n\n### Workarounds\nNone known",
+      "summary": "Improper Control of Generation of Code ('Code Injection') in mdx-mermaid",
+      "date": "2022-08-31T22:26:11Z",
+      "cve": "CVE-2022-36036",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "morgan-json@1.1.0",
+         "name": "morgan-json",
+         "version": "1.1.0"
+      },
+      "id": "GHSA-fwv4-6mxc-x5h3",
+      "description": "All versions of package morgan-json are vulnerable to Arbitrary Code Execution due to missing sanitization of input passed to the `Function` constructor.",
+      "summary": "morgan-json vulnerable to Arbitrary Code Execution",
+      "date": "2022-08-29T20:06:55Z",
+      "cve": "CVE-2022-25921",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "react-editable-json-tree@2.2.1",
+         "name": "react-editable-json-tree",
+         "version": "2.2.1"
+      },
+      "id": "GHSA-j3rv-w43q-f9x2",
+      "description": "### Impact\nOur library allows strings to be parsed as functions and stored as a specialized component, [`JsonFunctionValue`](https://github.com/oxyno-zeta/react-editable-json-tree/blob/09a0ca97835b0834ad054563e2fddc6f22bc5d8c/src/components/JsonFunctionValue.js). To do this, Javascript's [`eval`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval) function was used to execute strings that begin with \"function\" as Javascript. This was an oversight that unfortunately allows arbitrary code to be executed if it exists as a value within the JSON structure being displayed. Given that this component may often be used to display data from arbitrary, untrusted sources, this is extremely dangerous.\n\nOne important note is that users who have defined a custom [`onSubmitValueParser`](https://github.com/oxyno-zeta/react-editable-json-tree/tree/09a0ca97835b0834ad054563e2fddc6f22bc5d8c#onsubmitvalueparser) callback prop on the [`JsonTree`](https://github.com/oxyno-zeta/react-editable-json-tree/blob/09a0ca97835b0834ad054563e2fddc6f22bc5d8c/src/JsonTree.js) component should be ***unaffected***. This vulnerability exists in the default `onSubmitValueParser` prop which calls [`parse`](https://github.com/oxyno-zeta/react-editable-json-tree/blob/master/src/utils/parse.js#L30).\n\n### Patches\nWe have decided on a two-pronged approach to patching this vulnerability:\n\n1. Create a patch update that adds a workaround **which is not enabled by default** to preserve backwards-compatibility\n2. On the next major update, **we will enable this workaround by default**\n\nThe workaround we have decided on is adding a prop to `JsonTree` called `allowFunctionEvaluation`. This prop will be set to `true` in v2.2.2, so you can upgrade without fear of losing backwards-compatibility.\n\nWe have also implemented additional security measures as we know many people may not read the details of this vulnerability, and we want to do the best we can to keep you protected. In v2.2.2, we switched from using `eval` to using [`Function`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function) to construct anonymous functions. This is better than `eval` for the following reasons:\n\n- Arbitrary code should not be able to execute immediately, since the `Function` constructor explicitly *only creates* anonymous functions\n- Functions are created without local closures, so they only have access to the global scope\n\nThis change has brought a *slight* potential for breaking backwards-compatibility if users for some reason were relying on side-effects of our usage of `eval`, but that is beyond intended behavior, so we have decided to go ahead with this change and consider it a non-breaking change.\n\n### Workarounds\nAs mentioned above, there are a few scenarios you must consider:\n\nIf you use:\n- **Version `<2.2.2`**, you must upgrade as soon as possible.\n- **Version `^2.2.2`**, you must explicitly set `JsonTree`'s `allowFunctionEvaluation` prop to `false` to fully mitigate this vulnerability.\n- **Version `>=3.0.0`**, `allowFunctionEvaluation` is already set to `false` by default, so no further steps are necessary.\n\n### References\nNone.\n\n### For more information\nIf you have any questions or comments about this advisory:\n* Open an issue in the [GitHub repo](https://github.com/oxyno-zeta/react-editable-json-tree)\n",
+      "summary": "React Editable Json Tree vulnerable to arbitrary code execution via function parsing",
+      "date": "2022-08-18T19:15:28Z",
+      "cve": "CVE-2022-36010",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "convert-svg-core@0.6.2",
+         "name": "convert-svg-core",
+         "version": "0.6.2"
+      },
+      "id": "GHSA-54px-mhwv-5v8x",
+      "description": "The package convert-svg-core before 0.6.3 are vulnerable to Arbitrary Code Injection when using a specially crafted SVG file. An attacker can read arbitrary files from the file system and then show the file content as a converted PNG file.",
+      "summary": "Code injection via SVG file in convert-svg-core",
+      "date": "2022-06-11T00:00:17Z",
+      "cve": "CVE-2022-24429",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "metacalc@0.0.1",
+         "name": "metacalc",
+         "version": "0.0.1"
+      },
+      "id": "GHSA-5gc4-cx9x-9c43",
+      "description": "The package metacalc before 0.0.2 is vulnerable to Arbitrary Code Execution when it exposes JavaScript's Math class to the v8 context. As the Math class is exposed to user-land, it can be used to get access to JavaScript's Function constructor.",
+      "summary": "Code Injection in metacalc",
+      "date": "2022-06-09T00:00:29Z",
+      "cve": "CVE-2022-21122",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "obsidian-dataview@0.4.12-hotfix1",
+         "name": "obsidian-dataview",
+         "version": "0.4.12-hotfix1"
+      },
+      "id": "GHSA-xfg5-vrmc-24wc",
+      "description": "Obsidian Dataview through 0.4.12-hotfix1 allows eval injection. The `evalInContext` function in executes user input, which allows an attacker to craft malicious Markdown files that will execute arbitrary code once opened. NOTE: 0.4.13 provides a mitigation for some use cases.",
+      "summary": "Obsidian Dataview vulnerable to code injection due to unsafe eval",
+      "date": "2022-05-24T19:19:42Z",
+      "cve": "CVE-2021-42057",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "dot@1.1.2",
+         "name": "dot",
+         "version": "1.1.2"
+      },
+      "id": "GHSA-297x-8xj4-vcxv",
+      "description": "The dot package v1.1.2 uses Function() to compile templates. This can be exploited by the attacker if they can control the given template or if they can control the value set on Object.prototype.",
+      "summary": "Improper Control of Generation of Code in doT",
+      "date": "2022-05-24T17:11:32Z",
+      "cve": "CVE-2020-8141",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "pdfjs-dist@2.0.489",
+         "name": "pdfjs-dist",
+         "version": "2.0.489"
+      },
+      "id": "GHSA-7jg2-jgv3-fmr4",
+      "description": "The PDF viewer does not sufficiently sanitize PostScript calculator functions, allowing malicious JavaScript to be injected through a crafted PDF file. This JavaScript can then be run with the permissions of the PDF viewer by its worker. This vulnerability affects Firefox ESR < 52.8, Firefox < 60 and PDF.js < 2.0.550.",
+      "summary": "Malicious PDF can inject JavaScript into PDF Viewer",
+      "date": "2022-05-14T01:22:02Z",
+      "cve": "CVE-2018-5158",
+      "year": 2018
+   },
+   {
+      "package": {
+         "raw": "accesslog@0.0.2",
+         "name": "accesslog",
+         "version": "0.0.2"
+      },
+      "id": "GHSA-8m2f-74r2-x3f2",
+      "description": "All versions of package accesslog are vulnerable to Arbitrary Code Injection due to the usage of the Function constructor without input sanitization. If (attacker-controlled) user input is given to the format option of the package's exported constructor function, it is possible for an attacker to execute arbitrary JavaScript code on the host that this package is being run on.",
+      "summary": "Code injection in accesslog",
+      "date": "2022-03-18T00:01:10Z",
+      "cve": "CVE-2022-25760",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "handlebars@3.0.7",
+         "name": "handlebars",
+         "version": "3.0.7"
+      },
+      "id": "GHSA-3cqr-58rm-57f8",
+      "description": "Handlebars before 3.0.8 and 4.x before 4.5.3 is vulnerable to Arbitrary Code Execution. The lookup helper fails to properly validate templates, allowing attackers to submit templates that execute arbitrary JavaScript. This can be used to run arbitrary code on a server processing Handlebars templates or in a victim's browser (effectively serving as XSS).",
+      "summary": "Arbitrary Code Execution in Handlebars",
+      "date": "2022-02-10T20:38:19Z",
+      "cve": "CVE-2019-20920",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "joplin@2.6.2",
+         "name": "joplin",
+         "version": "2.6.2"
+      },
+      "id": "GHSA-8478-53pv-jxvm",
+      "description": "Joplin prior to version 2.7.1 allows remote attackers to execute system commands through malicious code in user search results.",
+      "summary": "Joplin Vulnerable to Code Injection",
+      "date": "2022-02-09T00:00:29Z",
+      "cve": "CVE-2022-23340",
+      "year": 2022
+   },
+   {
+      "package": {
+         "raw": "md-to-pdf@4.1.0",
+         "name": "md-to-pdf",
+         "version": "4.1.0"
+      },
+      "id": "GHSA-x949-7cm6-fm6p",
+      "description": "The package md-to-pdf before 5.0.0 are vulnerable to Remote Code Execution (RCE) due to utilizing the library gray-matter to parse front matter content, without disabling the JS engine.",
+      "summary": "Code Injection in md-to-pdf.",
+      "date": "2021-12-16T14:34:40Z",
+      "cve": "CVE-2021-23639",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "total4@0.0.42",
+         "name": "total4",
+         "version": "0.0.42"
+      },
+      "id": "GHSA-g7mq-rfj2-25wq",
+      "description": "The package total4 before 0.0.43 are vulnerable to Arbitrary Code Execution via the `U.set()` and `U.get()` functions.",
+      "summary": "Code Injection in total4",
+      "date": "2021-12-10T17:26:33Z",
+      "cve": "CVE-2021-23390",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "total.js@3.4.8",
+         "name": "total.js",
+         "version": "3.4.8"
+      },
+      "id": "GHSA-7fm6-gxqg-2pwr",
+      "description": "The package total.js before 3.4.9 are vulnerable to Arbitrary Code Execution via the U.set() and U.get() functions.",
+      "summary": "Code Injection in total.js",
+      "date": "2021-12-10T17:26:06Z",
+      "cve": "CVE-2021-23389",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "@asyncapi/modelina@0.59.9",
+         "name": "modelina",
+         "version": "0.59.9",
+         "scope": "asyncapi"
+      },
+      "id": "GHSA-4jg2-84c2-pj95",
+      "description": "### Impact\nAnyone who is using the default presets and/or does not handle the functionality themself.\n\n### Patches\nIt is impossible to fully guard against this, because users have access to the original raw information. However, as of version 1, if you only access the constrained models, you will not encounter this issue.\n\nFurther similar situations are NOT seen as a security issue, but intended behavior.\n\n### Workarounds\nFully custom presets that change the entire rendering process which can then escape the user input.\n\n### For more information\nEven though that I changed all the presets here, the vulnerability is still present throughout. I am using a JSON Schema here for simplicity.\n```ts\nconst jsonSchemaDoc = {\n  $id: 'CustomClass',\n  type: 'object',\n  properties: {\n      'property: any; \\n constructor(){console.log(\"injected\")} \\n private _temp': { type: 'string' },\n  }\n};\ngenerator = new TypeScriptGenerator(\n  { \n    presets: [\n      {\n        class: {\n            property({ propertyName, content }) {\n              return `private ${propertyName}: any;`;\n            },\n            ctor() {\n              return '';\n            },\n            getter() {\n              return '';\n            },\n            setter() {\n              return '';\n            }\n        }\n      }\n    ]\n  }\n);\nconst inputModel = await generator.process(jsonSchemaDoc);\n```\nThis would render\n```ts\nexport class CustomClass {\n  private property: any; \n   constructor(){console.log(\"injected\")} \n   private _temp: any;\n  private additionalProperties: any;\n}\n```",
+      "summary": "Improper Control of Generation of Code ('Code Injection') in @asyncapi/modelina",
+      "date": "2021-09-21T18:41:59Z",
+      "cve": "CVE-2023-23619",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "hbs@4.1.2",
+         "name": "hbs",
+         "version": "4.1.2"
+      },
+      "id": "GHSA-7f5c-rpf4-86p8",
+      "description": "The npm hbs package is an Express view engine wrapper for Handlebars. Depending on usage, users of hbs may be vulnerable to a file disclosure vulnerability. There is currently no patch for this vulnerability. hbs mixes pure template data with engine configuration options through the Express render API. By overwriting internal configuration options a file disclosure vulnerability may be triggered in downstream applications. For an example PoC see the referenced GHSL-2021-020.",
+      "summary": "Insertion of Sensitive Information into Externally-Accessible File or Directory and Exposure of Sensitive Information to an Unauthorized Actor in hbs",
+      "date": "2021-09-02T17:16:46Z",
+      "cve": "CVE-2021-32822",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "pac-resolver@4.2.0",
+         "name": "pac-resolver",
+         "version": "4.2.0"
+      },
+      "id": "GHSA-9j49-mfvp-vmhm",
+      "description": "This affects the package pac-resolver before 5.0.0. This can occur when used with untrusted input, due to unsafe PAC file handling. **NOTE:** The fix for this vulnerability is applied in the node-degenerator library, a dependency written by the same maintainer.",
+      "summary": "Code Injection in pac-resolver",
+      "date": "2021-09-02T17:10:06Z",
+      "cve": "CVE-2021-23406",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "total.js@3.4.8",
+         "name": "total.js",
+         "version": "3.4.8"
+      },
+      "id": "GHSA-vwhc-pww7-72x6",
+      "description": "Total.js framework (npm package total.js) is a framework for Node.js platfrom written in pure JavaScript similar to PHP's Laravel or Python's Django or ASP.NET MVC. In total.js framework before version 3.4.9, calling the utils.set function with user-controlled values leads to code-injection. This can cause a variety of impacts that include arbitrary code execution. This is fixed in version 3.4.9.",
+      "summary": "Code Injection in total.js",
+      "date": "2021-09-01T18:24:05Z",
+      "cve": "CVE-2021-32831",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "@asyncapi/java-spring-cloud-stream-template@0.6.9",
+         "name": "java-spring-cloud-stream-template",
+         "version": "0.6.9",
+         "scope": "asyncapi"
+      },
+      "id": "GHSA-xj6r-2jpm-qvxp",
+      "description": "The following was initially reported by @jonaslagoni:\n\nGiven the following command:\n`ag ./dummy.json @asyncapi/java-spring-cloud-stream-template --force-write --output ./output`\n\nWith the following AsyncAPI document:\n```json\n{\n  \"asyncapi\": \"2.0.0\",\n  \"info\": {\n    \"title\": \"Streetlight\",\n    \"version\": \"1.0.0\"\n  },\n  \"defaultContentType\": \"json\",\n  \"channels\": {\n    \"security/audit/channel\": {\n      \"description\": \"Channel for the turn on command which should turn on the streetlight\",\n      \"parameters\": {\n        \"streetlight_id\": {\n          \"description\": \"The ID of the streetlight\",\n          \"schema\": {\n            \"type\": \"string\"\n          }\n        }\n      },\n      \"publish\": {\n        \"operationId\": \"test() { System.out.println(\\\"injected\\\"); return test(0); }\\n public Consumer<CustomClass> someothername\",\n        \"message\": {\n          \"name\": \"TurnonCommand\",\n          \"payload\": {\n            \"$ref\": \"#/components/schemas/CustomClass\"\n          }\n        }\n      }\n    }\n  },\n  \"components\": {\n    \"schemas\" : {\n      \"CustomClass\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"prop\": { \n              \"type\": \"string\"\n          }\n        }\n      }\n    }\n  }\n}\n```\n\nWhich changes the following output: \n\n```java\n...\n  @Bean\n  public Consumer<CustomClass> test() {\n    // Add business logic here.\n    return null;\n  }\n...\n```\nTo\n```java\n...\n  @Bean\n  public Consumer<CustomClass> test() { System.out.println(\"injected\"); return someothername(); }\n  public Consumer<CustomClass> someothername() {\n    // Add business logic here.\n    return null;\n  }\n...\n```",
+      "summary": "Code injection issue for java-spring-cloud-stream-template",
+      "date": "2021-08-25T14:45:52Z",
+      "cve": "CVE-2021-37694",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "shiba@1.2.1",
+         "name": "shiba",
+         "version": "1.2.1"
+      },
+      "id": "GHSA-jvf4-g24p-2qgw",
+      "description": "All versions of package shiba are vulnerable to Arbitrary Code Execution due to the default usage of the function `load()` of the package js-yaml instead of its secure replacement , `safeLoad()`.",
+      "summary": "Arbitrary Code Execution in shiba",
+      "date": "2021-05-10T18:37:34Z",
+      "cve": "CVE-2020-7738",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "handlebars@4.7.6",
+         "name": "handlebars",
+         "version": "4.7.6"
+      },
+      "id": "GHSA-f2jv-r9rf-7988",
+      "description": "The package handlebars before 4.7.7 are vulnerable to Remote Code Execution (RCE) when selecting certain compiling options to compile templates coming from an untrusted source.",
+      "summary": "Remote code execution in handlebars when compiling templates",
+      "date": "2021-05-06T15:57:44Z",
+      "cve": "CVE-2021-23369",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "xmlhttprequest@1.6.0",
+         "name": "xmlhttprequest",
+         "version": "1.6.0"
+      },
+      "id": "GHSA-h4j5-c7cj-74xg",
+      "description": "This affects the package xmlhttprequest before 1.7.0; all versions of package xmlhttprequest-ssl. Provided requests are sent synchronously (`async=False` on `xhr.open`), malicious user input flowing into `xhr.send` could result in arbitrary code being injected and run.",
+      "summary": "xmlhttprequest and xmlhttprequest-ssl vulnerable to Arbitrary Code Injection",
+      "date": "2021-05-04T18:02:34Z",
+      "cve": "CVE-2020-28502",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "oauth2-server@3.1.1",
+         "name": "oauth2-server",
+         "version": "3.1.1"
+      },
+      "id": "GHSA-2fw4-mgq9-39cx",
+      "description": "\"oauth2-server (aka node-oauth2-server) through 3.1.1 implements OAuth 2.0 without PKCE. It does not prevent authorization code injection. This is similar to CVE-2020-7692. NOTE: the vendor states 'As RFC7636 is an extension, I think the claim in the Readme of \"RFC 6749 compliant\" is valid and not misleading and I also therefore wouldn't describe this as a \"vulnerability\" with the library per se.'\"",
+      "summary": "Code Injection in oauth2-server",
+      "date": "2021-04-22T15:53:45Z",
+      "cve": "CVE-2017-18924",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "script-manager@0.8.6",
+         "name": "script-manager",
+         "version": "0.8.6"
+      },
+      "id": "GHSA-rhwf-hqpr-q8g2",
+      "description": "An unintended require vulnerability in script-manager npm package version 0.8.6 and earlier may allow attackers to execute arbitrary code.",
+      "summary": "Code Injection in script-manager",
+      "date": "2021-04-13T15:24:38Z",
+      "cve": "CVE-2020-8129",
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "total.js@3.4.6",
+         "name": "total.js",
+         "version": "3.4.6"
+      },
+      "id": "GHSA-3wj8-vp9h-rm6m",
+      "description": "total.js is a framework for Node.js platfrom written in pure JavaScript similar to PHP's Laravel or Python's Django or ASP.NET MVC. It can be used as web, desktop, service or IoT application.\n\nAffected versions of this package are vulnerable to Remote Code Execution (RCE) via `set`.\n\n### PoC\n```js\n// To be run in a nodejs console: \nrequire('total.js/utils').set({}, 'a;eval(`require(\"child_process\")\\\\x2eexecSync(\"touch pwned\")`);//')\n```",
+      "summary": "total.js Remote Code Execution Vulnerability",
+      "date": "2021-03-19T21:32:20Z",
+      "cve": "CVE-2021-23344",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "nobelprizeparser@1.0.1",
+         "name": "nobelprizeparser",
+         "version": "1.0.1"
+      },
+      "id": "GHSA-4wv4-mgfq-598v",
+      "description": "Code injection through use of eval.",
+      "summary": "Code injection in nobelprizeparser",
+      "date": "2021-03-12T23:00:19Z",
+      "cve": null,
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "angular-expressions@1.1.1",
+         "name": "angular-expressions",
+         "version": "1.1.1"
+      },
+      "id": "GHSA-j6px-jwvv-vpwq",
+      "description": "### Impact\n\nThe vulnerability, reported by GoSecure Inc, allows Remote Code Execution, if you call `expressions.compile(userControlledInput)` where `userControlledInput` is text that comes from user input.\n\nThis time, the security of the package could be bypassed by using a more complex payload, using a `.constructor.constructor` technique.\n\n* If running angular-expressions in the browser, an attacker could run any browser script when the application code calls expressions.compile(userControlledInput).\n* If running angular-expressions on the server, an attacker could run any Javascript expression, thus gaining Remote Code Execution.\n\n### Patches\n\nUsers should upgrade to version 1.1.2 of angular-expressions\n\n### Workarounds\n\nA temporary workaround might be either to : \n\n* disable user-controlled input that will be fed into angular-expressions in your application\n\nOR\n\n* allow only following characters in the userControlledInput : \n\n```js\nif (/^[|a-zA-Z.0-9 :\"'+-?]+$/.test(userControlledInput)) {\n      var result = expressions.compile(userControlledInput);\n}\nelse {\n     result = undefined;\n}\n```\n\n### References\n\n[Removal of angular-expression sandbox](http://blog.angularjs.org/2016/09/angular-16-expression-sandbox-removal.html)\n\n### For more information\n\nIf you have any questions or comments about this advisory:\n* Open an issue in [angular-expressions](https://github.com/peerigon/angular-expressions/issues)\n* [Email us](mailto:contact@javascript-ninja.fr)\n\n### Credits \n\nThe issue was reported by Maxime Nadeau from GoSecure, Inc.",
+      "summary": "Angular Expressions - Remote Code Execution",
+      "date": "2021-02-01T15:01:26Z",
+      "cve": "CVE-2021-21277",
+      "year": 2021
+   },
+   {
+      "package": {
+         "raw": "handlebars@3.0.7",
+         "name": "handlebars",
+         "version": "3.0.7"
+      },
+      "id": "GHSA-2cf5-4w76-r9qv",
+      "description": "Versions of `handlebars` prior to 3.0.8 or 4.5.2 are vulnerable to Arbitrary Code Execution. The package's lookup helper fails to properly validate templates, allowing attackers to submit templates that execute arbitrary JavaScript in the system. It can be used to run arbitrary code in a server processing Handlebars templates or on a victim's browser (effectively serving as Cross-Site Scripting).\n\nThe following template can be used to demonstrate the vulnerability:  \n```{{#with \"constructor\"}}\n\t{{#with split as |a|}}\n\t\t{{pop (push \"alert('Vulnerable Handlebars JS');\")}}\n\t\t{{#with (concat (lookup join (slice 0 1)))}}\n\t\t\t{{#each (slice 2 3)}}\n\t\t\t\t{{#with (apply 0 a)}}\n\t\t\t\t\t{{.}}\n\t\t\t\t{{/with}}\n\t\t\t{{/each}}\n\t\t{{/with}}\n\t{{/with}}\n{{/with}}```\n\n\n## Recommendation\n\nUpgrade to version 3.0.8, 4.5.2 or later.",
+      "summary": "Arbitrary Code Execution in handlebars",
+      "date": "2020-09-04T14:57:38Z",
+      "cve": null,
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "typed-function@0.10.5",
+         "name": "typed-function",
+         "version": "0.10.5"
+      },
+      "id": "GHSA-3qh4-r86r-grvm",
+      "description": "Versions of `typed-function` prior to 0.10.6 are vulnerable to Arbitrary JavaScript Execution. Function names are not properly sanitized and may allow an attacker to execute arbitrary code.\n\n\n## Recommendation\n\nUpgrade to version 0.10.6 or later.",
+      "summary": "Arbitrary JavaScript Execution in typed-function",
+      "date": "2020-09-02T18:24:39Z",
+      "cve": "CVE-2017-1001004",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "static-eval@2.0.1",
+         "name": "static-eval",
+         "version": "2.0.1"
+      },
+      "id": "GHSA-x9hc-rw35-f44h",
+      "description": "Versions of `static-eval`prior to 2.0.2 pass untrusted user input directly to the global function constructor, resulting in an arbitrary code execution vulnerability when user input is parsed via the package.\n\n## Proof of concept\n```\nvar evaluate = require('static-eval');\nvar parse = require('esprima').parse;\n\nvar src = process.argv[2];\nvar payload = '(function({x}){return x.constructor})({x:\"\".sub})(\"console.log(process.env)\")()'\nvar ast = parse(payload).body[0].expression;\nconsole.log(evaluate(ast, {x:1}));\n```\n\n\n## Recommendation\n\nUpgrade to version 2.0.2 or later.",
+      "summary": "Sandbox Breakout / Arbitrary Code Execution in static-eval",
+      "date": "2020-09-02T15:46:03Z",
+      "cve": null,
+      "year": 2020
+   },
+   {
+      "package": {
+         "raw": "summit@0.1.22",
+         "name": "summit",
+         "version": "0.1.22"
+      },
+      "id": "GHSA-cwcp-6c48-fm7m",
+      "description": "Affected versions of `summit` allow attackers to execute arbitrary commands via collection names when using the `PouchDB` driver.\n\n## Recommendation\n\nNo direct patch is available at this time.\n\nCurrently, the best option to mitigate the issue is to avoid using the `PouchDB` driver, as the package author has abandoned this feature entirely.",
+      "summary": "Unsafe eval() in summit allows arbitrary code execution",
+      "date": "2020-09-01T16:39:38Z",
+      "cve": "CVE-2017-16020",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "jsrender@0.9.73",
+         "name": "jsrender",
+         "version": "0.9.73"
+      },
+      "id": "GHSA-r87w-47m8-22w3",
+      "description": "Affected versions of `jsrender` are susceptible to a remote code execution vulnerability when used with server delivered client-side tempates which dynamically embed user input.\n\n## Proof of Concept\n\n\n```js\n//POC-REQUEST\n{{for ~x!=1?(constructor.constructor(\"return arguments.callee.caller\")()):~y(10)}}\n{{:#data}}\n{{/for}}\n```\n\n```js\n//POC-RESPONSE\nfunction anonymous(data,view,j,u) { // template var v,t=j._tag,ret=\"\" +t(\"for\",view,this,[ {view:view,tmpl:1, params:{args:['~x!=1?(constructor.constructor(\\\"return arguments.callee.caller\\\")()):~y(10)']}, args:[view.hlp(\"x\")!=1?(data.constructor.constructor(\"return arguments.callee.caller\")()):view.hlp(\"y\")(10)], props:{}}]); return ret; } \n```\n\n\n## Recommendation\n\nUpdate to version 0.9.74 or later.",
+      "summary": "Template Injection in jsrender",
+      "date": "2020-09-01T15:24:24Z",
+      "cve": "CVE-2016-3942",
+      "year": 2016
+   },
+   {
+      "package": {
+         "raw": "mongo-express@0.53.0",
+         "name": "mongo-express",
+         "version": "0.53.0"
+      },
+      "id": "GHSA-h47j-hc6x-h3qq",
+      "description": "### Impact\n\nRemote code execution on the host machine by any authenticated user.\n\n### Proof Of Concept\n\nLaunching mongo-express on a Mac, pasting the following into the \"create index\" field will pop open the Mac calculator:\n\n```javascript\nthis.constructor.constructor(\"return process\")().mainModule.require('child_process').execSync('/Applications/Calculator.app/Contents/MacOS/Calculator')\n```\n\n### Patches\nUsers should upgrade to version `0.54.0`\n\n### Workarounds\n_Is there a way for users to fix or remediate the vulnerability without upgrading?_\n\n### References\n[Snyk Security Advisory](https://snyk.io/vuln/SNYK-JS-MONGOEXPRESS-473215)\n[CVE](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-10758)\n\n### For more information\nIf you have any questions or comments about this advisory:\n* Open an issue in [example link to repo](http://example.com)\n* Email us at [example email address](mailto:example@example.com)\n\n#### Thanks\n\n@JLLeitschuh for finding and reporting this vulnerability",
+      "summary": "Remote Code Execution Vulnerability in NPM mongo-express",
+      "date": "2019-12-30T19:30:31Z",
+      "cve": "CVE-2019-10758",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "safer-eval@1.3.6",
+         "name": "safer-eval",
+         "version": "1.3.6"
+      },
+      "id": "GHSA-v63x-xc9j-hhvq",
+      "description": "All versions of `safer-eval` are vulnerable to Sandbox Escape leading to Remote Code Execution. The package fails to restrict access to the main context and is not suited to process arbitrary user input. This may allow attackers to execute arbitrary code in the system.\n\n\n## Recommendation\n\nThe package is not meant to receive user input. Consider using an alternative package until a fix is made available.",
+      "summary": "Sandbox Breakout / Arbitrary Code Execution in safer-eval",
+      "date": "2019-12-11T02:01:44Z",
+      "cve": "CVE-2019-10769",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "safer-eval@1.3.1",
+         "name": "safer-eval",
+         "version": "1.3.1"
+      },
+      "id": "GHSA-hgch-jjmr-gp7w",
+      "description": "Versions of `safer-eval` before 1.3.2 are vulnerable to Sandbox Escape leading to Remote Code Execution. A payload using constructor properties can escape the sandbox and execute arbitrary code.\n\n\n## Recommendation\n\nUpgrade to version 1.3.2.",
+      "summary": "Sandbox Breakout / Arbitrary Code Execution in safer-eval",
+      "date": "2019-10-17T18:27:30Z",
+      "cve": "CVE-2019-10760",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "wiki-plugin-datalog@0.1.5",
+         "name": "wiki-plugin-datalog",
+         "version": "0.1.5"
+      },
+      "id": "GHSA-pm52-wwrw-c282",
+      "description": "Versions of `wiki-plugin-datalog` prior to 0.1.6 are vulnerable to Command Injection. The package failed to sanitize URLs on the curl endpoint, allowing attackers to inject commands and possibly achieving Remote Code Execution on the system.\n\n\n## Recommendation\n\nUpgrade to version 0.1.6 or later.",
+      "summary": "Command Injection in wiki-plugin-datalog",
+      "date": "2019-06-13T18:59:06Z",
+      "cve": null,
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "node-os-utils@1.0.8",
+         "name": "node-os-utils",
+         "version": "1.0.8"
+      },
+      "id": "GHSA-j9f8-8h89-j69x",
+      "description": "Versions of `node-os-utils` prior to 1.1.0 are vulnerable to Remote Code Execution. Due to insufficient input validation an attacker could run arbitrary commands on the server thus rendering the package vulnerable to Remote Code Execution.\n\n\n## Recommendation\n\nUpgrade to version 1.1.0 or later.",
+      "summary": "Remote Code Execution in node-os-utils",
+      "date": "2019-06-11T16:16:34Z",
+      "cve": null,
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "js-yaml@3.13.0",
+         "name": "js-yaml",
+         "version": "3.13.0"
+      },
+      "id": "GHSA-8j8c-7jfh-h6hx",
+      "description": "Versions of `js-yaml` prior to 3.13.1 are vulnerable to Code Injection. The `load()` function may execute arbitrary code injected through a malicious YAML file. Objects that have `toString` as key, JavaScript code as value and are used as explicit mapping keys allow attackers to execute the supplied code through the `load()` function. The `safeLoad()` function is unaffected.\n\nAn example payload is \n`{ toString: !<tag:yaml.org,2002:js/function> 'function (){return Date.now()}' } : 1` \nwhich returns the object \n{\n  \"1553107949161\": 1\n}\n\n\n## Recommendation\n\nUpgrade to version 3.13.1.",
+      "summary": "Code Injection in js-yaml",
+      "date": "2019-06-04T20:14:07Z",
+      "cve": null,
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "morgan@1.9.0",
+         "name": "morgan",
+         "version": "1.9.0"
+      },
+      "id": "GHSA-gwg9-rgvj-4h5j",
+      "description": "Verisons of `morgan` before 1.9.1 are vulnerable to code injection when user input is allowed into the filter or combined with a prototype pollution attack.\n\n\n## Recommendation\n\nUpdate to version 1.9.1 or later.",
+      "summary": "Code Injection in morgan",
+      "date": "2019-03-25T18:03:23Z",
+      "cve": "CVE-2019-5413",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "xterm@3.8.0",
+         "name": "xterm",
+         "version": "3.8.0"
+      },
+      "id": "GHSA-mc23-976p-j42x",
+      "description": "A remote code execution vulnerability exists in Xterm.js when the component mishandles special characters.",
+      "summary": "xterm vulnerable to remote code execution ",
+      "date": "2019-01-14T16:19:55Z",
+      "cve": "CVE-2019-0542",
+      "year": 2019
+   },
+   {
+      "package": {
+         "raw": "cryo@0.0.6",
+         "name": "cryo",
+         "version": "0.0.6"
+      },
+      "id": "GHSA-38f5-ghc2-fcmv",
+      "description": "All versions of `cryo` are vulnerable to code injection due to an Insecure implementation of deserialization.\n\n\n## Proof of concept\n\n```js\nvar Cryo = require('cryo');\nvar frozen = '{\"root\":\"_CRYO_REF_3\",\"references\":[{\"contents\":{},\"value\":\"_CRYO_FUNCTION_function () {console.log(\\\\\"defconrussia\\\\\"); return 1111;}\"},{\"contents\":{},\"value\":\"_CRYO_FUNCTION_function () {console.log(\\\\\"defconrussia\\\\\");return 2222;}\"},{\"contents\":{\"toString\":\"_CRYO_REF_0\",\"valueOf\":\"_CRYO_REF_1\"},\"value\":\"_CRYO_OBJECT_\"},{\"contents\":{\"__proto__\":\"_CRYO_REF_2\"},\"value\":\"_CRYO_OBJECT_\"}]}'\nvar hydrated = Cryo.parse(frozen);\nconsole.log(hydrated);\n```\n\n\n## Recommendation\n\nNo fix is currently available. Consider using an alternative module until a fix is made available.",
+      "summary": "Code Injection in cryo",
+      "date": "2018-08-21T17:02:43Z",
+      "cve": "CVE-2018-3784",
+      "year": 2018
+   },
+   {
+      "package": {
+         "raw": "pouchdb@6.0.4",
+         "name": "pouchdb",
+         "version": "6.0.4"
+      },
+      "id": "GHSA-cgqv-x5cx-xvqh",
+      "description": "Affected versions of `pouchdb` do not properly sandbox the code execution engine which executes the map/reduce functions for temporary views and design documents. Under certain circumstances, an attacker could uses this to run arbitrary code on the server.\n\n\n## Recommendation\n\nUpdate to version 6.0.5 or later.",
+      "summary": "Arbitrary Code Injection in pouchdb",
+      "date": "2018-07-26T16:22:08Z",
+      "cve": "CVE-2016-10546",
+      "year": 2016
+   },
+   {
+      "package": {
+         "raw": "electron@1.6.13",
+         "name": "electron",
+         "version": "1.6.13"
+      },
+      "id": "GHSA-4w88-rjj3-x7wp",
+      "description": "Affected versions of `ElectronJS` are susceptible to a remote code execution vulnerability that occurs when an affected application access remote content, even if the [sandbox option](https://electron.atom.io/docs/api/sandbox-option) is enabled.\n\n\n\n## Recommendation\n\nUpdate to electron version 1.7.8 or later.",
+      "summary": "Chromium Remote Code Execution in electron",
+      "date": "2018-07-24T20:04:23Z",
+      "cve": "CVE-2017-16151",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "pg@2.11.1",
+         "name": "pg",
+         "version": "2.11.1"
+      },
+      "id": "GHSA-wc9v-mj63-m9g5",
+      "description": "Affected versions of `pg` contain a remote code execution vulnerability that occurs when the remote database or query specifies a crafted column name. \n\nThere are two specific scenarios in which it is likely for an application to be vulnerable:\n1. The application executes unsafe, user-supplied sql which contains malicious column names.\n2. The application connects to an untrusted database and executes a query returning results which contain a malicious column name.\n\n## Proof of Concept\n```\nconst { Client } = require('pg')\nconst client = new Client()\nclient.connect()\n\nconst sql = `SELECT 1 AS \"\\\\'/*\", 2 AS \"\\\\'*/\\n + console.log(process.env)] = null;\\n//\"`\n\nclient.query(sql, (err, res) => {\n  client.end()\n})\n```\n\n\n## Recommendation\n\n* Version 2.x.x: Update to version 2.11.2 or later.\n* Version 3.x.x: Update to version 3.6.4 or later.\n* Version 4.x.x: Update to version 4.5.7 or later.\n* Version 5.x.x: Update to version 5.2.1 or later.\n* Version 6.x.x: Update to version 6.4.2 or later. ( Note that versions 6.1.6, 6.2.5, and 6.3.3 are also patched. )\n* Version 7.x.x: Update to version 7.1.2 or later. ( Note that version 7.0.2 is also patched. )",
+      "summary": "Remote Code Execution in pg",
+      "date": "2018-07-24T19:44:42Z",
+      "cve": "CVE-2017-16082",
+      "year": 2017
+   },
+   {
+      "package": {
+         "raw": "syntax-error@1.1.0",
+         "name": "syntax-error",
+         "version": "1.1.0"
+      },
+      "id": "GHSA-5726-g6r9-5f22",
+      "description": "Versions of `syntax-error` prior to 1.1.1 are affected by a cross-site scripting vulnerability which may allow a malicious file to execute code when browserified. \n\n## Recommendation\n\nUpdate to version 1.1.1 or later.",
+      "summary": "Potential for Script Injection in syntax-error",
+      "date": "2017-10-24T18:33:36Z",
+      "cve": "CVE-2014-7192",
+      "year": 2014
+   },
+   {
+      "package": {
+         "raw": "bassmaster@1.5.1",
+         "name": "bassmaster",
+         "version": "1.5.1"
+      },
+      "id": "GHSA-5j3g-jfq3-7jwx",
+      "description": "A vulnerability exists in bassmaster <= 1.5.1 that allows for an attacker to provide arbitrary JavaScript that is then executed server side via eval.\n\n\n## Recommendation\n\nUpdate to bassmaster version 1.5.2 or greater.",
+      "summary": "Arbitrary JavaScript Execution in bassmaster",
+      "date": "2017-10-24T18:33:36Z",
+      "cve": "CVE-2014-7205",
+      "year": 2014
+   },
+   {
+      "package": {
+         "raw": "swig-templates@2.0.3",
+         "name": "swig-templates",
+         "version": "2.0.3"
+      },
+      "id": "SNYK-JS-SWIGTEMPLATES-3266806",
+      "description": "swig-templates is an A simple, powerful, and extendable templating engine for node.js and browsers, similar to Django, Jinja2, and Twig.\nAffected versions of this package are vulnerable to Arbitrary Code Execution via the renderFile method.\nNote:\nThe following conditions are required to exploit the vulnerability:\n\nUser input is used in the context of the package.\n\nUser input is not sanitized.\n\nThe value is dynamic.\n\n\n",
+      "summary": "Arbitrary Code Execution  Affecting swig-templates package, versions *",
+      "date": "2 Feb 2023",
+      "cve": "CVE-2023-25344",
+      "year": 2023
+   },
+   {
+      "package": {
+         "raw": "mock2easy@0.0.24",
+         "name": "mock2easy",
+         "version": "0.0.24"
+      },
+      "id": "GHSA-g4xj-wcq6-qwx5",
+      "description": "This affects all versions up to and including version 0.0.24 of package mock2easy. a malicious user could inject commands through the `_data` variable: \n\nAffected Area\n\n```js\nrequire('../server/getJsonByCurl')(mock2easy, function(error, stdout) {\n    if (error) {\n        return res.json(500, error);\n    }\n    res.json(JSON.parse(stdout));\n}, '', _data.interfaceUrl, query, _data.cookie, _data.interfaceType);```",
+      "summary": "Code injection in mock2easy",
+      "date": "2021-05-06T18:25:58Z",
+      "cve": "CVE-2020-7697",
+      "year": 2020
+   }
+]
