@@ -9,15 +9,45 @@ on:
       - main
 
 jobs:
-  build:
+  lint:
+    runs-on: ubuntu-latest
     env:
-      OCAML_COMPILER: 5.3
+      # allow opam depext to yes package manager prompts
+      OPAMCONFIRMLEVEL: unsafe-yes
+    steps:
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
 
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Checkout Submodules
+        run: |
+          git submodule update --init vendor/graphjs vendor/ECMA-SL
+
+      - name: Setup OCaml
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: "5.3"
+
+      - name: Install dependencies
+        run: opam install -y . --deps-only --with-dev-setup
+
+      - name: Run lint
+        run: ./scripts/lint.sh
+
+  build:
+    needs: lint
+    env:
+      # allow opam depext to yes package manager prompts
+      OPAMCONFIRMLEVEL: unsafe-yes
     strategy:
       fail-fast: false
-
     runs-on: ubuntu-latest
-
     steps:
       - name: Setup SSH
         run: |
@@ -38,10 +68,10 @@ jobs:
         with:
           node-version: 18
 
-      - name: Setup OCaml ${{ env.OCAML_COMPILER }}
+      - name: Setup OCaml
         uses: ocaml/setup-ocaml@v3
         with:
-          ocaml-compiler: ${{ env.OCAML_COMPILER }}
+          ocaml-compiler: 5.3
 
       - name: Install dependencies
         run: opam install -y . --deps-only --with-test

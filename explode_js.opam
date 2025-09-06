@@ -28,6 +28,7 @@ depends: [
   "prelude"
   "yojson"
   "z3"
+  "ocamlformat" {with-dev-setup}
   "odoc" {with-doc}
 ]
 build: [
