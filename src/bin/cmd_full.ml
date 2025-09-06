@@ -1,6 +1,21 @@
 open Explode_js
 open Result
 
+module Settings = struct
+  type t =
+    { input_file : Fpath.t
+    ; package_dir : Fpath.t option
+    ; deterministic : bool
+    ; lazy_values : bool
+    ; proto_pollution : bool
+    ; enumerate_all : bool
+    ; workspace_dir : Fpath.t
+    ; time_limit : float option
+    ; optimized_import : bool
+    }
+  [@@deriving make]
+end
+
 let run_with_timeout limit f =
   let exception Sigchld in
   let open Unix in
@@ -50,9 +65,12 @@ let full ~deterministic ~lazy_values ~proto_pollution ~enumerate_all package_dir
     if scheme_file_exists then
       let explode_start = Unix.gettimeofday () in
       let result =
-        Cmd_run.run ~deterministic ~lazy_values ~proto_pollution ~enumerate_all
-          ~workspace_dir ~package_dir ~scheme_file
-          ~original_file:(Some input_file) ~time_limit:(Some 30.0)
+        let settings =
+          Cmd_run.Settings.make ~deterministic ~lazy_values ~proto_pollution
+            ~enumerate_all ~workspace_dir ?package_dir ~scheme_file
+            ?original_file:(Some input_file) ?time_limit:(Some 30.0) ()
+        in
+        Cmd_run.run settings
       in
       let explode_time = Unix.gettimeofday () -. explode_start in
       let _ = Bos.OS.File.writef explode_time_path "%f@." explode_time in
@@ -71,8 +89,17 @@ let full ~deterministic ~lazy_values ~proto_pollution ~enumerate_all package_dir
       Fmt.epr "error: Failed during symbolic execution/confirmation@.";
       n )
 
-let run ~deterministic ~lazy_values ~proto_pollution ~enumerate_all ~package_dir
-  ~input_file ~workspace_dir ~time_limit ~optimized_import =
+let run
+  { Settings.deterministic
+  ; lazy_values
+  ; proto_pollution
+  ; enumerate_all
+  ; package_dir
+  ; input_file
+  ; workspace_dir
+  ; time_limit
+  ; optimized_import
+  } =
   let* _ = Bos.OS.Dir.create ~path:true ~mode:0o777 workspace_dir in
   let work () =
     full ~deterministic ~lazy_values ~proto_pollution ~enumerate_all package_dir

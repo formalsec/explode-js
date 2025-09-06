@@ -2,6 +2,15 @@ open Result
 open Explode_js
 open Explode_js_instrument
 
+module Settings = struct
+  type t =
+    { proto_pollution : bool
+    ; workspace_dir : Fpath.t
+    ; input_dir : Fpath.t
+    }
+  [@@deriving make]
+end
+
 let is_valid_npm_package input_dir =
   Bos.OS.File.exists Fpath.(input_dir / "package.json")
 
@@ -124,7 +133,7 @@ let run_confirmation ~proto_pollution ~enumerate_all workspace_dir scheme_file =
   in
   Logs.err_count ()
 
-let run ~proto_pollution ~workspace_dir ~input_dir =
+let run { Settings.proto_pollution; workspace_dir; input_dir } =
   Logs.app (fun k -> k "── PHASE 0: VULNERABILITY DETECTION ──");
   let* package_json_exists = is_valid_npm_package input_dir in
   if not package_json_exists then begin

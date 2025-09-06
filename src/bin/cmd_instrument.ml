@@ -1,25 +1,44 @@
 open Explode_js_instrument
 
-type instrument =
-  | Symbolic
-  | Concrete
+module Settings = struct
+  type instrument =
+    | Symbolic
+    | Concrete
 
-let pp_instrument fmt = function
-  | Symbolic -> Fmt.string fmt "symbolic"
-  | Concrete -> Fmt.string fmt "concrete"
+  let pp_instrument fmt = function
+    | Symbolic -> Fmt.string fmt "symbolic"
+    | Concrete -> Fmt.string fmt "concrete"
 
-let instrument_of_string s =
-  match String.lowercase_ascii s with
-  | "symbolic" -> Ok Symbolic
-  | "concrete" -> Ok Concrete
-  | _ -> Error (`Msg "unknown instrument type")
+  let instrument_of_string s =
+    match String.lowercase_ascii s with
+    | "symbolic" -> Ok Symbolic
+    | "concrete" -> Ok Concrete
+    | _ -> Error (`Msg "unknown instrument type")
 
-let instrument_conv = Cmdliner.Arg.conv (instrument_of_string, pp_instrument)
+  let instrument_conv = Cmdliner.Arg.conv (instrument_of_string, pp_instrument)
 
-let run ~debug ~mode ~scheme_file ~original_file ~witness_file ~output_path =
+  type t =
+    { debug : bool
+    ; mode : instrument
+    ; scheme_file : Fpath.t
+    ; original_file : Fpath.t option
+    ; witness_file : Fpath.t option
+    ; output_path : string
+    }
+  [@@deriving make]
+end
+
+let run
+  { Settings.debug
+  ; mode
+  ; scheme_file
+  ; original_file
+  ; witness_file
+  ; output_path
+  } =
   if debug then Logs.set_level (Some Debug);
   match mode with
-  | Symbolic -> (
+  | Settings.Symbolic -> (
     match
       Test.Symbolic.generate_all ?original_file ~proto_pollution:false
         ~scheme_file ~output_dir:output_path ()

@@ -92,8 +92,12 @@ let cmd_run =
   and+ scheme_file = input_file
   and+ original_file = input_file_opt
   and+ time_limit in
-  Cmd_run.run ~deterministic ~lazy_values ~proto_pollution ~enumerate_all
-    ~workspace_dir ~package_dir ~scheme_file ~original_file ~time_limit
+  let settings =
+    Cmd_run.Settings.make ~workspace_dir ?package_dir ~deterministic
+      ~lazy_values ~proto_pollution ~enumerate_all ~scheme_file ?original_file
+      ?time_limit ()
+  in
+  Cmd_run.run settings
 
 let info_exploit =
   let doc = "Explode.js single file symbolic confirmation" in
@@ -108,8 +112,11 @@ let cmd_exploit =
   and+ lazy_values
   and+ workspace_dir
   and+ time_limit in
-  Cmd_exploit.run ~deterministic ~lazy_values ~input_file ~workspace_dir
-    ~time_limit
+  let settings =
+    Cmd_exploit.Settings.make ~deterministic ~lazy_values ~input_file
+      ~workspace_dir ?time_limit ()
+  in
+  Cmd_exploit.run settings
 
 let info_full =
   let doc = "Explode.js full analysis" in
@@ -128,8 +135,12 @@ let cmd_full =
   and+ workspace_dir
   and+ time_limit
   and+ optimized_import in
-  Cmd_full.run ~deterministic ~lazy_values ~proto_pollution ~enumerate_all
-    ~package_dir ~input_file ~workspace_dir ~time_limit ~optimized_import
+  let settings =
+    Cmd_full.Settings.make ~input_file ?package_dir ~deterministic
+      ~proto_pollution ~enumerate_all ~lazy_values ~workspace_dir ?time_limit
+      ~optimized_import ()
+  in
+  Cmd_full.run settings
 
 let info_instrument =
   let doc = "Explode.js test instrumentator" in
@@ -142,7 +153,7 @@ let cmd_instrument =
   let mode =
     let open Cmd_instrument in
     let doc = "Instrumentation mode." in
-    Arg.(value & opt instrument_conv Symbolic & info [ "mode" ] ~doc)
+    Arg.(value & opt Settings.instrument_conv Symbolic & info [ "mode" ] ~doc)
   in
   let output_path =
     let doc = "Output path." in
@@ -158,8 +169,11 @@ let cmd_instrument =
   and+ original_file = input_file_opt
   and+ witness_file
   and+ output_path in
-  Cmd_instrument.run ~debug ~mode ~scheme_file ~original_file ~witness_file
-    ~output_path
+  let settings =
+    Cmd_instrument.Settings.make ~debug ~mode ~scheme_file ?original_file
+      ?witness_file ~output_path ()
+  in
+  Cmd_instrument.run settings
 
 let info_package =
   let doc = "Explode.js full package analysis" in
@@ -172,7 +186,10 @@ let cmd_package =
   let+ proto_pollution
   and+ workspace_dir
   and+ input_dir in
-  Cmd_package.run ~proto_pollution ~workspace_dir ~input_dir
+  let settings =
+    Cmd_package.Settings.make ~proto_pollution ~workspace_dir ~input_dir
+  in
+  Cmd_package.run settings
 
 let v :
   ( int
