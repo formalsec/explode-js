@@ -1,6 +1,21 @@
 open Explode_js
 open Result
 
+module Settings = struct
+  type t =
+    { workspace_dir : Fpath.t
+    ; package_dir : Fpath.t option
+    ; deterministic : bool
+    ; lazy_values : bool
+    ; proto_pollution : bool
+    ; enumerate_all : bool
+    ; scheme_file : Fpath.t
+    ; original_file : Fpath.t option
+    ; time_limit : float option
+    }
+  [@@deriving make]
+end
+
 let with_workspace ~proto_pollution workspace_dir scheme_path package_dir
   filename f =
   let _timestamp =
@@ -133,8 +148,17 @@ let write_reports reports_file results =
     (Yojson.pretty_print ~std:true)
     results
 
-let run ~deterministic ~lazy_values ~proto_pollution ~enumerate_all
-  ~workspace_dir ~package_dir ~scheme_file ~original_file ~time_limit:_ =
+let run
+  { Settings.deterministic
+  ; lazy_values
+  ; proto_pollution
+  ; enumerate_all
+  ; workspace_dir
+  ; package_dir
+  ; scheme_file
+  ; original_file
+  ; _
+  } =
   Logs.app (fun k -> k "── PHASE 1: TEMPLATE GENERATION ──");
   Logs.app (fun k -> k "\u{2714} Loaded: %a" Fpath.pp scheme_file);
   with_workspace ~proto_pollution workspace_dir scheme_file package_dir
