@@ -44,7 +44,9 @@
   smtml
   prelude
   yojson
-  z3)
+  z3
+  (ocamlformat
+    :with-dev-setup))
  (tags
   ("symbolic execution" javascript exploit))
  (sites
