@@ -5,6 +5,7 @@
  (flags
   (:standard -open Explode_js_prelude))
  (libraries bos cmdliner extunix explode_js explode_js.instrument)
- (preprocess (pps ppx_deriving.make))
+ (preprocess
+  (pps ppx_deriving.make))
  (instrumentation
   (backend bisect_ppx)))

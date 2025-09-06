@@ -45,8 +45,7 @@ let run_file ~deterministic ~lazy_values ~workspace_dir input_file =
   let result, report =
     try
       run ~lazy_values ~timeout:30 ~print_return_value:false
-        ~no_stop_at_failure:false
-        ~solver_type:Smtml.Solver_type.Z3_solver
+        ~no_stop_at_failure:false ~solver_type:Smtml.Solver_type.Z3_solver
         ~callback_out:(fun _ _ -> ())
         ~callback_err:(fun thread ty ->
           let solver = Choice.solver thread in
