@@ -64,7 +64,7 @@ jobs:
           git submodule update --init vendor/graphjs vendor/ECMA-SL
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 18
 
