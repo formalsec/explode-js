@@ -1,3 +1,6 @@
+# Dependencies
+.neo4j/
+
 # OCaml
 _build/
 
