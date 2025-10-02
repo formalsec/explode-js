@@ -10,7 +10,7 @@ on:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     env:
       # allow opam depext to yes package manager prompts
       OPAMCONFIRMLEVEL: unsafe-yes
@@ -47,7 +47,7 @@ jobs:
       OPAMCONFIRMLEVEL: unsafe-yes
     strategy:
       fail-fast: false
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Setup SSH
         run: |
