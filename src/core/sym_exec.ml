@@ -43,15 +43,15 @@ let run_file ~deterministic ~lazy_values ~workspace_dir input_file =
   let testsuite = Fpath.(workspace_dir / "test-suite") in
   let* _ = OS.Dir.create ~mode:0o777 ~path:true testsuite in
   let result, report =
+    let settings =
+      Symbolic_engine.Settings.make ~lazy_values ~timeout:30
+        ~print_return_value:false ~filename:input_file prog
+    in
     try
-      run ~lazy_values ~timeout:30 ~print_return_value:false
-        ~no_stop_at_failure:false ~solver_type:Smtml.Solver_type.Z3_solver
-        ~callback_out:(fun _ _ -> ())
-        ~callback_err:(fun thread ty ->
-          let solver = Choice.solver thread in
-          let pc = Choice.pc thread in
-          Sym_path_resolver.solve solver pc ty testsuite )
-        input_file prog
+      run settings ~callback_err:(fun thread ty ->
+        let solver = Choice.solver thread in
+        let pc = Choice.pc thread in
+        Sym_path_resolver.solve solver pc ty testsuite )
     with exn ->
       (Error (`Failure (Printexc.to_string exn)), dummy_report input_file)
   in
