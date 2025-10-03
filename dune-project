@@ -31,7 +31,7 @@
   dune-site
   dune-glob
   (ecma-sl
-   (= "1.4.0"))
+   (= "pin"))
   (extunix
    (= "0.4.3"))
   (ppxlib
@@ -41,10 +41,11 @@
   (mdx :with-test)
   ocaml
   ; (owl (>= 1.1))
-  smtml
+  (smtml
+   (= "pin"))
   prelude
   yojson
-  z3
+  cvc5
   (ocamlformat
     :with-dev-setup))
  (tags

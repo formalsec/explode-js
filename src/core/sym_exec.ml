@@ -45,7 +45,8 @@ let run_file ~deterministic ~lazy_values ~workspace_dir input_file =
   let result, report =
     let settings =
       Symbolic_engine.Settings.make ~lazy_values ~timeout:30
-        ~print_return_value:false ~filename:input_file prog
+        ~print_return_value:false ~solver_type:Smtml.Solver_type.Cvc5_solver
+        ~filename:input_file prog
     in
     try
       run settings ~callback_err:(fun thread ty ->

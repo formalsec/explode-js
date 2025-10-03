@@ -1,3 +1,5 @@
 pin-depends: [
-  [ "ecma-sl.1.4.0" "./vendor/ECMA-SL" ]
+  [ "ecma-sl.pin" "./vendor/ECMA-SL" ]
+  [ "cvc5.pin" "./vendor/ocaml-cvc5" ]
+  [ "smtml.pin" "git+https://github.com/formalsec/smtml.git#5a720c992a2c7d6485545d805f696de09a14b301" ]
 ]

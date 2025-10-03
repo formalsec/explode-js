@@ -12,7 +12,7 @@ let () =
   in
   Arg.parse spec_list ignore usage
 
-let with_dir fpath f =
+let in_dir fpath f =
   let cwd = Sys.getcwd () in
   Sys.chdir fpath;
   Fun.protect ~finally:(fun () -> Sys.chdir cwd) f
@@ -29,20 +29,22 @@ let opam_exec rest = Format.sprintf "opam exec -- %s" rest
 let setup_graphjs () =
   let execute = execute "setup_graphjs" in
   Format.printf "Installing graphjs ...@.";
-  with_dir "vendor/graphjs" @@ fun () ->
+  in_dir "vendor/graphjs" @@ fun () ->
   execute "pip install -r ./requirements.txt"
     "Could not install graphjs's python requirements";
-  with_dir "parser" @@ fun () ->
+  in_dir "parser" @@ fun () ->
   execute "npm install" "Could not install graphjs's normalizer dependencies";
   execute "npm exec tsc" "Could not compile graphjs's normalizer"
 
-let setup_z3 () =
-  let execute = execute "setup_z3" in
-  Format.printf "Installing Z3 ...@.";
-  execute (opam_install "z3") "Could not install z3 through opam!"
+let setup_vendored () =
+  let execute = execute "setup_vendored" in
+  in_dir "vendor" @@ fun () ->
+  in_dir "ocaml-cvc5" (fun () ->
+    execute "git submodule update --init"
+      "Could not checkout cvc5's vendored dependencies" )
 
 let setup_explodejs () =
-  setup_z3 ();
+  setup_vendored ();
   let execute = execute "setup_explodejs" in
   Format.printf "Installing Explode-js ...@.";
   execute
