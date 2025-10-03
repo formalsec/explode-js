@@ -52,8 +52,7 @@ COPY --chown=explodejs:explodejs . /home/explodejs/explode-js
 # Remove .git dirs to free some space
 RUN rm -rf /home/explodejs/explode-js/.git \
     &&  rm -rf /home/explodejs/explode-js/vendor/graphjs/.git \
-    &&  rm -rf /home/explodejs/explode-js/vendor/ECMA-SL/.git \
-    &&  rm -rf /home/explodejs/explode-js/bench/datasets/.git
+    &&  rm -rf /home/explodejs/explode-js/vendor/ECMA-SL/.git
 
 RUN cd "${BASE}/explode-js/vendor/graphjs" \
     && sudo pip install --break-system-packages -r ./requirements.txt \
