@@ -43,8 +43,10 @@ let setup_vendored () =
     execute "git submodule update --init"
       "Could not checkout cvc5's vendored dependencies" )
 
+let _ = setup_vendored
+
 let setup_explodejs () =
-  setup_vendored ();
+  (* setup_vendored (); *)
   let execute = execute "setup_explodejs" in
   Format.printf "Installing Explode-js ...@.";
   execute
