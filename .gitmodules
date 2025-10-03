@@ -13,3 +13,6 @@
 [submodule "vendor/ECMA-SL"]
 	path = vendor/ECMA-SL
 	url = git@github.com:formalsec/ECMA-SL.git
+[submodule "vendor/ocaml-cvc5"]
+	path = vendor/ocaml-cvc5
+	url = https://github.com/formalsec/ocaml-cvc5.git

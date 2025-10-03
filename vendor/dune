@@ -1,4 +1,4 @@
-(dirs :standard \ ECMA-SL)
+(dirs :standard \ ECMA-SL ocaml-cvc5)
 
 (install
  (package explode_js)
