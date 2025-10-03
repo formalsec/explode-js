@@ -12,6 +12,7 @@ module Settings = struct
     ; workspace_dir : Fpath.t
     ; time_limit : float option
     ; optimized_import : bool
+    ; solver_type : Smtml.Solver_type.t
     }
   [@@deriving make]
 end
@@ -41,8 +42,8 @@ let run_with_timeout limit f =
       | WSIGNALED _ | WSTOPPED _ -> `Timeout
   end
 
-let full ~deterministic ~lazy_values ~proto_pollution ~enumerate_all package_dir
-  input_file workspace_dir optimized_import =
+let full ~deterministic ~lazy_values ~proto_pollution ~enumerate_all
+  ~solver_type package_dir input_file workspace_dir optimized_import =
   let res =
     let graphjs_time_path = Fpath.(workspace_dir / "graphjs_time.txt") in
     let explode_time_path = Fpath.(workspace_dir / "explode_time.txt") in
@@ -68,7 +69,8 @@ let full ~deterministic ~lazy_values ~proto_pollution ~enumerate_all package_dir
         let settings =
           Cmd_run.Settings.make ~deterministic ~lazy_values ~proto_pollution
             ~enumerate_all ~workspace_dir ?package_dir ~scheme_file
-            ?original_file:(Some input_file) ?time_limit:(Some 30.0) ()
+            ?original_file:(Some input_file) ?time_limit:(Some 30.0)
+            ~solver_type ()
         in
         Cmd_run.run settings
       in
@@ -99,11 +101,12 @@ let run
   ; workspace_dir
   ; time_limit
   ; optimized_import
+  ; solver_type
   } =
   let* _ = Bos.OS.Dir.create ~path:true ~mode:0o777 workspace_dir in
   let work () =
-    full ~deterministic ~lazy_values ~proto_pollution ~enumerate_all package_dir
-      input_file workspace_dir optimized_import
+    full ~deterministic ~lazy_values ~proto_pollution ~enumerate_all
+      ~solver_type package_dir input_file workspace_dir optimized_import
   in
   let res =
     match time_limit with

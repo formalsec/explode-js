@@ -36,22 +36,18 @@ let setup_graphjs () =
   execute "npm install" "Could not install graphjs's normalizer dependencies";
   execute "npm exec tsc" "Could not compile graphjs's normalizer"
 
-let setup_vendored () =
-  let execute = execute "setup_vendored" in
-  in_dir "vendor" @@ fun () ->
-  in_dir "ocaml-cvc5" (fun () ->
-    execute "git submodule update --init"
-      "Could not checkout cvc5's vendored dependencies" )
-
-let _ = setup_vendored
+let setup_cvc5 () =
+  let execute = execute "setup_cvc5" in
+  execute (opam_install "cvc5")
+    "Could not checkout cvc5's vendored dependencies"
 
 let setup_explodejs () =
-  (* setup_vendored (); *)
   let execute = execute "setup_explodejs" in
   Format.printf "Installing Explode-js ...@.";
   execute
     (opam_install ". --deps-only --with-test --with-doc")
     "Could not install Explode-js's dependencies";
+  setup_cvc5 ();
   execute
     (opam_exec "dune build @install --profile release")
     "Could not build Explode-js!";

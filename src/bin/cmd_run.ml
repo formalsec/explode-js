@@ -12,6 +12,7 @@ module Settings = struct
     ; scheme_file : Fpath.t
     ; original_file : Fpath.t option
     ; time_limit : float option
+    ; solver_type : Smtml.Solver_type.t
     }
   [@@deriving make]
 end
@@ -122,9 +123,10 @@ let write_report report_file result =
   Bos.OS.File.writef ~mode:0o666 report_file "%a" Sym_exec.print_report result
 
 let run_single ~deterministic ~lazy_values ~(workspace_dir : Fpath.t)
-  (test_file : Fpath.t) original_file scheme_file scheme =
+  ~solver_type (test_file : Fpath.t) original_file scheme_file scheme =
   let* res =
-    Sym_exec.run_file ~deterministic ~lazy_values ~workspace_dir test_file
+    Sym_exec.run_file ~deterministic ~lazy_values ~workspace_dir ~solver_type
+      test_file
   in
   let* found_witness =
     Replay.run_single ?original_file ~scheme_file ~scheme ~workspace_dir
@@ -134,9 +136,10 @@ let run_single ~deterministic ~lazy_values ~(workspace_dir : Fpath.t)
   (found_witness, res)
 
 let run_server ~deterministic ~lazy_values ~(workspace_dir : Fpath.t)
-  (server_file : Fpath.t) scheme =
+  ~solver_type (server_file : Fpath.t) scheme =
   let* res =
-    Sym_exec.run_file ~deterministic ~lazy_values ~workspace_dir server_file
+    Sym_exec.run_file ~deterministic ~lazy_values ~workspace_dir ~solver_type
+      server_file
   in
   let* () = Replay.run_server ~workspace_dir server_file scheme res in
   let+ () = write_report Fpath.(workspace_dir / "report.json") res in
@@ -157,6 +160,7 @@ let run
   ; package_dir
   ; scheme_file
   ; original_file
+  ; solver_type
   ; _
   } =
   Logs.app (fun k -> k "── PHASE 1: TEMPLATE GENERATION ──");
@@ -173,8 +177,8 @@ let run
       let workspace_dir = Fpath.(workspace_dir // rem_ext (base test)) in
       let found_witness, results =
         match
-          run_single ~deterministic ~lazy_values ~workspace_dir test orig_file
-            scheme_file scheme
+          run_single ~deterministic ~lazy_values ~workspace_dir ~solver_type
+            test orig_file scheme_file scheme
         with
         | Ok (found_witness, sym_result) ->
           (found_witness, sym_result :: results)
@@ -188,7 +192,8 @@ let run
       Logs.app (fun k -> k "\u{25C9} [%d/%d] Procesing %a" i n Fpath.pp server);
       let workspace_dir = Fpath.(workspace_dir // rem_ext (base server)) in
       let* sym_result =
-        run_server ~deterministic ~lazy_values ~workspace_dir server scheme
+        run_server ~deterministic ~lazy_values ~workspace_dir ~solver_type
+          server scheme
       in
       loop (succ i) (sym_result :: results) remaning
   in

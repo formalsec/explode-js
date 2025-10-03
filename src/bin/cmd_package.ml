@@ -7,6 +7,7 @@ module Settings = struct
     { proto_pollution : bool
     ; workspace_dir : Fpath.t
     ; input_dir : Fpath.t
+    ; solver_type : Smtml.Solver_type.t
     }
   [@@deriving make]
 end
@@ -87,7 +88,8 @@ let run_graphjs_timed workspace_dir entry_file =
   | `Exited n | `Signaled n ->
     Error (`Msg (Fmt.str "Graphjs exited with non-zero code: %d" n))
 
-let run_confirmation ~proto_pollution ~enumerate_all workspace_dir scheme_file =
+let run_confirmation ~proto_pollution ~enumerate_all ~solver_type workspace_dir
+  scheme_file =
   (* FIXME: Should be command flags *)
   let deterministic = false in
   let lazy_values = true in
@@ -107,8 +109,8 @@ let run_confirmation ~proto_pollution ~enumerate_all workspace_dir scheme_file =
       let workspace_dir = Fpath.(workspace_dir // rem_ext (base test)) in
       let found_witness, results =
         match
-          Cmd_run.run_single ~deterministic ~lazy_values ~workspace_dir test
-            None scheme_file scheme
+          Cmd_run.run_single ~deterministic ~lazy_values ~workspace_dir
+            ~solver_type test None scheme_file scheme
         with
         | Ok (found_witness, sym_result) ->
           (found_witness, sym_result :: results)
@@ -122,8 +124,8 @@ let run_confirmation ~proto_pollution ~enumerate_all workspace_dir scheme_file =
       Logs.app (fun k -> k "\u{25C9} [%d/%d] Procesing %a" i n Fpath.pp server);
       let workspace_dir = Fpath.(workspace_dir // rem_ext (base server)) in
       let* sym_result =
-        Cmd_run.run_server ~deterministic ~lazy_values ~workspace_dir server
-          scheme
+        Cmd_run.run_server ~deterministic ~lazy_values ~workspace_dir
+          ~solver_type server scheme
       in
       loop (succ i) (sym_result :: results) remaning
   in
@@ -133,7 +135,7 @@ let run_confirmation ~proto_pollution ~enumerate_all workspace_dir scheme_file =
   in
   Logs.err_count ()
 
-let run { Settings.proto_pollution; workspace_dir; input_dir } =
+let run { Settings.proto_pollution; workspace_dir; input_dir; solver_type } =
   Logs.app (fun k -> k "── PHASE 0: VULNERABILITY DETECTION ──");
   let* package_json_exists = is_valid_npm_package input_dir in
   if not package_json_exists then begin
@@ -163,8 +165,8 @@ let run { Settings.proto_pollution; workspace_dir; input_dir } =
       print_detected_vulnerabilities scheme_file;
       let explode_start = Unix.gettimeofday () in
       let result =
-        run_confirmation ~proto_pollution ~enumerate_all:true workspace_dir
-          scheme_file
+        run_confirmation ~proto_pollution ~enumerate_all:true ~solver_type
+          workspace_dir scheme_file
       in
       let explode_time = Unix.gettimeofday () -. explode_start in
       let _ = Bos.OS.File.writef explode_time_path "%f@." explode_time in

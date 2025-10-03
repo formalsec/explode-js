@@ -23,6 +23,9 @@
  (name explode_js)
  (synopsis "Automatic exploit generation for Node.js")
  (description "Explode.js: Automatic exploit generation engine for Node.js applications")
+ (depopts
+  z3
+  cvc5)
  (depends
   bos
   (bisect_ppx (and :with-test (>= 2.5.0)))
@@ -45,7 +48,6 @@
    (= "pin"))
   prelude
   yojson
-  cvc5
   (ocamlformat
     :with-dev-setup))
  (tags

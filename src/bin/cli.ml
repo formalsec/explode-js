@@ -66,6 +66,13 @@ let optimized_import =
   let doc = "Use optimized import heuristics in graphjs" in
   Arg.(value & flag & info [ "optimized-import" ] ~doc)
 
+let solver_type =
+  let doc = "SMT solver to use" in
+  Arg.(
+    value
+    & opt Smtml.Solver_type.conv Smtml.Solver_type.Cvc5_solver
+    & info [ "solver" ] ~doc )
+
 let sdocs = Manpage.s_common_options
 
 let info_run =
@@ -91,11 +98,12 @@ let cmd_run =
   and+ enumerate_all
   and+ scheme_file = input_file
   and+ original_file = input_file_opt
-  and+ time_limit in
+  and+ time_limit
+  and+ solver_type in
   let settings =
     Cmd_run.Settings.make ~workspace_dir ?package_dir ~deterministic
       ~lazy_values ~proto_pollution ~enumerate_all ~scheme_file ?original_file
-      ?time_limit ()
+      ?time_limit ~solver_type ()
   in
   Cmd_run.run settings
 
@@ -111,10 +119,11 @@ let cmd_exploit =
   and+ deterministic
   and+ lazy_values
   and+ workspace_dir
-  and+ time_limit in
+  and+ time_limit
+  and+ solver_type in
   let settings =
     Cmd_exploit.Settings.make ~deterministic ~lazy_values ~input_file
-      ~workspace_dir ?time_limit ()
+      ~workspace_dir ?time_limit ~solver_type ()
   in
   Cmd_exploit.run settings
 
@@ -134,11 +143,12 @@ let cmd_full =
   and+ lazy_values
   and+ workspace_dir
   and+ time_limit
-  and+ optimized_import in
+  and+ optimized_import
+  and+ solver_type in
   let settings =
     Cmd_full.Settings.make ~input_file ?package_dir ~deterministic
       ~proto_pollution ~enumerate_all ~lazy_values ~workspace_dir ?time_limit
-      ~optimized_import ()
+      ~optimized_import ~solver_type ()
   in
   Cmd_full.run settings
 
@@ -185,9 +195,11 @@ let info_package =
 let cmd_package =
   let+ proto_pollution
   and+ workspace_dir
-  and+ input_dir in
+  and+ input_dir
+  and+ solver_type in
   let settings =
     Cmd_package.Settings.make ~proto_pollution ~workspace_dir ~input_dir
+      ~solver_type
   in
   Cmd_package.run settings
 

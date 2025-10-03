@@ -27,10 +27,10 @@ depends: [
   "smtml" {= "pin"}
   "prelude"
   "yojson"
-  "cvc5"
   "ocamlformat" {with-dev-setup}
   "odoc" {with-doc}
 ]
+depopts: ["z3" "cvc5"]
 build: [
   ["dune" "subst"] {dev}
   [

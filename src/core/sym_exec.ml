@@ -35,7 +35,8 @@ let dummy_report input_file =
   ; failures = []
   }
 
-let run_file ~deterministic ~lazy_values ~workspace_dir input_file =
+let run_file ~deterministic ~lazy_values ~workspace_dir ~solver_type input_file
+    =
   Ecma_sl.Log.Config.log_warns := true;
   (* Ecma_sl.Log.Config.log_debugs := true; *)
   Logs.app (fun k -> k "├── Symbolic execution output:");
@@ -45,8 +46,7 @@ let run_file ~deterministic ~lazy_values ~workspace_dir input_file =
   let result, report =
     let settings =
       Symbolic_engine.Settings.make ~lazy_values ~timeout:30
-        ~print_return_value:false ~solver_type:Smtml.Solver_type.Cvc5_solver
-        ~filename:input_file prog
+        ~print_return_value:false ~solver_type ~filename:input_file prog
     in
     try
       run settings ~callback_err:(fun thread ty ->
