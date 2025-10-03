@@ -1,7 +1,28 @@
 # Changelog
 
-## Unreleased
+## 1.4.0 - 2025-10-03
 
+- 2025-10-03 Allow passing solver type in the cli
+- 2025-10-03 Don't checkout cvc5 modules in setup.ml
+- 2025-10-03 Use cvc5 instead of z3 as the default solver
+- 2025-10-03 Vendor cvc5
+- 2025-10-03 Remove authentication in neo4j
+- 2025-10-03 Remove lint job and add it as a step of build
+- 2025-10-02 Switch to self-hosted CI runner and disable gh pages build ([#10](https://github.com/formalsec/explode-js/issues/10))
+- 2025-10-02 Bump ecma-sl
+- 2025-10-02 Add nix-shell configuration
+- 2025-09-08 Bump actions/setup-node from 4 to 5
+- 2025-09-06 Chore: format code
+- 2025-09-06 Chore: add lint pass to CI and create dir for scripts
+- 2025-09-06 Refactor: use ppx_deriving.make to create setting constructors
+- 2025-09-06 Refactor(setup): pass strings instead of commands to execute
+- 2025-08-29 Add CWEBench.js dataset
+- 2025-08-25 Bump actions/upload-pages-artifact from 3 to 4
+- 2025-08-19 Bump actions/checkout from 4 to 5
+- 2025-08-12 Install test dependencies in docker image ([#76](https://github.com/formalsec/explode-js/issues/76))
+- 2025-08-10 Fix build with docker ([#80](https://github.com/formalsec/explode-js/issues/80))
+- 2025-07-31 Add CODEOWNERS
+- 2025-07-24 Update README.md with instruction to install neo4j ([#74](https://github.com/formalsec/explode-js/issues/74))
 - 2025-07-20 Use git-cliff for automatic changelog generation ([#69](https://github.com/formalsec/explode-js/issues/69))
 - 2025-07-19 Bump ecma-sl dev -> 1.4.0 ([#66](https://github.com/formalsec/explode-js/issues/66))
 - 2025-06-27 Manage ECMA-SL through an opam pin instead of a submodule
@@ -34,9 +55,6 @@
 - 2025-05-12 Don't compile unused data-frame generators
 - 2025-05-12 Update explode-js's eval script with custom timeout
 - 2025-05-12 Update ECMA-SL submodule with public repo
-
-## 1.2.1 - 2025-05-08
-
 - 2025-05-08 Update Dockerfile
 
 ## 1.2.0 - 2025-04-18
