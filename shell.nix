@@ -18,6 +18,8 @@ pkgs.mkShell {
     mkdir -p $NEO4J_HOME/{data,logs,conf}
     if [ ! -f $NEO4J_HOME/conf/neo4j.conf ]; then
       cp -r ${pkgs.neo4j}/share/neo4j/conf/* $NEO4J_HOME/conf/
+      chmod +w $NEO4J_HOME/conf/neo4j.conf
+      echo "dbms.security.auth_enabled=false" >> $NEO4J_HOME/conf/neo4j.conf
     fi
     echo "Neo4j home is set to $NEO4J_HOME"
 
