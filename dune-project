@@ -55,24 +55,24 @@
  (sites
   (share nodejs)))
 
-(package
- (name explode_js-runner)
- (synopsis "Explode-js runner")
- (description "explode_js-runner")
- (depends
-  dune
-  dune-site
-  dune-glob
-  (extunix
-   (= "0.4.3"))
-  (ppxlib
-   (= "0.35.0"))
-  explode_js
-  jingoo
-  logs
-  sqlite3
-  sqlite3_utils
-  tiny_httpd)
-  (sites
-   (share templates)
-   (share static)))
+; (package
+;  (name explode_js-runner)
+;  (synopsis "Explode-js runner")
+;  (description "explode_js-runner")
+;  (depends
+;   dune
+;   dune-site
+;   dune-glob
+;   (extunix
+;    (= "0.4.3"))
+;   (ppxlib
+;    (= "0.35.0"))
+;   explode_js
+;   jingoo
+;   logs
+;   sqlite3
+;   sqlite3_utils
+;   tiny_httpd)
+;   (sites
+;    (share templates)
+;    (share static)))
