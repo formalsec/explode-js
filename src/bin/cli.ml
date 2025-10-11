@@ -196,10 +196,11 @@ let cmd_package =
   let+ proto_pollution
   and+ workspace_dir
   and+ input_dir
-  and+ solver_type in
+  and+ solver_type
+  and+ enumerate_all in
   let settings =
     Cmd_package.Settings.make ~proto_pollution ~workspace_dir ~input_dir
-      ~solver_type
+      ~solver_type ~enumerate_all
   in
   Cmd_package.run settings
 

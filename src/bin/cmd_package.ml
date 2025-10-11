@@ -8,6 +8,7 @@ module Settings = struct
     ; workspace_dir : Fpath.t
     ; input_dir : Fpath.t
     ; solver_type : Smtml.Solver_type.t
+    ; enumerate_all : bool
     }
   [@@deriving make]
 end
@@ -135,7 +136,13 @@ let run_confirmation ~proto_pollution ~enumerate_all ~solver_type workspace_dir
   in
   Logs.err_count ()
 
-let run { Settings.proto_pollution; workspace_dir; input_dir; solver_type } =
+let run
+  { Settings.proto_pollution
+  ; workspace_dir
+  ; input_dir
+  ; solver_type
+  ; enumerate_all
+  } =
   Logs.app (fun k -> k "── PHASE 0: VULNERABILITY DETECTION ──");
   let* package_json_exists = is_valid_npm_package input_dir in
   if not package_json_exists then begin
@@ -145,12 +152,12 @@ let run { Settings.proto_pollution; workspace_dir; input_dir; solver_type } =
     Ok 1
   end
   else begin
-    let timestamp =
-      let now = Unix.localtime @@ Unix.gettimeofday () in
-      ExtUnix.Specific.strftime "%Y%m%dT%H%M%S" now
-    in
-    let workspace_dir = Fpath.(workspace_dir / timestamp) in
-    with_npm_package workspace_dir input_dir @@ fun workspace_dir entry_file ->
+    (* let timestamp = *)
+    (*   let now = Unix.localtime @@ Unix.gettimeofday () in *)
+    (*   ExtUnix.Specific.strftime "%Y%m%dT%H%M%S" now *)
+    (* in *)
+    let workspace_dir = input_dir in
+    let entry_file = parse_entry_file Fpath.(workspace_dir / "package.json") in
     let graphjs_time_path = Fpath.(workspace_dir / "graphjs_time.txt") in
     let explode_time_path = Fpath.(workspace_dir / "explode_time.txt") in
     let* graphjs_time = run_graphjs_timed workspace_dir entry_file in
@@ -165,7 +172,7 @@ let run { Settings.proto_pollution; workspace_dir; input_dir; solver_type } =
       print_detected_vulnerabilities scheme_file;
       let explode_start = Unix.gettimeofday () in
       let result =
-        run_confirmation ~proto_pollution ~enumerate_all:true ~solver_type
+        run_confirmation ~proto_pollution ~enumerate_all ~solver_type
           workspace_dir scheme_file
       in
       let explode_time = Unix.gettimeofday () -. explode_start in
