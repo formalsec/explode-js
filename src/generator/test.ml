@@ -12,17 +12,15 @@ let generate_test_file prefix i =
 
 let resolve_file dir scheme = function
   | Some f -> f
-  | None -> (
-    match Scheme.filename scheme with
-    | Some original_file ->
-      (* If path is relative, it is relative to the scheme dir *)
-      if Fpath.is_abs original_file then original_file
-      else Fpath.append dir original_file
-    | None -> assert false )
+  | None ->
+    let original_file = Scheme.filename scheme in
+    (* If path is relative, it is relative to the scheme dir *)
+    if Fpath.is_abs original_file then original_file
+    else Fpath.append dir original_file
 
 module Symbolic = struct
   let write ~mode ~output_file original_file scheme =
-    let open Result in
+    let open Result.Syntax in
     Logs.app (fun k -> k "├── \u{1F4C4} %a" Fpath.pp output_file);
     (* When rendering templates we get a symbolic test *)
     let test_data = Exploit_templates.Symbolic.render scheme in
@@ -31,11 +29,11 @@ module Symbolic = struct
 
   let write_all ?(mode = 0o644) ?original_file ~scheme_file ~output_dir schemes
       =
-    let open Result in
+    let open Result.Syntax in
     let n = List.length schemes in
     Logs.app (fun k -> k "\u{2692} Generating %d template(s):" n);
     let i = ref 0 in
-    list_map
+    Result.list_map
       (fun scheme ->
         let n = !i in
         incr i;
@@ -61,21 +59,23 @@ module Symbolic = struct
 
   let generate_all ?(mode = 0o644) ?original_file ~proto_pollution ~scheme_file
     ~output_dir () =
-    let open Result in
-    let* schemes = Scheme.Parser.from_file ~proto_pollution scheme_file in
-    write_all ~mode ?original_file ~scheme_file ~output_dir schemes
+    let open Result.Syntax in
+    let* _schemes = Scheme.Parser.from_file ~proto_pollution scheme_file in
+    (* write_all ~mode ?original_file ~scheme_file ~output_dir schemes *)
+    let _ = (mode, original_file, output_dir) in
+    assert false
 end
 
 module Literal = struct
   let write ~mode output_file original_file model scheme =
-    let open Result in
+    let open Result.Syntax in
     let test_data = Exploit_templates.Literal.render model scheme in
     let* module_data = Bos.OS.File.read original_file in
     Bos.OS.File.writef ~mode output_file "%s@\n%s@." module_data test_data
 
   let generate_single ?(mode = 0o644) ?original_file ~workspace_dir witness_file
     scheme_file scheme i =
-    let open Result in
+    let open Result.Syntax in
     let* model = Model.Parser.from_file witness_file in
     let parent_dir = Fpath.parent scheme_file in
     let original_file = resolve_file parent_dir scheme original_file in
@@ -83,7 +83,7 @@ module Literal = struct
     write ~mode output_file original_file model scheme
 
   let generate_client ?(mode = 0o644) workspace_dir witness_file scheme i =
-    let open Result in
+    let open Result.Syntax in
     let* model = Model.Parser.from_file witness_file in
     let output_file = Fpath.(workspace_dir / Fmt.str "literal_%d.js" i) in
     let test_data = Exploit_templates.Literal.render model scheme in
@@ -92,24 +92,35 @@ module Literal = struct
 
   let generate_all ?(mode = 0o644) ?original_file ~proto_pollution ~output_dir
     scheme_file witness_file =
-    let open Result in
+    let open Result.Syntax in
     let* model = Model.Parser.from_file witness_file in
     let* schemes = Scheme.Parser.from_file ~proto_pollution scheme_file in
     let i = ref 0 in
-    list_iter
-      (fun scheme ->
-        let n = !i in
-        incr i;
-        let st = Fmt.str "symbolic_test_%d" n in
-        match
-          Astring.String.find_sub ~sub:st (Fpath.to_string witness_file)
-        with
-        | None -> Ok ()
-        | Some _ -> begin
-          let parent_dir = Fpath.parent scheme_file in
-          let original_file = resolve_file parent_dir scheme original_file in
-          let output_file = generate_test_file output_dir n in
-          write ~mode output_file original_file model scheme
-        end )
-      schemes
+    (* Result.list_iter *)
+    (*   (fun scheme -> *)
+    (*     let n = !i in *)
+    (*     incr i; *)
+    (*     let st = Fmt.str "symbolic_test_%d" n in *)
+    (*     match *)
+    (*       Astring.String.find_sub ~sub:st (Fpath.to_string witness_file) *)
+    (*     with *)
+    (*     | None -> Ok () *)
+    (*     | Some _ -> begin *)
+    (*       let parent_dir = Fpath.parent scheme_file in *)
+    (*       let original_file = resolve_file parent_dir scheme original_file in *)
+    (*       let output_file = generate_test_file output_dir n in *)
+    (*       write ~mode output_file original_file model scheme *)
+    (*     end ) *)
+    (*   schemes *)
+    let _ =
+      ( mode
+      , original_file
+      , output_dir
+      , scheme_file
+      , witness_file
+      , model
+      , schemes
+      , i )
+    in
+    assert false
 end

@@ -1,72 +1,100 @@
 open Bos
-open Result
 open Ecma_sl_symbolic
 module Symbolic_memory = Symbolic_memory.Make (Symbolic_object_default)
 include Symbolic_engine.Make (Symbolic_memory) (Sym_failure) ()
 
-let dispatch_file_ext on_js (file : Fpath.t) =
-  if Fpath.has_ext ".js" file then on_js file
-  else Error (`Msg (Fmt.str "%a :unreconized file type" Fpath.pp file))
+module Settings = struct
+  type t =
+    { deterministic : bool [@default false]
+    ; lazy_values : bool
+    ; timeout : int [@default 30]
+    ; workspace_dir : Path.t
+    ; solver_type : Smtml.Solver_type.t
+    ; input_file : Path.t [@main]
+    }
+  [@@deriving make, show]
+end
 
-let prog_of_js file =
-  let js2ecma_sl file output =
-    Cmd.(v "js2ecma-sl" % "-s" % "-c" % "-i" % p file % "-o" % p output)
-  in
-  let ast_file = Fpath.(file -+ "_ast.cesl") in
-  let* () = OS.Cmd.run (js2ecma_sl file ast_file) in
-  let* ast = OS.File.read ast_file in
-  let es6 = Ecma_sl.Share.es6_sym_interp () in
-  let program = String.concat ";\n" [ ast; es6 ] in
-  let+ () = OS.File.delete ast_file in
-  Ecma_sl.Parsing.parse_prog program
+module Input = struct
+  let ast_file_suffix = "_ast.cesl"
 
-let print_model fmt model =
-  Yojson.pretty_print ~std:true fmt (Smtml.Model.to_json model)
+  let js2ecma_sl ~input_file ~output_file =
+    Cmd.(
+      v "js2ecma-sl" % "-s" % "-c" % "-i" % p input_file % "-o" % p output_file )
 
-let print_report fmt report =
-  Yojson.pretty_print ~std:true fmt (Symbolic_result.to_json report)
+  let from_javascript_file file =
+    let open Result.Syntax in
+    let ast_file = Path.(file -+ ast_file_suffix) in
+    Fun.protect ~finally:(fun () -> ignore @@ OS.File.delete ast_file)
+    @@ fun () ->
+    let* () = OS.Cmd.run (js2ecma_sl ~input_file:file ~output_file:ast_file) in
+    let* ast_content = OS.File.read ast_file in
+    let es6_prelude = Ecma_sl.Share.es6_sym_interp () in
+    let program = String.concat ";\n" [ ast_content; es6_prelude ] in
+    Ok (Ecma_sl.Parsing.parse_prog program)
 
-let dummy_report input_file =
-  { Symbolic_result.filename = input_file
-  ; execution_time = 0.
-  ; solver_time = 0.
-  ; solver_queries = 0
-  ; num_failures = 1
-  ; failures = []
-  }
+  let load_program (file : Path.t) =
+    if Path.has_ext ".js" file then from_javascript_file file
+    else Error (`Msg (Fmt.str "%a :unreconized file type" Path.pp file))
+end
 
-let run_file ~deterministic ~lazy_values ~workspace_dir ~solver_type input_file
-    =
-  Ecma_sl.Log.Config.log_warns := true;
-  (* Ecma_sl.Log.Config.log_debugs := true; *)
-  Logs.app (fun k -> k "├── Symbolic execution output:");
-  let* prog = dispatch_file_ext prog_of_js input_file in
-  let testsuite = Fpath.(workspace_dir / "test-suite") in
-  let* _ = OS.Dir.create ~mode:0o777 ~path:true testsuite in
-  let result, report =
-    let settings =
-      Symbolic_engine.Settings.make ~lazy_values ~timeout:30
-        ~print_return_value:false ~solver_type ~filename:input_file prog
+module Execution = struct
+  let make_error_report (settings : Settings.t) exn_msg =
+    let report =
+      { Symbolic_result.filename = settings.input_file
+      ; execution_time = 0.
+      ; solver_time = 0.
+      ; solver_queries = 0
+      ; num_failures = 1
+      ; failures = []
+      }
     in
+    (Error (`Failure exn_msg), report)
+
+  let run (settings : Settings.t) prog =
+    let engine_settings =
+      Symbolic_engine.Settings.make ~lazy_values:settings.lazy_values
+        ~timeout:settings.timeout ~print_return_value:false
+        ~solver_type:settings.solver_type ~filename:settings.input_file prog
+    in
+    let testsuite_dir = Path.(settings.workspace_dir / "test-suite") in
     try
-      run settings ~callback_err:(fun thread ty ->
+      run engine_settings ~callback_err:(fun thread ty ->
         let solver = Choice.solver thread in
         let pc = Choice.pc thread in
-        Sym_path_resolver.solve solver pc ty testsuite )
-    with exn ->
-      (Error (`Failure (Printexc.to_string exn)), dummy_report input_file)
-  in
-  if not deterministic then
-    Logs.app (fun k ->
-      k "├── Symbolic execution stats: clock: %fs | solver: %fs"
-        report.execution_time report.solver_time );
-  match result with
-  | Ok () ->
-    assert (report.num_failures = 0);
-    Logs.app (fun k -> k "└── \u{2714} No issues detected.");
-    Ok report
-  | Error (`Failure msg) -> Error (`Msg msg)
-  | Error _ (* Error from symbolic execution, we can ignore *) ->
-    Logs.app (fun k ->
-      k "├── \u{26A0} Detected %d issue(s)!" report.num_failures );
-    Ok report
+        Sym_path_resolver.solve solver pc ty testsuite_dir )
+    with exn -> make_error_report settings (Printexc.to_string exn)
+end
+
+module Reporting = struct
+  let process_and_log_result (settings : Settings.t) report result =
+    if not settings.deterministic then
+      Logs.app (fun k ->
+        k "Symbolic execution stats: clock: %fs | solver: %fs"
+          report.Symbolic_result.execution_time report.solver_time );
+    match result with
+    | Ok () ->
+      assert (report.num_failures = 0);
+      Logs.app (fun k -> k "\u{2714} No issues detected.");
+      Ok report
+    | Error (`Failure msg) -> Error (`Msg msg)
+    | Error _ (* Error from symbolic execution, we can ignore *) ->
+      Logs.app (fun k -> k "\u{26A0} Detected %d issue(s)!" report.num_failures);
+      Ok report
+end
+
+let setup_environment (settings : Settings.t) =
+  let open Result.Syntax in
+  Ecma_sl.Log.Config.log_warns := true;
+  (* Ecma_sl.Log.Config.log_debugs := true; *)
+  Logs.app (fun k -> k "Symbolic execution output:");
+  let testsuite = Path.(settings.workspace_dir / "test-suite") in
+  let+ _ = OS.Dir.create ~mode:0o777 ~path:true testsuite in
+  ()
+
+let run_file settings =
+  let open Result.Syntax in
+  let* () = setup_environment settings in
+  let* program = Input.load_program settings.input_file in
+  let result, report = Execution.run settings program in
+  Reporting.process_and_log_result settings report result

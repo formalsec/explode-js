@@ -1,10 +1,14 @@
+const { assert } = require("./utils");
+
 let obj = {};
 obj.__proto__.foo = "bar";
-console.log(({}).foo);
+assert(({}).foo == "bar");
+
 let obj2 = { "__proto__" : { bar : "baz" } };
-console.log(({}).bar);
-console.log(obj2.bar);
+assert(({}).bar == undefined);
+assert(obj2.bar == "baz");
+
 let x = "__proto__";
 let obj3 = { [x] : { baz : "qux" } };
-console.log(obj3.baz);
-console.log(obj3.__proto__.baz);
+assert(obj3.baz == undefined);
+assert(obj3.__proto__.baz = "qux");

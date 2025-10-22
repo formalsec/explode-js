@@ -1,4 +1,3 @@
-open Result
 open Explode_js
 open Explode_js_instrument
 
@@ -25,6 +24,7 @@ let parse_entry_file package_json_path =
 
 let with_npm_package workspace_dir input_dir f =
   (* Create workspace_dir *)
+  let open Result.Syntax in
   let* _ = Bos.OS.Dir.create ~path:true ~mode:0o777 workspace_dir in
   (* Recursively copy files from input_dir to workspace_dir *)
   let* () =
@@ -76,13 +76,14 @@ let print_detected_vulnerabilities scheme_file =
     schemes
 
 let run_graphjs_timed workspace_dir entry_file =
+  let open Result.Syntax in
   let start = Unix.gettimeofday () in
   let stderr = Fpath.(workspace_dir / "graphjs.stderr") in
   let stdout = Fpath.(workspace_dir / "graphjs.stdout") in
-  let* status =
-    Graphjs.run ~stderr ~stdout ~optimized_import:false ~output:workspace_dir
-      ~file:entry_file ()
+  let settings =
+    Graphjs.make_settings ~output:workspace_dir ~file:entry_file ()
   in
+  let* status = Graphjs.run ~stderr ~stdout settings in
   let time = Unix.gettimeofday () -. start in
   match status with
   | `Exited 0 -> Ok time
@@ -91,6 +92,7 @@ let run_graphjs_timed workspace_dir entry_file =
 
 let run_confirmation ~proto_pollution ~enumerate_all ~solver_type workspace_dir
   scheme_file =
+  let open Result.Syntax in
   (* FIXME: Should be command flags *)
   let deterministic = false in
   let lazy_values = true in
@@ -138,11 +140,12 @@ let run_confirmation ~proto_pollution ~enumerate_all ~solver_type workspace_dir
 
 let run
   { Settings.proto_pollution
-  ; workspace_dir
+  ; workspace_dir = _
   ; input_dir
   ; solver_type
   ; enumerate_all
   } =
+  let open Result.Syntax in
   Logs.app (fun k -> k "── PHASE 0: VULNERABILITY DETECTION ──");
   let* package_json_exists = is_valid_npm_package input_dir in
   if not package_json_exists then begin

@@ -44,13 +44,18 @@ let run_with_timeout limit f =
 
 let full ~deterministic ~lazy_values ~proto_pollution ~enumerate_all
   ~solver_type package_dir input_file workspace_dir optimized_import =
+  let open Result.Syntax in
   let res =
     let graphjs_time_path = Fpath.(workspace_dir / "graphjs_time.txt") in
     let explode_time_path = Fpath.(workspace_dir / "explode_time.txt") in
     (* 1. Run graphjs *)
     let graphjs_start = Unix.gettimeofday () in
     let* status =
-      Graphjs.run ~optimized_import ~file:input_file ~output:workspace_dir ()
+      let settings =
+        Graphjs.make_settings ~optimized_import ~file:input_file
+          ~output:workspace_dir ()
+      in
+      Graphjs.run settings
     in
     let graphjs_time = Unix.gettimeofday () -. graphjs_start in
     let _ = Bos.OS.File.writef graphjs_time_path "%f@." graphjs_time in
@@ -103,6 +108,7 @@ let run
   ; optimized_import
   ; solver_type
   } =
+  let open Result.Syntax in
   let* _ = Bos.OS.Dir.create ~path:true ~mode:0o777 workspace_dir in
   let work () =
     full ~deterministic ~lazy_values ~proto_pollution ~enumerate_all

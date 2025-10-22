@@ -1,8 +1,9 @@
 type t =
-  | Cmd_injection
-  | Code_injection
-  | Path_traversal
-  | Proto_pollution
+  | Cmd_injection [@name "command-injection"]
+  | Code_injection [@name "code-injection"]
+  | Path_traversal [@name "path-traversal"]
+  | Proto_pollution [@name "prototype-pollution"]
+[@@deriving yojson]
 
 let discr = function
   | Cmd_injection -> 0
@@ -25,4 +26,4 @@ let of_string = function
   | "code-injection" -> Ok Code_injection
   | "path-traversal" -> Ok Path_traversal
   | "prototype-pollution" -> Ok Proto_pollution
-  | str -> Error (`Unknown_vuln_type str)
+  | str -> Error (`Msg (Fmt.str "unexpected vuln type %s" str))

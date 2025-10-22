@@ -1,28 +1,25 @@
 open Ecma_sl_symbolic
 
-let ( let* ) = Result.bind
-
 let solve solver pc (ty : Symbolic_error.t) workspace =
-  let open Result in
-  let pcs = Exploit_patterns.apply pc ty in
-  let result =
-    list_map
-      (fun pc ->
-        let model =
-          try
-            match Solver.get_sat_model solver pc with
-            | `Unsat | `Unknown -> None
-            | `Model m -> Some m
-          with exn ->
-            Logs.err (fun k ->
-              k "solver: %s: cannot encode desired pc" (Printexc.to_string exn) );
-            None
-        in
-        let* pc_path, model = Sym_failure.serialize workspace pc model in
-        let exploit = Sym_failure.default_exploit () in
-        Ok { Sym_failure.ty; pc; pc_path; model; exploit } )
-      pcs
+  let open Result.Syntax in
+  let witness_writer = Sym_failure.make_witness_writer () in
+
+  let get_model_safely solver pc =
+    match Solver.get_sat_model solver pc with
+    | `Model m -> Some m
+    | `Unsat | `Unknown -> None
+    | exception exn -> begin
+      Logs.err (fun k ->
+        k "solver: %s: cannot encode desired pc" (Printexc.to_string exn) );
+      None
+    end
   in
-  match result with
-  | Ok v -> v
-  | Error (`Msg err) -> Fmt.failwith "%s" err
+
+  let process_path_condition pc =
+    let model = get_model_safely solver pc in
+    let+ pc_path, model = witness_writer workspace pc model in
+    Sym_failure.make ~ty ~pc ~pc_path ?model ()
+  in
+
+  let pcs = Exploit_patterns.apply pc ty in
+  Result.list_map process_path_condition pcs |> Result.get_ok

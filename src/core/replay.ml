@@ -1,196 +1,181 @@
 open Bos
 open Result
+open Explode_js_gen
 module String = Astring.String
 
 let npm_install = Cmd.(v "npm" % "i")
 
-let node1 program_file = Cmd.(v "node" % p program_file)
+let node program_file = Cmd.(v "node" % p program_file)
 
-let node2 test_file witness_file = Cmd.(v "node" % p test_file % p witness_file)
-
-let setup_npm_dependencies () =
-  let pkg_json = Fpath.(v "." / "package.json") in
-  let* file_exists = OS.File.exists pkg_json in
-  if not file_exists then Ok ()
-  else
-    let run_out = OS.Cmd.run_out ~err:OS.Cmd.err_run_out npm_install in
-    let* _ = OS.Cmd.out_null run_out in
-    Ok ()
-
-let env testsuite_dir =
-  let ws = Unix.realpath @@ Fpath.to_string testsuite_dir in
-  let sharejs =
-    match Sites.Share.nodejs with
-    | hd :: _ -> hd
-    | [] -> assert false
-  in
+let env =
+  let sharejs = List.hd Sites.Share.nodejs in
   let node_path = OS.Env.opt_var "NODE_PATH" ~absent:"" in
-  let node_path = Fmt.str "%s:.:%s:%a" node_path ws Fpath.pp sharejs in
+  let node_path = Fmt.str "%s:.:%a" node_path Path.pp sharejs in
   String.Map.of_list [ ("NODE_PATH", node_path) ]
 
-let with_effects f =
+let setup_npm_dependencies () =
+  let open Result.Syntax in
+  let package_json = Path.(v "." / "package.json") in
+  let* file_exists = OS.File.exists package_json in
+  if not file_exists then Ok ()
+  else
+    let* _ = OS.Cmd.(run_out ~err:OS.Cmd.err_run_out npm_install |> out_null) in
+    Ok ()
+
+let generate_poc ~dir scheme model =
+  let open Result.Syntax in
+  let model = Model.from_smtml model in
+  let poc = Exploit_templates.Literal.render model scheme in
+  let poc_file = Path.(dir / "poc.js") in
+  let* () = Bos.OS.File.writef poc_file "%s@." poc in
+  Ok poc_file
+
+let with_potential_effects f =
   let open Replay_effect in
   (* Don't care if these file operations fail *)
-  let exploit_file = Fpath.(v "./exploited") in
-  let _ = OS.File.write exploit_file "success\n" in
-  let result = f (File_access exploit_file :: Replay_effect.defaults) in
-  let _ = OS.File.delete exploit_file in
-  result
+  let aux_file = Path.(v "./exploited") in
+  let _ = OS.File.write aux_file "success\n" in
+  Fun.protect ~finally:(fun () -> ignore (OS.File.delete aux_file)) @@ fun () ->
+  f (File_access aux_file :: Replay_effect.defaults)
 
-let execute_witness ~env (test_file : Fpath.t) (witness_file : Fpath.t) =
-  let open OS in
-  with_effects @@ fun potential_effects ->
-  let cmd = node2 test_file witness_file in
-  let err_fpath = Fpath.add_ext ".stderr" witness_file in
-  let err = Cmd.err_file err_fpath in
-  let out_fpath = Fpath.add_ext ".stdout" witness_file in
-  let result = Cmd.(run_out ~env ~err cmd |> out_file out_fpath) in
-  let* err = OS.File.read err_fpath in
-  let+ out = OS.File.read out_fpath in
+let run_node_file ~env file =
+  let open Result.Syntax in
+  let cmd = node file in
+  let err_file = Path.add_ext ".stderr" file in
+  let out_file = Path.add_ext ".stdout" file in
+  let run_result =
+    OS.Cmd.run_out ~env ~err:(OS.Cmd.err_file err_file) cmd
+    |> OS.Cmd.out_file out_file
+  in
+  let status_result =
+    let+ (), status = run_result in
+    status
+  in
+  let* err_output = OS.File.read err_file in
+  let+ out_output = OS.File.read out_file in
+  (status_result, out_output, err_output)
+
+let check_poc_effects out_output err_output potential_effects =
   let visiable_effect = function
-    | Replay_effect.Stdout sub -> String.find_sub ~sub out |> Option.is_some
+    | Replay_effect.Stdout sub ->
+      String.find_sub ~sub out_output |> Option.is_some
     | File file -> begin
       match OS.File.exists file with
       | Ok file_exists -> file_exists
       | Error (`Msg err) -> Fmt.failwith "%s" err
     end
     | File_access file ->
-      let { Unix.st_atime; st_ctime; _ } = Unix.stat (Fpath.to_string file) in
-      Float.Infix.(st_atime > st_ctime)
+      let { Unix.st_atime; st_ctime; _ } = Unix.stat (Path.to_string file) in
+      st_atime > st_ctime
     | Error str ->
       let sub = Fmt.str "Error: %s" str in
-      String.find_sub ~sub err |> Option.is_some
+      String.find_sub ~sub err_output |> Option.is_some
   in
-  let effect_ = List.find_opt visiable_effect potential_effects in
-  ( (let+ (), status = result in
-     status )
-  , effect_ )
+  List.find_opt visiable_effect potential_effects
 
-let generate_literal_test ?original_file workspace_dir scheme_file scheme
-  witness_file i =
-  match (scheme_file, scheme) with
-  | Some scheme_file, Some scheme ->
-    let _ =
-      Explode_js_instrument.Test.Literal.generate_single ~mode:0o666
-        ?original_file ~workspace_dir witness_file scheme_file scheme i
+let execute_and_check_poc ~env poc_file =
+  let open Result.Syntax in
+  with_potential_effects @@ fun potential_effects ->
+  let+ status_result, out_output, err_output = run_node_file ~env poc_file in
+  let eff = check_poc_effects out_output err_output potential_effects in
+  (status_result, eff)
+
+let log_and_cleanup_effect eff =
+  match eff with
+  | Some eff -> begin
+    let () =
+      match eff with
+      | Replay_effect.File file -> ignore @@ OS.Path.delete file
+      | _ -> ()
     in
-    ()
-  | (None | Some _), _ -> ()
-
-let check_effect (exploit : Sym_failure.exploit) effect_ =
-  match effect_ with
-  | Some ((Replay_effect.Stdout _ | File_access _ | Error _) as eff) ->
-    Logs.app (fun k ->
-      k "│   │   │   └── \u{2714} Status: Success %a" Replay_effect.pp eff );
-    exploit.success <- true;
-    exploit.effect_ <- Some eff;
-    true
-  | Some (File file as eff) ->
-    let _ = OS.Path.delete file in
-    Logs.app (fun k ->
-      k "│   │   │   └── \u{2714} Status: Success %a" Replay_effect.pp eff );
-    exploit.success <- true;
-    exploit.effect_ <- Some eff;
-    true
+    Logs.app (fun k -> k "\u{2714} Status: Success %a" Replay_effect.pp eff);
+    Some eff
+  end
   | None ->
-    Logs.app (fun k -> k "│   │   │   └── \u{2716} Status: No side effect" );
-    false
+    Logs.app (fun k -> k "\u{2716} Status: No side effect");
+    None
 
-let run_single ?original_file ?scheme_file ?scheme ~workspace_dir input_file
-  (sym_result : Sym_exec.Symbolic_result.t) =
+let test_model_exploit ~dir scheme model =
+  let open Result.Syntax in
+  Logs.app (fun k ->
+    k "\u{1F4C4} Trying model :@\n %a" (Smtml.Model.pp ~no_values:false) model );
   let* () = setup_npm_dependencies () in
-  let* testsuite_dir = OS.Dir.must_exist Fpath.(workspace_dir / "test-suite") in
-  let env = env testsuite_dir in
-  let i = ref 0 in
-  let failures = sym_result.failures in
-  let n = List.length failures in
-  let found_witness = ref false in
-  if n = 0 then Ok false
-  else begin
-    Logs.app (fun k -> k "│   ├── \u{21BA} Replaying %d test case(s)" n);
-    let* () =
-      list_iter
-        (fun { Sym_failure.model; exploit; _ } ->
-          incr i;
-          match model with
-          | None -> Ok ()
-          | Some { path = witness; _ } ->
-            Logs.app (fun k ->
-              k "│   │   ├── \u{1F4C4} [%d/%d] Using test case: %a" !i n
-                Fpath.pp witness );
-            generate_literal_test ?original_file workspace_dir scheme_file
-              scheme witness !i;
-            let+ status, effect_ = execute_witness ~env input_file witness in
-            begin
-              match status with
-              | Ok (_, status) ->
-                Logs.app (fun k ->
-                  k "│   │   │   ├── Node %a" OS.Cmd.pp_status status )
-              | Error (`Msg err) ->
-                Logs.app (fun k -> k "│   │   │   ├── Node: %s" err)
-            end;
-            if check_effect exploit effect_ then found_witness := true )
-        failures
-    in
-    Ok !found_witness
+  let* poc_file = generate_poc ~dir scheme model in
+  let+ status_result, eff = execute_and_check_poc ~env poc_file in
+  match status_result with
+  | Ok (_, status) -> begin
+    Logs.app (fun k -> k "\u{1F4C4} Node %a" OS.Cmd.pp_status status);
+    let final_effect = log_and_cleanup_effect eff in
+    Option.map (fun eff -> (poc_file, eff)) final_effect
+  end
+  | Error (`Msg err) -> begin
+    Logs.app (fun k -> k "\u{1F4C4} Node: %s" err);
+    None
   end
 
-let run_server ~workspace_dir server_file scheme
-  (sym_result : Sym_exec.Symbolic_result.t) =
-  let* () = setup_npm_dependencies () in
-  let* testsuite_dir = OS.Dir.must_exist Fpath.(workspace_dir / "test-suite") in
-  let env = env testsuite_dir in
-  let i = ref 0 in
-  let failures = sym_result.failures in
-  let n = List.length failures in
-  if n = 0 then Ok ()
-  else begin
-    Logs.app (fun k -> k "│   ├── \u{21BA} Replaying %d test case(s)" n);
-    list_iter
-      (fun { Sym_failure.model; exploit; _ } ->
-        incr i;
-        match model with
-        | None -> Ok ()
-        | Some { path = witness_file; _ } ->
-          Logs.app (fun k ->
-            k "│   │   ├── \u{1F4C4} [%d/%d] Using test case: %a" !i n Fpath.pp
-              witness_file );
-          let pid = Unix.fork () in
-          if pid = 0 then begin
-            (* Set the PGID the same as pid's *)
-            ExtUnix.Specific.setpgid 0 0;
-            (* Launch server in the child *)
-            let cmd = node1 server_file in
-            match Bos.OS.Cmd.(run_out ~env cmd |> to_null) with
-            | Ok () -> exit 0
-            | Error (`Msg err) -> Fmt.failwith "%s" err
-          end
-          else begin
-            (* Generate client test, and run it *)
-            let result =
-              let* client_file =
-                Explode_js_instrument.Test.Literal.generate_client workspace_dir
-                  witness_file scheme !i
-              in
-              Unix.sleepf 0.100;
-              execute_witness ~env client_file witness_file
-            in
-            (* Don't need the child anymore, so clean it up. *)
-            Unix.kill ~-pid Sys.sigkill;
-            let waited_pid, _status = Unix.waitpid [] ~-pid in
-            (* Sanity check *)
-            assert (waited_pid = pid);
-            let+ status, effect_ = result in
-            begin
-              match status with
-              | Ok (_, status) ->
-                Logs.app (fun k ->
-                  k "│   │   │   ├── Node %a" OS.Cmd.pp_status status )
-              | Error (`Msg err) ->
-                Logs.app (fun k -> k "│   │   │   ├── Node: %s" err)
-            end;
-            let _ = check_effect exploit effect_ in
-            ()
-          end )
-      failures
-  end
+let find_exploitable_model ~dir scheme (model : Sym_failure.t) =
+  let open Option.Syntax in
+  let* model = model.model in
+  let* result = test_model_exploit ~dir scheme model.data |> Result.to_option in
+  result
+
+(* let run_server ~workspace_dir server_file scheme *)
+(*   (sym_result : Sym_exec.Symbolic_result.t) = *)
+(*   let open Result.Syntax in *)
+(*   let* () = setup_npm_dependencies () in *)
+(*   let* testsuite_dir = OS.Dir.must_exist Path.(workspace_dir / "test-suite") in *)
+(*   let env = env testsuite_dir in *)
+(*   let i = ref 0 in *)
+(*   let failures = sym_result.failures in *)
+(*   let n = List.length failures in *)
+(*   if n = 0 then Ok () *)
+(*   else begin *)
+(*     Logs.app (fun k -> k "│   ├── \u{21BA} Replaying %d test case(s)" n); *)
+(*     list_iter *)
+(*       (fun { Sym_failure.model; exploit; _ } -> *)
+(*         incr i; *)
+(*         match model with *)
+(*         | None -> Ok () *)
+(*         | Some { path = witness_file; _ } -> *)
+(*           Logs.app (fun k -> *)
+(*             k "│   │   ├── \u{1F4C4} [%d/%d] Using test case: %a" !i n Path.pp *)
+(*               witness_file ); *)
+(*           let pid = Unix.fork () in *)
+(*           if pid = 0 then begin *)
+(*             (1* Set the PGID the same as pid's *1) *)
+(*             ExtUnix.Specific.setpgid 0 0; *)
+(*             (1* Launch server in the child *1) *)
+(*             let cmd = node1 server_file in *)
+(*             match Bos.OS.Cmd.(run_out ~env cmd |> to_null) with *)
+(*             | Ok () -> exit 0 *)
+(*             | Error (`Msg err) -> Fmt.failwith "%s" err *)
+(*           end *)
+(*           else begin *)
+(*             (1* Generate client test, and run it *1) *)
+(*             let result = *)
+(*               let* client_file = *)
+(*                 Explode_js_gen.Test.Literal.generate_client workspace_dir *)
+(*                   witness_file scheme !i *)
+(*               in *)
+(*               Unix.sleepf 0.100; *)
+(*               execute_witness ~env client_file witness_file *)
+(*             in *)
+(*             (1* Don't need the child anymore, so clean it up. *1) *)
+(*             Unix.kill ~-pid Sys.sigkill; *)
+(*             let waited_pid, _status = Unix.waitpid [] ~-pid in *)
+(*             (1* Sanity check *1) *)
+(*             assert (waited_pid = pid); *)
+(*             let+ status, effect_ = result in *)
+(*             begin *)
+(*               match status with *)
+(*               | Ok (_, status) -> *)
+(*                 Logs.app (fun k -> *)
+(*                   k "│   │   │   ├── Node %a" OS.Cmd.pp_status status ) *)
+(*               | Error (`Msg err) -> *)
+(*                 Logs.app (fun k -> k "│   │   │   ├── Node: %s" err) *)
+(*             end; *)
+(*             let _ = check_effect exploit effect_ in *)
+(*             () *)
+(*           end ) *)
+(*       failures *)
+(*   end *)

@@ -1,5 +1,4 @@
 open Explode_js
-open Result
 
 module Settings = struct
   type t =
@@ -19,6 +18,7 @@ end
 
 let with_workspace ~proto_pollution workspace_dir scheme_path package_dir
   filename f =
+  let open Result.Syntax in
   let _timestamp =
     let now = Unix.localtime @@ Unix.gettimeofday () in
     ExtUnix.Specific.strftime "%Y%m%dT%H%M%S" now
@@ -66,7 +66,7 @@ let with_workspace ~proto_pollution workspace_dir scheme_path package_dir
   (* List.iter (fun scheme -> *)
   (*   Fmt.pr "SCHEME:@\n%a@." Explode_js_instrument.Scheme.pp scheme) schemes; *)
   let* () =
-    list_iter
+    Result.list_iter
       (fun scheme ->
         let dname = Fpath.parent scheme_path in
         let fname = Explode_js_instrument.Scheme.filename scheme in
@@ -124,6 +124,7 @@ let write_report report_file result =
 
 let run_single ~deterministic ~lazy_values ~(workspace_dir : Fpath.t)
   ~solver_type (test_file : Fpath.t) original_file scheme_file scheme =
+  let open Result.Syntax in
   let* res =
     Sym_exec.run_file ~deterministic ~lazy_values ~workspace_dir ~solver_type
       test_file
@@ -137,6 +138,7 @@ let run_single ~deterministic ~lazy_values ~(workspace_dir : Fpath.t)
 
 let run_server ~deterministic ~lazy_values ~(workspace_dir : Fpath.t)
   ~solver_type (server_file : Fpath.t) scheme =
+  let open Result.Syntax in
   let* res =
     Sym_exec.run_file ~deterministic ~lazy_values ~workspace_dir ~solver_type
       server_file
@@ -163,6 +165,7 @@ let run
   ; solver_type
   ; _
   } =
+  let open Result.Syntax in
   Logs.app (fun k -> k "── PHASE 1: TEMPLATE GENERATION ──");
   Logs.app (fun k -> k "\u{2714} Loaded: %a" Fpath.pp scheme_file);
   with_workspace ~proto_pollution workspace_dir scheme_file package_dir

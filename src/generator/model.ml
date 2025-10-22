@@ -7,6 +7,24 @@ let get map x =
   | Some v -> v
   | None -> Value.Undefined
 
+let from_smtml model =
+  let add_binding map (s, v) =
+    let name = Smtml.Symbol.to_string s in
+    match v with
+    | Smtml.Value.Nothing -> map
+    | True -> Map.add name (Value.Bool true) map
+    | False -> Map.add name (Value.Bool false) map
+    | Int x -> Map.add name (Value.Number (float_of_int x)) map
+    | Real x -> Map.add name (Value.Number x) map
+    | Str x -> Map.add name (Value.String x) map
+    | _ -> begin
+      Logs.err (fun m -> m "unexpected value '%a' in model" Smtml.Value.pp v);
+      map
+    end
+  in
+  let bindings = Smtml.Model.get_bindings model in
+  List.fold_left add_binding Map.empty bindings
+
 module Parser = struct
   module Json = Yojson.Basic
   module Util = Yojson.Basic.Util
@@ -26,8 +44,7 @@ module Parser = struct
     let model = Util.member "model" json |> Util.to_assoc in
     List.fold_left add_binding Map.empty model
 
-  let from_file (input_file : Fpath.t) : (t, [> Instrument_result.err ]) result
-      =
+  let from_file (input_file : Fpath.t) : (t, [> `Msg of string ]) result =
     let open Result in
     let fname = Fpath.to_string input_file in
     match Json.from_file ~fname fname with

@@ -8,26 +8,7 @@ type param_type =
   | Object of
       [ `Lazy | `Polluted of int | `Normal of (string * param_type) list ]
   | Union of param_type list
-
-let rec pp_param_type fmt = function
-  | Any -> Fmt.pf fmt "Any"
-  | Number -> Fmt.pf fmt "Number"
-  | String -> Fmt.pf fmt "String"
-  | Boolean -> Fmt.pf fmt "Boolean"
-  | Function -> Fmt.pf fmt "Function"
-  | Array types ->
-    Fmt.pf fmt "Array[%a]" (Fmt.list ~sep:Fmt.sp pp_param_type) types
-  | Object `Lazy -> Fmt.pf fmt "Object<Lazy>"
-  | Object (`Polluted n) -> Fmt.pf fmt "Object<Polluted %d>" n
-  | Object (`Normal fields) ->
-    let pp_field fmt (name, ty) = Fmt.pf fmt "%s: %a" name pp_param_type ty in
-    Fmt.pf fmt "Object{@[<hov 1>%a@]}"
-      (Fmt.list ~sep:(fun fmt () -> Fmt.pf fmt ";@ ") pp_field)
-      fields
-  | Union types ->
-    Fmt.pf fmt "@[<hov 1>Union[%a]@]"
-      (Fmt.list ~sep:(fun fmt () -> Fmt.pf fmt " |@ ") pp_param_type)
-      types
+[@@deriving show]
 
 let rec equal_param_type a b =
   match (a, b) with
@@ -55,7 +36,7 @@ let rec equal_param_type a b =
     false
 
 type t =
-  { filename : Fpath.t option
+  { filename : Fpath.t
   ; ty : Vuln_type.t option
   ; source : string option
   ; source_lineno : int option
@@ -65,6 +46,7 @@ type t =
   ; params : (string * param_type) list
   ; cont : cont option
   }
+[@@deriving show]
 
 and cont =
   | Return of t
@@ -73,28 +55,14 @@ and cont =
       { request_ty : [ `GET | `POST ]
       ; port : int
       }
-
-let rec pp fmt { filename; params; cont; _ } =
-  Fmt.pf fmt "@[<hov 1>{ filename=%a;@ params=%a;@ cont=%a }@]"
-    (Fmt.option Fpath.pp) filename
-    (Fmt.list
-       ~sep:(fun fmt () -> Fmt.pf fmt ";@ ")
-       (fun fmt (s, t) -> Fmt.pf fmt "%s: %a" s pp_param_type t) )
-    params (Fmt.option pp_cont) cont
-
-and pp_cont fmt = function
-  | Return t -> Fmt.pf fmt "Return(%a)" pp t
-  | Sequence t -> Fmt.pf fmt "Sequence(%a)" pp t
-  | Client { request_ty; port } ->
-    let pp_request_ty fmt = function
-      | `GET -> Fmt.pf fmt "GET"
-      | `POST -> Fmt.pf fmt "POST"
-    in
-    Fmt.pf fmt "Client{ request_ty=%a; port=%d }" pp_request_ty request_ty port
+[@@deriving show]
 
 let ty { ty; _ } = ty
 
 let filename { filename; _ } = filename
+
+let metadata { filename; ty; sink; sink_lineno; _ } =
+  (filename, ty, sink, sink_lineno)
 
 let rec client { cont; _ } =
   match cont with
@@ -110,7 +78,7 @@ let needs_client scheme =
 (** [unroll_params params] performs type unrolling of union types *)
 let rec unroll_params ~proto_pollution (params : (string * param_type) list) :
   (string * param_type) list list =
-  let open List in
+  let open List.Syntax in
   let rec loop wl acc =
     match wl with
     | [] -> acc
@@ -165,7 +133,7 @@ let rec unroll_params ~proto_pollution (params : (string * param_type) list) :
   List.rev params
 
 let rec unroll ~proto_pollution (tmpl : t) : t list =
-  let open List in
+  let open List.Syntax in
   let cs =
     let+ params = unroll_params ~proto_pollution tmpl.params in
     { tmpl with params }
@@ -183,13 +151,10 @@ let rec unroll ~proto_pollution (tmpl : t) : t list =
 
 module Parser : sig
   val from_file :
-       proto_pollution:bool
-    -> Fpath.t
-    -> (t list, [> Instrument_result.err ]) result
+    proto_pollution:bool -> Fpath.t -> (t list list, [> `Msg of string ]) result
 end = struct
-  open Result
-  module Json = Yojson.Basic
-  module Json_util = Yojson.Basic.Util
+  module Json = Yojson.Safe
+  module Json_util = Yojson.Safe.Util
 
   let param_type_of_string (ty : string) =
     match String.trim ty with
@@ -204,7 +169,7 @@ end = struct
     | "polluted_object2" -> Ok (Object (`Polluted 2))
     | "polluted_object3" -> Ok (Object (`Polluted 3))
     | "lazy_object" -> Ok (Object `Lazy)
-    | x -> Error (`Unknown_param_type x)
+    | x -> Error (`Msg (Fmt.str "unexpected param type: '%s'" x))
 
   let fix_dynamic_prop =
     let counter = ref ~-1 in
@@ -215,13 +180,14 @@ end = struct
     | str -> str
 
   let rec param_of_json (json : Json.t) =
+    let open Result.Syntax in
     match json with
     | `String ty -> param_type_of_string ty
     | `Assoc obj -> begin
       match Json_util.member "_union" json with
       | `Null ->
         let+ params =
-          list_map
+          Result.list_map
             (fun (k, v) ->
               let+ ty = param_of_json v in
               (fix_dynamic_prop k, ty) )
@@ -229,16 +195,16 @@ end = struct
         in
         Object (`Normal params)
       | `List tys ->
-        let+ tys = list_map param_of_json tys in
+        let+ tys = Result.list_map param_of_json tys in
         Union tys
       | _ ->
         (* should not happen *)
         assert false
     end
     | `List arr ->
-      let+ arr = list_map param_of_json arr in
+      let+ arr = Result.list_map param_of_json arr in
       Array arr
-    | _ -> Error (`Unknown_param (Fmt.str "%a" Json.pp json))
+    | _ -> Error (`Msg (Fmt.str "unexpected param %a" Json.pp json))
 
   let string_opt = function
     | `String str -> Some str
@@ -246,7 +212,7 @@ end = struct
 
   let string = function
     | `String str -> Ok str
-    | _ -> Error `Expected_string
+    | json -> Error (`Msg (Fmt.str "expecting 'String' but got %a" Json.pp json))
 
   let int_opt = function
     | `Int i -> Some i
@@ -254,17 +220,18 @@ end = struct
 
   let int = function
     | `Int i -> Ok i
-    | _ -> Error (`Msg "expecting an integer")
+    | json -> Error (`Msg (Fmt.str "expecting 'Int' but got %a" Json.pp json))
 
   let list = function
     | `List lst -> Ok lst
-    | _ -> Error `Expected_list
+    | json -> Error (`Msg (Fmt.str "expecting 'List' but got %a" Json.pp json))
 
   let assoc = function
     | `Assoc lst -> Ok lst
-    | _ -> Error `Expected_assoc
+    | json -> Error (`Msg (Fmt.str "expecting 'Assoc' but got %a" Json.pp json))
 
   let bind v f =
+    let open Result.Syntax in
     match v with
     | None -> Ok None
     | Some v ->
@@ -272,6 +239,7 @@ end = struct
       Some v
 
   let request_ty_of_json json =
+    let open Result.Syntax in
     let* s = string json in
     match s with
     | "GET" -> Ok `GET
@@ -279,8 +247,10 @@ end = struct
     | _ -> Error (`Msg (Fmt.str "unexpected client request of type: %s" s))
 
   let rec t_of_json (json : Json.t) =
-    let filename =
-      Json_util.member "filename" json |> string_opt |> Option.map Fpath.v
+    let open Result.Syntax in
+    let* filename =
+      let* filename = Json_util.member "filename" json |> string in
+      Ok (Fpath.v (Unix.realpath filename))
     in
     let* ty =
       let vuln_type = Json_util.member "vuln_type" json |> string_opt in
@@ -292,11 +262,11 @@ end = struct
     let sink_lineno = Json_util.member "sink_lineno" json |> int_opt in
     let* tainted_params =
       let* tainted = Json_util.member "tainted_params" json |> list in
-      list_map string tainted
+      Result.list_map string tainted
     in
     let* params =
       let* params = Json_util.member "params_types" json |> assoc in
-      list_map
+      Result.list_map
         (fun (k, v) ->
           let+ ty = param_of_json v in
           (fix_dynamic_prop k, ty) )
@@ -315,6 +285,7 @@ end = struct
     }
 
   and cont_of_json json =
+    let open Result.Syntax in
     (* Can only have one type of continuation at a time *)
     (* FIXME: To Allow return(s?) I made this horrible nested match *)
     match Json_util.member "return" json with
@@ -345,11 +316,12 @@ end = struct
       Some (Return tree)
 
   let from_file ~proto_pollution fname =
+    let open Result.Syntax in
     let fname = Fpath.to_string fname in
     match Json.from_file ~fname fname with
-    | exception Yojson.Json_error msg -> Error (`Malformed_json msg)
+    | exception Yojson.Json_error msg -> Error (`Msg msg)
     | json ->
       let* vulns = list json in
-      let+ vulns = list_map t_of_json vulns in
-      List.concat_map (unroll ~proto_pollution) vulns
+      let+ vulns = Result.list_map t_of_json vulns in
+      List.map (unroll ~proto_pollution) vulns
 end
