@@ -3,6 +3,7 @@
 
 # OCaml
 _build/
+_destdir/
 
 # Tool execution
 import.report
