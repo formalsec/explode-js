@@ -45,7 +45,7 @@
   ocaml
   ; (owl (>= 1.1))
   (smtml
-   (= "pin"))
+   (>= 0.13.0))
   prelude
   yojson
   (ocamlformat
