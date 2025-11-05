@@ -17,11 +17,15 @@ let find_vulnerabilities (settings : Settings.Cmd_run.t) =
   let workspace_dir = settings.workspace_dir in
   (* Input path is a directory, we must resolve it to a file *)
   let* entry_file = find_entry_file settings.input_path in
-  let graphjs_settings =
-    Graphjs.Settings.make ~file:entry_file ~output:workspace_dir ()
+  let* graphjs_result =
+    let settings =
+      Graphjs.Settings.make ~file:entry_file ~output:workspace_dir ()
+    in
+    let stderr = Fpath.(workspace_dir / "graphjs-stderr.txt") in
+    let stdout = Fpath.(workspace_dir / "graphjs-stdout.txt") in
+    Graphjs.run ~stderr ~stdout settings
   in
-  let* status = Graphjs.run graphjs_settings in
-  match status with
+  match graphjs_result with
   | `Exited 0 -> begin
     Bos.OS.File.must_exist Fpath.(workspace_dir / "taint_summary.json")
   end
