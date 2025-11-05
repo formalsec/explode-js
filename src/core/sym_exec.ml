@@ -10,6 +10,7 @@ module Settings = struct
     ; timeout : int [@default 30]
     ; workspace_dir : Path.t
     ; solver_type : Smtml.Solver_type.t
+    ; path_only : bool
     ; input_file : Path.t [@main]
     }
   [@@deriving make, show]
@@ -62,7 +63,8 @@ module Execution = struct
       run engine_settings ~callback_err:(fun thread ty ->
         let solver = Choice.solver thread in
         let pc = Choice.pc thread in
-        Sym_path_resolver.solve solver pc ty testsuite_dir )
+        Sym_path_resolver.solve ~path_only:settings.path_only solver pc ty
+          testsuite_dir )
     with exn -> make_error_report settings (Printexc.to_string exn)
 end
 

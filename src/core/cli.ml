@@ -62,10 +62,6 @@ let enumerate_all =
   let doc = "Enumerate all possible exploits" in
   Arg.(value & flag & info [ "enumerate-all" ] ~doc)
 
-let package_dir =
-  let doc = "Path to package under analysis" in
-  Arg.(value & opt (some fpath) None & info [ "package-dir" ] ~doc)
-
 let optimized_import =
   let doc = "Use optimized import heuristics in graphjs" in
   Arg.(value & flag & info [ "optimized-import" ] ~doc)
@@ -76,6 +72,10 @@ let solver_type =
     value
     & opt Smtml.Solver_type.conv Smtml.Solver_type.Cvc5_solver
     & info [ "solver" ] ~doc )
+
+let path_only =
+  let doc = "Only search for paths that reach dangerous sinks." in
+  Arg.(value & flag & info [ "path-only" ] ~doc)
 
 let sdocs = Manpage.s_common_options
 
@@ -260,9 +260,11 @@ let cmd_run =
     let+ workspace_dir
     and+ lazy_values
     and+ solver_type
-    and+ input_path in
+    and+ input_path
+    and+ path_only in
     let settings =
-      Settings.Cmd_run.make ~workspace_dir ~lazy_values ~solver_type input_path
+      Settings.Cmd_run.make ~workspace_dir ~lazy_values ~solver_type ~path_only
+        input_path
     in
     Cmd_run.run settings
   in

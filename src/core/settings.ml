@@ -4,6 +4,7 @@ module Cmd_run = struct
     ; lazy_values : bool
     ; vuln_type : Explode_js_gen.Vuln_type.t option [@default None]
     ; solver_type : Smtml.Solver_type.t
+    ; path_only : bool
     ; input_path : Path.t [@main]
     }
   [@@deriving make, show]

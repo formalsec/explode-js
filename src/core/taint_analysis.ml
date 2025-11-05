@@ -14,7 +14,8 @@ let execute_scheme (settings : Settings.Cmd_run.t) i (scheme : Scheme.t) =
   in
   let sym_settings =
     Sym_exec.Settings.make ~lazy_values:settings.lazy_values
-      ~workspace_dir:sym_workspace ~solver_type:settings.solver_type test_file
+      ~workspace_dir:sym_workspace ~solver_type:settings.solver_type
+      ~path_only:settings.path_only test_file
   in
   let time, outcome =
     let sym_result = Sym_exec.run_file sym_settings in
@@ -25,11 +26,13 @@ let execute_scheme (settings : Settings.Cmd_run.t) i (scheme : Scheme.t) =
     | Ok results when results.num_failures = 0 ->
       (results.execution_time, Path_not_found)
     | Ok results -> begin
-      let find_model = Replay.find_exploitable_model ~dir:workspace scheme in
-      match List.find_map find_model results.failures with
-      | None -> (results.execution_time, Path_found)
-      | Some (path, effect_) ->
-        (results.execution_time, Exploit_found { path; effect_ })
+      if settings.path_only then (results.execution_time, Path_found)
+      else
+        let find_model = Replay.find_exploitable_model ~dir:workspace scheme in
+        match List.find_map find_model results.failures with
+        | None -> (results.execution_time, Path_found)
+        | Some (path, effect_) ->
+          (results.execution_time, Exploit_found { path; effect_ })
     end
   in
   Ok (Analysis_results.make_test_result ~path:test_file ~outcome ~time)
@@ -53,7 +56,9 @@ let test_vulnerability (settings : Settings.Cmd_run.t) i
       let all_results = result :: all_results in
       match result.outcome with
       | Exploit_found _ -> Ok (Some result, all_results)
-      | Path_found -> loop (Some result, all_results) (i + 1) rest
+      | Path_found ->
+        if settings.path_only then Ok (Some result, all_results)
+        else loop (Some result, all_results) (i + 1) rest
       | Path_not_found -> loop (best_so_far, all_results) (i + 1) rest
     end
   in

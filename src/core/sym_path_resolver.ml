@@ -1,6 +1,6 @@
 open Ecma_sl_symbolic
 
-let solve solver pc (ty : Symbolic_error.t) workspace =
+let solve ?(path_only = false) solver pc (ty : Symbolic_error.t) workspace =
   let open Result.Syntax in
   let witness_writer = Sym_failure.make_witness_writer () in
 
@@ -21,5 +21,5 @@ let solve solver pc (ty : Symbolic_error.t) workspace =
     Sym_failure.make ~ty ~pc ~pc_path ?model ()
   in
 
-  let pcs = Exploit_patterns.apply pc ty in
+  let pcs = if path_only then [ pc ] else Exploit_patterns.apply pc ty in
   Result.list_map process_path_condition pcs |> Result.get_ok
