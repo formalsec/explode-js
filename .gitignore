@@ -4,6 +4,7 @@
 # OCaml
 _build/
 _destdir/
+*.install
 
 # Tool execution
 import.report
@@ -15,5 +16,3 @@ res*/
 results
 _results
 __pycache__/
-fast-parsed-results.csv
-nodeMedic-parsed-results.csv
