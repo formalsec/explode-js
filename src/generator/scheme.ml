@@ -36,7 +36,7 @@ let rec equal_param_type a b =
     false
 
 type t =
-  { filename : Fpath.t
+  { filename : Fpath.t option
   ; ty : Vuln_type.t option
   ; source : string option
   ; source_lineno : int option
@@ -62,7 +62,7 @@ let ty { ty; _ } = ty
 let filename { filename; _ } = filename
 
 let metadata { filename; ty; sink; sink_lineno; _ } =
-  (filename, ty, sink, sink_lineno)
+  (Option.get filename, ty, sink, sink_lineno)
 
 let rec client { cont; _ } =
   match cont with
@@ -249,8 +249,11 @@ end = struct
   let rec t_of_json (json : Json.t) =
     let open Result.Syntax in
     let* filename =
-      let* filename = Json_util.member "filename" json |> string in
-      Ok (Fpath.v (Unix.realpath filename))
+      match Json_util.member "filename" json with
+      | `Null -> Ok None
+      | json ->
+        let* filename = string json in
+        Ok (Some (Fpath.v (Unix.realpath filename)))
     in
     let* ty =
       let vuln_type = Json_util.member "vuln_type" json |> string_opt in
