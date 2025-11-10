@@ -1,19 +1,6 @@
 open Cmdliner
 
-let real_fpath exists s =
-  let open Result.Syntax in
-  let file = Fpath.v s in
-  let* file_exists = exists file in
-  if file_exists then Ok file
-  else Error (`Msg (Fmt.str "File '%a' not found" Fpath.pp file))
-
-let fpath = Arg.conv (Fpath.of_string, Fpath.pp)
-
-let _valid_fpath = Arg.conv (real_fpath Bos.OS.Path.exists, Fpath.pp)
-
-let non_dir_fpath = Arg.conv (real_fpath Bos.OS.File.exists, Fpath.pp)
-
-let dir_fpath = Arg.conv (real_fpath Bos.OS.Dir.exists, Fpath.pp)
+let fpath = Arg.conv (Path.of_string, Path.pp)
 
 let debug =
   let doc = "Debug mode." in
@@ -28,23 +15,9 @@ let input_path =
   let doc = "Name of the input path." in
   Arg.(required & pos 0 (some fpath) None & info [] ~doc ~docv)
 
-let input_file =
-  let docv = "FILE" in
-  let doc = "Name of the input file." in
-  Arg.(required & pos 0 (some non_dir_fpath) None & info [] ~doc ~docv)
-
-let input_file_opt =
-  let doc = "Overwrite input file in scheme_path" in
-  Arg.(value & opt (some fpath) None & info [ "filename" ] ~doc)
-
-let input_dir =
-  let docv = "DIR" in
-  let doc = "Name of the input directory containing the package." in
-  Arg.(value & pos 0 dir_fpath (Fpath.v "./") & info [] ~doc ~docv)
-
 let workspace_dir =
   let doc = "Directory to store intermediate results" in
-  Arg.(value & opt fpath (Fpath.v "_results") & info [ "workspace" ] ~doc)
+  Arg.(value & opt fpath (Path.v "_results") & info [ "workspace" ] ~doc)
 
 let time_limit =
   let doc = "Maximum time limit for analysis" in
