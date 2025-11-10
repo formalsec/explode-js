@@ -2,7 +2,10 @@ let extract_from_package_json package_json =
   let json_data = Yojson.Safe.from_file @@ Fpath.to_string package_json in
   match Yojson.Safe.Util.member "main" json_data with
   | `String path -> Ok (Fpath.v path)
-  | `Null | _ -> Error (`Msg "could not extract entry file from package.json")
+  | `Null ->
+    (* When "main" not present assume index.js *)
+    Ok (Fpath.v "./index.js")
+  | _ -> Error (`Msg "could not extract entry file from package.json")
 
 let find_entry_file path =
   let open Result.Syntax in
