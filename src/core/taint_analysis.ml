@@ -70,25 +70,30 @@ let test_vulnerability (settings : Settings.Cmd_run.t) i
 
 let run_from_file (settings : Settings.Cmd_run.t) =
   let open Result.Syntax in
+  let start_time = Unix.gettimeofday () in
   let* _ = Utils.create_dir settings.workspace_dir in
   let* vulns =
     Scheme.Parser.from_file ~proto_pollution:false settings.input_path
   in
 
-  let results = List.mapi (test_vulnerability settings) vulns in
-
   let successes, failures =
+    let results = List.mapi (test_vulnerability settings) vulns in
     List.partition_map
       (function
         | Ok v -> Either.Left v
         | Error e -> Either.Right e )
       results
   in
+  let execution_time = Unix.gettimeofday () -. start_time in
 
   List.iter
     (fun (`Msg err) ->
       Logs.err (fun m -> m "Failed to test vulnerability: %s" err) )
     failures;
+
+  Utils.write_time
+    Path.(settings.workspace_dir / "explode_time.txt")
+    execution_time;
 
   let json_results = List.map Analysis_results.to_yojson successes in
   let output_file = Path.(settings.workspace_dir / "results.json") in
