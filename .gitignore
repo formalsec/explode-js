@@ -10,9 +10,6 @@ _destdir/
 import.report
 explode-out/
 
-# Benchmarking
-*.pdf
-res*/
-results
-_results
-__pycache__/
+# Testing
+node_modules/
+package-lock.json
