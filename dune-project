@@ -1,4 +1,4 @@
-(lang dune 3.15)
+(lang dune 3.20)
 
 (using mdx 0.4)
 
@@ -11,9 +11,9 @@
 (source
  (github explode-js/explode-js))
 
-(authors "Filipe Marques")
+(authors "Filipe Marques <filipe.s.marques@tecnico.ulisboa.pt>")
 
-(maintainers "Filipe Marques")
+(maintainers "Filipe Marques <filipe.s.marques@tecnico.ulisboa.pt>")
 
 (license MIT)
 
@@ -21,8 +21,17 @@
 
 (package
  (name explode_js)
- (synopsis "Automatic exploit generation for Node.js")
- (description "Explode.js: Automatic exploit generation engine for Node.js applications")
+ (synopsis "Automatic Exploit Generation for Node.js Packages")
+ (description
+  "Explode.js is an exploit generation tool for Node.js packages \
+  that can automatically synthesize functional exploits for \
+  multi-interaction vulnerablitilties. That is, vulnerabilities \
+  that require a series of interactions with the vulnerable package \
+  to be exploited. Given a vulnerable package, explode-js can \
+  identify code injection, command injection, prototype pollution, \
+  and path traversal vulnerabilities, and build a JS program that is \
+  guaranteed to produce observable side effects, thereby confirming \
+  the existence of the vulnerability and eliminating false positives.")
  (depopts
   z3
   cvc5)
@@ -43,7 +52,6 @@
   fpath
   (mdx :with-test)
   ocaml
-  ; (owl (>= 1.1))
   (smtml
    (>= 0.13.0))
   prelude
@@ -54,25 +62,3 @@
   ("symbolic execution" javascript exploit))
  (sites
   (share nodejs)))
-
-; (package
-;  (name explode_js-runner)
-;  (synopsis "Explode-js runner")
-;  (description "explode_js-runner")
-;  (depends
-;   dune
-;   dune-site
-;   dune-glob
-;   (extunix
-;    (= "0.4.3"))
-;   (ppxlib
-;    (= "0.35.0"))
-;   explode_js
-;   jingoo
-;   logs
-;   sqlite3
-;   sqlite3_utils
-;   tiny_httpd)
-;   (sites
-;    (share templates)
-;    (share static)))
