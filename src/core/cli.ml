@@ -7,40 +7,30 @@ let debug =
   Arg.(value & flag & info [ "debug" ] ~doc)
 
 let deterministic =
-  let doc = "Deterministic output for tests." in
+  let doc = "Removes undeterministic values from outputs. Useful for tests." in
   Arg.(value & flag & info [ "deterministic" ] ~doc)
 
 let input_path =
   let docv = "PATH" in
-  let doc = "Name of the input path." in
+  let doc = "Path to the input file. Can be a directory." in
   Arg.(required & pos 0 (some fpath) None & info [] ~doc ~docv)
 
 let workspace_dir =
-  let doc = "Directory to store intermediate results" in
+  let doc = "Directory to store intermediate results." in
   Arg.(value & opt fpath (Path.v "_results") & info [ "workspace" ] ~doc)
 
-let time_limit =
-  let doc = "Maximum time limit for analysis" in
-  Arg.(value & opt (some float) None & info [ "timeout" ] ~doc)
-
 let lazy_values =
-  let doc = "Lazy values" in
+  let doc =
+    "Turn lazy values in symbolic execution on/off (resp. true/false)."
+  in
   Arg.(value & opt bool true & info [ "lazy-values" ] ~doc)
 
 let proto_pollution =
-  let doc = "Turn prototype pollution heuristics on" in
+  let doc = "Use prototype pollution heuristics." in
   Arg.(value & flag & info [ "proto-pollution" ] ~doc)
 
-let enumerate_all =
-  let doc = "Enumerate all possible exploits" in
-  Arg.(value & flag & info [ "enumerate-all" ] ~doc)
-
-let optimized_import =
-  let doc = "Use optimized import heuristics in graphjs" in
-  Arg.(value & flag & info [ "optimized-import" ] ~doc)
-
 let solver_type =
-  let doc = "SMT solver to use" in
+  let doc = "SMT solver to use." in
   Arg.(
     value
     & opt Smtml.Solver_type.conv Smtml.Solver_type.Cvc5_solver
@@ -54,162 +44,15 @@ let sdocs = Manpage.s_common_options
 
 let version = Cmd_version.version
 
-(* let info_run = *)
-(*   let doc = "Explode.js symbolic vulnerability confirmation engine" in *)
-(*   let description = "Tries to blow stuff up" in *)
-(*   let man = [ `S Manpage.s_description; `P description ] in *)
-(*   let man_xrefs = [] in *)
-(*   let exits = *)
-(*     [ Cmd.Exit.info ~doc:"on application failure" 1 *)
-(*     ; Cmd.Exit.info ~doc:"on unsupported/unknown vulnerability type" 2 *)
-(*     ; Cmd.Exit.info ~doc:"on unsupported/malformed taint summary" 3 *)
-(*     ; Cmd.Exit.info ~doc:"on internal timeout (when set)" 4 *)
-(*     ] *)
-(*   in *)
-(*   Cmd.info "run" ~doc ~sdocs ~exits ~man ~man_xrefs *)
-
-(* let cmd_run = *)
-(*   let+ workspace_dir *)
-(*   and+ package_dir *)
-(*   and+ deterministic *)
-(*   and+ lazy_values *)
-(*   and+ proto_pollution *)
-(*   and+ enumerate_all *)
-(*   and+ scheme_file = input_file *)
-(*   and+ original_file = input_file_opt *)
-(*   and+ time_limit *)
-(*   and+ solver_type in *)
-(*   let settings = *)
-(*     Cmd_run.Settings.make ~workspace_dir ?package_dir ~deterministic *)
-(*       ~lazy_values ~proto_pollution ~enumerate_all ~scheme_file ?original_file *)
-(*       ?time_limit ~solver_type () *)
-(*   in *)
-(*   Cmd_run.run settings *)
-
-(* let info_exploit = *)
-(*   let doc = "Explode.js single file symbolic confirmation" in *)
-(*   let description = "Tries to blow stuff up" in *)
-(*   let man = [ `S Manpage.s_description; `P description ] in *)
-(*   let man_xrefs = [] in *)
-(*   Cmd.info "exploit" ~doc ~sdocs ~man ~man_xrefs *)
-
-(* let cmd_exploit = *)
-(*   let+ input_file *)
-(*   and+ deterministic *)
-(*   and+ lazy_values *)
-(*   and+ workspace_dir *)
-(*   and+ time_limit *)
-(*   and+ solver_type in *)
-(*   let settings = *)
-(*     Cmd_exploit.Settings.make ~deterministic ~lazy_values ~input_file *)
-(*       ~workspace_dir ?time_limit ~solver_type () *)
-(*   in *)
-(*   Cmd_exploit.run settings *)
-
-(* let info_full = *)
-(*   let doc = "Explode.js full analysis" in *)
-(*   let description = "Tries to blow stuff up" in *)
-(*   let man = [ `S Manpage.s_description; `P description ] in *)
-(*   let man_xrefs = [] in *)
-(*   Cmd.info "full" ~doc ~sdocs ~man ~man_xrefs *)
-
-(* let cmd_full = *)
-(*   let+ input_file *)
-(*   and+ package_dir *)
-(*   and+ deterministic *)
-(*   and+ proto_pollution *)
-(*   and+ enumerate_all *)
-(*   and+ lazy_values *)
-(*   and+ workspace_dir *)
-(*   and+ time_limit *)
-(*   and+ optimized_import *)
-(*   and+ solver_type in *)
-(*   let settings = *)
-(*     Cmd_full.Settings.make ~input_file ?package_dir ~deterministic *)
-(*       ~proto_pollution ~enumerate_all ~lazy_values ~workspace_dir ?time_limit *)
-(*       ~optimized_import ~solver_type () *)
-(*   in *)
-(*   Cmd_full.run settings *)
-
-(* let info_instrument = *)
-(*   let doc = "Explode.js test instrumentator" in *)
-(*   let description = "" in *)
-(*   let man = [ `S Manpage.s_description; `P description ] in *)
-(*   let man_xrefs = [] in *)
-(*   Cmd.info "instrument" ~doc ~sdocs ~man ~man_xrefs *)
-
-(* let cmd_instrument = *)
-(*   let mode = *)
-(*     let open Cmd_instrument in *)
-(*     let doc = "Instrumentation mode." in *)
-(*     Arg.(value & opt Settings.instrument_conv Symbolic & info [ "mode" ] ~doc) *)
-(*   in *)
-(*   let output_path = *)
-(*     let doc = "Output path." in *)
-(*     Arg.(value & opt string "symbolic_test" & info [ "output"; "o" ] ~doc) *)
-(*   in *)
-(*   let witness_file = *)
-(*     let doc = "Concrete witness file." in *)
-(*     Arg.(value & opt (some fpath) None & info [ "witness" ] ~doc) *)
-(*   in *)
-(*   let+ debug *)
-(*   and+ mode *)
-(*   and+ scheme_file = input_file *)
-(*   and+ original_file = input_file_opt *)
-(*   and+ witness_file *)
-(*   and+ output_path in *)
-(*   let settings = *)
-(*     Cmd_instrument.Settings.make ~debug ~mode ~scheme_file ?original_file *)
-(*       ?witness_file ~output_path () *)
-(*   in *)
-(*   Cmd_instrument.run settings *)
-
-(* let info_package = *)
-(*   let doc = "Explode.js full package analysis" in *)
-(*   let description = "Tries to blow stuff up" in *)
-(*   let man = [ `S Manpage.s_description; `P description ] in *)
-(*   let man_xrefs = [] in *)
-(*   Cmd.info "package" ~doc ~sdocs ~man ~man_xrefs *)
-
-(* let cmd_package = *)
-(*   let+ proto_pollution *)
-(*   and+ workspace_dir *)
-(*   and+ input_dir *)
-(*   and+ solver_type *)
-(*   and+ enumerate_all in *)
-(*   let settings = *)
-(*     Cmd_package.Settings.make ~proto_pollution ~workspace_dir ~input_dir *)
-(*       ~solver_type ~enumerate_all *)
-(*   in *)
-(*   Cmd_package.run settings *)
-
-(* let v : *)
-(*   ( int *)
-(*   , [ `Expected_assoc *)
-(*     | `Expected_list *)
-(*     | `Expected_string *)
-(*     | `Malformed_json of string *)
-(*     | `Msg of string *)
-(*     | `Status of int *)
-(*     | `Unknown_param of string *)
-(*     | `Unknown_param_type of string *)
-(*     | `Unknown_vuln_type of string *)
-(*     ] ) *)
-(*   result *)
-(*   Cmd.t = *)
-(*   let info = Cmd.info "explode-js" in *)
-(*   Cmd.group info *)
-(*     [ Cmd.v info_exploit cmd_exploit *)
-(*     ; Cmd.v info_run cmd_run *)
-(*     ; Cmd.v info_full cmd_full *)
-(*     ; Cmd.v info_instrument cmd_instrument *)
-(*     ; Cmd.v info_package cmd_package *)
-(*     ] *)
 let cmd_version =
   let info =
-    let doc = "Explode.js version" in
-    let descrption = "" in
-    let man = [ `S Manpage.s_description; `P descrption ] in
+    let doc = "Show program and library versions" in
+    let description =
+      "This command allows users to verify which version of explode-js they \
+       are running. Additionally, the command outputs the versions of \
+       statically linked libraries. This is useful for debugging."
+    in
+    let man = [ `S Manpage.s_description; `P description ] in
     let man_xrefs = [] in
     Cmd.info "version" ~version ~doc ~sdocs ~man ~man_xrefs
   in
@@ -222,8 +65,14 @@ let cmd_version =
 
 let cmd_run =
   let info =
-    let doc = "Explode.js symbolic vulnerability confirmation engine" in
-    let description = "Tries to blow stuff up" in
+    let doc = "Start the exploit generation engine" in
+    let description =
+      "This command executes the main exploit generation engine. It initiates \
+       the two-stage pipeline, combining static analysis with symbolic \
+       execution, to analyze a target. The main input should be either a \
+       directory (e.g., \".\" for the local directory) or a JSON file \
+       containing a vulnerable interaction scheme (VIS)."
+    in
     let man = [ `S Manpage.s_description; `P description ] in
     let man_xrefs = [] in
     Cmd.info "run" ~version ~doc ~sdocs ~man ~man_xrefs
@@ -244,5 +93,36 @@ let cmd_run =
   Cmd.v info command
 
 let commands =
-  let info = Cmd.info ~version "explode-js" in
+  let info =
+    let doc = "An automatic exploit generator for Node.js packages" in
+    let description =
+      [ `P
+          "$(b,explode-js) is an exploit generation tool for Node.js packages \
+           that can automatically synthesize functional exploits for \
+           $(i,multi-interaction vulnerablitilties). That is, vulnerabilities \
+           that require a series of interactions with the vulnerable package \
+           to be exploited. Given a vulnerable package, explode-js can \
+           identify code injection, command injection, prototype pollution, \
+           and path traversal vulnerabilities, and build a JS program that is \
+           guaranteed to produce observable side effects, thereby confirming \
+           the existence of the vulnerability and eliminating false positives."
+      ; `P
+          "$(b,explode-js) uses a two-stage algorithm to generate exploits. \
+           First, static analysis builds an $(i,exploit template), a symbolic \
+           call chain defined by a $(i,vulnerable interaction scheme) (VIS), \
+           designed to reach a sensitive sink. Second, symbolic execution runs \
+           this template to find a valid path. The resulting path constraints \
+           are extended to ensure an attacker-controlled effect at the sink. \
+           An SMT solver finds concrete inputs that satisfy these constraints, \
+           which are then injected into the template to produce a functional \
+           exploit."
+      ; `P
+          "Use: $(b,explode-js) $(i,COMMAND) --help, for more information on a \
+           specific command."
+      ]
+    in
+    let man = `S Manpage.s_description :: description in
+    let man_xrefs = [] in
+    Cmd.info ~version ~doc ~man ~man_xrefs "explode-js"
+  in
   Cmd.group info [ cmd_version; cmd_run ]
