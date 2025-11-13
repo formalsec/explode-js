@@ -44,10 +44,8 @@
   dune-glob
   (ecma-sl
    (= "pin"))
-  (extunix
-   (= "0.4.3"))
-  (ppxlib
-   (= "0.35.0"))
+  extunix
+  ppxlib
   ppx_deriving
   fpath
   (mdx :with-test)
