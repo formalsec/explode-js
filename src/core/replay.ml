@@ -88,28 +88,30 @@ let log_and_cleanup_effect eff =
       | Replay_effect.File file -> ignore @@ OS.Path.delete file
       | _ -> ()
     in
-    Logs.app (fun k -> k "\u{2714} Status: Success %a" Replay_effect.pp eff);
+    Logs.app (fun k -> k "[+] \u{2714} Status: Success %a" Replay_effect.pp eff);
     Some eff
   end
   | None ->
-    Logs.app (fun k -> k "\u{2716} Status: No side effect");
+    Logs.app (fun k -> k "[-] \u{2716} Status: No side effect");
     None
 
 let test_model_exploit ~dir scheme model =
   let open Result.Syntax in
   Logs.app (fun k ->
-    k "\u{1F4C4} Trying model :@\n %a" (Smtml.Model.pp ~no_values:false) model );
+    k "[+] \u{1F4C4} Trying model :@\n %a"
+      (Smtml.Model.pp ~no_values:false)
+      model );
   let* () = setup_npm_dependencies () in
   let* poc_file = generate_poc ~dir scheme model in
   let+ status_result, eff = execute_and_check_poc ~env poc_file in
   match status_result with
   | Ok (_, status) -> begin
-    Logs.app (fun k -> k "\u{1F4C4} Node %a" OS.Cmd.pp_status status);
+    Logs.app (fun k -> k "[+] \u{1F4C4} Node %a" OS.Cmd.pp_status status);
     let final_effect = log_and_cleanup_effect eff in
     Option.map (fun eff -> (poc_file, eff)) final_effect
   end
   | Error (`Msg err) -> begin
-    Logs.app (fun k -> k "\u{1F4C4} Node: %s" err);
+    Logs.app (fun k -> k "[-] \u{1F4C4} Node: %s" err);
     None
   end
 

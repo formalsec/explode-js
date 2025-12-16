@@ -72,16 +72,17 @@ module Reporting = struct
   let process_and_log_result (settings : Settings.t) report result =
     if not settings.deterministic then
       Logs.app (fun k ->
-        k "Symbolic execution stats: clock: %fs | solver: %fs"
+        k "[+] Symbolic execution stats: clock: %fs | solver: %fs"
           report.Symbolic_result.execution_time report.solver_time );
     match result with
     | Ok () ->
       assert (report.num_failures = 0);
-      Logs.app (fun k -> k "\u{2714} No issues detected.");
+      Logs.app (fun k -> k "[-] \u{2714} No issues detected.");
       Ok report
     | Error (`Failure msg) -> Error (`Msg msg)
     | Error _ (* Error from symbolic execution, we can ignore *) ->
-      Logs.app (fun k -> k "\u{26A0} Detected %d issue(s)!" report.num_failures);
+      Logs.app (fun k ->
+        k "[+] \u{26A0} Detected %d issue(s)!" report.num_failures );
       Ok report
 end
 
@@ -89,7 +90,7 @@ let setup_environment (settings : Settings.t) =
   let open Result.Syntax in
   Ecma_sl.Log.Config.log_warns := true;
   (* Ecma_sl.Log.Config.log_debugs := true; *)
-  Logs.app (fun k -> k "Symbolic execution output:");
+  Logs.app (fun k -> k "[+] Symbolic execution output:");
   let testsuite = Path.(settings.workspace_dir / "test-suite") in
   let+ _ = OS.Dir.create ~mode:0o777 ~path:true testsuite in
   ()

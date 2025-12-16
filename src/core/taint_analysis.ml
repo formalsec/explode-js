@@ -46,7 +46,7 @@ let test_vulnerability (settings : Settings.Cmd_run.t) i
   let rec loop (best_so_far, all_results) i = function
     | [] -> Ok (best_so_far, all_results)
     | scheme :: rest -> begin
-      Logs.app (fun k -> k "  \u{251C}\u{2500} Trying scheme %d..." i);
+      Logs.app (fun k -> k "[+] Trying scheme %d..." i);
       let* result =
         execute_scheme { settings with workspace_dir } i scheme
         |> Result.map_error @@ fun (`Msg err) ->
@@ -64,6 +64,9 @@ let test_vulnerability (settings : Settings.Cmd_run.t) i
   in
   let scheme0 = List.hd schemes in
   let filename, vuln_type, sink, sink_lineno = Scheme.metadata scheme0 in
+  if Option.is_some vuln_type then
+    Logs.app (fun k ->
+      k "[+] Testing %a vulnerability ..." (Fmt.option Vuln_type.pp) vuln_type );
   let+ result, raw_results = loop (None, []) 0 schemes in
   Analysis_results.make ~filename ?vuln_type ?sink ?sink_lineno ?result
     ~raw_results ()
@@ -75,6 +78,12 @@ let run_from_file (settings : Settings.Cmd_run.t) =
   let* vulns =
     Scheme.Parser.from_file ~proto_pollution:false settings.input_path
   in
+
+  let num_vulns = List.length vulns in
+  ( match num_vulns with
+  | 0 -> Logs.app (fun k -> k "[-] No potential vulnerabilities detected")
+  | 1 -> Logs.app (fun k -> k "[+] Found 1 potential vulnerability")
+  | n -> Logs.app (fun k -> k "[+] Found %d potential vulnerabilties" n) );
 
   let successes, failures =
     let results = List.mapi (test_vulnerability settings) vulns in

@@ -1,7 +1,7 @@
 let run_package (settings : Settings.Cmd_run.t) =
   let open Result.Syntax in
   Logs.app (fun m ->
-    m "Starting static analysis on %a" Path.pp settings.input_path );
+    m "[+] Starting static analysis (dir %a)" Path.pp settings.input_path );
   let* result =
     (* Create workspace_dir prior to starting static analysis because we have to
        change dir *)
