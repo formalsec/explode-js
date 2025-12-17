@@ -9,7 +9,8 @@
   fmt
   smtml
   ppx_deriving
-  ppx_deriving_yojson str)
+  ppx_deriving_yojson
+  str)
  (flags
   (:standard -open Std))
  (preprocess
