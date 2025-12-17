@@ -1,17 +1,34 @@
-; (executable
-;  (package explode_js)
-;  (public_name explode-js)
-;  (name main)
-;  (libraries
-;   bos
-;   cmdliner
-;   extunix
-;   explode_js
-;   explode_js.generator
-;   explode_js.std)
-;  (flags
-;   (:standard -open Std))
-;  (preprocess
-;   (pps ppx_deriving.make ppx_deriving.show ppx_deriving_yojson))
-;  (instrumentation
-;   (backend bisect_ppx)))
+(executable
+ (public_name explode-js)
+ (name main)
+ (libraries
+  bos
+  cmdliner
+  dune-site
+  dune-glob
+  ecma-sl
+  ecma-sl.symbolic
+  extunix
+  explode_js.generator
+  explode_js.std
+  fmt
+  fpath
+  ppx_deriving
+  ppx_deriving_yojson
+  yojson)
+ (flags
+  (:standard -open Std))
+ (preprocess
+  (pps ppx_deriving.make ppx_deriving.show ppx_deriving_yojson)))
+
+(generate_sites_module
+ (module site)
+ (sites explode_js))
+
+(install
+ (package explode_js)
+ (section
+  (site
+   (explode_js nodejs)))
+ (files
+  (esl_symbolic.js as esl_symbolic.js)))

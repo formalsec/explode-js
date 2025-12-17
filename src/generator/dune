@@ -1,8 +1,16 @@
 (library
  (public_name explode_js.generator)
  (name explode_js_gen)
+ (libraries
+  yojson
+  bos
+  bos.setup
+  explode_js.std
+  fmt
+  smtml
+  ppx_deriving
+  ppx_deriving_yojson str)
  (flags
   (:standard -open Std))
- (libraries yojson bos bos.setup explode_js.std fmt smtml ppx_deriving ppx_deriving_yojson str)
  (preprocess
   (pps ppx_deriving.show ppx_deriving_yojson)))
