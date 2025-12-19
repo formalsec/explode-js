@@ -1,5 +1,7 @@
 (lang dune 3.20)
 
+(using menhir 2.1)
+
 (using mdx 0.4)
 
 (using dune_site 0.1)
@@ -54,6 +56,10 @@
    (>= 0.13.0))
   prelude
   yojson
+  (menhir
+   (and
+    :build
+    (>= "20220210")))
   (ocamlformat
     :with-dev-setup))
  (tags

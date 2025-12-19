@@ -1,0 +1,18 @@
+<rule> ::= <rulename> "::=" <rulebody>;
+
+<rulename> ::= "<" <string> ">";
+
+<rulebody> ::=
+    <atoms>
+  | <atoms> "|" <rulebody>
+  ;
+
+<atoms> ::=
+    <atom>
+  | <atom> <atoms>
+  ;
+
+<atom> ::=
+    <rulename>
+  | <string>
+  ;

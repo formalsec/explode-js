@@ -9,3 +9,7 @@ module Cmd_run = struct
     }
   [@@deriving make, show]
 end
+
+module Cmd_complete = struct
+  type t = { input_path : Path.t [@main] } [@@deriving make, show]
+end

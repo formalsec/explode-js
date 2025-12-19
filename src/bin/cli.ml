@@ -92,6 +92,25 @@ let cmd_run =
   in
   Cmd.v info command
 
+let cmd_complete =
+  let info =
+    let doc = "Experimental payload completion engine" in
+    let description =
+      "This command is still experimental and intentionally not documented. \
+       Use at your own risk!"
+    in
+    let man = [ `S Manpage.s_description; `P description ] in
+    let man_xrefs = [] in
+    Cmd.info "complete" ~version ~doc ~sdocs ~man ~man_xrefs
+  in
+  let command =
+    let open Term.Syntax in
+    let+ input_path in
+    let settings = Settings.Cmd_complete.make input_path in
+    Cmd_complete.run settings
+  in
+  Cmd.v info command
+
 let commands =
   let info =
     let doc = "An automatic exploit generator for Node.js packages" in
@@ -125,4 +144,4 @@ let commands =
     let man_xrefs = [] in
     Cmd.info ~version ~doc ~man ~man_xrefs "explode-js"
   in
-  Cmd.group info [ cmd_version; cmd_run ]
+  Cmd.group info [ cmd_version; cmd_run; cmd_complete ]

@@ -11,6 +11,7 @@
   extunix
   explode_js.generator
   explode_js.std
+  explode_js.injector
   fmt
   fpath
   ppx_deriving

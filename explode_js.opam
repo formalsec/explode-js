@@ -27,6 +27,7 @@ depends: [
   "smtml" {>= "0.13.0"}
   "prelude"
   "yojson"
+  "menhir" {build & >= "20220210"}
   "ocamlformat" {with-dev-setup}
   "odoc" {with-doc}
 ]

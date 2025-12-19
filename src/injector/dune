@@ -1,0 +1,13 @@
+(menhir
+ (modules parser)
+ (flags --dump --explain --table))
+
+(library
+ (name injector)
+ (public_name explode_js.injector)
+ (modules lexer parse parser rule)
+ (libraries bos explode_js.std fmt prelude sedlex menhirLib)
+ (flags
+  (:standard -open Std))
+ (preprocess
+  (pps sedlex.ppx ppx_deriving.show)))

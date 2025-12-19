@@ -1,0 +1,15 @@
+<start> ::= <prog>;
+
+<prog> ::= <stmt> | <stmt> ";" <prog>;
+
+<stmt> ::= <var_assign> | <func_call> | <expr>;
+
+<var_assign> ::= "var " <id> " = " <expr>;
+
+<func_call> ::= <id> "(" <params_call> ")";
+
+<expr> ::= <digit> | <id>;
+
+<params_call> ::= <expr> | <expr> "," <params_call>;
+
+<digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
