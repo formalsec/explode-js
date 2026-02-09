@@ -1,7 +1,6 @@
 open Bos
 open Ecma_sl_symbolic
-module Symbolic_memory = Symbolic_memory.Make (Symbolic_object_default)
-include Symbolic_engine.Make (Symbolic_memory) (Sym_failure) ()
+include Symbolic_engine.Make (Sym_failure) ()
 
 module Settings = struct
   type t =
@@ -56,13 +55,15 @@ module Execution = struct
     let engine_settings =
       Symbolic_engine.Settings.make ~lazy_values:settings.lazy_values
         ~timeout:settings.timeout ~print_return_value:false
-        ~solver_type:settings.solver_type ~filename:settings.input_file prog
+        ~solver_type:settings.solver_type
+        ~memory_type:Symbolic_memory_type.Default ~filename:settings.input_file
+        prog
     in
     let testsuite_dir = Path.(settings.workspace_dir / "test-suite") in
     try
       run engine_settings ~callback_err:(fun thread ty ->
-        let solver = Choice.solver thread in
-        let pc = Choice.pc thread in
+        let solver = Thread.solver thread in
+        let pc = Thread.pc thread in
         Sym_path_resolver.solve ~path_only:settings.path_only solver pc ty
           testsuite_dir )
     with exn -> make_error_report settings (Printexc.to_string exn)
