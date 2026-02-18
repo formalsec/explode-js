@@ -5,8 +5,9 @@
 (library
  (name injector)
  (public_name explode_js.injector)
- (modules lexer parse parser rule)
- (libraries bos explode_js.std fmt prelude sedlex menhirLib)
+ (modules lexer parse parser rule call_graph transform)
+          ; smt_encoder)
+ (libraries bos explode_js.std fmt prelude sedlex menhirLib smtml)
  (flags
   (:standard -open Std))
  (preprocess

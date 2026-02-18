@@ -45,8 +45,8 @@ let rec token buf =
   match%sedlex buf with
   | Plus any_blank -> token buf
   | intlit -> assert false
-  | "<" -> LBRACKET
-  | ">" -> RBRACKET
+  | "<" -> LANGLE
+  | ">" -> RANGLE
   | "|" -> UNION
   | ";" -> SEMI
   | "::=" -> DEQ

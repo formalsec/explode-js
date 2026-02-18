@@ -1,2 +1,5 @@
-<digits> ::= <digit> | <digit> <digits>;
+<digits> ::=
+  | <digit>
+  | <digit> <digits>;
+
 <digit> ::= "0" | "1";

@@ -1,6 +1,9 @@
 let run (settings : Settings.Cmd_complete.t) =
   let open Result.Syntax in
-  let input_path = settings.input_path in
-  Logs.app (fun k -> k "Parsing: %a" Path.pp input_path);
-  let+ rules = Injector.Parse.from_file input_path in
-  Fmt.pr "@[<v 1>Parsed grammar:@;%a@]@." (Fmt.list Injector.Rule.pp) rules
+  let+ rules = Injector.Parse.from_file settings.input_path in
+  Fmt.pr "Original grammar:@.";
+  List.iter (fun rule -> Fmt.pr "%a@." Injector.Rule.pp rule) rules;
+
+  let unfolded_rules = Injector.Transform.unfold rules 2 in
+  Fmt.pr "Unfolded grammar (k = 2):@.";
+  List.iter (fun rule -> Fmt.pr "%a@." Injector.Rule.pp rule) unfolded_rules;

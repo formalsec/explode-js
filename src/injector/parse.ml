@@ -23,3 +23,7 @@ let from_file path =
       Sedlexing.set_filename buf (Path.to_string path);
       parse_with_error buf )
     ()
+
+let from_string str =
+  let buf = Sedlexing.Utf8.from_string str in
+  parse_with_error buf

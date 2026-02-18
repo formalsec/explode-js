@@ -3,8 +3,8 @@
 %}
 
 %token SEMI
-%token LBRACKET
-%token RBRACKET
+%token LANGLE
+%token RANGLE
 %token UNION
 %token DEQ
 %token EOF
@@ -18,10 +18,10 @@ let grammar :=
   | rules = terminated(rule, SEMI)+; EOF; { rules }
 
 let rule :=
-  | name = rulename; DEQ; body = rulebody; { { Rule.name; body } }
+  | name = rulename; DEQ; UNION?; body = rulebody; { { Rule.name; body } }
 
 let rulename :=
-  | LBRACKET; s = STR; RBRACKET; { s }
+  | LANGLE; s = STR; RANGLE; { s }
 
 let rulebody :=
   | rulecases = separated_nonempty_list(UNION, rulecase); { rulecases }
