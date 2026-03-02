@@ -54,7 +54,7 @@
   (mdx :with-test)
   ocaml
   (smtml
-   (>= 0.21.0))
+   (>= 0.22.0))
   prelude
   yojson
   (menhir
