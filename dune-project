@@ -39,7 +39,6 @@
   cvc5)
  (depends
   bos
-  (bisect_ppx (and :with-test (>= 2.5.0)))
   cmdliner
   dune
   dune-site
