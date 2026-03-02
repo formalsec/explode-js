@@ -15,17 +15,10 @@ jobs:
     container:
       image: ghcr.io/formalsec/ocaml-5.4-z3
     steps:
-      # - name: Setup SSH
-        # run: |
-        #   mkdir -p ~/.ssh
-        #   echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_rsa
-        #   chmod 600 ~/.ssh/id_rsa
-        #   ssh-keyscan github.com >> ~/.ssh/known_hosts
-
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ssh-key: ${{ secrets.DEPLOY_KEY }}
+          ssh-key: ${{ secrets.DEPLOY_KEY }} # This key is used for the main repo and submodules
           submodules: recursive # This will handle all submodules automatically
 
       - name: Checkout Submodules
