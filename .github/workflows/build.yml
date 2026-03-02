@@ -1,9 +1,9 @@
 name: Build
 
 on:
-  # push:
-  #   branches:
-  #     - main
+  push:
+    branches:
+      - main
   # pull_request:
   #   branches:
   #     - main
@@ -11,12 +11,9 @@ on:
 
 jobs:
   build:
-    env:
-      # allow opam depext to yes package manager prompts
-      OPAMCONFIRMLEVEL: unsafe-yes
-    strategy:
-      fail-fast: false
     runs-on: self-hosted
+    container:
+      image: ghcr.io/formalsec/ocaml-5.4-cvc5
     steps:
       - name: Setup SSH
         run: |
@@ -29,23 +26,10 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Checkout Submodules
-        run: |
-          git submodule update --init vendor/graphjs vendor/ECMA-SL
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 18
-
-      - name: Setup OCaml
-        uses: ocaml/setup-ocaml@v3
-        with:
-          ocaml-compiler: 5.3
+        run: git submodule update --init vendor/graphjs vendor/ECMA-SL
 
       - name: Install dependencies
-        run: |
-          opam install -y . --deps-only --with-test
-          opam install ocamlformat
+        run: opam install -y . --deps-only --with-test
 
       - name: Run lint
         run: ./scripts/lint.sh
