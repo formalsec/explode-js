@@ -21,11 +21,11 @@ jobs:
           ssh-key: ${{ secrets.DEPLOY_KEY }} # This key is used for the main repo and submodules
           submodules: true
 
+      - name: Lint
+        run: ./scripts/lint.sh
+
       - name: Install dependencies
         run: opam install -y . --deps-only --with-test
-
-      - name: Run lint
-        run: ./scripts/lint.sh
 
       - name: Build
         run: dune build @install
