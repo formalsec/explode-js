@@ -45,7 +45,7 @@
   dune-site
   dune-glob
   (ecma-sl
-   (= "pin"))
+   (= "dev"))
   extunix
   ppxlib
   ppx_deriving
@@ -53,7 +53,7 @@
   (mdx :with-test)
   ocaml
   (smtml
-   (>= 0.13.0))
+   (>= 0.21.0))
   prelude
   yojson
   (menhir

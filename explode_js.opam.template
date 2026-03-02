@@ -1,4 +1,4 @@
 pin-depends: [
-  [ "ecma-sl.pin" "./vendor/ECMA-SL" ]
-  [ "cvc5.pin" "./vendor/ocaml-cvc5" ]
+  [ "ecma-sl.dev" "./vendor/ECMA-SL" ]
+  [ "cvc5.dev" "./vendor/ocaml-cvc5" ]
 ]

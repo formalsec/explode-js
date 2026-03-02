@@ -17,14 +17,14 @@ depends: [
   "dune" {>= "3.20"}
   "dune-site"
   "dune-glob"
-  "ecma-sl" {= "pin"}
+  "ecma-sl" {= "dev"}
   "extunix"
   "ppxlib"
   "ppx_deriving"
   "fpath"
   "mdx" {with-test}
   "ocaml"
-  "smtml" {>= "0.13.0"}
+  "smtml" {>= "0.21.0"}
   "prelude"
   "yojson"
   "menhir" {build & >= "20220210"}
@@ -51,6 +51,6 @@ build: [
 dev-repo: "git+https://github.com/explode-js/explode-js.git"
 x-maintenance-intent: ["(latest)"]
 pin-depends: [
-  [ "ecma-sl.pin" "./vendor/ECMA-SL" ]
-  [ "cvc5.pin" "./vendor/ocaml-cvc5" ]
+  [ "ecma-sl.dev" "./vendor/ECMA-SL" ]
+  [ "cvc5.dev" "./vendor/ocaml-cvc5" ]
 ]
