@@ -19,10 +19,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           ssh-key: ${{ secrets.DEPLOY_KEY }} # This key is used for the main repo and submodules
-          submodules: recursive # This will handle all submodules automatically
-
-      - name: Checkout Submodules
-        run: git submodule update --init vendor/graphjs vendor/ECMA-SL
+          submodules: true
 
       - name: Install dependencies
         run: opam install -y . --deps-only --with-test
