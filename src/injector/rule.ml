@@ -18,7 +18,6 @@ type t =
   }
 
 let pp fmt { name; body } =
-  Fmt.pf fmt "@[<hov 2><%s> ::= @[<hv>%a@]@];"
-    name
-    (Fmt.list ~sep:(Fmt.any "@ | ") pp_rulecase) body
-
+  Fmt.pf fmt "@[<hov 2><%s> ::= @[<hv>%a@]@];" name
+    (Fmt.list ~sep:(Fmt.any "@ | ") pp_rulecase)
+    body

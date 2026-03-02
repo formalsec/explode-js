@@ -37,7 +37,7 @@ let newline = [%sedlex.regexp? '\r' | '\n' | "\r\n"]
 
 let any_blank = [%sedlex.regexp? blank | newline]
 
-let string_elem = [%sedlex.regexp? Sub(any, "\"") | "\\\"" ]
+let string_elem = [%sedlex.regexp? Sub (any, "\"") | "\\\""]
 
 let str = [%sedlex.regexp? "\"", Star string_elem, "\""]
 

@@ -4,6 +4,7 @@ let run (settings : Settings.Cmd_complete.t) =
   Fmt.pr "Original grammar:@.";
   List.iter (fun rule -> Fmt.pr "%a@." Injector.Rule.pp rule) rules;
 
-  let unfolded_rules = Injector.Transform.unfold rules 2 in
-  Fmt.pr "Unfolded grammar (k = 2):@.";
-  List.iter (fun rule -> Fmt.pr "%a@." Injector.Rule.pp rule) unfolded_rules;
+  let k = 3 in
+  let unfolded_rules = Injector.Transform.unfold rules k in
+  Fmt.pr "Unfolded grammar (k = %d):@." k;
+  List.iter (fun rule -> Fmt.pr "%a@." Injector.Rule.pp rule) unfolded_rules
