@@ -48,6 +48,7 @@
   extunix
   ppxlib
   ppx_deriving
+  ppx_deriving_yojson
   fpath
   (mdx :with-test)
   ocaml
