@@ -35,7 +35,7 @@ jobs:
         run: ./scripts/lint.sh
 
       - name: Build
-        run: opam exec -- dune build @install
+        run: dune build @install
 
       - name: Test
-        run: opam exec -- dune runtest -j 1
+        run: dune runtest -j 1
