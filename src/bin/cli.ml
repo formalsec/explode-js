@@ -33,7 +33,7 @@ let solver_type =
   let doc = "SMT solver to use." in
   Arg.(
     value
-    & opt Smtml.Solver_type.conv Smtml.Solver_type.Cvc5_solver
+    & opt Smtml.Solver_type.conv Smtml.Solver_type.Z3_solver
     & info [ "solver" ] ~doc )
 
 let path_only =
