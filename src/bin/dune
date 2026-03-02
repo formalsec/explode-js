@@ -6,6 +6,7 @@
   cmdliner
   dune-site
   dune-glob
+  dune-build-info
   ecma-sl
   ecma-sl.symbolic
   extunix

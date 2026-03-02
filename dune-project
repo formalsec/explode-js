@@ -43,6 +43,7 @@
   dune
   dune-site
   dune-glob
+  dune-build-info
   (ecma-sl
    (= "dev"))
   extunix
