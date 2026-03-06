@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted-native
+    runs-on: self-hosted-nix
     container:
       image: ghcr.io/formalsec/ocaml-5.4-z3
     steps:
