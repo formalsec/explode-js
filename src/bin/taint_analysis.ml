@@ -15,7 +15,8 @@ let execute_scheme (settings : Settings.Cmd_run.t) i (scheme : Scheme.t) =
   let sym_settings =
     Sym_exec.Settings.make ~lazy_values:settings.lazy_values
       ~workspace_dir:sym_workspace ~solver_type:settings.solver_type
-      ~path_only:settings.path_only test_file
+      ~path_only:settings.path_only ~deterministic:settings.deterministic
+      test_file
   in
   let time, outcome =
     let sym_result = Sym_exec.run_file sym_settings in

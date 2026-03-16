@@ -85,10 +85,11 @@ let cmd_run =
     and+ lazy_values
     and+ solver_type
     and+ input_path
-    and+ path_only in
+    and+ path_only
+    and+ deterministic in
     let settings =
       Settings.Cmd_run.make ~workspace_dir ~lazy_values ~solver_type ~path_only
-        input_path
+        ~deterministic input_path
     in
     Cmd_run.run settings
   in
