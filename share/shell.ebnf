@@ -1,0 +1,37 @@
+<start> ::= <program>;
+
+<program> ::= <line> | <line> "\n" <program>;
+
+<line> ::= <command_list> | <comment> | <command_list> " " <comment> | "";
+
+<comment> ::= "#" <any_chars>;
+
+<command_list> ::= <command> | <command> ";" <command_list> | <command> "|" <command_list>;
+
+<command> ::= <simple_cmd> | <var_assign> | <subshell>;
+
+<simple_cmd> ::= <word> | <word> " " <args>;
+
+<args> ::= <arg> | <arg> " " <args>;
+
+<arg> ::= <word> | <var_ref> | <redirection>;
+
+<var_assign> ::= <id> "=" <word>;
+
+<var_ref> ::= "$" <id> | "${" <id> "}";
+
+<subshell> ::= "$(" <command_list> ")";
+
+<redirection> ::= ">" <word> | ">>" <word> | "<" <word>;
+
+<word> ::= <id>;
+
+<id> ::= <letter> | <letter> <id_tail>;
+<id_tail> ::= <alnum> | <alnum> <id_tail>;
+
+<letter> ::= "a" | "b" | "c" | "z" | "A" | "Z" | "_";
+<alnum> ::= <letter> | <digit>;
+<digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
+<chars> ::= "" | <char> <chars>;
+<any_chars> ::= "" | <any_char> <any_chars>;
+<any_char> ::= <alnum> | " " | "!" ;

@@ -1,0 +1,51 @@
+<start> ::= <statement_list>;
+
+<statement_list> ::= <statement_or_comment> | <statement_or_comment> "\n" <statement_list>;
+
+<statement_or_comment> ::= <statement> | <comment> | "";
+
+<comment> ::= <single_comment> | <multi_comment>;
+<single_comment> ::= "--" <any_chars>;
+<multi_comment> ::= "/*" <multi_chars> "*/";
+
+<statement> ::= <select_stmt> | <insert_stmt> | <update_stmt> | <delete_stmt>;
+
+<select_stmt> ::= "SELECT " <columns> " FROM " <table_name>
+               | "SELECT " <columns> " FROM " <table_name> " WHERE " <condition>;
+
+<insert_stmt> ::= "INSERT INTO " <table_name> " VALUES (" <values> ")";
+
+<update_stmt> ::= "UPDATE " <table_name> " SET " <assignments> " WHERE " <condition>;
+
+<delete_stmt> ::= "DELETE FROM " <table_name> " WHERE " <condition>;
+
+<columns> ::= "*" | <column_list>;
+<column_list> ::= <id> | <id> ", " <column_list>;
+
+<values> ::= <value> | <value> ", " <values>;
+<value> ::= <number> | <string_lit> | "NULL";
+
+<assignments> ::= <assignment> | <assignment> ", " <assignments>;
+<assignment> ::= <id> " = " <value>;
+
+<condition> ::= <id> " " <comparator> " " <value>
+              | <condition> " AND " <condition>
+              | <condition> " OR " <condition>;
+
+<comparator> ::= "=" | "!=" | "<" | ">" | "<=" | ">=" | "LIKE";
+
+<table_name> ::= <id>;
+<string_lit> ::= "'" <chars> "'";
+<number> ::= <digit> | <digit> <number>;
+
+<id> ::= <letter> | <letter> <id_tail>;
+<id_tail> ::= <alnum> | <alnum> <id_tail>;
+<letter> ::= "a" | ... | "z" | "A" | ... | "Z" | "_";
+<alnum> ::= <letter> | <digit>;
+<digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
+<chars> ::= "" | <char> <chars>;
+<any_chars> ::= "" | <any_char> <any_chars>;       /* any char except newline */
+<multi_chars> ::= "" | <multi_char> <multi_chars>; /* any char except "*/"  */
+
+<any_char> ::= /* any char except newline */
+<multi_char> ::= /* any char except "*/" not sure how to represent this */
