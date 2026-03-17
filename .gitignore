@@ -13,3 +13,4 @@ explode-out/
 # Testing
 node_modules/
 package-lock.json
+_results/
