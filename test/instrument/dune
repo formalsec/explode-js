@@ -1,5 +1,0 @@
-(cram
- (deps
-  %{bin:explode-js}
-  (source_tree toy)
-  (source_tree unit)))

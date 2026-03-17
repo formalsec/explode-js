@@ -1,0 +1,13 @@
+(test
+ (name test_unfold)
+ (modules test_unfold)
+ (libraries explode_js.injector fmt)
+ (flags
+  (:standard -open Std)))
+
+(test
+ (name test_break)
+ (modules test_break)
+ (libraries explode_js.injector fmt)
+ (flags
+  (:standard -open Std)))

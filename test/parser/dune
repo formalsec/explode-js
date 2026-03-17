@@ -1,3 +1,0 @@
-; (test
-;  (name test_parser)
-;  (libraries explode_js.parser))

@@ -1,0 +1,9 @@
+(alias
+ (name test-unit)
+ (deps (alias runtest)))
+
+(cram
+ (deps
+  %{bin:explode-js}
+  (source_tree ../../packages)
+  (package ecma-sl)))

@@ -1,0 +1,8 @@
+(alias
+ (name test-unit)
+ (deps (alias runtest)))
+
+(cram
+ (deps
+  %{bin:explode-js}
+  ../mutual.bnf))

@@ -1,7 +1,0 @@
-(mdx
- (enabled_if %{bin-available:neo4j})
- (deps
-  %{bin:explode-js}
-  (file index.js)
-  (file package.json))
- (files README.md))
