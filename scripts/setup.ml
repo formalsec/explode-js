@@ -41,16 +41,20 @@ let setup_cvc5 () =
   execute (opam_install "cvc5")
     "Could not checkout cvc5's vendored dependencies"
 
+let _ = setup_cvc5
+
+let setup_z3 () =
+  let execute = execute "setup_z3" in
+  execute (opam_install "z3") "Could not checkout z3's vendored dependencies"
+
 let setup_explodejs () =
   let execute = execute "setup_explodejs" in
   Format.printf "Installing Explode-js ...@.";
   execute
     (opam_install ". --deps-only --with-test --with-doc")
     "Could not install Explode-js's dependencies";
-  setup_cvc5 ();
-  execute
-    (opam_exec "dune build @install --profile release")
-    "Could not build Explode-js!";
+  setup_z3 ();
+  execute (opam_exec "dune build @install") "Could not build Explode-js!";
   execute (opam_exec "dune install") "Could not install Explode-js!"
 
 let () =

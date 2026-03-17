@@ -16,9 +16,14 @@ $ opam init
 $ opam switch create 5.3.0 5.3.0
 ```
 
-- Setup a managed Python environment using either [direnv](https://direnv.net/) or [virtualenv](https://docs.python.org/3/library/venv.html).
+- Install [direnv](https://direnv.net/). And, do:
 
-- Install [neo4j](https://neo4j.com/docs/operations-manual/current/installation/). For ubuntu you can follow the instructions below:
+```sh
+$ cp example.envrc .envrc
+$ direnv allow
+```
+
+- Install [neo4j](https://neo4j.com/docs/operations-manual/current/installation/). In ubuntu do:
 
 ```sh
 # Download Neo4j GPG key and add it to apt
@@ -29,23 +34,6 @@ $ echo 'deb https://debian.neo4j.com stable 5' | tee -a /etc/apt/sources.list.d/
 
 # Update package list and install neo4j 5.26.4
 $ apt-get update && apt-get install -y neo4j=1:5.26.4 && \
-
-# Disable authentication for Neo4j (not recommended for production)
-echo dbms.security.auth_enabled=false >> /etc/neo4j/neo4j.conf
-
-# Set correct ownership for Neo4j data and log directories
-$ chown -R neo4j:neo4j /var/lib/neo4j && \
-  chown -R neo4j:neo4j /var/log/neo4j
-
-# Set group read/write permissions on data and log directories
-$ chmod -R g+rw /var/lib/neo4j && \
-  chmod -R g+rw /var/log/neo4j
-
-# Add your user to the neo4j group (don't run Neo4j as root)
-$ usermod -aG neo4j <YOUR USER>
-
-# Reboot or run to login into the neo4j group
-$ newgrp neo4j
 ```
 
 Then, you can proceed with the installation of Explode-js:
@@ -56,17 +44,16 @@ Then, you can proceed with the installation of Explode-js:
 ```sh
 $ git clone https://github.com/formalsec/explode-js.git
 # Use the latest stable release
-$ git checkout v1.3.2
 $ cd explode-js
 $ git submodule update --init
-$ ./setup.ml
+$ ./scripts/setup.ml
 ```
 
 - To run tests:
 
 <!-- $MDX skip -->
 ```sh
-$ dune runtest
+$ dune build @test-unit
 ```
 
 ### Build using docker
@@ -82,7 +69,7 @@ $ git submodule update --init
 # Build the image
 $ docker build . -t explode-js:latest
 # Run the image
-$ docker run --rm -it explode-js:latest bash
+$ docker run --rm -it explode-js
 ```
 
 ## Examples

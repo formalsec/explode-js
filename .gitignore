@@ -1,5 +1,6 @@
 # Dependencies
 .neo4j/
+.envrc
 
 # OCaml
 _build/
