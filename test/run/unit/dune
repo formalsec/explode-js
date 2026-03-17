@@ -1,6 +1,7 @@
 (alias
  (name test-unit)
- (deps (alias runtest)))
+ (deps
+  (alias runtest)))
 
 (cram
  (deps
