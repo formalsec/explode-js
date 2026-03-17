@@ -53,5 +53,4 @@ dev-repo: "git+https://github.com/explode-js/explode-js.git"
 x-maintenance-intent: ["(latest)"]
 pin-depends: [
   [ "ecma-sl.dev" "./vendor/ECMA-SL" ]
-  [ "cvc5.dev" "./vendor/ocaml-cvc5" ]
 ]
