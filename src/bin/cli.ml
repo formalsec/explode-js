@@ -15,6 +15,11 @@ let input_path =
   let doc = "Path to the input file. Can be a directory." in
   Arg.(required & pos 0 (some fpath) None & info [] ~doc ~docv)
 
+let input_path_or default =
+  let docv = "PATH" in
+  let doc = "Path to the input file. Can be a directory." in
+  Arg.(value & pos 0 fpath default & info [] ~doc ~docv)
+
 let workspace_dir =
   let doc = "Directory to store intermediate results." in
   Arg.(value & opt fpath (Path.v "_results") & info [ "workspace" ] ~doc)
@@ -84,7 +89,7 @@ let cmd_run =
     let+ workspace_dir
     and+ lazy_values
     and+ solver_type
-    and+ input_path
+    and+ input_path = input_path_or (Fpath.v ".")
     and+ path_only
     and+ deterministic in
     let settings =
