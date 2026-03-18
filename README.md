@@ -42,7 +42,7 @@ Then, you can proceed with the installation of Explode-js:
 
 <!-- $MDX skip -->
 ```sh
-$ git clone https://github.com/formalsec/explode-js.git
+$ git clone https://github.com/formalsec/explode-js-dev.git
 # Use the latest stable release
 $ cd explode-js
 $ git submodule update --init
