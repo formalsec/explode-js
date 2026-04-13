@@ -21,9 +21,9 @@ Basic completion:
   Grammar constraint (contains):
   SMT Expr: (str.in_re x
              (regexp.union
-              ((regexp.++
-                ((regexp.union ((regexp.++ ((str.to_re "c"), (str.to_re "b"))),
-                  (str.to_re "d"))), (str.to_re "a"))), (str.to_re "c"))))
+              (regexp.++
+               (regexp.union (regexp.++ (str.to_re "c") (str.to_re "b"))
+                (str.to_re "d")) (str.to_re "a")) (str.to_re "c")))
   Satisfying model:
   (model
     (x str "cba"))

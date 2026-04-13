@@ -21,7 +21,7 @@ Basic verification:
   Grammar candidate:
   SMT Expr: (str.in_re "cba"
              (regexp.union
-              ((regexp.++
-                ((regexp.union ((regexp.++ ((str.to_re "c"), (str.to_re "b"))),
-                  (str.to_re "d"))), (str.to_re "a"))), (str.to_re "c"))))
+              (regexp.++
+               (regexp.union (regexp.++ (str.to_re "c") (str.to_re "b"))
+                (str.to_re "d")) (str.to_re "a")) (str.to_re "c")))
   Candiate 'cba' is a valid sentence of A_2

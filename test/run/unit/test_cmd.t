@@ -19,7 +19,7 @@ Real world command injection
   [+] Testing command-injection vulnerability ...
   [+] Trying scheme 0...
   [+] Symbolic execution output:
-  Exec failure: (str.++ (x0, " ", "compile"))
+  Exec failure: (str.++ x0 " " "compile")
   [+] ⚠ Detected 1 issue(s)!
   [+] 📄 Trying model :
    (model
