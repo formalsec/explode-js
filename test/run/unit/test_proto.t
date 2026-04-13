@@ -4,20 +4,13 @@ Test prototype-pollution:
   [+] Testing prototype-pollution vulnerability ...
   [+] Trying scheme 0...
   [+] Symbolic execution output:
-  "Uncaught TypeError"
-  "Uncaught TypeError"
-  "Uncaught TypeError"
-  "Uncaught TypeError"
-  "Uncaught TypeError"
-  "Uncaught TypeError"
-  "Uncaught TypeError"
   Abort: "Uncaught Error: I pollute."
   [+] ⚠ Detected 1 issue(s)!
   [+] 📄 Trying model :
    (model
     (path str "__proto__.toString")
-    (val str "polluted")
-    (x0 str "__proto__")
-    (x1 str "toString"))
+    (symbol_17 str "__proto__")
+    (symbol_18 str "toString")
+    (val str "polluted"))
   [+] 📄 Node exited with 1
   [+] ✔ Status: Success (threw Error("I pollute."))

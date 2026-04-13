@@ -25,7 +25,7 @@ depends: [
   "fpath"
   "mdx" {with-test}
   "ocaml"
-  "smtml" {>= "0.22.0"}
+  "smtml" {>= "0.25.0"}
   "prelude"
   "yojson"
   "menhir" {build & >= "20220210"}
