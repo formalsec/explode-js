@@ -12,7 +12,7 @@ let solve ?(path_only = false) solver pc (ty : Symbolic_error.t) workspace =
       Logs.err (fun k ->
         k "solver: %s: cannot encode desired pc" (Printexc.to_string exn) );
       None
-    end
+      end
   in
 
   let process_path_condition pc =

@@ -20,8 +20,8 @@ let rec equal_param_type a b =
     true
   | Array tys1, Array tys2 -> List.for_all2 equal_param_type tys1 tys2
   | Union tys1, Union tys2 -> List.for_all2 equal_param_type tys1 tys2
-  | Object ty1, Object ty2 -> begin
-    match (ty1, ty2) with
+  | Object ty1, Object ty2 ->
+    begin match (ty1, ty2) with
     | `Lazy, `Lazy -> true
     | `Polluted a, `Polluted b -> a = b
     | `Normal a_props, `Normal b_props ->
@@ -30,7 +30,7 @@ let rec equal_param_type a b =
           String.equal a_prop b_prop && equal_param_type a_ty b_ty )
         a_props b_props
     | (`Lazy | `Polluted _ | `Normal _), _ -> false
-  end
+    end
   | ( (Any | Number | String | Boolean | Function | Array _ | Union _ | Object _)
     , _ ) ->
     false
@@ -110,7 +110,7 @@ let rec unroll_params ~proto_pollution (params : (string * param_type) list) :
           | _ ->
             let+ params = acc in
             List.cons (x, ty) params
-        end
+          end
         | Array [ String ] ->
           let lst1 =
             let+ acc in
@@ -183,8 +183,8 @@ end = struct
     let open Result.Syntax in
     match json with
     | `String ty -> param_type_of_string ty
-    | `Assoc obj -> begin
-      match Json_util.member "_union" json with
+    | `Assoc obj ->
+      begin match Json_util.member "_union" json with
       | `Null ->
         let+ params =
           Result.list_map
@@ -200,7 +200,7 @@ end = struct
       | _ ->
         (* should not happen *)
         assert false
-    end
+      end
     | `List arr ->
       let+ arr = Result.list_map param_of_json arr in
       Array arr
@@ -292,12 +292,12 @@ end = struct
     (* Can only have one type of continuation at a time *)
     (* FIXME: To Allow return(s?) I made this horrible nested match *)
     match Json_util.member "return" json with
-    | `Null -> begin
-      match Json_util.member "returns" json with
-      | `Null -> begin
-        match Json_util.member "sequence" json with
-        | `Null -> begin
-          match Json_util.member "client" json with
+    | `Null ->
+      begin match Json_util.member "returns" json with
+      | `Null ->
+        begin match Json_util.member "sequence" json with
+        | `Null ->
+          begin match Json_util.member "client" json with
           | `Null -> Ok None
           | tree ->
             let* request_ty =
@@ -305,15 +305,15 @@ end = struct
             in
             let+ port = Json_util.member "port" tree |> int in
             Some (Client { request_ty; port })
-        end
+          end
         | tree ->
           let+ tree = t_of_json tree in
           Some (Sequence tree)
-      end
+        end
       | tree ->
         let+ tree = t_of_json tree in
         Some (Return tree)
-    end
+      end
     | tree ->
       let+ tree = t_of_json tree in
       Some (Return tree)

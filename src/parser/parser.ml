@@ -47,7 +47,7 @@ and var_decl st =
     | _ ->
       error "var_decl: %a: unexpected token \"%a\"" pp_position pos Token.pp
         token
-  end
+    end
   | _ ->
     error "var_decl: %a: unexpected token \"%a\"" pp_position pos Token.pp token
 
@@ -59,7 +59,7 @@ and expr st =
     match token with
     | Dot -> assert false
     | _ -> Ok x
-  end
+    end
   | Num f ->
     let _ = State.consume st in
     Ok (Fmt.str "%.12g" f)

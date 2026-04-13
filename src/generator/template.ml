@@ -23,11 +23,11 @@ let render template models =
       let text =
         match a with
         | Text x -> x
-        | Var x -> begin
-          match List.assoc_opt x models with
+        | Var x ->
+          begin match List.assoc_opt x models with
           | Some s -> s
           | None -> Fmt.failwith "No value for template variable '%s'" x
-        end
+          end
       in
       loop (Fmt.str "%s%s" acc text) b
   in

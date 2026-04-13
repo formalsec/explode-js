@@ -26,15 +26,15 @@ let execute_scheme (settings : Settings.Cmd_run.t) i (scheme : Scheme.t) =
       (0.0, Analysis_results.Path_not_found)
     | Ok results when results.num_failures = 0 ->
       (results.execution_time, Path_not_found)
-    | Ok results -> begin
-      if settings.path_only then (results.execution_time, Path_found)
+    | Ok results ->
+      begin if settings.path_only then (results.execution_time, Path_found)
       else
         let find_model = Replay.find_exploitable_model ~dir:workspace scheme in
         match List.find_map find_model results.failures with
         | None -> (results.execution_time, Path_found)
         | Some (path, effect_) ->
           (results.execution_time, Exploit_found { path; effect_ })
-    end
+      end
   in
   Ok (Analysis_results.make_test_result ~path:test_file ~outcome ~time)
 
@@ -61,7 +61,7 @@ let test_vulnerability (settings : Settings.Cmd_run.t) i
         if settings.path_only then Ok (Some result, all_results)
         else loop (Some result, all_results) (i + 1) rest
       | Path_not_found -> loop (best_so_far, all_results) (i + 1) rest
-    end
+      end
   in
   let scheme0 = List.hd schemes in
   let filename, vuln_type, sink, sink_lineno = Scheme.metadata scheme0 in

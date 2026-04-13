@@ -59,11 +59,11 @@ let check_poc_effects out_output err_output potential_effects =
   let visiable_effect = function
     | Replay_effect.Stdout sub ->
       String.find_sub ~sub out_output |> Option.is_some
-    | File file -> begin
-      match OS.File.exists file with
+    | File file ->
+      begin match OS.File.exists file with
       | Ok file_exists -> file_exists
       | Error (`Msg err) -> Fmt.failwith "%s" err
-    end
+      end
     | File_access file ->
       let { Unix.st_atime; st_ctime; _ } = Unix.stat (Path.to_string file) in
       st_atime > st_ctime
@@ -90,7 +90,7 @@ let log_and_cleanup_effect eff =
     in
     Logs.app (fun k -> k "[+] \u{2714} Status: Success %a" Replay_effect.pp eff);
     Some eff
-  end
+    end
   | None ->
     Logs.app (fun k -> k "[-] \u{2716} Status: No side effect");
     None
@@ -109,11 +109,11 @@ let test_model_exploit ~dir scheme model =
     Logs.app (fun k -> k "[+] \u{1F4C4} Node %a" OS.Cmd.pp_status status);
     let final_effect = log_and_cleanup_effect eff in
     Option.map (fun eff -> (poc_file, eff)) final_effect
-  end
+    end
   | Error (`Msg err) -> begin
     Logs.app (fun k -> k "[-] \u{1F4C4} Node: %s" err);
     None
-  end
+    end
 
 let find_exploitable_model ~dir scheme (model : Sym_failure.t) =
   let open Option.Syntax in

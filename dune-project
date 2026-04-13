@@ -62,7 +62,9 @@
     :build
     (>= "20220210")))
   (ocamlformat
-    :with-dev-setup))
+    (and
+     (>= 0.29.0)
+     :with-dev-setup)))
  (tags
   ("symbolic execution" javascript exploit))
  (sites

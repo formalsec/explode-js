@@ -40,6 +40,6 @@ let find_vulnerabilities (settings : Settings.Cmd_run.t) =
   match graphjs_result with
   | `Exited 0 -> begin
     Bos.OS.File.must_exist Fpath.(workspace_dir / "taint_summary.json")
-  end
+    end
   | `Exited n | `Signaled n ->
     Error (`Msg (Fmt.str "Graphjs exited with non-zero code: %d" n))

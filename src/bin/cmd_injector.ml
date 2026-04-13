@@ -72,12 +72,12 @@ let cmd_complete (settings : Settings.Cmd_injector.t) =
   Fmt.pr "SMT Expr: %a@." Smtml.Typed.Bool.pp e;
 
   match Solver.check solver [ (c :> Smtml.Expr.t); (e :> Smtml.Expr.t) ] with
-  | `Sat -> begin
-    match Solver.model solver with
+  | `Sat ->
+    begin match Solver.model solver with
     | None -> assert false
     | Some m ->
       Fmt.pr "Satisfying model:@;%a@." (Smtml.Model.pp ~no_values:false) m
-  end
+    end
   | `Unsat ->
     Fmt.pr "It's not possile to contain '%s' in the grammar@." candidate_str
   | `Unknown -> assert false

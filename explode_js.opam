@@ -29,7 +29,7 @@ depends: [
   "prelude"
   "yojson"
   "menhir" {build & >= "20220210"}
-  "ocamlformat" {with-dev-setup}
+  "ocamlformat" {>= "0.29.0" & with-dev-setup}
   "odoc" {with-doc}
 ]
 depopts: ["z3" "cvc5"]

@@ -20,7 +20,7 @@ let from_smtml model =
     | _ -> begin
       Logs.err (fun m -> m "unexpected value '%a' in model" Smtml.Value.pp v);
       map
-    end
+      end
   in
   let bindings = Smtml.Model.get_bindings model in
   List.fold_left add_binding Map.empty bindings
