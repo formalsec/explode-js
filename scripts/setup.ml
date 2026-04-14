@@ -33,7 +33,7 @@ let setup_graphjs () =
   execute "pip install -r ./requirements.txt"
     "Could not install graphjs's python requirements";
   in_dir "parser" @@ fun () ->
-  execute "npm install" "Could not install graphjs's normalizer dependencies";
+  execute "npm ci" "Could not install graphjs's normalizer dependencies";
   execute "npm exec tsc" "Could not compile graphjs's normalizer"
 
 let setup_cvc5 () =
