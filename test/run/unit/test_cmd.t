@@ -19,18 +19,18 @@ Real world command injection
   [+] Testing command-injection vulnerability ...
   [+] Trying scheme 0...
   [+] Symbolic execution output:
-  Exec failure: (str.++ symbol_16 " " "compile")
+  Exec failure: (str.++ symbol_14 " " "compile")
   [+] ⚠ Detected 1 issue(s)!
   [+] 📄 Trying model :
    (model
     (options str "")
-    (symbol_16 str "`touch success`"))
+    (symbol_14 str "`touch success`"))
   [+] 📄 Node exited with 1
   [-] ✖ Status: No side effect
   [+] 📄 Trying model :
    (model
     (options str "")
-    (symbol_16 str "''; touch success #"))
+    (symbol_14 str "''; touch success #"))
   [+] 📄 Node exited with 1
   [-] ✖ Status: No side effect
 
