@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "djv": "2.0.0"
+  },
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-4hv7-3q38-97m8",
+    "sink": {
+      "file": "lib/utils/template.js",
+      "line": 110,
+      "code": "const tpl = new Function('schema', source)(schema);"
+    }
+  }
+}

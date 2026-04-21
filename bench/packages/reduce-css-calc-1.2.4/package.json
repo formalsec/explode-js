@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "reduce-css-calc": "1.2.4"
+  },
+  "vulnerability": {
+    "cwe": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-4662-j96g-mv46",
+    "sink": {
+      "file": "index.js",
+      "lineno": 75,
+      "code": "result = eval(toEvaluate)"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "veval": "1.0.0"
+  },
+  "vulnerabilities": {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-54qm-37qr-w5wq",
+    "sink": {
+      "file": "index.js",
+      "lineno": 13,
+      "code": "output = vm.runInContext(scr, context);"
+    }
+  }
+}

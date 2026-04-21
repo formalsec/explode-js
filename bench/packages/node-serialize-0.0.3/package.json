@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "node-serialize": "0.0.3"
+  },
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-q4v7-4rhw-9hqm",
+    "sink": {
+      "file": "lib/serialize.js",
+      "line": 75,
+      "code": "obj[key] = eval('(' + obj[key].substring(FUNCFLAG.length) + ')');"
+    }
+  }
+}

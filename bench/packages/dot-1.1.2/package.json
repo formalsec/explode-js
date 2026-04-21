@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "dot": "1.1.2"
+  },
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-297x-8xj4-vcxv",
+    "sink": {
+      "code": "return new Function(c.varname, str);",
+      "file": "doT.js",
+      "lineno": 133
+    }
+  }
+}

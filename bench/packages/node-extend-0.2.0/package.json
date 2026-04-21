@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "node-extend": "0.2.0"
+  },
+  "vulnerabilities": {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-cg42-4wrc-gp47",
+    "sink": {
+      "code": "var nn = eval('('+ss+')');",
+      "file": "lib/extend.js",
+      "line": 31
+    }
+  }
+}
