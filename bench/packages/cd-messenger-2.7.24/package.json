@@ -1,0 +1,45 @@
+{
+	"index": "index.js",
+	"dependencies": {
+		"cd-messenger": "2.7.24"
+	},
+
+	"vulnerabilities": [
+		{
+		"advisory":{
+			"id": "GHSA-v756-4whv-48vc",
+			"cve": "CVE-2020-7675",
+			"cwe": "CWE-78",
+			"github": "https://github.com/advisories/GHSA-v756-4whv-48vc",
+			"snyk": "https://security.snyk.io/vuln/SNYK-JS-CDMESSENGER-571493",
+			"nvd": "https://nvd.nist.gov/vuln/detail/CVE-2020-7675"
+		},
+
+		"location":{
+			"source": {
+				"file": "src/messenges-node.js",
+				"lineno": 67,
+				"code": "line: (color) => {"
+				},
+			"sink": {
+				"file": "src/messenger-node.js",
+				"lineno": 70,
+				"code": "eval(`cl.${color}()`); // eslint-disable-line"
+			}
+		},
+
+		"pocs": [{
+			"file": "cd-messenger-2.7.24.test.js",
+			"source": "secbench"
+			}
+		],
+
+		"patch":{
+			"fixed_version": "id",
+			"url": "url do commit",
+			"diff": "path_para_ficheiro_com_diff_relevante"
+		}
+
+	}
+]
+}
