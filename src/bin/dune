@@ -9,6 +9,7 @@
   dune-build-info
   ecma-sl
   ecma-sl.symbolic
+  ecma-sl.js2ecmasl
   extunix
   explode_js.generator
   explode_js.std
