@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "syntax-error": "1.1.0"
+  },
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-5726-g6r9-5f22",
+    "sink": {
+      "file": "index.js",
+      "line": 7,
+      "code": "Function(src);"
+    }
+  }
+}

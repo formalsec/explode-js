@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "nobelprizeparser": "1.0.1"
+  },
+  "vulnerability":  {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-4wv4-mgfq-598v",
+    "sink": {
+      "file": "lib/index.js",
+      "lineno": 13,
+      "code": "this.laureates = eval(`(${data})`).laureates;"
+    }
+  }
+}

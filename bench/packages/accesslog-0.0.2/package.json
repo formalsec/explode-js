@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "accesslog": "0.0.2"
+  },
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-8m2f-74r2-x3f2",
+    "sink": {
+      "file": "lib/compile.js",
+      "lineno": 6,
+      "code": "return new Function('tokens, req, res', js).bind(context);"
+    }
+  }
+}

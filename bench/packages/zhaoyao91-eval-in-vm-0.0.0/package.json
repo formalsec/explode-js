@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "@zhaoyao91/eval-in-vm": "0.0.0"
+  },
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-jp99-5h8w-gmxc",
+    "sink": {
+      "file": "eval-in-vm/index.js",
+      "line": 11,
+      "code": "vm.runInNewContext(finalCode, sandbox, options);"
+    }
+  }
+}

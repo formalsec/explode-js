@@ -1,0 +1,14 @@
+{
+	"dependencies": {
+		"safe-eval": "0.2.0"
+	},
+	"vulnerability": {
+	  "type": "code-injection",
+		"ghsa": "https://github.com/advisories/GHSA-hrpq-r399-whgw",
+    "sink": {
+		  "file": "index.js",
+			"line": 13,
+			"code": "vm.runInNewContext(code, sandbox)"
+		}
+	}
+}

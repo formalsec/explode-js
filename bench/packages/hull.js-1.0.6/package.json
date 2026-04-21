@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "hull.js": "1.0.6"
+  },
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-q849-wxrc-vqrp",
+    "sink": {
+      "file": "src/format.js",
+      "line": 9,
+      "code": "const _getXY = new Function('pt', 'return [pt' + format[0] + ',' + 'pt' + format[1] + '];');"
+    }
+  }
+}

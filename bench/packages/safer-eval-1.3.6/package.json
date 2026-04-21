@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "safer-eval": "1.3.6"
+  },
+  "vulnerability": {
+    "cwe": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-v63x-xc9j-hhvq",
+    "sink": {
+      "file": "lib/index.js",
+      "lineno": 64,
+      "code": "return vm.runInContext(src, this._context, this._options);"
+    }
+  }
+}

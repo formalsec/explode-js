@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "static-eval": "1.1.1"
+  },
+  "vulnerability": {
+    "cwe": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-8v27-2fg9-7h62",
+    "sink": {
+      "file": "index.js",
+      "line": 118,
+      "code": "return Function(keys.join(', '), 'return ' + unparse(node)).apply(null, vals);"
+    }
+  }
+}

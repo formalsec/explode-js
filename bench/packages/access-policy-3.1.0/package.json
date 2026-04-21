@@ -1,0 +1,14 @@
+{
+	"dependencies": {
+		"access-policy": "3.1.0"
+	},
+  "vulnerability": {
+    "type": "code-injection",
+		"ghsa": "https://github.com/advisories/GHSA-fw2f-7f87-5r6c",
+		"sink": {
+		  "file":"lib/encode.js",
+			"line":6,
+			"code": "return eval('`' + tmpl + '`');"
+		}
+  }
+}
