@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "is-my-json-valid": "2.20.0"
+  },
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-f522-ffg8-j8r6",
+    "sink": {
+      "file": "index.js",
+      "line": 571,
+      "code": "validate = validate.toFunction(scope)"
+    }
+  }
+}
