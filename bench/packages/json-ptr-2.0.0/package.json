@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "json-ptr": "2.0.0"
+  },
+  "vulnerabilities": {
+    "type": "code-injection",
+    "github": "https://github.com/advisories/GHSA-x5r6-x823-9848",
+    "sink": {
+      "code": "return new Function('it', body);",
+      "file": "src/util.ts",
+      "line": 159,
+    }
+  }
+}

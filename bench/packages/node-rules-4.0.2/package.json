@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "node-rules": "4.0.2"
+  },
+  "vulnerability": {
+    "cwe": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-8whr-v3gm-w8h9",
+    "sink": {
+      "file": "lib/node-rules.js",
+      "line": 152,
+      "code": "rule.condition = eval(rule.condition);"
+    }
+  }
+}
