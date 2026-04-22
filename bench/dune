@@ -1,0 +1,5 @@
+(dirs)
+
+(executable
+ (name main)
+ (libraries eio eio_main))
