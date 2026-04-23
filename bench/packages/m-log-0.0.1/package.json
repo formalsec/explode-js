@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "m-log": "0.0.1"
+  },
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": null,
+    "snyk": "https://security.snyk.io/vuln/npm:m-log:20160408",
+    "sink": {
+      "file": "libs/log.js",
+      "code": "eval('colors.setTheme({' + i + ':' + theme + '});');",
+      "lineno": 24
+    }
+  }
+}

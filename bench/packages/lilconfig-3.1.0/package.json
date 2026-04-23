@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "lilconfig": "3.1.0"
+  },
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-fq9m-v26v-2m4f",
+    "sink": {
+      "file": "dist/index.js",
+      "lineno": 37,
+      "code": "const mod = await eval(`import('${id}')`);"
+    }
+  }
+}

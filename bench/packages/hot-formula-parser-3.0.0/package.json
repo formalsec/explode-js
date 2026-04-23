@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "hot-formula-parser": "3.0.0"
+  },
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-rc77-xxq6-4mff",
+    "sink": {
+      "code": "var arr = eval(\"[\" + yytext + \"]\");",
+      "file": "lib/grammar-parser/grammar-parser.js",
+      "line": 268
+    }
+  }
+}

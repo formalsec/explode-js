@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "lodash":"4.17.20"
+  },
+  "vulnerabilities": {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-35jh-r3h4-6jhm",
+    "sink": {
+      "file": "lodash.js",
+      "lineno": 14894,
+      "code": "return Function(importsKeys, sourceURL + 'return ' + source)"
+    }
+  }
+}

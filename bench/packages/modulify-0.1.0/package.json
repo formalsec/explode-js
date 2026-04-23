@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "modulify": "0.1.0"
+  },
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": "",
+    "snyk": "https://security.snyk.io/vuln/npm:modulify:20160407",
+    "sink": {
+      "file": "src/modulify.js",
+      "lineno": 74,
+      "code": "eval(src);"
+    }
+  }
+}

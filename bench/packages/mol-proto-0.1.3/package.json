@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "mol-proto": "0.1.3"
+  },
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": null,
+    "snyk": "https://security.snyk.io/vuln/npm:mol-proto:20160407",
+    "sink": {
+      "file": "lib/proto_function.js",
+      "lineno": 62,
+      "code": "eval(code);"
+    }
+  }
+}

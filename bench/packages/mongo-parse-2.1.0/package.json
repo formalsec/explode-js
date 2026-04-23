@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "mongo-parse": "2.1.0"
+  },
+  "vulnerabilities": {
+    "type": "code-injection",
+    "ghsa": null,
+    "snyk": "https://security.snyk.io/vuln/npm:mongo-parse:20160408",
+    "sink": {
+      "file": "mongoParse.js",
+      "lineno": 93,
+      "code": "var normalizedFunction = new Function(\"return function(){var obj=this; return \"+query+\"}\")()"
+    }
+  }
+}

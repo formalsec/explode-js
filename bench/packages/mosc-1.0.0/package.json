@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "mosc": "1.0.0"
+  },
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-j665-rvj7-2jv9",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-MOSC-571492",
+    "sink": {
+      "file": "mosc.js",
+      "lineno": 50,
+      "code": "propertyBase[property_parts[0]] = eval(get_eval_string(pvalue));"
+    }
+  }
+}

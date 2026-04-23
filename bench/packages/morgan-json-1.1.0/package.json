@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "morgan-json": "<=1.1.0"
+  },
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-fwv4-6mxc-x5h3",
+    "sink": {
+      "code": "return new Function('tokens, req, res', js);",
+      "file": "index.js",
+      "line": 46
+    }
+  }
+}
