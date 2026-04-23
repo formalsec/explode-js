@@ -1,13 +1,14 @@
 {
+  "index": "index.js",
   "dependencies": {
-    "cd-messenger": "2.7.24"
+    "cd-messenger": "2.7.26"
   },
   "vulnerability": {
-    "type": "code-injection",
+    "cwe": "code-injection",
     "ghsa": "https://github.com/advisories/GHSA-v756-4whv-48vc",
     "sink": {
-      "file": "src/messenger-node.js",
-      "lineno": 70,
+      "file": "messenger-node.js",
+      "lineno": 71,
       "code": "eval(`cl.${color}()`); // eslint-disable-line"
     }
   }
