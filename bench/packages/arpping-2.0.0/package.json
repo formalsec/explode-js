@@ -1,0 +1,38 @@
+{
+    "index": "index.js",
+    "dependencies": {
+        "arpping": "2.0.0"
+    },
+
+    "vulnerabilities": [{
+        "advisory":{
+            "id": "",
+            "cve": "",
+            "cwe": "CWE-74",
+            "github": "",
+            "snyk": "https://security.snyk.io/vuln/SNYK-JS-ARPPING-1060047",
+            "nvd": ""
+        },
+
+        "location":{
+            "sink": {
+                "file":"index.js",
+                "lineno":120,
+                "code": "exec(`ping ${flag} ${this.timeout} ${ip}`, (err, stdout, stderr) => {"
+            }
+        },
+
+        "pocs": [{
+            "file": "arpping.test.js",
+            "source": "secbench"
+            }
+        ],
+
+        "patch":{
+            "fixed_version": "id",
+            "url": "url do commit",
+            "diff": "path_para_ficheiro_com_diff_relevante"
+        }
+
+        }]
+}
