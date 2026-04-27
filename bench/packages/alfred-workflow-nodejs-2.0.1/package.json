@@ -1,0 +1,118 @@
+{
+	"index": "index.js",  
+	"dependencies": {
+		"alfred-workflow-nodejs": "2.0.1"
+	},
+
+  	"vulnerabilities": [
+	{
+		"advisory":{
+			"id": "GHSA-9jm3-5835-537m",
+			"cve": "",
+			"cwe": "CWE-78",
+			"github": "https://github.com/advisories/GHSA-9jm3-5835-537m",
+			"snyk": "https://security.snyk.io/vuln/SNYK-JS-ALFREDWORKFLOWNODEJS-608975",
+			"nvd": ""
+		}, 
+
+		"location":{
+			"source":{
+				"file":"alfredNode.js",
+				"lineno":443, 
+				"code": "remove: function(key, callback) {"
+			},
+			"sink": {
+				"file":"alfredNode.js", 
+				"lineno":445, 
+				"code": "exec(getCommand, function(err, stdout, stderr) {"
+			}
+		},
+
+		"pocs": [{ 
+				"file": "alfred-workflow-nodejs.test.js", 
+				"source": "secbench" 
+			}
+		], 
+		
+		"patch":{
+			"fixed_version": "id", 
+			"url": "url do commit", 
+			"diff": "path_para_ficheiro_com_diff_relevante"
+		}	
+		
+	},
+	{
+		"advisory":{
+			"id": "GHSA-9jm3-5835-537m",
+			"cve": "",
+			"cwe": "CWE-78",
+			"github": "https://github.com/advisories/GHSA-9jm3-5835-537m",
+			"snyk": "https://security.snyk.io/vuln/SNYK-JS-ALFREDWORKFLOWNODEJS-608975",
+			"nvd": ""
+		}, 
+
+		"location":{
+			"source":{
+				"file":"alfredNode.js",
+				"lineno":425, 
+				"code": "get: function(key, callback) {"
+			},
+			"sink": {
+				"file":"alfredNode.js", 
+				"lineno":427, 
+				"code": "exec(getCommand, function(err, stdout, stderr) {"
+			}
+		},
+
+		"pocs": [{ 
+				"file": "alfred-workflow-nodejs.test.js", 
+				"source": "secbench" 
+			}
+		], 
+		
+		"patch":{
+			"fixed_version": "id", 
+			"url": "url do commit", 
+			"diff": "path_para_ficheiro_com_diff_relevante"
+		}	
+		
+	},
+	{
+		"advisory":{
+			"id": "GHSA-9jm3-5835-537m",
+			"cve": "",
+			"cwe": "CWE-78",
+			"github": "https://github.com/advisories/GHSA-9jm3-5835-537m",
+			"snyk": "https://security.snyk.io/vuln/SNYK-JS-ALFREDWORKFLOWNODEJS-608975",
+			"nvd": ""
+		}, 
+
+		"location":{
+			"source":{
+				"file":"alfredNode.js",
+				"lineno":398, 
+				"code": "set: function(key, value, callback) {"
+			},
+			"sink": {
+				"file":"alfredNode.js", 
+				"lineno":402, 
+				"code": "exec(setCommand, function(err, stdout, stderr) {"
+			}
+		},
+
+		"pocs": [{ 
+				"file": "alfred-workflow-nodejs.test.js", 
+				"source": "secbench" 
+			}
+		], 
+		
+		"patch":{
+			"fixed_version": "id", 
+			"url": "url do commit", 
+			"diff": "path_para_ficheiro_com_diff_relevante"
+		}	
+		
+	}
+
+  ]
+}
