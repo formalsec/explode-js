@@ -1,0 +1,15 @@
+{
+  "index": "index.js",
+  "dependencies": {
+    "apex-publish-static-files": "2.0.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-9jm3-5835-537m",
+    "sink": {
+      "file": "index.js",
+      "lineno": 54,
+      "code": "const childProcess = execSync("
+    }
+  }
+}
