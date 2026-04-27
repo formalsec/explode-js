@@ -1,0 +1,45 @@
+{
+	"index": "index.js",  
+	"dependencies": {
+		"adb-driver": "0.1.8"
+	},
+
+  	"vulnerabilities": [
+	{
+		"advisory":{
+			"id": "GHSA-4m6q-rxhm-675w",
+			"cve": "CVE-2020-7636",
+			"cwe": "CWE-74",
+			"github": "https://github.com/advisories/GHSA-4m6q-rxhm-675w",
+			"snyk": "https://security.snyk.io/vuln/SNYK-JS-ADBDRIVER-564430",
+			"nvd": "https://nvd.nist.gov/vuln/detail/CVE-2020-7636"
+		}, 
+
+		"location":{
+			"source":{
+				"file":"build/AdbDriver.js",
+				"lineno":17,
+				"code": "function execADBCommand(command, option) {"
+			},
+			"sink": {
+				"file":"build/AdbDriver.js", 
+				"lineno":26, 
+				"code": "child_process_1.exec(execCmd, option || { stdio: 'inherit' }, (err, stdout, stderr) => {"
+			}
+		},
+
+		"pocs": [{ 
+				"file": "adb-driver.test.js", 
+				"source": "secbench" 
+			}
+		], 
+		
+		"patch":{
+			"fixed_version": "", 
+			"url": "", 
+			"diff": ""
+		}	
+		
+		}
+  ]
+}
