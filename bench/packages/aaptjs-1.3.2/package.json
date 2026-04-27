@@ -1,0 +1,45 @@
+{
+	"index": "index.js",  
+	"dependencies": {
+		"aaptjs": "1.3.1"
+	},
+
+  	"vulnerabilities": [
+	{
+		"advisory":{
+			"id": "GHSA-pq2w-cvxp-cmjg",
+			"cve": "CVE-2020-26707",
+			"cwe": "CWE-78",
+			"github": "https://github.com/advisories/GHSA-m7p2-ghfh-pjvx",
+			"snyk": "https://security.snyk.io/vuln/SNYK-JS-AAPTJS-1769273",
+			"nvd": "https://nvd.nist.gov/vuln/detail/CVE-2020-26707"
+		}, 
+
+		"location":{
+			"source":{
+				"file": "index.js", 
+				"lineno": 50, 
+				"code": "function add(apkfilePath, files, callback) {"
+			},
+			"sink": {
+				"file":"index.js", 
+				"lineno":18, 
+				"code": "exec(cmd, (code, stdout, stderr) => {"
+			}
+		},
+
+		"pocs": [{ 
+				"file": "apptjs.test.js", 
+				"source": "secbench" 
+			}
+		], 
+		
+		"patch":{
+			"fixed_version": "", 
+			"url": "", 
+			"diff": ""
+		}	
+		
+		}
+  ]
+}
