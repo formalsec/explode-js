@@ -1,0 +1,43 @@
+{
+    "index": "index.js",
+    "dependencies": {
+        "apiconnect-cli-plugins": "6.0.2"
+    },
+
+    "vulnerabilities": [{
+        "advisory":{
+            "id": "GHSA-c9m9-48pw-6mpv",
+            "cve": "CVE-2020-7633",
+            "cwe": "CWE-74",
+            "github": "https://github.com/advisories/GHSA-c9m9-48pw-6mpv",
+            "snyk": "https://security.snyk.io/vuln/SNYK-JS-APICONNECTCLIPLUGINS-564427",
+            "nvd": "https://nvd.nist.gov/vuln/detail/CVE-2020-7633"
+        },
+
+        "location":{
+            "source":{
+                "file":"apiconnect-cli-plugins/lib/plugin-loader.js", 
+                "lineno":140,
+                "code": "function installPlugin(pluginUri, registryUri) {"
+            },
+            "sink": {
+                "file":"apiconnect-cli-plugins/lib/plugin-loader.js",
+                "lineno":181,
+                "code": "var proc = exec(installCmd, function(err) {"
+            }
+        },
+
+        "pocs": [{
+            "file": "apiconnect-cli-plugins.test.js",
+            "source": "secbench"
+            }
+        ],
+
+        "patch":{
+            "fixed_version": "",
+            "url": "",
+            "diff": ""
+        }
+
+        }]
+}
