@@ -1,0 +1,45 @@
+{
+    "index": "index.js",
+    "dependencies": {
+        "apex-publish-static-files": "2.0.0"
+    },
+
+    "vulnerabilities": [
+    {
+        "advisory":{
+            "id": "GHSA-9jm3-5835-537m",
+            "cve": "CVE-2018-16462",
+            "cwe": "CWE-78",
+            "github": "https://github.com/advisories/GHSA-9jm3-5835-537m",
+            "snyk": "https://security.snyk.io/vuln/SNYK-JS-APEXPUBLISHSTATICFILES-72552",
+            "nvd": "https://nvd.nist.gov/vuln/detail/CVE-2018-16462"
+        },
+
+        "location":{
+            "source":{
+                "file": "index.js",
+                "lineno": 9,
+                "code": "publish(opts) {"
+            },
+            "sink": {
+                "file": "index.js",
+                "lineno": 54,
+                "code": "const childProcess = execSync("
+            }
+        },
+
+        "pocs": [{
+                "file": "apex-publish-static-files.test.js",
+                "source": "secbench"
+            }
+        ],
+
+        "patch":{
+            "fixed_version": "",
+            "url": "",
+            "diff": ""
+        }
+
+    }
+  ]
+}
