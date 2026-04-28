@@ -1,0 +1,43 @@
+{
+    "index": "index.js",
+    "dependencies": {
+        "async-git":"1.13.1"
+    },
+
+    "vulnerabilities": [
+        {
+            "advisory":{
+                "id": "GHSA-6qpr-9mc5-7gch",
+                "cve": "CVE-2020-28490",
+                "cwe": "CWE-78",
+                "github_link": "https://github.com/advisories/GHSA-6qpr-9mc5-7gch",
+                "snyk": "https://security.snyk.io/vuln/SNYK-JS-ASYNCGIT-1064877",
+                "nvd": "https://nvd.nist.gov/vuln/detail/CVE-2020-28490"
+            },
+
+            "location":{
+                "source": {
+                    "lineno": 9,
+                    "code": "module.exports = async function(destination, {hard = true} = {}) {"
+                },
+                "sink": {
+                    "file": "lib/reset/index.js",
+                    "lineno": 11,
+                    "code": "return await exec(`git reset ${JSON.stringify(destination)} ${hard ? '--hard' : ''}`);"
+                }
+            },
+
+            "pocs": [{
+                "file": "async-git.test.js",
+                "source": ""
+                }
+            ],
+
+            "patch":{
+                "fixed_version": "id",
+                "url": "url do commit",
+                "diff": "path_para_ficheiro_com_diff_relevante"
+            }
+        }
+    ]
+}
