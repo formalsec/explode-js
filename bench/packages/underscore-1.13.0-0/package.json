@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "underscore": "1.13.0-0"
+  },
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-cf4h-3jhx-xvhq"
+    "sink": {
+      "code": "",
+      "file": "underscore-umd.js",
+      "lineno": 915
+    }
+  }
+}

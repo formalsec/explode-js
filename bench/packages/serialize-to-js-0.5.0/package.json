@@ -1,0 +1,15 @@
+{
+  "index": "index.js",
+  "dependencies": {
+    "serialize-to-js": "0.5.0"
+  },
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-mm62-wxc8-cf7m",
+    "sink": {
+      "file": "lib/deserialize.js",
+      "lineno": 28,
+      "code": "return (new Function('return ' + str))()"
+    }
+  }
+}
