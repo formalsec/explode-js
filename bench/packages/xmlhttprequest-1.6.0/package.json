@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "xmlhttprequest": "1.6.0"
+  },
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-h4j5-c7cj-74xg",
+    "sink": {
+      "file": "lib/XMLHttpRequest.js",
+      "code": "var syncProc = spawn(process.argv[0], [\"-e\", execString]);",
+      "lineno": 483
+    }
+  }
+}

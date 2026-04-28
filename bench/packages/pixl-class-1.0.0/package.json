@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "pixl-class": "1.0.0"
+  },
+
+  "vulnerability": {
+    "type": "CWE-94",
+    "ghsa": "https://github.com/advisories/GHSA-vm5j-vqr6-v7v8",
+    "sink": {
+      "file": "class.js",
+      "lineno": 26,
+      "code": "eval('constructor = function ('+args+') {'+inner_code+'};');"
+    }
+  }
+}

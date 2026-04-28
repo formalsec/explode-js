@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "squirrelly": "< 9.1.0"
+  },
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-w5pw-gmcw-rfc8",
+    "sink": {
+      "code": "return new ctor(options.varName, 'c', // SqrlConfig",
+      "file": "./dist/squirelly.cjs.js",
+      "line": 875
+    }
+  }
+}

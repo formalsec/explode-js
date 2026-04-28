@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "react-editable-json-tree": "< 2.2.2"
+  },
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-j3rv-w43q-f9x2",
+    "sink": {
+      "file": "dist/utils/parse.js",
+      "code": "return eval('(' + result + ')');",
+      "lineno": 37
+    }
+  }
+}
