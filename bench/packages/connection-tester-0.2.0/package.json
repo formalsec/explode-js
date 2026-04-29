@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "connection-tester": "0.2.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-w5mp-8p8w-mhh8",
+    "sink": {
+      "file": "index.js",
+      "line": 15,
+      "code": "const shellOut = shell.execSync(cmd).toString();"
+    }
+  }
+}
