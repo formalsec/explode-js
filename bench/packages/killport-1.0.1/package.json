@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "killport": "1.0.1"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-fc42-h7q4-qp8h",
+    "sink": {
+      "code": "cp.exec(cmd, function(err, stdout, stderr){",
+      "file": "index.js",
+      "lineno": 9
+    }
+  }
+}
