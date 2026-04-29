@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "compass-compile": "0.0.1"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-7q9f-x6rm-qmxr",
+    "sink": {
+      "file": "lib/compass.js",
+      "line": 25,
+      "code": "exec(command, function(error, stdout, stderr)"
+    }
+  }
+}
