@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "kill-process-by-name": "1.0.5"
+  },
+  "vulnerability": {
+    "type":"command-injection",
+    "ghsa":"https://github.com/advisories/GHSA-qc65-cgvr-93p6",
+    "snyk":"https://security.snyk.io/vuln/SNYK-JS-KILLPROCESSBYNAME-1078534",
+    "sink":{
+      "code":"exec('pkill -f ' + programname);",
+      "file":"index.js",
+      "lineno":12
+    }
+  }
+}
