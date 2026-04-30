@@ -1,0 +1,40 @@
+{
+  "dependencies": {
+    "get-npm-package-version": "1.0.6"
+  },
+  "index": "index.js",
+  "vulnerabilities": [
+    {
+      "advisory": {
+        "cve": "CVE-2021-25943",
+        "cwe": "CWE-78",
+        "github": "https://github.com/advisories/GHSA-4h66-vghf-xg5x",
+        "id": "GHSA-4h66-vghf-xg5x",
+        "nvd": "https://nvd.nist.gov/vuln/detail/CVE-2020-7795",
+        "snyk": "https://security.snyk.io/vuln/SNYK-JS-GETNPMPACKAGEVERSION-1050390"
+      },
+      "location": {
+        "sink": {
+          "code": "version = require('child_process').execSync(`npm view ${packageName} version`, config);",
+          "file": "index.js",
+          "lineno": 16
+        },
+        "source": {
+          "code": "module.exports = function (packageName, { registry = '', timeout = null } = {}) {",
+          "lineno": 1
+        }
+      },
+      "patch": {
+        "diff": "path_para_ficheiro_com_diff_relevante",
+        "fixed_version": "1.0.7",
+        "url": "https://github.com/hoperyy/get-npm-package-version/commit/40b1cf31a0607ea66f9e30a0c3af1383b52b2dec"
+      },
+      "pocs": [
+        {
+          "file": "get-npm-package-version.test.js",
+          "source": "secbench"
+        }
+      ]
+    }
+  ]
+}

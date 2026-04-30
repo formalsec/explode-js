@@ -1,0 +1,25 @@
+harness.js:16:12-16:99
+> version = require("child_process")["execSync"](`npm view ${packageName} version`, config);
+
+Reached sensitive command-injection sink 'child_process.execSync' with symbolic expr:
+(str.++ "npm view " payload " version")
+[1m[31mAbort[0;1m[0m: ["harness.js", 16., "command-injection", "child_process.execSync",
+        (str.++ "npm view " payload " version")]
+Path condition (PC): <empty>
+Model:
+ (model
+   (argv0 str "")
+   (argv1 str "")
+   (argv2 str "")
+   (argv3 str "")
+   (argv4 str "")
+   (payload str "")
+   (require('process').arch str ""))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  0.428s
+  - Solver time:     0.001s
+  - Solver queries:  1
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-cbd4fb-out"
