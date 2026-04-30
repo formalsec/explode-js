@@ -1,0 +1,60 @@
+./node_modules/promise/lib/done.js:6:0-13:2
+> Promise["prototype"]["done"] = function(onFulfilled, onRejected) {
+  var self = (arguments["length"] ? this["then"]["apply"](this, arguments) : this);
+  self["then"](null, function(err) { setTimeout(function() { throw err; }, 0); });
+};
+
+Uncaught TypeError: Cannot convert undefined or null to object
+./node_modules/promise/lib/finally.js:6:0-16:2
+> Promise["prototype"]["finally"] = function(f) { return this["then"](function(value) { return Promise["resolve"](f())["then"](function() { return value; }); }, function(err) { return Promise["resolve"](f())["then"](function() { throw err; }); }); };
+
+Uncaught TypeError: Cannot convert undefined or null to object
+./node_modules/promise/lib/es6-extensions.js:19:2-19:35
+> var p = new Promise(Promise["_61"]);
+
+Uncaught TypeError: is not a constructor
+./node_modules/promise/lib/node-extensions.js:118:0-130:2
+> Promise["prototype"]["nodeify"] = function(callback, ctx) {
+  if ((typeof callback != "function"))   return this;
+  this["then"](function(value) { asap(function() { callback["call"](ctx, null, value); }); }, function(err) { asap(function() { callback["call"](ctx, err); }); });
+};
+
+Uncaught TypeError: Cannot convert undefined or null to object
+./node_modules/colors/lib/index.js:8:4-8:51
+> String["prototype"]["__defineGetter__"](color, func);
+
+Uncaught TypeError: is not a function
+harness.js:13:8-20:11
+> exec(("git add " + files), function(err) { if (err) { reject(err); } else { resolve(); } });
+
+Reached sensitive command-injection sink 'child_process.exec' with symbolic expr:
+(str.++ "git add " payload)
+[1m[31mAbort[0;1m[0m: ["harness.js", 13., "command-injection", "child_process.exec",
+        (str.++ "git add " payload)]
+Path condition (PC):
+ (bool.eq argv0 "--") (bool.eq argv1 "--no-color")
+  (bool.eq argv2 "--no-colors") (bool.eq argv3 "--color=false")
+  (bool.eq argv4 "--color")
+Model:
+ (model
+   (argv0 str "--")
+   (argv1 str "--no-color")
+   (argv2 str "--no-colors")
+   (argv3 str "--color=false")
+   (argv4 str "--color")
+   (payload str "")
+   (require('process').arch str "")
+   (symbol_115 str "")
+   (symbol_116 str "")
+   (symbol_117 str "")
+   (symbol_118 str "")
+   (symbol_119 str "")
+   (symbol_120 str ""))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  140.515s
+  - Solver time:     0.012s
+  - Solver queries:  52
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-9c23e6-out"
