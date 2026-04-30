@@ -1,0 +1,31 @@
+harness.js:11:2-16:5
+> exec(cmd, {timeout: 30000}, function(e, stdout, stderr) {
+  if (e) { return cb(e); }
+  if (stderr) { return cb(new Error(stderr)); }
+  return cb(null, output["versions"]);
+});
+
+Reached sensitive command-injection sink 'child_process.exec' with symbolic expr:
+(str.++ "convert %s -auto-orient -strip -write mpr:%s +delete" payload
+ payload)
+[1m[31mAbort[0;1m[0m: ["harness.js", 11., "command-injection", "child_process.exec",
+        (str.++ "convert %s -auto-orient -strip -write mpr:%s +delete"
+         payload payload)]
+Path condition (PC): <empty>
+Model:
+ (model
+   (argv0 str "")
+   (argv1 str "")
+   (argv2 str "")
+   (argv3 str "")
+   (argv4 str "")
+   (payload str "")
+   (require('process').arch str ""))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  0.821s
+  - Solver time:     0.000s
+  - Solver queries:  1
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-47b7d4-out"
