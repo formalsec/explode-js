@@ -1,0 +1,41 @@
+{
+  "dependencies": {
+    "effect": "file:effect-1.0.4.tgz"
+  },
+  "index": "index.js",
+  "vulnerabilities": [
+    {
+      "advisory": {
+        "cve": "CVE-2020-7624",
+        "cwe": "CWE-78",
+        "github": "https://github.com/Javascipt/effect",
+        "id": "",
+        "nvd": "",
+        "snyk": "https://security.snyk.io/vuln/SNYK-JS-EFFECT-564256"
+      },
+      "location": {
+        "source" : {
+          "code" : "edge : function (options, callback) {",
+          "file" : "index.js",
+          "lineno" : 29
+        },
+        "sink": {
+          "code": "exec(cmd, function (error) {",
+          "file": "helper.js",
+          "lineno": 24
+        }
+      },
+      "patch": {
+        "diff": "n/a",
+        "fixed_version": "n/a",
+        "url": "url do commit"
+      },
+      "pocs": [
+        {
+          "file": "effect.test.js",
+          "source": "SecBench.js"
+        }
+      ]
+    }
+  ]
+}

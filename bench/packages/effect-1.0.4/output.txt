@@ -1,0 +1,27 @@
+harness.js:24:4-26:7
+> exec(cmd, function(error) { callback(error); });
+
+Reached sensitive command-injection sink 'child_process.exec' with symbolic expr:
+(str.++ "convert " payload " " " -negate -colorspace Gray -edge " "5"
+ " -resize " "100" "%" " " payload)
+[1m[31mAbort[0;1m[0m: ["harness.js", 24., "command-injection", "child_process.exec",
+        (str.++ "convert " payload " " " -negate -colorspace Gray -edge " "5"
+         " -resize " "100" "%" " " payload)]
+Path condition (PC): <empty>
+Model:
+ (model
+   (argv0 str "")
+   (argv1 str "")
+   (argv2 str "")
+   (argv3 str "")
+   (argv4 str "")
+   (payload str "")
+   (require('process').arch str ""))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  0.650s
+  - Solver time:     0.000s
+  - Solver queries:  1
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-ce0932-out"
