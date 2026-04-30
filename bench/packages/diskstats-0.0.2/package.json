@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "diskstats": "0.0.2"
+  },
+  "vulnerability":    {
+    "type": "command-injection",
+    "ghsa": null,
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-DISKSTATS-590099"
+    "sink": {
+      "code": "this.child_process.exec('df ' + this._ensureAbsPath(path), (err, stdout) => {",
+      "file": "lib/stats.js",
+      "lineno": 44
+    }
+  }
+}
