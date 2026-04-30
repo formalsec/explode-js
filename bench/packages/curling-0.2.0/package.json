@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "curling": "0.2.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-xmxh-g7wj-8m4m",
+    "sink": {
+      "file": "lib/curl-transport.js",
+      "line": 56,
+      "code": "exec(\"curl \" + command, function (error, stdout, stderr)"
+    }
+  }
+}
