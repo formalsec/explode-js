@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "git-add-remote": "1.0.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-h9v8-rm3m-5h5f",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-GITADDREMOTE-564269",
+    "sink": {
+      "code": "cp.exec('git remote add ' + name + ' ' + url, {cwd: cwd}, cb);",
+      "file": "index.js",
+      "lineno": 21
+    }
+  }
+}
