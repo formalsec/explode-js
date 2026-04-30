@@ -1,0 +1,16 @@
+{
+	"index": "index.js",
+	"dependencies": {
+		"fs-git":"1.0.1"
+	},
+	"vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-qr32-j4j6-3m7r",
+    "snyk": "https://security.snyk.io/vuln/npm:fs-git:20170601",
+    "sink": {
+      "file": "lib/index.js",
+      "lineno": 56,
+      "code": "child_process.exec(command, { maxBuffer: maxBuffer }, function (error, stdout, stderr) {"
+    }
+  }
+}
