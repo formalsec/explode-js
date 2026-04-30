@@ -1,0 +1,25 @@
+harness.js:10:4-24:7
+> exec(((("pdflatex -output-directory " + dest_file) + " ") + src_file), (err, stdout, stderr) => { if (err) { callback(1, `pdflatex[1] error: ${err}`); } else { exec(((("pdflatex -output-directory " + dest_file) + " ") + src_file), (err, stdout, stderr) => { if (err) { callback(1, `pdflatex[2] error: ${err}`); } else { callback(0, `[node-latex-complete] Complete source: ${src_file}, check out result in ${dest_file}!`); } }); } });
+
+Reached sensitive command-injection sink 'child_process.exec' with symbolic expr:
+(str.++ "pdflatex -output-directory " payload " " "./")
+[1m[31mAbort[0;1m[0m: ["harness.js", 10., "command-injection", "child_process.exec",
+        (str.++ "pdflatex -output-directory " payload " " "./")]
+Path condition (PC): <empty>
+Model:
+ (model
+   (argv0 str "")
+   (argv1 str "")
+   (argv2 str "")
+   (argv3 str "")
+   (argv4 str "")
+   (payload str "")
+   (require('process').arch str ""))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  0.426s
+  - Solver time:     0.001s
+  - Solver queries:  1
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-8a583d-out"

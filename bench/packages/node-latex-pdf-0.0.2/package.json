@@ -1,0 +1,44 @@
+{
+	"index": "index.js",
+	"dependencies": {
+		"node-latex-pdf": "0.0.2"
+	},
+
+	"vulnerabilities": [
+		{
+		"advisory":{
+			"id": "GHSA-32fw-9wq8-9x9c",
+			"cve": "CVE-2020-28433",
+			"cwe": "CWE-78",
+			"github": "https://github.com/advisories/GHSA-32fw-9wq8-9x9c",
+			"snyk": "https://security.snyk.io/vuln/SNYK-JS-NODELATEXPDF-1050426",
+			"nvd": "https://nvd.nist.gov/vuln/detail/CVE-2020-28433"
+		},
+
+		"location":{
+			"source": {
+				"file": "node-latex-pdf.js",
+				"lineno": 6,
+				"code": "var selflatex = function(src_file,dest_file,callback){"
+			},
+			"sink": {
+				"file": "node-latex-pdf.js",
+				"lineno": 10,
+				"code": "exec(\"pdflatex -output-directory \" + dest_file + \" \" + src_file, (err,stdout,stderr) => {"
+			}
+		},
+
+		"pocs": [{
+			"file": "poc.js",
+			"source": ""
+			}
+		],
+
+		"patch":{
+			"fixed_version": "0.0.3",
+			"url": "",
+			"diff": ""
+		}
+	}
+]
+}
