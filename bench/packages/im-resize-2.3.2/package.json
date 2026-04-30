@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "im-resize": "2.3.2"
+  },
+  "vulnerability": {
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-IMRESIZE-544183",
+    "ghsa": "https://github.com/advisories/GHSA-r9vm-rhmf-7hxx",
+    "sink":{
+      "file": "index.js",
+      "line": 11,
+      "code": "exec(cmd, {timeout: 30000}, function(e, stdout, stderr) {"
+    }
+  }
+}
