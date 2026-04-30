@@ -1,0 +1,34 @@
+- : app = { "type": symbol("normal"), "value": symbol("null"),
+            "__completion__": true, "target": symbol("empty"),  }
+harness.js:4:4-10:7
+> exec((("cat /sys/class/net/" + iface) + "/address"), function(err, out) {
+  if (err) {
+    callback(err, null);
+    return ;
+  }
+  callback(null, out["trim"]()["toLowerCase"]());
+});
+
+Reached sensitive command-injection sink 'child_process.exec' with symbolic expr:
+(str.++ "cat /sys/class/net/" payload "/address")
+[1m[31mAbort[0;1m[0m: ["harness.js", 4., "command-injection", "child_process.exec",
+        (str.++ "cat /sys/class/net/" payload "/address")]
+Path condition (PC): (bool.eq require('os').platform() "linux")
+Model:
+ (model
+   (argv0 str "")
+   (argv1 str "")
+   (argv2 str "")
+   (argv3 str "")
+   (argv4 str "")
+   (payload str "")
+   (require('os').platform() str "linux")
+   (require('process').arch str ""))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  0.813s
+  - Solver time:     0.009s
+  - Solver queries:  5
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-129a4f-out"

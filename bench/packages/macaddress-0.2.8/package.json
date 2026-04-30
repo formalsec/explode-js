@@ -1,0 +1,72 @@
+{
+  "dependencies": {
+    "macaddress": "0.2.8"
+  },
+  "index": "index.js",
+  "vulnerabilities": [
+    {
+      "advisory": {
+        "cve": " CVE-2018-13797",
+        "cwe": "CWE-78",
+        "github": "https://github.com/advisories/GHSA-pp57-mqmh-44h7",
+        "id": "GHSA-pp57-mqmh-44h7",
+        "nvd": "https://nvd.nist.gov/vuln/detail/CVE-2018-13797",
+        "snyk": "https://security.snyk.io/vuln/npm:macaddress:20180511"
+      },
+      "location": {
+        "sink": {
+          "file": "lib/linux.js",
+          "code": "exec(\"cat /sys/class/net/\" + iface + \"/address\", function (err, out) {",
+          "lineno": 4
+        },
+        "source": {
+          "file": "lib/linux.js",
+          "code": "module.exports = function (iface, callback) {",
+          "lineno": 3
+        }
+      },
+      "patch": {
+        "diff": "",
+        "fixed_version": "0.2.9",
+        "url": "https://github.com/scravy/node-macaddress/commit/358fd594adb196a86b94ac9c691f69fe5dad2332"
+      },
+      "pocs": [
+        {
+          "file": "poc.js",
+        }
+      ]
+    },
+    {
+      "advisory": {
+        "cve": " CVE-2018-13797",
+        "cwe": "CWE-78",
+        "github": "https://github.com/advisories/GHSA-pp57-mqmh-44h7",
+        "id": "GHSA-pp57-mqmh-44h7",
+        "nvd": "https://nvd.nist.gov/vuln/detail/CVE-2018-13797",
+        "snyk": "https://security.snyk.io/vuln/npm:macaddress:20180511"
+      },
+      "location": {
+        "sink": {
+          "file": "lib/unix.js",
+          "code": "exec(\"ifconfig \" + iface, function (err, out) {",
+          "lineno": 4
+        },
+        "source": {
+          "file": "lib/unix.js",
+          "code": "module.exports = function (iface, callback) {",
+          "lineno": 3
+        }
+      },
+      "patch": {
+        "diff": "",
+        "fixed_version": "0.2.9",
+        "url": "https://github.com/scravy/node-macaddress/commit/358fd594adb196a86b94ac9c691f69fe5dad2332"
+      },
+      "pocs": [
+        {
+          "file": "poc.js",
+        }
+      ]
+    }
+  ]
+}
