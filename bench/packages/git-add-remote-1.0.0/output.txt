@@ -1,0 +1,25 @@
+harness.js:21:4-21:66
+> cp["exec"](((("git remote add " + name) + " ") + url), {cwd: cwd}, cb);
+
+Reached sensitive command-injection sink 'child_process.exec' with symbolic expr:
+(str.++ "git remote add " payload " " "")
+[1m[31mAbort[0;1m[0m: ["harness.js", 21., "command-injection", "child_process.exec",
+        (str.++ "git remote add " payload " " "")]
+Path condition (PC): <empty>
+Model:
+ (model
+   (argv0 str "")
+   (argv1 str "")
+   (argv2 str "")
+   (argv3 str "")
+   (argv4 str "")
+   (payload str "")
+   (require('process').arch str ""))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  0.367s
+  - Solver time:     0.009s
+  - Solver queries:  1
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-cd9d8d-out"
