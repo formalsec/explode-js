@@ -1,0 +1,47 @@
+harness.js:66:2-92:7
+> var ls = cp["exec"](("ping  -c 1 " + ipAddress), function(error, stdout, stderr) {
+  if ((error !== null)) {
+    callback("IP address unreachable", ("exec error: " + error));
+    return ;
+  }
+  if (((stderr !== null) && (stderr !== ""))) {
+    callback("IP address unreachable", ("stderr: " + stderr));
+    return ;
+  }
+  var ls2 = cp["exec"]("arp -a", function(error2, stdout2, stderr2) {
+  if ((error2 !== null)) {
+    callback("IP address unreachable", ("exec error: " + error2));
+    return ;
+  }
+  if (((stderr2 !== null) && (stderr2 !== ""))) {
+    callback("IP address unreachable", ("stderr: " + stderr2));
+    return ;
+  }
+  stdout2 = stdout2["substring"]((stdout2["indexOf"](ipAddress) + (ipAddress["length"] + 5)))["substring"](MACADDRESS_LENGTH, 0);
+  callback(false, stdout2);
+  return ;
+});
+});
+
+Reached sensitive command-injection sink 'child_process.exec' with symbolic expr:
+(str.++ "ping  -c 1 " payload)
+[1m[31mAbort[0;1m[0m: ["harness.js", 66., "command-injection", "child_process.exec",
+        (str.++ "ping  -c 1 " payload)]
+Path condition (PC): <empty>
+Model:
+ (model
+   (argv0 str "")
+   (argv1 str "")
+   (argv2 str "")
+   (argv3 str "")
+   (argv4 str "")
+   (payload str "")
+   (require('process').arch str ""))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  0.474s
+  - Solver time:     0.000s
+  - Solver queries:  1
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-a44be9-out"

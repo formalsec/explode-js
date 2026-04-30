@@ -1,0 +1,40 @@
+{
+  "dependencies": {
+    "macfromip": "1.1.1"
+  },
+  "index": "macfromip.js",
+  "vulnerabilities": [
+    {
+      "advisory": {
+        "cve": "CVE-2020-7786",
+        "cwe": "CWE-78",
+        "github": "https://github.com/advisories/GHSA-vh8f-xw5v-8993",
+        "id": "GHSA-vh8f-xw5v-8993",
+        "nvd": "https://nvd.nist.gov/vuln/detail/CVE-2020-7786",
+        "snyk": "https://security.snyk.io/vuln/SNYK-JS-MACFROMIP-1048336"
+      },
+      "location": {
+        "sink": {
+          "code": "var ls = cp.exec('ping  -c 1 ' + ipAddress,",
+          "file": "macfromip.js",
+          "lineno": 66
+        },
+        "source": {
+          "code": "macfromip.getMacInLinux = function(ipAddress, callback){",
+          "file": "macfromip.js",
+          "lineno": 64
+        }
+      },
+      "patch": {
+        "diff": "n/a",
+        "fixed_version": "n/a",
+        "url": "https://github.com/bcamarneiro/macfromip/commit/1bbed8cd6f8299ad2e9d028e0ed0771340ab8391"
+      },
+      "pocs": [
+        {
+          "file": "poc.js",
+        }
+      ]
+    }
+  ]
+}
