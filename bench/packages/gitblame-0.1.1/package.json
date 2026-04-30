@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "gitblame": "0.1.1"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-3486-rvxc-hrrj",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-GITBLAME-1050430",
+    "sink": {
+      "file": "lib/gitblame.js",
+      "lineno": 15,
+      "code": "exec('git blame ' + filename, {cwd: dirname}, function (error, stdout, stderr) {"
+    }
+  }
+}
