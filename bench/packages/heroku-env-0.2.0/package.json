@@ -1,0 +1,40 @@
+{
+  "dependencies": {
+    "heroku-env": "0.2.0"
+  },
+  "index": "index.js",
+  "vulnerabilities": [
+    {
+      "advisory": {
+        "cve": "CVE-2020-28437",
+        "cwe": "CWE-78",
+        "github": "https://github.com/advisories/GHSA-jp45-65jw-94mj",
+        "id": "GHSA-jp45-65jw-94mj",
+        "nvd": "https://nvd.nist.gov/vuln/detail/CVE-2020-28437",
+        "snyk": "https://security.snyk.io/vuln/SNYK-JS-HEROKUENV-1050432"
+      },
+      "location": {
+        "sink": {
+          "code": "exec('heroku config --app ' + app, function(err, stdout) {",
+          "file": "lib/get.js",
+          "lineno": 3
+        },
+        "source": {
+          "code": "module.exports = function(app, name, cb) {",
+          "lineno": 27
+        }
+      },
+      "patch": {
+        "diff": "path_para_ficheiro_com_diff_relevante",
+        "fixed_version": "id",
+        "url": "url do commit"
+      },
+      "pocs": [
+        {
+          "file": "poc.js",
+          "source": ""
+        }
+      ]
+    }
+  ]
+}

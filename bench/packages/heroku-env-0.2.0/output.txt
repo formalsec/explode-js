@@ -1,0 +1,37 @@
+harness.js:3:2-18:4
+> exec(("heroku config --app " + app), function(err, stdout) {
+  if (err)   return cb(err);
+  var config = {};
+  var lines = stdout["split"]("
+");
+  lines["shift"]();
+  lines["forEach"](function(line) {
+  if (! line["trim"]())   return ;
+  var parts = line["split"](": ");
+  if (! parts[1]) { console["log"]("could not parse", line); } else { config[parts[0]["trim"]()] = parts[1]["trim"](); }
+});
+  cb(null, config);
+});
+
+Reached sensitive command-injection sink 'child_process.exec' with symbolic expr:
+(str.++ "heroku config --app " payload)
+[1m[31mAbort[0;1m[0m: ["harness.js", 3., "command-injection", "child_process.exec",
+        (str.++ "heroku config --app " payload)]
+Path condition (PC): <empty>
+Model:
+ (model
+   (argv0 str "")
+   (argv1 str "")
+   (argv2 str "")
+   (argv3 str "")
+   (argv4 str "")
+   (payload str "")
+   (require('process').arch str ""))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  0.978s
+  - Solver time:     0.001s
+  - Solver queries:  1
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-438ae2-out"
