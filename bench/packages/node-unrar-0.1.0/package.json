@@ -1,0 +1,45 @@
+{
+	"index": "index.js",
+	"dependencies": {
+		"node-unrar": "0.1.0"
+	},
+
+	"vulnerabilities": [
+		{
+		"advisory":{
+			"id": "",
+			"cve": "",
+			"cwe": "CWE-94",
+			"github": "",
+			"snyk": "",
+			"nvd": ""
+		},
+
+		"location":{
+			"source": {
+				"file": "lib/index.js",
+				"lineno": 17,
+				"code": "UnrarModule.prototype._execute = function (args, dstPath, cb) {"
+			},
+			"sink": {
+				"file": "lib/index.js",
+				"lineno": 23,
+				"code": "exec(execCommand, function (err, stdout, stderr) {"
+			}
+		},
+
+		"pocs": [{
+			"file": "node-unrar.test.js",
+			"source": ""
+			}
+		],
+
+		"patch":{
+			"fixed_version": "",
+			"url": "",
+			"diff": ""
+		}
+
+	}
+]
+}

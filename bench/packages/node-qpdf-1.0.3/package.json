@@ -1,0 +1,36 @@
+{
+  "dependencies": {
+    "node-qpdf": "1.0.3"
+  },
+  "index": "index.js",
+  "vulnerabilities": [
+    {
+      "advisory": {
+        "cve": "CVE-2023-26155",
+        "cwe": "CWE-77",
+        "github": "https://github.com/advisories/GHSA-fpr8-4wvx-j9q3",
+        "id": "GHSA-fpr8-4wvx-j9q3",
+        "nvd": "https://nvd.nist.gov/vuln/detail/CVE-2023-26155",
+        "snyk": "https://security.snyk.io/vuln/SNYK-JS-NODEQPDF-5747918"
+      },
+      "location": {
+        "source": {
+          "file": "index.js",
+          "lineno": 6,
+          "code": "Qpdf.encrypt = function(input, options, callback) {"
+        },
+        "sink": {
+          "file": "index.js",
+          "lineno": 110,
+          "code": "child = spawn('/bin/sh', ['-c', args.join(' ') + ' | cat']);"
+        }
+      },
+      "patch": {},
+      "pocs": [
+        {
+          "file": "poc.js"
+        }
+      ]
+    }
+  ]
+}

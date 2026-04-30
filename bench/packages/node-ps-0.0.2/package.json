@@ -1,0 +1,45 @@
+{
+	"index": "index.js",
+	"dependencies": {
+		"node-ps": "0.0.2"
+	},
+
+	"vulnerabilities": [
+		{
+		"advisory":{
+			"id": "GHSA-4rv9-5vc4-88cg",
+			"cve": "CVE-2020-7785",
+			"cwe": "CWE-78",
+			"github": "https://github.com/advisories/GHSA-4rv9-5vc4-88cg",
+			"snyk": "https://security.snyk.io/vuln/SNYK-JS-NODEPS-1048335",
+			"nvd": "CVE-2020-7785"
+		},
+
+		"location":{
+			"source": {
+				"file": "lib/index.js",
+				"lineno": 80,
+				"code": "function lookup(query, cb) {"
+			},
+			"sink": {
+				"file": "lib/index.js",
+				"lineno": 72,
+				"code": "childProcess.exec(cmd, function (err, stdout, stderr) {"
+			}
+		},
+
+		"pocs": [{
+			"file": "node-ps.test.js",
+			"source": ""
+			}
+		],
+
+		"patch":{
+			"fixed_version": "",
+			"url": "",
+			"diff": ""
+		}
+
+	}
+]
+}

@@ -1,0 +1,41 @@
+{
+    "index": "index.js",
+    "dependencies": {
+        "npm-git-publish": "0.2.4-beta"
+    },
+    "vulnerabilities": [
+        {
+            "advisory": {
+                "id": "GHSA-49mg-94fc-2fx6",
+                "cve": "",
+                "cwe": "CWE-94",
+                "github": "https://github.com/advisories/GHSA-49mg-94fc-2fx6",
+                "snyk": "https://security.snyk.io/vuln/SNYK-JS-NPMGITPUBLISH-541508",
+                "nvd": ""
+            },
+            "location": {
+                "source": {
+                    "file": "lib/publish.js",
+                    "lineno": 11,
+                    "code": "function publish(packageDir, gitRemoteUrl, options, tagName, tagMessageText, tempDir, packageInfo) {"
+                },
+                "sink": {
+                    "file": "lib/publish.js",
+                    "lineno": 92,
+                    "code": "child_process_1.execSync(\"git clone --quiet --depth 1 \" + gitRemoteUrl + \" \"\" + gitRepoDir + \"\"\", { stdio: 'inherit' });"
+                }
+            },
+            "pocs": [
+                {
+                    "file": "npm-git-publish.test.js",
+                    "source": ""
+                }
+            ],
+            "patch": {
+                "fixed_version": "",
+                "url": "",
+                "diff": ""
+            }
+        }
+    ]
+}

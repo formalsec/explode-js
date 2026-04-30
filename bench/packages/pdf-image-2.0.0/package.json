@@ -1,0 +1,104 @@
+{
+    "dependencies": {
+        "pdf-image": "2.0.0"
+    },
+    "index": "index.js",
+    "vulnerabilities": [
+        {
+            "advisory": {
+                "cve": "CVE-2020-8132",
+                "cwe": "CWE-78",
+                "github": "https://github.com/advisories/GHSA-rv7p-mmwq-x674",
+                "id": "GHSA-rv7p-mmwq-x674",
+                "nvd": "https://nvd.nist.gov/vuln/detail/CVE-2020-8132",
+                "snyk": "https://security.snyk.io/vuln/SNYK-JS-PDFIMAGE-551984"
+            },
+            "location": {
+                "source": {
+                    "file": "index.js",
+                    "lineno": 26,
+                    "code": "return util.format(\"pdfinfo \\\"%s\\\"\", this.pdfFilePath);"
+                },
+                "sink": {
+                    "file": "index.js",
+                    "lineno": 44,
+                    "code": "exec(getInfoCommand, function (err, stdout, stderr) {"
+                }
+            },
+            "patch": {
+                "diff": "",
+                "fixed_version": "",
+                "url": ""
+            },
+            "pocs": [
+                {
+                    "file": "pdf-image.test.js"
+                }
+            ]
+        },
+        {
+            "advisory": {
+                "cve": "CVE-2020-8132",
+                "cwe": "CWE-78",
+                "github": "https://github.com/advisories/GHSA-rv7p-mmwq-x674",
+                "id": "GHSA-rv7p-mmwq-x674",
+                "nvd": "https://nvd.nist.gov/vuln/detail/CVE-2020-8132",
+                "snyk": "https://security.snyk.io/vuln/SNYK-JS-PDFIMAGE-551984"
+            },
+            "location": {
+                "source": {
+                    "file": "index.js",
+                    "lineno": 96,
+                    "code": "return util.format(\"%s -append %s \\\"%s\\\"\", ..., imagePaths.join(' '), ...);"
+                },
+                "sink": {
+                    "file": "index.js",
+                    "lineno": 116,
+                    "code": "exec(combineCommand, function (err, stdout, stderr) {"
+                }
+            },
+            "patch": {
+                "diff": "",
+                "fixed_version": "n/a",
+                "url": "https://github.com/advisories/GHSA-rv7p-mmwq-x674"
+            },
+            "pocs": [
+                {
+                    "file": "pdf-image.test.js"
+                }
+            ]
+        },
+        {
+            "advisory": {
+                "cve": "CVE-2020-8132",
+                "cwe": "CWE-78",
+                "github": "https://github.com/advisories/GHSA-rv7p-mmwq-x674",
+                "id": "GHSA-rv7p-mmwq-x674",
+                "nvd": "https://nvd.nist.gov/vuln/detail/CVE-2020-8132",
+                "snyk": "https://security.snyk.io/vuln/SNYK-JS-PDFIMAGE-551984"
+            },
+            "location": {
+                "source": {
+                    "file": "index.js",
+                    "lineno": 84,
+                    "code": "constructConvertCommandForPage: function (pageNumber) {"
+                },
+                "sink": {
+                    "file": "index.js",
+                    "lineno": 170,
+                    "code": "exec(convertCommand, function (err, stdout, stderr) {"
+                }
+            },
+            "patch": {
+                "diff": "",
+                "fixed_version": "n/a",
+                "url": "https://github.com/advisories/GHSA-rv7p-mmwq-x674"
+            },
+            "pocs": [
+                {
+                    "file": "pdf-image.test.js"
+                }
+            ]
+        }
+    ]
+}

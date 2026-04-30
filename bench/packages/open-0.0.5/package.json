@@ -1,0 +1,29 @@
+{
+  "dependencies": { "open": "0.0.5" },
+  "index": "lib/open.js",
+  "vulnerabilities": [
+    {
+      "advisory": {
+        "cve": "",
+        "cwe": "CWE-94",
+        "github": "https://github.com/advisories/GHSA-28xh-wpgr-7fm8",
+        "id": "GHSA-28xh-wpgr-7fm8",
+        "nvd": "",
+        "snyk": "https://security.snyk.io/vuln/SNYK-JS-OPEN-174041"
+      },
+      "location": {
+        "sink": { 
+          "code": "return exec(opener + '\"' + escape(target) + '\"', callback);", 
+          "file": "lib/open.js", 
+          "lineno": 58 
+        }
+      },
+      "patch": {
+        "diff": "",
+        "fixed_version": "6.0.0",
+        "url": "url do commit"
+      },
+      "pocs": [ { "file": "poc1.js", "source": "link" } ]
+    }
+  ]
+}

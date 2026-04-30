@@ -1,0 +1,40 @@
+{
+    "dependencies": {
+        "npm-lockfile": "2.0.3"
+    },
+    "index": "getLockfile.js",
+    "vulnerabilities": [
+        {
+            "advisory": {
+                "cve": "CVE-2022-0841",
+                "cwe": "CWE-78",
+                "github": "https://github.com/advisories/GHSA-cr6m-62pq-hmqh",
+                "id": "GHSA-cr6m-62pq-hmqh",
+                "nvd": "https://nvd.nist.gov/vuln/detail/CVE-2022-0841",
+                "snyk": "https://security.snyk.io/vuln/SNYK-JS-NPMLOCKFILE-2421201"
+            },
+            "location": {
+                "source": {
+                    "file": "getLockfile.js",
+                    "lineno": 15,
+                    "code": "module.exports = function getLockfile(packageFile, date, {"
+                },
+                "sink": {
+                    "file": "getLockfile.js",
+                    "lineno": 42,
+                    "code": "exec( `npm install --package-lock --package-lock-only${date ? ` --before=${date}` : ''}${only ? ` --only=${only}` : ''}`,"
+                }
+            },
+            "patch": {
+                "diff": "",
+                "fixed_version": "2.0.4",
+                "url": "https://github.com/ljharb/npm-lockfile/commit/bfdb84813260f0edbf759f2fde1e8c816c1478b8"
+            },
+            "pocs": [
+                {
+                    "file": "poc.js"
+                }
+            ]
+        }
+    ]
+}
