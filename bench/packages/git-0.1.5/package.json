@@ -1,0 +1,40 @@
+{
+    "dependencies": {
+        "git": "0.1.5"
+    },
+    "index": "...",
+    "vulnerabilities": [
+        {
+            "advisory": {
+                "cve": "CVE-2021-25943",
+                "cwe": "CWE-1321",
+                "github": "https://github.com/advisories/GHSA-cwcx-rxgc-cmw3",
+                "id": "GHSA-cwcx-rxgc-cmw3",
+                "nvd": "link",
+                "snyk": "https://github.com/advisories/GHSA-cwcx-rxgc-cmw3"
+            },
+            "location": {
+                "sink": {
+                    "code": "exec(call_string, options,",
+                    "file": "git.js",
+                    "lineno": 232
+                },
+                "source": {
+                    "code": "function set (obj, key, val) ",
+                    "lineno": 21
+                }
+            },
+            "patch": {
+                "diff": "path_para_ficheiro_com_diff_relevante",
+                "fixed_version": "id",
+                "url": "url do commit"
+            },
+            "pocs": [
+                {
+                    "file": "poc1.js",
+                    "source": "link"
+                }
+            ]
+        }
+    ]
+}
