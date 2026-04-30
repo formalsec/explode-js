@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "heroku-env": "0.2.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-jp45-65jw-94mj",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-HEROKUENV-1050432",
+    "sink": {
+      "code": "exec('heroku config --app ' + app, function(err, stdout) {",
+        "file": "lib/get.js",
+        "lineno": 3
+    }
+  }
+}
