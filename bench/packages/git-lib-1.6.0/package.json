@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "git-lib": "1.6.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-GITLIB-1012734",
+    "sink": {
+      "file": "git.js",
+      "code": "exec('git add ' + files, function(err){",
+      "line": 13
+    }
+  }
+}
