@@ -1,0 +1,41 @@
+{
+    "dependencies": {
+        "install-package": "0.4.0",
+        "left-pad": "^1.3.0"
+    },
+    "index": "index.js",
+    "vulnerabilities": [
+        {
+        "advisory": {
+            "id": "GHSA-6m4r-m3gc-h4r5",
+            "cve_id": "CVE-2020-7629",
+            "cwe": "CWE-78",
+            "nvd":"nvd.nist.gov/vuln/detail/CVE-2020-7629",
+            "snyk":"https://snyk.io/vuln/SNYK-JS-INSTALLPACKAGE-564267",
+            "github": "https://github.com/advisories/GHSA-6m4r-m3gc-h4r5"
+        },
+        "location": {
+            "source": {
+                    "file": "index.js",
+                    "lineno": 63,
+                    "code": "module.exports = function (packages, options, execOptions) {"
+                },
+                "sink": {
+                    "file": "index.js",
+                    "lineno": 82,
+                    "code": "exec(args.join(' '), execOpts, (error, stdout, stderr) => {"
+                }
+        },
+        "patch": {
+            "url": "",
+            "diff": "",
+            "fixed_version": ""
+        },
+        "pocs": [
+            {
+            "file": "poc.js",
+            "source": ""
+            }
+        ]
+    }
+]}
