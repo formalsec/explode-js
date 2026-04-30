@@ -1,0 +1,163 @@
+./node_modules/js-yaml/lib/js-yaml/type/str.js:5:0-8:3
+> module["exports"] = new Type("tag:yaml.org,2002:str", {kind: "scalar", construct: function(data) { return ((data !== null) ? data : ""); }});
+
+Uncaught TypeError: is not a constructor
+./node_modules/js-yaml/lib/js-yaml/type/seq.js:5:0-8:3
+> module["exports"] = new Type("tag:yaml.org,2002:seq", {kind: "sequence", construct: function(data) { return ((data !== null) ? data : []); }});
+
+Uncaught TypeError: is not a constructor
+./node_modules/js-yaml/lib/js-yaml/type/map.js:5:0-8:3
+> module["exports"] = new Type("tag:yaml.org,2002:map", {kind: "mapping", construct: function(data) { return ((data !== null) ? data : {}); }});
+
+Uncaught TypeError: is not a constructor
+./node_modules/js-yaml/lib/js-yaml/schema/failsafe.js:5:0-8:3
+> module["exports"] = new Type("tag:yaml.org,2002:map", {kind: "mapping", construct: function(data) { return ((data !== null) ? data : {}); }});
+
+Uncaught TypeError: is not a constructor
+./node_modules/js-yaml/lib/js-yaml/type/null.js:22:0-34:3
+> module["exports"] = new Type("tag:yaml.org,2002:null", {kind: "scalar", resolve: resolveYamlNull, construct: constructYamlNull, predicate: isNull, represent: {canonical: function() { return "~"; }, lowercase: function() { return "null"; }, uppercase: function() { return "NULL"; }, camelcase: function() { return "Null"; }}, defaultStyle: "lowercase"});
+
+Uncaught TypeError: is not a constructor
+./node_modules/js-yaml/lib/js-yaml/type/bool.js:24:0-35:3
+> module["exports"] = new Type("tag:yaml.org,2002:bool", {kind: "scalar", resolve: resolveYamlBoolean, construct: constructYamlBoolean, predicate: isBoolean, represent: {lowercase: function(object) { return (object ? "true" : "false"); }, uppercase: function(object) { return (object ? "TRUE" : "FALSE"); }, camelcase: function(object) { return (object ? "True" : "False"); }}, defaultStyle: "lowercase"});
+
+Uncaught TypeError: is not a constructor
+./node_modules/js-yaml/lib/js-yaml/type/int.js:150:0-168:3
+> module["exports"] = new Type("tag:yaml.org,2002:int", {kind: "scalar", resolve: resolveYamlInteger, construct: constructYamlInteger, predicate: isInteger, represent: {binary: function(object) { return ("0b" + object["toString"](2)); }, octal: function(object) { return ("0" + object["toString"](8)); }, decimal: function(object) { return object["toString"](10); }, hexadecimal: function(object) { return ("0x" + object["toString"](16)["toUpperCase"]()); }}, defaultStyle: "decimal", styleAliases: {binary: [2, "bin"], octal: [8, "oct"], decimal: [10, "dec"], hexadecimal: [16, "hex"]}});
+
+Uncaught TypeError: is not a constructor
+./node_modules/js-yaml/lib/js-yaml/type/float.js:98:0-105:3
+> module["exports"] = new Type("tag:yaml.org,2002:float", {kind: "scalar", resolve: resolveYamlFloat, construct: constructYamlFloat, predicate: isFloat, represent: representYamlFloat, defaultStyle: "lowercase"});
+
+Uncaught TypeError: is not a constructor
+./node_modules/js-yaml/lib/js-yaml/schema/json.js:98:0-105:3
+> module["exports"] = new Type("tag:yaml.org,2002:float", {kind: "scalar", resolve: resolveYamlFloat, construct: constructYamlFloat, predicate: isFloat, represent: representYamlFloat, defaultStyle: "lowercase"});
+
+Uncaught TypeError: is not a constructor
+./node_modules/js-yaml/lib/js-yaml/schema/core.js:98:0-105:3
+> module["exports"] = new Type("tag:yaml.org,2002:float", {kind: "scalar", resolve: resolveYamlFloat, construct: constructYamlFloat, predicate: isFloat, represent: representYamlFloat, defaultStyle: "lowercase"});
+
+Uncaught TypeError: is not a constructor
+./node_modules/js-yaml/lib/js-yaml/type/timestamp.js:82:0-88:3
+> module["exports"] = new Type("tag:yaml.org,2002:timestamp", {kind: "scalar", resolve: resolveYamlTimestamp, construct: constructYamlTimestamp, instanceOf: Date, represent: representYamlTimestamp});
+
+Uncaught TypeError: is not a constructor
+./node_modules/js-yaml/lib/js-yaml/type/merge.js:9:0-12:3
+> module["exports"] = new Type("tag:yaml.org,2002:merge", {kind: "scalar", resolve: resolveYamlMerge});
+
+Uncaught TypeError: is not a constructor
+./node_modules/js-yaml/lib/js-yaml/type/binary.js:129:0-135:3
+> module["exports"] = new Type("tag:yaml.org,2002:binary", {kind: "scalar", resolve: resolveYamlBinary, construct: constructYamlBinary, predicate: isBinary, represent: representYamlBinary});
+
+Uncaught TypeError: is not a constructor
+./node_modules/js-yaml/lib/js-yaml/type/omap.js:40:0-44:3
+> module["exports"] = new Type("tag:yaml.org,2002:omap", {kind: "sequence", resolve: resolveYamlOmap, construct: constructYamlOmap});
+
+Uncaught TypeError: is not a constructor
+./node_modules/js-yaml/lib/js-yaml/type/pairs.js:49:0-53:3
+> module["exports"] = new Type("tag:yaml.org,2002:pairs", {kind: "sequence", resolve: resolveYamlPairs, construct: constructYamlPairs});
+
+Uncaught TypeError: is not a constructor
+./node_modules/js-yaml/lib/js-yaml/type/set.js:25:0-29:3
+> module["exports"] = new Type("tag:yaml.org,2002:set", {kind: "mapping", resolve: resolveYamlSet, construct: constructYamlSet});
+
+Uncaught TypeError: is not a constructor
+./node_modules/js-yaml/lib/js-yaml/schema/default_safe.js:13:2-15:5
+> schema["include"]["forEach"](function(includedSchema) { result = compileList(includedSchema, name, result); });
+
+Uncaught TypeError: Cannot convert undefined or null to object
+./node_modules/js-yaml/lib/js-yaml/type/js/undefined.js:22:0-28:3
+> module["exports"] = new Type("tag:yaml.org,2002:js/undefined", {kind: "scalar", resolve: resolveJavascriptUndefined, construct: constructJavascriptUndefined, predicate: isUndefined, represent: representJavascriptUndefined});
+
+Uncaught TypeError: is not a constructor
+./node_modules/js-yaml/lib/js-yaml/type/js/regexp.js:54:0-60:3
+> module["exports"] = new Type("tag:yaml.org,2002:js/regexp", {kind: "scalar", resolve: resolveJavascriptRegExp, construct: constructJavascriptRegExp, predicate: isRegExp, represent: representJavascriptRegExp});
+
+Uncaught TypeError: is not a constructor
+./node_modules/js-yaml/lib/js-yaml/type/js/function.js:78:0-84:3
+> module["exports"] = new Type("tag:yaml.org,2002:js/function", {kind: "scalar", resolve: resolveJavascriptFunction, construct: constructJavascriptFunction, predicate: isFunction, represent: representJavascriptFunction});
+
+Uncaught TypeError: is not a constructor
+./node_modules/js-yaml/lib/js-yaml/schema/default_full.js:78:0-84:3
+> module["exports"] = new Type("tag:yaml.org,2002:js/function", {kind: "scalar", resolve: resolveJavascriptFunction, construct: constructJavascriptFunction, predicate: isFunction, represent: representJavascriptFunction});
+
+Uncaught TypeError: is not a constructor
+./node_modules/readable-stream/lib/_stream_writable.js:42:0-42:32
+> util["inherits"](Writable, Stream);
+
+Uncaught TypeError: is not a function
+./node_modules/readable-stream/lib/_stream_duplex.js:46:0-46:32
+> util["inherits"](Duplex, Readable);
+
+Uncaught TypeError: is not a function
+./node_modules/readable-stream/lib/_stream_transform.js:74:0-74:33
+> util["inherits"](Transform, Duplex);
+
+Uncaught TypeError: is not a function
+./node_modules/readable-stream/lib/_stream_passthrough.js:35:0-35:38
+> util["inherits"](PassThrough, Transform);
+
+Uncaught TypeError: is not a function
+0.0
+3488.0
+111680.0
+3465280.0
+107426912.0
+./node_modules/JSONStream/index.js:3:0-27:1
+> module["exports"] = function(filepath, split, encoding) {
+  split = ((typeof split !== "undefined") ? split : "
+");
+  encoding = ((typeof encoding !== "undefined") ? encoding : "utf8");
+  var ca = [];
+  var chain = fs["readFileSync"](filepath, encoding);
+  if (((chain["indexOf"]("-END CERTIFICATE-") < 0) || (chain["indexOf"]("-BEGIN CERTIFICATE-") < 0))) { throw Error("File does not contain 'BEGIN CERTIFICATE' or 'END CERTIFICATE'"); }
+  chain = chain["split"](split);
+  var cert = [];
+  var _i, _len;
+  for ((_i = 0, _len = chain["length"]); (_i < _len); _i++) {
+    var line = chain[_i];
+    if (! (line["length"] !== 0)) { continue; }
+    cert["push"](line);
+    if (line["match"]("/-END CERTIFICATE-/")) {
+      ca["push"](cert["join"](split));
+      cert = [];
+    }
+  }
+  return ca;
+};
+
+Uncaught SyntaxError
+harness.js:91:12-91:106
+> var execDockerCompose = exec(((("docker-compose exec " + serviceName) + " ") + cmd), {cwd: cwd});
+
+Reached sensitive command-injection sink 'child_process.exec' with symbolic expr:
+(str.++ "docker-compose exec " payload " " "touch vulnerable")
+[1m[31mAbort[0;1m[0m: ["harness.js", 91., "command-injection", "child_process.exec",
+        (str.++ "docker-compose exec " payload " " "touch vulnerable")]
+Path condition (PC):
+ (bool.ne
+  (real.ne (real.reinterpret_int (str.to_int symbol_307))
+   (real.reinterpret_int (str.to_int symbol_307))) true)
+  (bool.eq (real.eq (real.reinterpret_int (str.to_int symbol_307)) 0.) false)
+  (real.eq (real.reinterpret_int (str.to_int symbol_307))
+   (real.reinterpret_int (str.to_int symbol_307)))
+  (real.eq (real.reinterpret_int (str.to_int symbol_307)) 1.)
+  (bool.eq (real.eq (real.reinterpret_int (str.to_int symbol_307)) 1.) true)
+Model:
+ (model
+   (argv0 str "")
+   (argv1 str "")
+   (argv2 str "")
+   (argv3 str "")
+   (argv4 str "")
+   (payload str "")
+   (require('process').arch str "")
+   (symbol_307 str "1"))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  81.338s
+  - Solver time:     0.005s
+  - Solver queries:  8
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-f104da-out"

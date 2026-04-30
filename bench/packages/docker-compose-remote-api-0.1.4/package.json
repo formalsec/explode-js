@@ -1,0 +1,40 @@
+{
+  "dependencies": {
+    "docker-compose-remote-api": "0.1.4"
+  },
+  "index": "index.js",
+  "vulnerabilities": [
+    {
+      "advisory": {
+        "cve": "CVE-2020-7606",
+        "cwe": "CWE-78",
+        "github": "https://github.com/advisories/GHSA-q6pj-jh94-5fpr",
+        "id": "GHSA-q6pj-jh94-5fpr",
+        "nvd": "https://nvd.nist.gov/vuln/detail/CVE-2020-7606",
+        "snyk": "https://security.snyk.io/vuln/SNYK-JS-DOCKERCOMPOSEREMOTEAPI-560125"
+      },
+      "location": {
+        "sink": {
+          "code": "var execDockerCompose  = exec(\"docker-compose exec \" + serviceName + \" \" + cmd, { cwd: cwd });",
+          "file": "index.js",
+          "lineno": 91
+        },
+        "source": {
+          "code": "exec: function(serviceName, cmd, fnStdout, fnStderr, fnExit){",
+          "lineno": 90
+        }
+      },
+      "patch": {
+        "diff": "path_para_ficheiro_com_diff_relevante",
+        "fixed_version": "id",
+        "url": "url do commit"
+      },
+      "pocs": [
+        {
+          "file": "docker-compose-remote-api.test.js",
+          "source": "https://github.com/formalsec"
+        }
+      ]
+    }
+  ]
+}
