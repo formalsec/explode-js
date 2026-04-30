@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "docker-compose-remote-api": "0.1.4"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-q6pj-jh94-5fpr",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-DOCKERCOMPOSEREMOTEAPI-560125",
+    "sink": {
+      "code": "var execDockerCompose  = exec(\"docker-compose exec \" + serviceName + \" \" + cmd, { cwd: cwd });",
+      "file": "index.js",
+      "lineno": 91
+    }
+  }
+}
