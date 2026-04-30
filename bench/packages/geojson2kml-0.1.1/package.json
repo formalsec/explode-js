@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "geojson2kml": "0.1.1"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-w83x-fp72-p9qc",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-GEOJSON2KML-1050412",
+    "sink": {
+      "code": "exec(ogrCommand, function(err, stdout, stderr)",
+      "file": "index.js",
+      "lineno": 6
+    }
+  }
+}
