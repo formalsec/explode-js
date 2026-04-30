@@ -1,0 +1,53 @@
+./node_modules/http-duplex/index.js:58:0-58:35
+> inherits(HttpDuplex, DuplexStream);
+
+Uncaught TypeError: is not a function
+./node_modules/git-side-band-message/index.js:1:0-1:36
+> var defaultPrefix = new Buffer("");
+
+Uncaught ReferenceError: Buffer is not defined
+./node_modules/pushover-giting/lib/service.js:31:0-31:30
+> inherits(Service, HttpDuplex);
+
+Uncaught TypeError: is not a function
+harness.js:223:1-230:4
+> child["exec"](cmd, {cwd: dir}, function(err) {
+  debug(((("Git.pull " + dir) + " done: ") + err));
+  if (err)   return cb(err);
+  cb(null);
+});
+
+Reached sensitive command-injection sink 'child_process.exec' with symbolic expr:
+(str.++
+ "git pull file:///Users/joseafonso/Documents/PhD/explode-js/bench/packages/giting-0.0.7/repos "
+ payload)
+[1m[31mAbort[0;1m[0m: ["harness.js", 223., "command-injection", "child_process.exec",
+        (str.++
+         "git pull file:///Users/joseafonso/Documents/PhD/explode-js/bench/packages/giting-0.0.7/repos "
+         payload)]
+Path condition (PC):
+ (bool.ne
+  (real.ne (real.reinterpret_int (str.to_int symbol_121))
+   (real.reinterpret_int (str.to_int symbol_121))) true)
+  (bool.eq (real.eq (real.reinterpret_int (str.to_int symbol_121)) 0.) false)
+  (real.eq (real.reinterpret_int (str.to_int symbol_121))
+   (real.reinterpret_int (str.to_int symbol_121)))
+  (real.eq (real.reinterpret_int (str.to_int symbol_121)) 1.)
+Model:
+ (model
+   (argv0 str "")
+   (argv1 str "")
+   (argv2 str "")
+   (argv3 str "")
+   (argv4 str "")
+   (payload str "")
+   (require('process').arch str "")
+   (symbol_121 str "1"))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  6.083s
+  - Solver time:     0.021s
+  - Solver queries:  6
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-3b77a7-out"

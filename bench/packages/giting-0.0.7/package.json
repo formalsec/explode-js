@@ -1,0 +1,45 @@
+{
+	"index": "lib/git.js",
+	"dependencies": {
+		"giting": "0.0.7"
+	},
+
+	"vulnerabilities": [
+		{
+		"advisory":{
+			"id": "GHSA-53xj-v576-3ch2",
+			"cve": "CVE-2019-10802",
+			"cwe": "CWE-78",
+			"github": "https://github.com/advisories/GHSA-53xj-v576-3ch2",
+			"snyk": "https://security.snyk.io/vuln/SNYK-JS-GITING-559008",
+			"nvd": "https://nvd.nist.gov/vuln/detail/CVE-2019-10802"
+		},
+
+		"location":{
+			"source": {
+				"file": "lib/git.js",
+				"lineno": 217,
+				"code": "Git.prototype.pull = function(repo, cb) {"
+			},
+			"sink": {
+				"file": "lib/git.js",
+				"lineno": 223,
+				"code": "child.exec(cmd, {"
+			}
+		},
+
+		"pocs": [{
+			"file": "poc.js",
+			"source": ""
+			}
+		],
+
+		"patch":{
+			"fixed_version": "0.0.8",
+			"url": "https://github.com/MangoRaft/git/commit/9be41081f547d3dcef25e7d7c957bc2a3be2dfe0",
+			"diff": ""
+		}
+
+	}
+]
+}
