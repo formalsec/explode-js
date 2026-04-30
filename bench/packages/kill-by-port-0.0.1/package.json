@@ -1,0 +1,40 @@
+{
+    "dependencies": {
+        "kill-by-port": "0.0.1"
+    },
+    "index":"index.js",
+    "vulnerabilities":[
+        {
+            "advisory":{
+                "cve":"CVE-2021-23363",
+                "cwe":"CWE-1321",
+                "github":"https://github.com/advisories/GHSA-mm4f-47ch-f7hx",
+                "id":"GHSA-mm4f-47ch-f7hx",
+                "nvd":"https://nvd.nist.gov/vuln/detail/CVE-2021-23363",
+                "snyk":"https://security.snyk.io/vuln/SNYK-JS-KILLBYPORT-1078531"
+            },
+            "location":{
+                "sink":{
+                    "code":"processId = exec(`lsof -t -i:${port}`)",
+                    "file":"index.js",
+                    "lineno":8
+                },
+                "source":{
+                    "code":"exports.killByPort = function (port) {",
+                    "lineno":5
+                }
+            },
+            "patch":{
+                "diff":"path_para_ficheiro_com_diff_relevante",
+                "fixed_version":"id",
+                "url":"url do commit"
+            },
+            "pocs":[
+                {
+                    "file":"kill-by-port.test.js",
+                    "source":"link"
+                }
+            ]
+        }
+    ]
+}

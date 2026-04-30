@@ -1,0 +1,40 @@
+{
+    "dependencies":{
+        "kill-port":"1.3.1"
+    },
+    "index":"index.js",
+    "vulnerabilities":[
+        {
+            "advisory":{
+                "cve":"CVE-2019-5414",
+                "cwe":"CWE-78",
+                "github":"https://github.com/advisories/GHSA-pmv6-gf98-p3r5",
+                "id":"GHSA-pmv6-gf98-p3r5",
+                "nvd":"https://nvd.nist.gov/vuln/detail/CVE-2019-5414",
+                "snyk":"https://security.snyk.io/vuln/SNYK-JS-KILLPORT-173974"
+            },
+            "location":{
+                "sink":{
+                    "code":"`Stop-Process -Id (Get-NetTCPConnection -LocalPort ${port}).OwningProcess -Force`",
+                    "file":"index.js",
+                    "lineno":12
+                },
+                "source":{
+                    "code":"module.exports = function (port) {",
+                    "lineno":5
+                }
+            },
+            "patch":{
+                "diff":"path_para_ficheiro_com_diff_relevante",
+                "fixed_version":"id",
+                "url":"url do commit"
+            },
+            "pocs":[
+                {
+                    "file":"kill-port.test.js",
+                    "source":""
+                }
+            ]
+        }
+    ]
+}

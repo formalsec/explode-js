@@ -1,0 +1,72 @@
+{
+    "dependencies": {
+        "kill-port-process": "0.0.1"
+    },
+    "index":"src/index.js",
+    "vulnerabilities":[
+        {
+            "advisory":{
+                "cve":"CVE-2019-15609",
+                "cwe":"CWE-78",
+                "github":"https://github.com/advisories/GHSA-xp4x-j9vh-c3wf",
+                "id":"GHSA-xp4x-j9vh-c3wf",
+                "nvd":"https://nvd.nist.gov/vuln/detail/CVE-2019-15609",
+                "snyk":"https://security.snyk.io/vuln/SNYK-JS-KILLPORTPROCESS-543829"
+            },
+            "location":{
+                "sink":{
+                    "code":"exec(command, (err, stdout, stderr) => {",
+                    "file":"src/index.js",
+                    "lineno":44
+                },
+                "source":{
+                    "code":"module.exports = async (input, opts = {}) => {",
+                    "lineno":5
+                }
+            },
+            "patch":{
+                "diff":"path_para_ficheiro_com_diff_relevante",
+                "fixed_version":"id",
+                "url":"url do commit"
+            },
+            "pocs":[
+                {
+                    "file":"kill-port-process.test.js",
+                    "source":"SecBench.js"
+                }
+            ]
+        },
+        {
+            "advisory":{
+                "cve":"CVE-2019-15609",
+                "cwe":"CWE-78",
+                "github":"https://github.com/advisories/GHSA-xp4x-j9vh-c3wf",
+                "id":"GHSA-xp4x-j9vh-c3wf",
+                "nvd":"https://nvd.nist.gov/vuln/detail/CVE-2019-15609",
+                "snyk":"https://security.snyk.io/vuln/SNYK-JS-KILLPORTPROCESS-543829"
+            },
+            "location":{
+                "sink":{
+                    "code":"exec(`taskkill /PID ${pid} /F`, (err, stdout, stderr) => {",
+                    "file":"src/index.js",
+                    "lineno":63
+                },
+                "source":{
+                    "code":"module.exports = async (input, opts = {}) => {",
+                    "lineno":5
+                }
+            },
+            "patch":{
+                "diff":"path_para_ficheiro_com_diff_relevante",
+                "fixed_version":"id",
+                "url":"url do commit"
+            },
+            "pocs":[
+                {
+                    "file":"",
+                    "source":""
+                }
+            ]
+        }
+    ]
+}
