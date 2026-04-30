@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "lsof": "0.1.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-whq6-mj2r-mjqc",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-LSOF-543632",
+    "sink": {
+      "file": "lib/lsof.js",
+      "lineno": 37,
+      "code": "cp.exec('lsof -i tcp:' + port, function(err, d) {"
+    }
+  }
+}
