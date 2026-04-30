@@ -1,0 +1,45 @@
+{
+	"index": "index.js",
+	"dependencies": {
+		"git-tags-remote": "1.0.2"
+	},
+
+	"vulnerabilities": [
+		{
+		"advisory":{
+			"id": "GHSA-4m6q-rxhm-675w",
+			"cve": "CVE-2020-7636",
+			"cwe": "CWE-78",
+			"github": "https://github.com/advisories/GHSA-4m6q-rxhm-675w",
+			"snyk": "https://security.snyk.io/vuln/SNYK-JS-GITTAGSREMOTE-596503",
+			"nvd": "https://nvd.nist.gov/vuln/detail/CVE-2020-7636"
+		},
+
+		"location":{
+			"source": {
+				"file": "index.js",
+				"lineno": 26,
+				"code": "const get = (repo) => new Promise((resolve, reject) => {"
+			},
+			"sink": {
+				"file": "index.js",
+				"lineno": 5,
+				"code": "exec(`git ls-remote --tags ${repo}`, (error, stdout, stderr) => {"
+			}
+		},
+
+		"pocs": [{
+			"file": "poc.js",
+			"source": ""
+			}
+		],
+
+		"patch":{
+			"fixed_version": "",
+			"url": "",
+			"diff": ""
+		}
+
+	}
+]
+}
