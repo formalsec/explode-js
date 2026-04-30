@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "ffmpeg-sdk": "0.0.5"
+  },
+  "vulnerability":
+  {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-rwvf-c3wm-qm6w",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-FFMPEGSDK-1050429",
+    "sink": {
+      "file": "index.js",
+      "lineno": 9,
+      "code": "exec(command, (error, stdout, stderr) => {"
+    }
+  }
+}
