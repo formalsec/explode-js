@@ -1,0 +1,25 @@
+harness.js:56:2-61:7
+> exec(("curl " + command), function(error, stdout, stderr) { cb(null, {payload: stdout, stats: parseStats(stderr)}); })["on"]("error", function(err) { cb(err, null); });
+
+Reached sensitive command-injection sink 'child_process.exec' with symbolic expr:
+(str.++ "curl " payload)
+[1m[31mAbort[0;1m[0m: ["harness.js", 56., "command-injection", "child_process.exec",
+        (str.++ "curl " payload)]
+Path condition (PC): <empty>
+Model:
+ (model
+   (argv0 str "")
+   (argv1 str "")
+   (argv2 str "")
+   (argv3 str "")
+   (argv4 str "")
+   (payload str "")
+   (require('process').arch str ""))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  0.633s
+  - Solver time:     0.001s
+  - Solver queries:  1
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-e6b0ea-out"
