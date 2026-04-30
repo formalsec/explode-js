@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "effect": "file:effect-1.0.4.tgz"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "github": "https://github.com/Javascipt/effect",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-EFFECT-564256",
+    "sink": {
+      "code": "exec(cmd, function (error) {",
+      "file": "helper.js",
+      "line": 24
+    }
+  }
+}
