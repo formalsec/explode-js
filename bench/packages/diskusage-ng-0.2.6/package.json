@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "diskusage-ng": "0.2.6"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-3269-x4pw-vffg",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-DISKUSAGENG-564425",
+    "sink": {
+      "code": "exec('df -k \"' + path + '\"', function(err, stdout) {",
+      "file": "lib/posix.js",
+      "lineno": 11
+    }
+  }
+}
