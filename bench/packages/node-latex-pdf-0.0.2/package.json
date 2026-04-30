@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "node-latex-pdf": "0.0.2"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-32fw-9wq8-9x9c",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-NODELATEXPDF-1050426",
+    "sink": {
+      "file": "node-latex-pdf.js",
+      "lineno": 10,
+      "code": "exec(\"pdflatex -output-directory \" + dest_file + \" \" + src_file, (err,stdout,stderr) => {"
+    }
+  }
+}
