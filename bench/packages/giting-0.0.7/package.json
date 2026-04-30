@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "giting": "0.0.7"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-53xj-v576-3ch2",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-GITING-559008",
+    "sink": {
+      "file": "lib/git.js",
+      "lineno": 223,
+      "code": "child.exec(cmd, {"
+    }
+  }
+}
