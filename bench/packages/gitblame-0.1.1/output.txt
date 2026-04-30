@@ -1,0 +1,34 @@
+harness.js:15:2-23:5
+> exec(("git blame " + filename), {cwd: dirname}, function(error, stdout, stderr) {
+  if ((error !== null)) {
+    console["log"](("exec error: " + error));
+    return cb(new Error(error));
+  }
+  var lines = stdout["split"]("
+");
+  lines["unshift"]("");
+  cb(null, lines);
+});
+
+Reached sensitive command-injection sink 'child_process.exec' with symbolic expr:
+(str.++ "git blame " payload)
+[1m[31mAbort[0;1m[0m: ["harness.js", 15., "command-injection", "child_process.exec",
+        (str.++ "git blame " payload)]
+Path condition (PC): <empty>
+Model:
+ (model
+   (argv0 str "")
+   (argv1 str "")
+   (argv2 str "")
+   (argv3 str "")
+   (argv4 str "")
+   (payload str "")
+   (require('process').arch str ""))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  0.401s
+  - Solver time:     0.001s
+  - Solver queries:  1
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-4e5c86-out"
