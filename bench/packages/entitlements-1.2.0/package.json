@@ -1,0 +1,41 @@
+{
+  "dependencies": { 
+		"entitlements": "1.2.0" 
+	},
+  "index": "index.js",
+  "vulnerabilities": [
+    {
+      "advisory": {
+        "cve": "",
+        "cwe": "CWE-78",
+        "github": "https://github.com/advisories/GHSA-g8vp-6hv4-m67c",
+        "id": "GHSA-g8vp-6hv4-m67c",
+        "nvd": "",
+        "snyk": "https://security.snyk.io/package/npm/entitlements/1.2.0"
+      },
+      "location": {
+        "sink": {
+          "file": "index.js",
+          "lineno": 7,
+          "code": "exec('codesign -d --entitlements :- ' + path, function(error, output){"
+        },
+        "source": {
+          "file": "index.js",
+          "lineno": 7,
+          "code": "exec('codesign -d --entitlements :- ' + path, function(error, output){"
+        }
+      },
+      "patch": {
+        "diff": "",
+        "fixed_version": "1.3.0",
+        "url": "https://github.com/matiassingers/entitlements/commit/9a717b1a830f375c331accc6f6c253b7af18505d"
+      },
+      "pocs": [ 
+				{ 
+					"file": "poc1.js", 
+					"source": "https://hackerone.com/reports/341869" 
+				} 
+			]
+    }
+  ]
+}

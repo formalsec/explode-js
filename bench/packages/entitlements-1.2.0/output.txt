@@ -1,0 +1,80 @@
+./node_modules/lodash-node/modern/internals/baseCreate.js:14:0-14:74
+> var nativeCreate = (isNative(nativeCreate = Object["create"]) && nativeCreate);
+
+Uncaught TypeError: is not a function
+./node_modules/lodash-node/modern/support.js:30:0-30:94
+> support["funcDecomp"] = (! isNative(global["WinRTError"]) && reThis["test"](function() { return this; }));
+
+Uncaught TypeError: is not a function
+./node_modules/lodash-node/modern/objects/keys.js:14:0-14:66
+> var nativeKeys = (isNative(nativeKeys = Object["keys"]) && nativeKeys);
+
+Uncaught TypeError: is not a function
+./node_modules/lodash-node/modern/collections/groupBy.js:52:0-54:3
+> var groupBy = createAggregator(function(result, value, key) { (hasOwnProperty["call"](result, key) ? result[key] : result[key] = [])["push"](value); });
+
+Uncaught TypeError: is not a function
+./node_modules/lodash-node/modern/collections/indexBy.js:50:0-52:3
+> var indexBy = createAggregator(function(result, value, key) { result[key] = value; });
+
+Uncaught TypeError: is not a function
+./node_modules/lodash-node/modern/utilities/now.js:24:0-26:2
+> var now = ((isNative(now = Date["now"]) && now) || function() { return new Date()["getTime"](); });
+
+Uncaught TypeError: is not a function
+./node_modules/lodash-node/modern/objects/isPlainObject.js:22:0-22:88
+> var getPrototypeOf = (isNative(getPrototypeOf = Object["getPrototypeOf"]) && getPrototypeOf);
+
+Uncaught TypeError: is not a function
+./node_modules/lodash-node/modern/internals/reUnescapedHtml.js:13:0-13:74
+> var reUnescapedHtml = RegExp((("[" + keys(htmlEscapes)["join"]("")) + "]"), "g");
+
+Uncaught TypeError: is not a function
+./node_modules/lodash-node/modern/utilities/parseInt.js:24:0-24:71
+> var reLeadingSpacesAndZeros = RegExp((("^[" + whitespace) + "]*0+(?=.$)"));
+
+Uncaught SyntaxError
+./node_modules/lodash-node/modern/internals/htmlUnescapes.js:13:0-13:40
+> var htmlUnescapes = invert(htmlEscapes);
+
+Uncaught TypeError: is not a function
+./node_modules/lodash-node/modern/internals/reEscapedHtml.js:13:0-13:75
+> var reEscapedHtml = RegExp((("(" + keys(htmlUnescapes)["join"]("|")) + ")"), "g");
+
+Uncaught TypeError: is not a function
+./node_modules/lodash-node/modern/index.js:123:4-123:39
+> return fn(object, source, options);
+
+Uncaught TypeError: is not a function
+./node_modules/plist/lib/node.js:13:0-14:34
+> exports["parseFile"] = deprecate(parseFile, ("`parseFile()` is deprecated. " + "Use `parseString()` instead."));
+
+Uncaught TypeError: is not a function
+harness.js:7:2-13:5
+> exec(("codesign -d --entitlements :- " + path), function(error, output) {
+  if (error) { return callback(error); }
+  callback(null, plist["parse"](output));
+});
+
+Reached sensitive command-injection sink 'child_process.exec' with symbolic expr:
+(str.++ "codesign -d --entitlements :- " payload)
+[1m[31mAbort[0;1m[0m: ["harness.js", 7., "command-injection", "child_process.exec",
+        (str.++ "codesign -d --entitlements :- " payload)]
+Path condition (PC): <empty>
+Model:
+ (model
+   (argv0 str "")
+   (argv1 str "")
+   (argv2 str "")
+   (argv3 str "")
+   (argv4 str "")
+   (payload str "")
+   (require('process').arch str ""))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  101.027s
+  - Solver time:     0.001s
+  - Solver queries:  1
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-e765ce-out"
