@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "eslint-fixer": "0.1.5"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-45w5-pvr8-4rh5",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-ESLINTFIXER-1087438",
+    "sink": {
+      "file": "index.js",
+      "line": 24,
+      "code": "childProcess.exec(cmd, (error, stdout, stderr) => {"
+    }
+  }
+}
