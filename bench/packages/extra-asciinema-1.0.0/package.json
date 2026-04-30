@@ -1,0 +1,45 @@
+{
+	"index": "index.js",
+	"dependencies": {
+		"extra-asciinema": "1.0.0"
+	},
+
+	"vulnerabilities": [
+		{
+		"advisory":{
+			"id": "",
+			"cve": "",
+			"cwe": "CWE-78",
+			"github": "",
+			"snyk": "https://security.snyk.io/vuln/SNYK-JS-EXTRAASCIINEMA-608292",
+			"nvd": ""
+		},
+
+		"location":{
+			"source": {
+				"file": "index.js",
+				"lineno": 207,
+				"code": "function uploadSync(f) {"
+			},
+			"sink": {
+				"file": "index.js",
+				"lineno": 208,
+				"code": "var stdout = cp9.execSync(`asciinema upload ${f}`, {encoding: 'utf8'});"
+			}
+		},
+
+		"pocs": [{
+			"file": "extra-asciinema.test.js",
+			"source": ""
+			}
+		],
+
+		"patch":{
+			"fixed_version": "1.0.23",
+			"url": "https://github.com/nodef/extra-asciinema/commit/fd1a8a38d6c72e1eb573b2ab03d5e86de8047480",
+			"diff": ""
+		}
+
+	}
+]
+}
