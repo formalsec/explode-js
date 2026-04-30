@@ -1,0 +1,48 @@
+- : app = { "type": symbol("normal"), "value": symbol("undefined"),
+            "__completion__": true, "target": symbol("empty"),  }
+- : app = { "type": symbol("normal"), "value": symbol("undefined"),
+            "__completion__": true, "target": symbol("empty"),  }
+harness.js:11:4-21:7
+> exec((("df -k "" + path) + """), function(err, stdout) {
+  if (err) { return cb(err); }
+  try { cb(null, parse(stdout)); } catch (e) { cb(e); }
+});
+
+Reached sensitive command-injection sink 'child_process.exec' with symbolic expr:
+(str.++ "df -k \"" payload "\"")
+[1m[31mAbort[0;1m[0m: ["harness.js", 11., "command-injection", "child_process.exec",
+        (str.++ "df -k \"" payload "\"")]
+Path condition (PC):
+ (bool.or
+  (bool.or
+   (bool.or
+    (bool.or
+     (bool.or
+      (bool.or
+       (bool.or (bool.eq require('os').platform() "aix")
+        (bool.eq require('os').platform() "darwin"))
+       (bool.eq require('os').platform() "freebsd"))
+      (bool.eq require('os').platform() "linux"))
+     (bool.eq require('os').platform() "openbsd"))
+    (bool.eq require('os').platform() "sunos"))
+   (bool.eq require('os').platform() "win32"))
+  (bool.eq require('os').platform() "android"))
+  (bool.ne "win32" require('os').platform()) (bool.ne "\"" payload)
+Model:
+ (model
+   (argv0 str "")
+   (argv1 str "")
+   (argv2 str "")
+   (argv3 str "")
+   (argv4 str "")
+   (payload str "")
+   (require('os').platform() str "darwin")
+   (require('process').arch str ""))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  1.338s
+  - Solver time:     0.006s
+  - Solver queries:  6
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-0d12b7-out"
