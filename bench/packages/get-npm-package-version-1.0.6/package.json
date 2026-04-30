@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "get-npm-package-version": "1.0.6"
+  },
+  "vulnerabilities": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-4h66-vghf-xg5x",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-GETNPMPACKAGEVERSION-1050390",
+    "sink": {
+      "code": "version = require('child_process').execSync(`npm view ${packageName} version`, config);",
+      "file": "index.js",
+      "lineno": 16
+    }
+  }
+}
