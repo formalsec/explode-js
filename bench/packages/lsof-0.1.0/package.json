@@ -1,0 +1,45 @@
+{
+	"index": "index.js",
+	"dependencies": {
+		"lsof": "0.1.0"
+	},
+
+	"vulnerabilities": [
+		{
+		"advisory":{
+			"id": "GHSA-whq6-mj2r-mjqc",
+			"cve": "CVE-2019-10783",
+			"cwe": "CWE-78",
+			"github": "https://github.com/advisories/GHSA-whq6-mj2r-mjqc",
+			"snyk": "https://security.snyk.io/vuln/SNYK-JS-LSOF-543632",
+			"nvd": "https://nvd.nist.gov/vuln/detail/CVE-2019-10783"
+		},
+
+		"location":{
+			"sink": {
+				"file": "lib/lsof.js",
+				"lineno": 37,
+				"code": "cp.exec('lsof -i tcp:' + port, function(err, d) {"
+			},
+			"source": {
+				"file": "lib/lsof.js",
+				"lineno": 36,
+				"code": "var rawTcpPort = exports.rawTcpPort = function(port, fn) {"
+			}
+			},
+
+		"pocs": [{
+			"file": "poc.js",
+			"source": ""
+			}
+		],
+
+		"patch":{
+			"fixed_version": "id",
+			"url": "url do commit",
+			"diff": "path_para_ficheiro_com_diff_relevante"
+		}
+
+	}
+]
+}

@@ -1,0 +1,45 @@
+harness.js:37:4-67:7
+> cp["exec"](("lsof -i tcp:" + port), function(err, d) {
+  d = d["split"]("
+");
+  var data = [];
+  var headers = d[0]["toLowerCase"]()["split"]("/\s+/");
+  headers["forEach"](function(v, k) { if ((v === "")) { delete headers[k]; } });
+  delete d[0];
+  d["pop"]();
+  d["forEach"](function(v) {
+  v = v["split"]("/\s+/");
+  var k = {};
+  var finalField = v[headers["length"]];
+  if (finalField) {
+    k["state"] = finalField["substring"](1, (finalField["length"] - 1))["toLowerCase"]();
+    v["pop"]();
+  }
+  v["forEach"](function(s, i) { k[headers[i]] = s; });
+  data["push"](k);
+});
+  fn(data);
+});
+
+Reached sensitive command-injection sink 'child_process.exec' with symbolic expr:
+(str.++ "lsof -i tcp:" payload)
+[1m[31mAbort[0;1m[0m: ["harness.js", 37., "command-injection", "child_process.exec",
+        (str.++ "lsof -i tcp:" payload)]
+Path condition (PC): <empty>
+Model:
+ (model
+   (argv0 str "")
+   (argv1 str "")
+   (argv2 str "")
+   (argv3 str "")
+   (argv4 str "")
+   (payload str "")
+   (require('process').arch str ""))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  0.432s
+  - Solver time:     0.010s
+  - Solver queries:  1
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-9f79f7-out"
