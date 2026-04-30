@@ -1,0 +1,35 @@
+harness.js:191:8-200:10
+> exec(`ffmpeg -hide_banner -loglevel quiet -ss ${start} -i ${input} -t ${duration} -c copy ${output}.mp4`, (error, stdout, stderr) => {
+  if (error) {
+    reject(error);
+    return ;
+  }
+  resolve(`${output}.mp4`);
+});
+
+Reached sensitive command-injection sink 'child_process.exec' with symbolic expr:
+(str.++
+ "ffmpeg -hide_banner -loglevel quiet -ss 0 -i package-lock.json -t 30 -c copy "
+ payload ".mp4")
+[1m[31mAbort[0;1m[0m: ["harness.js", 191., "command-injection", "child_process.exec",
+        (str.++
+         "ffmpeg -hide_banner -loglevel quiet -ss 0 -i package-lock.json -t 30 -c copy "
+         payload ".mp4")]
+Path condition (PC): <empty>
+Model:
+ (model
+   (argv0 str "")
+   (argv1 str "")
+   (argv2 str "")
+   (argv3 str "")
+   (argv4 str "")
+   (payload str "")
+   (require('process').arch str ""))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  0.495s
+  - Solver time:     0.001s
+  - Solver queries:  1
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-3eb035-out"
