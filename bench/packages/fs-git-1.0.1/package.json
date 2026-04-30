@@ -1,0 +1,154 @@
+{
+	"index": "index.js",
+	"dependencies": {
+		"fs-git":"1.0.1",
+		"sleep": "6.3.0"
+	},
+
+	"vulnerabilities": [
+		{
+		"advisory":{
+			"id": "GHSA-qr32-j4j6-3m7r",
+			"cve": "CVE-2017-16087",
+			"cwe": "CWE-78",
+			"github": "https://github.com/advisories/GHSA-qr32-j4j6-3m7r",
+			"snyk": "https://security.snyk.io/vuln/npm:fs-git:20170601",
+			"nvd": ""
+		},
+
+		"location":{
+			"source": {
+				"file": "lib/index.js",
+				"lineno": 53,
+				"code": "FSGit.prototype.readFile = function (path, opts) {"
+			},
+			"sink": {
+				"file": "lib/index.js",
+				"lineno": 56,
+				"code": "child_process.exec(command, { maxBuffer: maxBuffer }, function (error, stdout, stderr) {"
+			}
+		},
+
+		"pocs": [{
+			"file": "fs-git.test.js",
+			"source": ""
+			}
+		],
+
+		"patch":{
+			"fixed_version": "1.0.2",
+			"url": "https://github.com/vvakame/fs-git/commit/eb5f70efa5cfbff1ab299fa7daaa5de549243998",
+			"diff": ""
+		}
+
+	},
+	{
+		"advisory":{
+			"id": "GHSA-qr32-j4j6-3m7r",
+			"cve": "CVE-2017-16087",
+			"cwe": "CWE-78",
+			"github": "https://github.com/advisories/GHSA-qr32-j4j6-3m7r",
+			"snyk": "https://security.snyk.io/vuln/npm:fs-git:20170601",
+			"nvd": ""
+		},
+
+		"location":{
+			"source": {
+				"file": "lib/index.js",
+				"lineno": 74,
+				"code": "FSGit.prototype.revParse = function (ref) {"
+			},
+			"sink": {
+				"file": "lib/index.js",
+				"lineno": 77,
+				"code": "child_process.exec(command, { maxBuffer: maxBuffer }, function (error, stdout, stderr) {"
+			}
+		},
+
+		"pocs": [{
+			"file": "fs-git.test.js",
+			"source": ""
+			}
+		],
+
+		"patch":{
+			"fixed_version": "1.0.2",
+			"url": "https://github.com/vvakame/fs-git/commit/eb5f70efa5cfbff1ab299fa7daaa5de549243998",
+			"diff": ""
+		}
+
+	},
+	{
+		"advisory":{
+			"id": "GHSA-qr32-j4j6-3m7r",
+			"cve": "CVE-2017-16087",
+			"cwe": "CWE-78",
+			"github": "https://github.com/advisories/GHSA-qr32-j4j6-3m7r",
+			"snyk": "https://security.snyk.io/vuln/npm:fs-git:20170601",
+			"nvd": ""
+		},
+
+		"location":{
+			"source": {
+				"file": "lib/index.js",
+				"lineno": 10,
+				"code": "function FSGit(path, ref) {"
+			},
+			"sink": {
+				"file": "lib/index.js",
+				"lineno": 34,
+				"code": "child_process.exec(command, { maxBuffer: maxBuffer }, function (error, stdout, stderr) {"
+			}
+		},
+
+		"pocs": [{
+			"file": "fs-git.test.js",
+			"source": ""
+			}
+		],
+
+		"patch":{
+			"fixed_version": "1.0.2",
+			"url": "https://github.com/vvakame/fs-git/commit/eb5f70efa5cfbff1ab299fa7daaa5de549243998",
+			"diff": ""
+		}
+
+	},
+	{
+		"advisory":{
+			"id": "GHSA-qr32-j4j6-3m7r",
+			"cve": "CVE-2017-16087",
+			"cwe": "CWE-78",
+			"github": "https://github.com/advisories/GHSA-qr32-j4j6-3m7r",
+			"snyk": "https://security.snyk.io/vuln/npm:fs-git:20170601",
+			"nvd": ""
+		},
+
+		"location":{
+			"source": {
+				"file": "lib/index.js",
+				"lineno": 89,
+				"code": "FSGit.prototype._lsTree = function (ref, path) {"
+			},
+			"sink": {
+				"file": "lib/index.js",
+				"lineno": 96,
+				"code": "child_process.exec(command, { maxBuffer: maxBuffer }, function (error, stdout, stderr) {"
+			}
+		},
+
+		"pocs": [{
+			"file": "fs-git.test.js",
+			"source": ""
+			}
+		],
+
+		"patch":{
+			"fixed_version": "1.0.2",
+			"url": "https://github.com/vvakame/fs-git/commit/eb5f70efa5cfbff1ab299fa7daaa5de549243998",
+			"diff": ""
+		}
+
+	}
+]
+}

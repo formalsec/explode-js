@@ -1,0 +1,25 @@
+harness.js:56:12-68:15
+> child_process["exec"](command, {maxBuffer: maxBuffer}, function(error, stdout, stderr) { if (error) { reject(error); } else { if ((opts && opts["encoding"])) { resolve(stdout["toString"](opts["encoding"])); } else { resolve(stdout); } } });
+
+Reached sensitive command-injection sink 'child_process.exec' with symbolic expr:
+(str.++ "git --git-dir=undefined " "show " "undefined:" payload)
+[1m[31mAbort[0;1m[0m: ["harness.js", 56., "command-injection", "child_process.exec",
+        (str.++ "git --git-dir=undefined " "show " "undefined:" payload)]
+Path condition (PC): <empty>
+Model:
+ (model
+   (argv0 str "")
+   (argv1 str "")
+   (argv2 str "")
+   (argv3 str "")
+   (argv4 str "")
+   (payload str "")
+   (require('process').arch str ""))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  0.714s
+  - Solver time:     0.001s
+  - Solver queries:  1
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-02cac1-out"
