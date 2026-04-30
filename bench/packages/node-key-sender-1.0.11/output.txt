@@ -1,0 +1,28 @@
+harness.js:117:12-123:15
+> return exec(command, {}, function(error, stdout, stderr) { if ((error == null)) { resolve(stdout, stderr); } else { reject(error, stdout, stderr); } });
+
+Reached sensitive command-injection sink 'child_process.exec' with symbolic expr:
+(str.++ "java -jar \"./node_modules/node-key-sender/jar/key-sender.jar\" "
+ payload " " "node-key-sender-sendkeys" "")
+[1m[31mAbort[0;1m[0m: ["harness.js", 117., "command-injection", "child_process.exec",
+        (str.++
+         "java -jar \"./node_modules/node-key-sender/jar/key-sender.jar\" "
+         payload " " "node-key-sender-sendkeys" "")]
+Path condition (PC): <empty>
+Model:
+ (model
+   (argv0 str "")
+   (argv1 str "")
+   (argv2 str "")
+   (argv3 str "")
+   (argv4 str "")
+   (payload str "")
+   (require('process').arch str ""))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  0.610s
+  - Solver time:     0.001s
+  - Solver queries:  1
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-139e47-out"

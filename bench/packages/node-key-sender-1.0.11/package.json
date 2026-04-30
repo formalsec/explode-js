@@ -1,0 +1,117 @@
+{
+	"index": "index.js",
+	"dependencies": {
+		"node-key-sender": "1.0.11"
+	},
+
+	"vulnerabilities": [
+		{
+		"advisory":{
+			"id": "GHSA-4xrw-wvmq-8jmh",
+			"cve": "CVE-2020-7627",
+			"cwe": "CWE-78",
+			"github": "https://github.com/advisories/GHSA-4xrw-wvmq-8jmh",
+			"snyk": "https://security.snyk.io/vuln/SNYK-JS-NODEKEYSENDER-564261",
+			"nvd": "https://nvd.nist.gov/vuln/detail/CVE-2020-7627"
+		},
+
+		"location":{
+			"source": {
+				"file": "key-sender.js",
+				"lineno": 111,
+				"code": "module.execute = function(arrParams) {"
+			},
+			"sink": {
+				"file": "key-sender.js",
+				"lineno": 117,
+				"code": "return exec(command, {}, function(error, stdout, stderr) {"
+			}
+		},
+
+		"pocs": [{
+			"file": "poc.js",
+			"source": ""
+			}
+		],
+
+		"patch":{
+			"fixed_version": "1.0.12",
+			"url": "",
+			"diff": ""
+		}
+
+	},
+	{
+		"advisory":{
+			"id": "GHSA-4xrw-wvmq-8jmh",
+			"cve": "CVE-2020-7627",
+			"cwe": "CWE-78",
+			"github": "https://github.com/advisories/GHSA-4xrw-wvmq-8jmh",
+			"snyk": "https://security.snyk.io/vuln/SNYK-JS-NODEKEYSENDER-564261",
+			"nvd": "https://nvd.nist.gov/vuln/detail/CVE-2020-7627"
+		},
+
+		"location":{
+			"source": {
+				"file": "key-sender.js",
+				"lineno": 66,
+				"code": "module.sendKeys = function(arrKeyCodes) {"
+			},
+			"sink": {
+				"file": "key-sender.js",
+				"lineno": 117,
+				"code": "return exec(command, {}, function(error, stdout, stderr) {"
+			}
+		},
+
+		"pocs": [{
+			"file": "node-key-sender.test.js",
+			"source": ""
+			}
+		],
+
+		"patch":{
+			"fixed_version": "1.0.12",
+			"url": "",
+			"diff": ""
+		}
+
+	},
+	{
+		"advisory":{
+			"id": "GHSA-4xrw-wvmq-8jmh",
+			"cve": "CVE-2020-7627",
+			"cwe": "CWE-78",
+			"github": "https://github.com/advisories/GHSA-4xrw-wvmq-8jmh",
+			"snyk": "https://security.snyk.io/vuln/SNYK-JS-NODEKEYSENDER-564261",
+			"nvd": "https://nvd.nist.gov/vuln/detail/CVE-2020-7627"
+		},
+
+		"location":{
+			"source": {
+				"file": "key-sender.js",
+				"lineno": 62,
+				"code": "module.sendKey = function(keyCode) {"
+			},
+			"sink": {
+				"file": "key-sender.js",
+				"lineno": 117,
+				"code": "return exec(command, {}, function(error, stdout, stderr) {"
+			}
+		},
+
+		"pocs": [{
+			"file": "node-key-sender.test.js",
+			"source": ""
+			}
+		],
+
+		"patch":{
+			"fixed_version": "1.0.12",
+			"url": "",
+			"diff": ""
+		}
+
+	}
+]
+}
