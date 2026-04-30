@@ -1,0 +1,39 @@
+{
+  "dependencies": {
+    "network-manager": "1.0.2"
+  },
+  "index": "index.js",
+  "vulnerabilities": [
+    {
+      "advisory": {
+        "cve": "CVE-2019-10786",
+        "cwe": "CWE-78",
+        "github": "https://github.com/advisories/GHSA-ph32-23p8-9rw5",
+        "id": "GHSA-ph32-23p8-9rw5",
+        "nvd": "https://nvd.nist.gov/vuln/detail/CVE-2019-10786",
+        "snyk": "https://security.snyk.io/vuln/SNYK-JS-NETWORKMANAGER-544035"
+      },
+      "location": {
+        "sink": {
+          "code": "pOut = childProcess.execSync(cli, options);",
+          "file": "common.js",
+          "lineno": 9
+        },
+        "source": {
+          "code": "module.exports = require('./linux/manager.js');",
+          "lineno": 4
+        }
+      },
+      "patch": {
+        "diff": "",
+        "fixed_version": "",
+        "url": ""
+      },
+      "pocs": [
+        {
+          "file": "poc.js",
+        }
+      ]
+    }
+  ]
+}

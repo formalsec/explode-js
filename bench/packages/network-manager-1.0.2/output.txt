@@ -1,0 +1,34 @@
+harness.js:9:8-9:51
+> pOut = childProcess["execSync"](cli, options);
+
+Reached sensitive command-injection sink 'child_process.execSync' with symbolic expr:
+(str.++ symbol_26 " -t  -f type,device,state,connection d")
+[1m[31mAbort[0;1m[0m: ["harness.js", 9., "command-injection", "child_process.execSync",
+        (str.++ symbol_26 " -t  -f type,device,state,connection d")]
+Path condition (PC): <empty>
+Model:
+ (model
+   (argv0 str "")
+   (argv1 str "")
+   (argv2 str "")
+   (argv3 str "")
+   (argv4 str "")
+   (payload str "")
+   (require('process').arch str "")
+   (symbol_26 str "")
+   (symbol_27 real 0.)
+   (symbol_28 bool false)
+   (symbol_29 str "")
+   (symbol_30 real 0.)
+   (symbol_31 bool false)
+   (symbol_32 str "")
+   (symbol_33 real 0.)
+   (symbol_34 bool false))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  0.871s
+  - Solver time:     0.001s
+  - Solver queries:  1
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-8086f1-out"
