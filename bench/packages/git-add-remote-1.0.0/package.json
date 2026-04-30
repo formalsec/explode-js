@@ -3,11 +3,39 @@
     "dependencies": {
         "git-add-remote": "1.0.0"
     },
-    "links": {
-        "source1": "https://security.snyk.io/vuln/SNYK-JS-GITADDREMOTE-564269",
-        "source2": ""
-    },
-    "fixedVersion": "n/a",
-    "fixCommit": "n/a",
-    "sink": "index.js:21:8"
+    "vulnerabilities": [
+        {
+            "advisory": {
+                "cve": "CVE-2020-7630",
+                "cwe": "CWE-78",
+                "github": "https://github.com/advisories/GHSA-h9v8-rm3m-5h5f",
+                "id": "GHSA-h9v8-rm3m-5h5f",
+                "nvd": "https://nvd.nist.gov/vuln/detail/CVE-2020-7630",
+                "snyk": "https://security.snyk.io/vuln/SNYK-JS-GITADDREMOTE-564269"
+            },
+            "location": {
+                "sink": {
+                    "code": "cp.exec('git remote add ' + name + ' ' + url, {cwd: cwd}, cb);",
+                    "file": "index.js",
+                    "lineno": 21
+                },
+                "source": {
+                    "file":"index.js",
+                    "code": "module.exports = function(dir) {",
+                    "lineno": 6
+                }
+            },
+            "patch": {
+                "diff": "",
+                "fixed_version": "",
+                "url": ""
+            },
+            "pocs": [
+                {
+                    "file": "poc.js",
+                    "source": "link"
+                }
+            ]
+        }
+    ]
 }
