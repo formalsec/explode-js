@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "entitlements": "1.2.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-g8vp-6hv4-m67c",
+    "snyk": "https://security.snyk.io/package/npm/entitlements/1.2.0",
+    "sink": {
+      "file": "index.js",
+      "lineno": 7,
+      "code": "exec('codesign -d --entitlements :- ' + path, function(error, output){"
+    }
+  }
+}
