@@ -1,0 +1,42 @@
+harness.js:35:6-65:9
+> exec(("ps -ef | grep " + name), function(error, stdout) {
+  if (error) { reject(error); }
+  ;
+  var items = stdout["split"](EOL);
+  var list = [];
+  items["forEach"](function(i) {
+  var content = i["split"](" ");
+  content = filter(content);
+  content = content["reverse"]();
+  if (! ! content[0]) { if (! new RegExp("grep|kill")["test"](content[1])) {
+  content = content["reverse"]();
+  list["push"](content[1]);
+} }
+});
+  if (! list["length"]) { resolve(res); }
+  res = res["concat"](list);
+  exec(("sudo kill -SIGKILL " + list["join"](" ")), function(error) { reject(); });
+});
+
+Reached sensitive command-injection sink 'child_process.exec' with symbolic expr:
+(str.++ "ps -ef | grep " payload)
+[1m[31mAbort[0;1m[0m: ["harness.js", 35., "command-injection", "child_process.exec",
+        (str.++ "ps -ef | grep " payload)]
+Path condition (PC): <empty>
+Model:
+ (model
+   (argv0 str "")
+   (argv1 str "")
+   (argv2 str "")
+   (argv3 str "")
+   (argv4 str "")
+   (payload str "")
+   (require('process').arch str ""))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  0.874s
+  - Solver time:     0.001s
+  - Solver queries:  1
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-9ad9e1-out"
