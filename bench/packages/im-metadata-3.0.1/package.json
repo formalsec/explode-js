@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "im-metadata": "3.0.1"
+  },
+  "vulnerability": {
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-IMMETADATA-544184",
+    "ghsa": "https://github.com/advisories/GHSA-qfxv-qqvg-24pg",
+    "sink": {
+      "file": "./index.js",
+      "line": 15,
+      "code": "exec(cmd, opts, function(e, stdout, stderr) {"
+    }
+  }
+}
