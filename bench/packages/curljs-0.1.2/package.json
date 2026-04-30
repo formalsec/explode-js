@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "curljs": "0.1.2"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-cqfc-9452-r36j",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-CURLJS-1050404",
+    "sink": {
+      "file": "index.js",
+      "line": 37,
+      "code": "cp.exec(curlString, function(err, stdout, stderr)"
+    }
+  }
+}
