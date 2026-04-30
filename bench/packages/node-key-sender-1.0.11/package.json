@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "node-key-sender": "1.0.11"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-4xrw-wvmq-8jmh",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-NODEKEYSENDER-564261",
+    "sink": {
+      "file": "key-sender.js",
+      "lineno": 117,
+      "code": "return exec(command, {}, function(error, stdout, stderr) {"
+    }
+  }
+}
