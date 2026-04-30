@@ -1,0 +1,45 @@
+{
+	"index": "index.js",
+	"dependencies": {
+		"curljs": "0.1.2"
+	},
+
+	"vulnerabilities": [
+		{
+		"advisory":{
+			"id": "GHSA-cqfc-9452-r36j",
+			"cve": "CVE-2020-28425",
+			"cwe": "CWE-78",
+			"github": "https://github.com/advisories/GHSA-cqfc-9452-r36j",
+			"snyk": "https://security.snyk.io/vuln/SNYK-JS-CURLJS-1050404",
+			"nvd": "https://nvd.nist.gov/vuln/detail/CVE-2020-28425"
+		},
+
+		"location":{
+			"source": {
+				"file": "index.js",
+				"lineno": 15,
+				"code": "var curl = function(url, options, callback) {"
+			},
+			"sink": {
+				"file": "index.js",
+				"lineno": 37,
+				"code": "cp.exec(curlString, function(err, stdout, stderr) {"
+			}
+			},
+
+		"pocs": [{
+			"file": "curljs.test.js",
+			"source": "secbench"
+			}
+		],
+
+		"patch":{
+			"fixed_version": "id",
+			"url": "url do commit",
+			"diff": "path_para_ficheiro_com_diff_relevante"
+		}
+
+	}
+]
+}

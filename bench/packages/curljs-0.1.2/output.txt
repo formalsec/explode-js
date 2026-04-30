@@ -1,0 +1,26 @@
+harness.js:37:8-39:11
+> cp["exec"](curlString, function(err, stdout, stderr) { callback(err, stdout, stderr); });
+
+Reached sensitive command-injection sink 'child_process.exec' with symbolic expr:
+(str.++ "curl '" payload "' " "-L -S --max-redirs 5  --connect-timeout 5  ")
+[1m[31mAbort[0;1m[0m: ["harness.js", 37., "command-injection", "child_process.exec",
+        (str.++ "curl '" payload "' "
+         "-L -S --max-redirs 5  --connect-timeout 5  ")]
+Path condition (PC): <empty>
+Model:
+ (model
+   (argv0 str "")
+   (argv1 str "")
+   (argv2 str "")
+   (argv3 str "")
+   (argv4 str "")
+   (payload str "")
+   (require('process').arch str ""))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  1.020s
+  - Solver time:     0.018s
+  - Solver queries:  1
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-c47233-out"
