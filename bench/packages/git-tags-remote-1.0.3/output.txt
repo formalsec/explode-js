@@ -1,0 +1,29 @@
+./node_modules/semver/ranges/subset.js:73:0-73:66
+> const minimumVersionWithPreRelease = [new Comparator(">=0.0.0-0")];
+
+Uncaught TypeError: is not a constructor
+harness.js:1:498-1:584
+> r["exec"](("git ls-remote --tags " + e), (e, r, o) => { ((o && s(new Error(o))), t(r["toString"]()["trim"]())); });
+
+Reached sensitive command-injection sink 'child_process.exec' with symbolic expr:
+(str.++ "git ls-remote --tags " payload)
+[1m[31mAbort[0;1m[0m: ["harness.js", 1., "command-injection", "child_process.exec",
+        (str.++ "git ls-remote --tags " payload)]
+Path condition (PC): <empty>
+Model:
+ (model
+   (argv0 str "")
+   (argv1 str "")
+   (argv2 str "")
+   (argv3 str "")
+   (argv4 str "")
+   (payload str "")
+   (require('process').arch str ""))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  41.869s
+  - Solver time:     0.001s
+  - Solver queries:  1
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-4e5c2b-out"

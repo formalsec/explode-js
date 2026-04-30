@@ -1,0 +1,73 @@
+{
+    "advisory": {
+        "id": "GHSA-gm9x-q798-hmr4",
+        "npm_id": "1517",
+        "cwe": "CWE-78",
+        "github_link": "https://github.com/advisories/GHSA-gm9x-q798-hmr4"
+    },
+    "correct_cwe": "CWE-78 ",
+    "correct_package_link": "https://registry.npmjs.org/git-tags-remote/-/git-tags-remote-1.0.3.tgz",
+    "vulnerability": {
+        "vulnerability_location": [
+            {
+                "source": {
+                    "file": "dist/index.js",
+                    "lineno": 1,
+                    "code": "exports.get=s=>e.__awaiter(void 0,void 0,void 0,(function*(){return(e=>{const r=new Map;return e.split('\n')."
+                },
+                "sink": {
+                    "file": "dist/index.js",
+                    "lineno": 1,
+                    "code": "r.exec('git ls-remote --tags '+e,(e,r,o)=>{o&&s(new Error(o))"
+                }
+            }
+        ]
+    },
+    "poc": [
+        {
+            "file":"poc.js", 
+            "source":""
+        }
+    ],
+    "patch": [
+        {
+            "url": ""
+        }
+    ],
+    "tools": {
+        "codeql": {
+            "score": "B"
+        },
+        "njsscan": {
+            "score": "D"
+        },
+        "graudit": {
+            "score": "D"
+        },
+        "insidersec": {
+            "score": "D"
+        },
+        "eslint": {
+            "score": "C"
+        },
+        "appinspector": {
+            "score": "C"
+        },
+        "msdevskim": {
+            "score": "D"
+        },
+        "drek": {
+            "score": "D"
+        },
+        "mosca": {
+            "score": "D"
+        },
+        "odgen": {
+            "score": "D"
+        }
+    },
+    "dependencies": {
+        "git-tags-remote": "1.0.3",
+        "tslib": "^2.0.0"
+    }
+}
