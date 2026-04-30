@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "macfromip": "1.1.1"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-vh8f-xw5v-8993",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-MACFROMIP-1048336",
+    "sink": {
+      "code": "var ls = cp.exec('ping  -c 1 ' + ipAddress,",
+      "file": "macfromip.js",
+      "lineno": 66
+    }
+  }
+}
