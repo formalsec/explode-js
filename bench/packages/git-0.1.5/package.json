@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "git": "0.1.5"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-cwcx-rxgc-cmw3",
+    "sink": {
+      "code": "exec(call_string, options,",
+      "file": "git.js",
+      "line": 232
+    }
+  }
+}
