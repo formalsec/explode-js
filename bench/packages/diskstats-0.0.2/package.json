@@ -1,0 +1,72 @@
+{
+  "dependencies": {
+    "diskstats": "0.0.2"
+  },
+  "index": "lib/stats.js",
+  "vulnerabilities": [
+    {
+      "advisory": {
+        "cve": "",
+        "cwe": "CWE-78",
+        "github": "",
+        "id": "",
+        "nvd": "",
+        "snyk": "https://security.snyk.io/vuln/SNYK-JS-DISKSTATS-590099"
+      },
+      "location": {
+        "sink": {
+          "code": "this.child_process.exec('df ' + this._ensureAbsPath(path), (err, stdout) => {",
+          "file": "lib/stats.js",
+          "lineno": 44
+        },
+        "source": {
+          "code": "module.exports = function(child_process, path) {",
+          "lineno": 96
+        }
+      },
+      "patch": {
+        "diff": "path_para_ficheiro_com_diff_relevante",
+        "fixed_version": "id",
+        "url": "url do commit"
+      },
+      "pocs": [
+        {
+          "file": "diskstats.test.js",
+          "source": "github.com/cristianstaicu/SecBench.js"
+        }
+      ]
+    },
+    {
+      "advisory": {
+        "cve": "",
+        "cwe": "CWE-78",
+        "github": "",
+        "id": "",
+        "nvd": "",
+        "snyk": "https://security.snyk.io/vuln/SNYK-JS-DISKSTATS-590099"
+      },
+      "location": {
+        "sink": {
+          "code": "this.child_process.exec('df -i ' + this._ensureAbsPath(path), (err, stdout) => {",
+          "file": "lib/stats.js",
+          "lineno": 56
+        },
+        "source": {
+          "code": "module.exports = function(child_process, path) {",
+          "lineno": 96
+        }
+      },
+      "patch": {
+        "diff": "path_para_ficheiro_com_diff_relevante",
+        "fixed_version": "id",
+        "url": "url do commit"
+      },
+      "pocs": [
+        {
+          "file": "diskstats.test.js",
+          "source": "github.com/cristianstaicu/SecBench.js"
+        }
+      ]
+    }
+  ]
+}
