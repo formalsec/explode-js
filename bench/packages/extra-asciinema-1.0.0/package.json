@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "extra-asciinema": "1.0.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": null,
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-EXTRAASCIINEMA-608292",
+    "sink": {
+      "file": "index.js",
+      "line": 208,
+      "code": "var stdout = cp9.execSync(`asciinema upload ${f}`, {encoding: 'utf8'});"
+    }
+  }
+}
