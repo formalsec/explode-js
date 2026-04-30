@@ -1,0 +1,37 @@
+- : app = { "type": symbol("normal"), "value": loc(23019),
+            "__completion__": true, "target": symbol("empty"),  }
+harness.js:7:4-11:6
+> exec(cmd, {maxBuffer: (1024 * 1000)}, function(err, stdout, stderr) {
+  if (err)   return reject(err);
+  if (stderr)   return reject(stderr);
+  resolve(stdout);
+});
+
+Reached sensitive command-injection sink 'child_process.exec' with symbolic expr:
+(str.replace
+ (str.++
+  "git log --no-color --pretty=format:'{\n      \"commitHash\": \"%H\",\n      \"commitMessage\": \"%s\",\n      \"timestamp\": \"%at000\",\n      \"authorName\": \"%an\"\n    },' --abbrev-commit -"
+  payload "") "\"" "<SEPARATOR>")
+[1m[31mAbort[0;1m[0m: ["harness.js", 7., "command-injection", "child_process.exec",
+        (str.replace
+         (str.++
+          "git log --no-color --pretty=format:'{\n      \"commitHash\": \"%H\",\n      \"commitMessage\": \"%s\",\n      \"timestamp\": \"%at000\",\n      \"authorName\": \"%an\"\n    },' --abbrev-commit -"
+          payload "") "\"" "<SEPARATOR>")]
+Path condition (PC): (bool.ne payload "")
+Model:
+ (model
+   (argv0 str "")
+   (argv1 str "")
+   (argv2 str "")
+   (argv3 str "")
+   (argv4 str "")
+   (payload str "A")
+   (require('process').arch str ""))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  1.763s
+  - Solver time:     0.002s
+  - Solver queries:  3
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-167255-out"
