@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "pomelo-monitor": "0.3.7"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-4j54-mxf6-wxx2",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-POMELOMONITOR-173695",
+    "sink": {
+      "file": "lib/processMonitor.js",
+      "lineno": 28,
+      "code": "exec(cmd, function(err, output) {"
+    }
+  }
+}
