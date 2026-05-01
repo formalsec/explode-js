@@ -1,0 +1,40 @@
+./node_modules/color-convert/index.js:36:1-36:31
+> graph[fromModel]["distance"] = 0;
+
+Uncaught TypeError: Cannot convert undefined or null to object
+./node_modules/chalk/index.js:55:0-64:1
+> for (/* unknown expr: VariableDeclarator */ of Object["keys"](ansiStyles)) {
+  ansiStyles[key]["closeRe"] = new RegExp(escapeStringRegexp(ansiStyles[key]["close"]), "g");
+  styles[key] = {get() {
+  const codes = ansiStyles[key];
+  return build["call"](this, (this["_styles"] ? this["_styles"]["concat"](codes) : [codes]), this["_empty"], key);
+}};
+}
+
+Uncaught TypeError: Cannot convert undefined or null to object
+harness.js:28:2-30:12
+> return execSync((("lsof -i:" + port) + " -P -t -sTCP:LISTEN"), execOptions)["split"]("
+")[0]["trim"]();
+
+Reached sensitive command-injection sink 'child_process.execSync' with symbolic expr:
+(str.++ "lsof -i:" payload " -P -t -sTCP:LISTEN")
+[1m[31mAbort[0;1m[0m: ["harness.js", 28., "command-injection", "child_process.execSync",
+        (str.++ "lsof -i:" payload " -P -t -sTCP:LISTEN")]
+Path condition (PC): (bool.eq argv0 "--no-color") (bool.eq argv1 "--")
+Model:
+ (model
+   (argv0 str "--no-color")
+   (argv1 str "--")
+   (argv2 str "")
+   (argv3 str "")
+   (argv4 str "")
+   (payload str "")
+   (require('process').arch str ""))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  9.903s
+  - Solver time:     0.002s
+  - Solver queries:  4
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-4735b7-out"
