@@ -1,0 +1,72 @@
+{
+    "index": "index.js",
+    "dependencies": {
+        "roar-pidusage": "1.1.6"
+    },
+    "vulnerabilities": [
+        {
+            "advisory": {
+                "id": "GHSA-xfxf-qw26-hr33",
+                "cve": "CVE-2021-23380",
+                "cwe": "CWE-78",
+                "github": "https://github.com/advisories/GHSA-xfxf-qw26-hr33",
+                "snyk": "https://security.snyk.io/vuln/SNYK-JS-ROARPIDUSAGE-1078528",
+                "nvd": "https://nvd.nist.gov/vuln/detail/CVE-2021-23380"
+            },
+            "location": {
+                "source": {
+                    "file": "lib/stats.js",
+                    "lineno": 96,
+                    "code": "ps: function(pid, options, done) {"
+                },
+                "sink": {
+                    "file": "lib/stats.js",
+                    "lineno": 103,
+                    "code": "exec(cmd + pid, function(err, stdout, stderr) {"
+                }
+            },
+            "pocs": [
+                {
+                    "file": "poc.js"
+                }
+            ],
+            "patch": {
+                "fixed_version": "",
+                "url": "",
+                "diff": ""
+            }
+        },
+        {
+            "advisory": {
+                "id": "GHSA-xfxf-qw26-hr33",
+                "cve": "CVE-2021-23380",
+                "cwe": "CWE-78",
+                "github": "https://github.com/advisories/GHSA-xfxf-qw26-hr33",
+                "snyk": "https://security.snyk.io/vuln/SNYK-JS-ROARPIDUSAGE-1078528",
+                "nvd": "https://nvd.nist.gov/vuln/detail/CVE-2021-23380"
+            },
+            "location": {
+                "source": {
+                    "file": "index.js",
+                    "lineno": 36,
+                    "code": "exports.stat = function() {"
+                },
+                "sink": {
+                    "file": "lib/stats.js",
+                    "lineno": 103,
+                    "code": "exec(cmd + pid, function(err, stdout, stderr) {"
+                }
+            },
+            "pocs": [
+                {
+                    "file": "poc.js"
+                }
+            ],
+            "patch": {
+                "fixed_version": "",
+                "url": "",
+                "diff": ""
+            }
+        }
+    ]
+}
