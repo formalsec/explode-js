@@ -1,0 +1,90 @@
+./node_modules/agent-base/patch-core.js:279:4-279:55
+> throw new TypeError(("Invalid Version: " + version));
+
+(str.++ "Uncaught TypeError: " "Invalid Version: " symbol_55)
+0.0
+3328.0
+106880.0
+3316992.0
+102830336.0
+-1107223200.0
+35820608.0
+1110442432.0
+63980672.0
+1983404384.0
+1355997600.0
+-913743488.0
+1738724384.0
+-1934115840.0
+171954400.0
+1035622336.0
+2039524864.0
+No support for JSON require, loading './node_modules/mime/types.json' as a lazyObject!
+./node_modules/charm/index.js:67:0-67:29
+> Charm["prototype"] = new Stream();
+
+Uncaught TypeError: is not a constructor
+./node_modules/readable-stream/lib/_stream_readable.js:63:0-63:32
+> util["inherits"](Readable, Stream);
+
+Uncaught TypeError: is not a function
+./node_modules/readable-stream/lib/_stream_writable.js:42:0-42:32
+> util["inherits"](Writable, Stream);
+
+Uncaught TypeError: is not a function
+./node_modules/readable-stream/lib/_stream_duplex.js:46:0-46:32
+> util["inherits"](Duplex, Readable);
+
+Uncaught TypeError: is not a function
+./node_modules/readable-stream/lib/_stream_transform.js:74:0-74:33
+> util["inherits"](Transform, Duplex);
+
+Uncaught TypeError: is not a function
+./node_modules/readable-stream/lib/_stream_passthrough.js:35:0-35:38
+> util["inherits"](PassThrough, Transform);
+
+Uncaught TypeError: is not a function
+./node_modules/duplexer2/index.js:54:0-54:104
+> DuplexWrapper["prototype"] = Object["create"](stream["Duplex"]["prototype"], {constructor: {value: DuplexWrapper}});
+
+Uncaught TypeError: Object prototype may only be an Object or null
+harness.js:37:8-39:10
+> execSync(`git fetch origin pull/${id}/head:${branch} && git checkout ${branch}`);
+
+Reached sensitive command-injection sink 'child_process.execSync' with symbolic expr:
+(str.++ "git fetch origin pull/1/head:" payload " && git checkout " payload
+ "")
+[1m[31mAbort[0;1m[0m: ["harness.js", 37., "command-injection", "child_process.execSync",
+        (str.++ "git fetch origin pull/1/head:" payload " && git checkout "
+         payload "")]
+Path condition (PC):
+ (bool.ne (str.++ "Invalid Version: " symbol_55) "")
+  (bool.ne
+   (real.ne (real.reinterpret_int (str.to_int symbol_82))
+    (real.reinterpret_int (str.to_int symbol_82))) true)
+  (bool.eq (real.eq (real.reinterpret_int (str.to_int symbol_82)) 0.) false)
+  (real.eq (real.reinterpret_int (str.to_int symbol_82))
+   (real.reinterpret_int (str.to_int symbol_82)))
+  (real.eq (real.reinterpret_int (str.to_int symbol_82)) 1.)
+  (bool.eq (real.eq (real.reinterpret_int (str.to_int symbol_82)) 1.) true)
+Model:
+ (model
+   (argv0 str "")
+   (argv1 str "")
+   (argv2 str "")
+   (argv3 str "")
+   (argv4 str "")
+   (payload str "")
+   (require('process').arch str "")
+   (symbol_55 str "")
+   (symbol_56 real 0.)
+   (symbol_57 bool false)
+   (symbol_82 str "1"))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  30.882s
+  - Solver time:     0.006s
+  - Solver queries:  9
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-52e1fb-out"
