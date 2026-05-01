@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "ps-kill": "1.0.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-7qmm-q394-fmch",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-PSKILL-1078529",
+    "sink": {
+      "file": "index.js",
+      "lineno": 8,
+      "code": "exec(cmd, function (error) {"
+      }
+    }
+  }
