@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "react-dev-utils": "11.0.3"
+  },
+  "vulnerability": {
+        "type": "command-injection",
+        "ghsa": "https://github.com/advisories/GHSA-5q6m-3h65-w53x",
+        "snyk": "https://security.snyk.io/vuln/SNYK-JS-REACTDEVUTILS-1083268",
+        "sink": {
+          "file": "getProcessForPort.js",
+          "lineno": 28,
+          "code": "return execSync('lsof -i:' + port + ' -P -t -sTCP:LISTEN', execOptions)"
+        }
+      }
+}
