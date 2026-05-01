@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "psnode": "0.0.1"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-m8fm-mv5w-33pv",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-PSNODE-1078543",
+    "sink": {
+      "file": "lib/index.js",
+      "lineno": 59,
+      "code": "ChildProcess.exec(killCommand, function (err, stdout, stderr) {"
+      }
+    }
+  }
