@@ -1,0 +1,25 @@
+harness.js:8:2-12:5
+> exec(cmd, function(error) { if ((typeof callback === "function")) { callback(error); } });
+
+Reached sensitive command-injection sink 'child_process.exec' with symbolic expr:
+(str.++ "kill -9 " payload)
+[1m[31mAbort[0;1m[0m: ["harness.js", 8., "command-injection", "child_process.exec",
+        (str.++ "kill -9 " payload)]
+Path condition (PC): <empty>
+Model:
+ (model
+   (argv0 str "")
+   (argv1 str "")
+   (argv2 str "")
+   (argv3 str "")
+   (argv4 str "")
+   (payload str "")
+   (require('process').arch str ""))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  0.380s
+  - Solver time:     0.001s
+  - Solver queries:  1
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-cf43a4-out"
