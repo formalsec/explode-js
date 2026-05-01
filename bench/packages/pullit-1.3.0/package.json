@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "pullit": "1.3.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-8px5-63x9-5c7p",
+    "snyk":"https://security.snyk.io/vuln/npm:pullit:20180214",
+    "sink": {
+      "file": "src/index.js",
+      "lineno": 37,
+      "code": "execSync("
+    }
+  }
+}
