@@ -1,0 +1,40 @@
+{
+  "index": "index.js",
+  "dependencies": {
+    "samsung-remote": "1.2.5"
+  },
+  "vulnerabilities": [
+    {
+      "advisory": {
+        "id": "GHSA-fg5w-w99f-rj6w",
+        "cve": "CVE-2021-29300",
+        "cwe": "CWE-78",
+        "github": "https://github.com/advisories/GHSA-fg5w-w99f-rj6w",
+        "snyk": "https://security.snyk.io/vuln/SNYK-JS-SAMSUNGREMOTE-72278",
+        "nvd": "https://nvd.nist.gov/vuln/detail/CVE-2021-29300"
+      },
+      "location": {
+        "source": {
+          "file": "lib/samsung-remote.js",
+          "lineno": 10,
+          "code": "var Remote = function(config) {"
+        },
+        "sink": {
+          "file": "lib/samsung-remote.js",
+          "lineno": 103,
+          "code": "return exec(\"ping -c 1 \" + config.ip, function (error, stdout, stderr) {"
+        }
+      },
+      "pocs": [
+        {
+          "file": "poc.js"
+        }
+      ],
+      "patch": {
+        "fixed_version": "1.5.2",
+        "url": "https://github.com/ronomon/opened/commit/7effe011d4fea8fac7f78c00615e0a6e69af68ec",
+        "diff": ""
+      }
+    }
+  ]
+}

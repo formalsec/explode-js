@@ -1,0 +1,27 @@
+- : app = { "type": symbol("normal"), "value": symbol("undefined"),
+            "__completion__": true, "target": symbol("empty"),  }
+harness.js:103:8-109:11
+> return exec(("ping -c 1 " + config["ip"]), function(error, stdout, stderr) { if (error) { done(1); } else { done(0); } });
+
+Reached sensitive command-injection sink 'child_process.exec' with symbolic expr:
+(str.++ "ping -c 1 " payload)
+[1m[31mAbort[0;1m[0m: ["harness.js", 103., "command-injection", "child_process.exec",
+        (str.++ "ping -c 1 " payload)]
+Path condition (PC): (bool.ne payload "")
+Model:
+ (model
+   (argv0 str "")
+   (argv1 str "")
+   (argv2 str "")
+   (argv3 str "")
+   (argv4 str "")
+   (payload str "A")
+   (require('process').arch str ""))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  0.648s
+  - Solver time:     0.002s
+  - Solver queries:  3
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-a06072-out"
