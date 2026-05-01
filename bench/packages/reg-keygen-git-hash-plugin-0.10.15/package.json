@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "reg-keygen-git-hash-plugin": "0.10.15"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-49q3-8867-5wmp",
+    "snyk": null,
+    "sink": {
+      "file": "lib/git-cmd-client.js",
+      "lineno": 22,
+      "code": "return child_process_1.execSync(`git branch -a --contains ${hash}`, { encoding: \"utf8\" });"
+    }
+  }
+}
