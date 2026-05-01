@@ -1,0 +1,30 @@
+harness.js:103:4-114:6
+> exec((cmd + pid), function(err, stdout, stderr) {
+  if (err)   return done(err, null);
+  stdout = stdout["split"](os["EOL"])[1];
+  stdout = stdout["replace"]("/^\s+/", "")["replace"]("/\s\s+/g", " ")["split"](" ");
+  return done(null, {cpu: parseFloat(stdout[0]["replace"](",", ".")), memory: (parseFloat(stdout[1]) * 1024)});
+});
+
+Reached sensitive command-injection sink 'child_process.exec' with symbolic expr:
+(str.++ "ps -o pcpu,rss -p " payload)
+[1m[31mAbort[0;1m[0m: ["harness.js", 103., "command-injection", "child_process.exec",
+        (str.++ "ps -o pcpu,rss -p " payload)]
+Path condition (PC): <empty>
+Model:
+ (model
+   (argv0 str "")
+   (argv1 str "")
+   (argv2 str "")
+   (argv3 str "")
+   (argv4 str "")
+   (payload str "")
+   (require('process').arch str ""))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  1.139s
+  - Solver time:     0.001s
+  - Solver queries:  1
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-06a272-out"

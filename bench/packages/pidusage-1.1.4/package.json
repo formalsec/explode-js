@@ -1,0 +1,168 @@
+{
+  "index": "index.js",
+  "dependencies": {
+    "pidusage": "1.1.4"
+  },
+  "vulnerabilities": [
+    {
+      "advisory": {
+        "id": "GHSA-hfq9-rfpv-j8r8",
+        "cve": "CVE-2017-16034",
+        "cwe": "CWE-94",
+        "github": "https://github.com/advisories/GHSA-hfq9-rfpv-j8r8",
+        "snyk": "https://snyk.io/vuln/npm:pidusage:20170605",
+        "nvd": "https://nvd.nist.gov/vuln/detail/CVE-2017-1000220"
+      },
+      "location": {
+        "source": {
+          "file": "lib/stats.js",
+          "lineno": 12,
+          "code": "  proc: function(pid, options, done) {"
+        },
+        "sink": {
+          "file": "lib/stats.js",
+          "lineno": 103,
+          "code": "exec(cmd + pid, function(err, stdout, stderr) {"
+        }
+      },
+      "pocs": [
+        {
+          "file": "poc.js"
+        }
+      ],
+      "patch": {
+        "fixed_version": "1.1.5",
+        "url": "url do commit",
+        "diff": "path_para_ficheiro_com_diff_relevante"
+      }
+    },
+    {
+      "advisory": {
+        "id": "GHSA-hfq9-rfpv-j8r8",
+        "cve": "CVE-2017-16034",
+        "cwe": "CWE-94",
+        "github": "https://github.com/advisories/GHSA-hfq9-rfpv-j8r8",
+        "snyk": "https://snyk.io/vuln/npm:pidusage:20170605",
+        "nvd": ""
+      },
+      "location": {
+        "source": {
+          "file": "lib/stats.js",
+          "lineno": 12,
+          "code": "  proc: function(pid, options, done) {"
+        },
+        "sink": {
+          "file": "lib/stats.js",
+          "lineno": 35,
+          "code": "return self.proc_calc(pid, options, done)"
+        }
+      },
+      "pocs": [
+        {
+          "file": "poc.js"
+        }
+      ],
+      "patch": {
+        "fixed_version": "1.1.5",
+        "url": "url do commit",
+        "diff": "path_para_ficheiro_com_diff_relevante"
+      }
+    },
+    {
+      "advisory": {
+        "id": "GHSA-hfq9-rfpv-j8r8",
+        "cve": "CVE-2017-16034",
+        "cwe": "CWE-94",
+        "github": "https://github.com/advisories/GHSA-hfq9-rfpv-j8r8",
+        "snyk": "https://snyk.io/vuln/npm:pidusage:20170605",
+        "nvd": ""
+      },
+      "location": {
+        "source": {
+          "file": "lib/stats.js",
+          "lineno": 39,
+          "code": "proc_calc: function(pid, options, done) {"
+        },
+        "sink": {
+          "file": "lib/stats.js",
+          "lineno": 45,
+          "code": "fs.readFile(p.join('/proc', ''+pid, 'stat'), 'utf8', function(err, infos) {"
+        }
+      },
+      "pocs": [
+        {
+          "file": "poc.js"
+        }
+      ],
+      "patch": {
+        "fixed_version": "1.1.5",
+        "url": "url do commit",
+        "diff": "path_para_ficheiro_com_diff_relevante"
+      }
+    },
+    {
+      "advisory": {
+        "id": "GHSA-hfq9-rfpv-j8r8",
+        "cve": "CVE-2017-16034",
+        "cwe": "CWE-94",
+        "github": "https://github.com/advisories/GHSA-hfq9-rfpv-j8r8",
+        "snyk": "https://snyk.io/vuln/npm:pidusage:20170605",
+        "nvd": ""
+      },
+      "location": {
+        "source": {
+          "file": "lib/stats.js",
+          "lineno": 96,
+          "code": "ps: function(pid, options, done) {"
+        },
+        "sink": {
+          "file": "lib/stats.js",
+          "lineno": 103,
+          "code": "exec(cmd + pid, function(err, stdout, stderr) {"
+        }
+      },
+      "pocs": [
+        {
+          "file": "poc.js"
+        }
+      ],
+      "patch": {
+        "fixed_version": "1.1.5",
+        "url": "url do commit",
+        "diff": "path_para_ficheiro_com_diff_relevante"
+      }
+    },
+    {
+      "advisory": {
+        "id": "GHSA-hfq9-rfpv-j8r8",
+        "cve": "CVE-2017-16034",
+        "cwe": "CWE-94",
+        "github": "https://github.com/advisories/GHSA-hfq9-rfpv-j8r8",
+        "snyk": "https://snyk.io/vuln/npm:pidusage:20170605",
+        "nvd": ""
+      },
+      "location": {
+        "source": {
+          "file": "lib/stats.js",
+          "lineno": 119,
+          "code": "win: function(pid, options, done) {"
+        },
+        "sink": {
+          "file": "lib/stats.js",
+          "lineno": 124,
+          "code": "var wmic = spawn('wmic', args.split(' '), {detached: true})"
+        }
+      },
+      "pocs": [
+        {
+          "file": "poc.js"
+        }
+      ],
+      "patch": {
+        "fixed_version": "1.1.5",
+        "url": "url do commit",
+        "diff": "path_para_ficheiro_com_diff_relevante"
+      }
+    }
+  ]
+}
