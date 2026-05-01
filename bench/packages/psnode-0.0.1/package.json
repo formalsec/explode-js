@@ -1,0 +1,40 @@
+{
+  "index": "index.js",
+  "dependencies": {
+    "psnode": "0.0.1"
+  },
+  "vulnerabilities": [
+    {
+      "advisory": {
+        "id": "GHSA-m8fm-mv5w-33pv",
+        "cve": "CVE-2021-23375",
+        "cwe": "CWE-78",
+        "github": "https://github.com/advisories/GHSA-m8fm-mv5w-33pv",
+        "snyk": "https://security.snyk.io/vuln/SNYK-JS-PSNODE-1078543",
+        "nvd": "https://nvd.nist.gov/vuln/detail/CVE-2021-23375"
+      },
+      "location": {
+        "source": {
+          "file": "lib/index.js",
+          "lineno": 57,
+          "code": "module.exports.kill = function (pid, next) {"
+        },
+        "sink": {
+          "file": "lib/index.js",
+          "lineno": 59,
+          "code": "ChildProcess.exec(killCommand, function (err, stdout, stderr) {"
+        }
+      },
+      "pocs": [
+        {
+          "file": "poc.js"
+        }
+      ],
+      "patch": {
+        "fixed_version": "id",
+        "url": "url do commit",
+        "diff": "path_para_ficheiro_com_diff_relevante"
+      }
+    }
+  ]
+}
