@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "portprocesses": "1.0.4"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-vm67-7vmg-66vm",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-PORTPROCESSES-1078536",
+    "sink": {
+      "file": "exec.js",
+      "lineno": 5,
+      "code": "exec(cmd, (err, stdout, stderr) => {"
+    }
+  }
+}
