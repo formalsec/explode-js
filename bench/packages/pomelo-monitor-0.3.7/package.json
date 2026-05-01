@@ -1,0 +1,40 @@
+{
+  "index": "index.js",
+  "dependencies": {
+    "pomelo-monitor": "0.3.7"
+  },
+  "vulnerabilities": [
+    {
+      "advisory": {
+        "id": "GHSA-4j54-mxf6-wxx2",
+        "cve": "CVE-2020-7620",
+        "cwe": "CWE-78",
+        "github": "https://github.com/advisories/GHSA-4j54-mxf6-wxx2",
+        "snyk": "https://security.snyk.io/vuln/SNYK-JS-POMELOMONITOR-173695",
+        "nvd": "https://nvd.nist.gov/vuln/detail/CVE-2020-7620"
+      },
+      "location": {
+        "source": {
+          "file": "lib/processMonitor.js",
+          "lineno": 23,
+          "code": "function getPsInfo(param, callback) { "
+        },
+        "sink": {
+          "file": "lib/processMonitor.js",
+          "lineno": 28,
+          "code": "exec(cmd, function(err, output) {"
+        }
+      },
+      "pocs": [
+        {
+          "file": "poc.js"
+        }
+      ],
+      "patch": {
+        "fixed_version": "id",
+        "url": "url do commit",
+        "diff": "path_para_ficheiro_com_diff_relevante"
+      }
+    }
+  ]
+}

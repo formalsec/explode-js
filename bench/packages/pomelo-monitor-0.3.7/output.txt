@@ -1,0 +1,32 @@
+harness.js:28:1-39:4
+> exec(cmd, function(err, output) {
+  if (! ! err) {
+    if ((err["code"] === 1)) { console["log"]("the content is null!"); } else { console["error"](("getPsInfo failed! " + err["stack"])); }
+    callback(err, null);
+    return ;
+  }
+  format(param, output, callback);
+});
+
+Reached sensitive command-injection sink 'child_process.exec' with symbolic expr:
+(str.++ "ps auxw | grep " payload " | grep -v 'grep'")
+[1m[31mAbort[0;1m[0m: ["harness.js", 28., "command-injection", "child_process.exec",
+        (str.++ "ps auxw | grep " payload " | grep -v 'grep'")]
+Path condition (PC): <empty>
+Model:
+ (model
+   (argv0 str "")
+   (argv1 str "")
+   (argv2 str "")
+   (argv3 str "")
+   (argv4 str "")
+   (payload str "")
+   (require('process').arch str ""))
+
+[1mSymbolic Execution Summary:[0m
+  - Execution time:  1.158s
+  - Solver time:     0.001s
+  - Solver queries:  1
+  - Result:          [1m[31mFound 1 problems![0;1m[0m
+
+Results saved in: "/var/folders/v_/hj7tcw2j3kd7hyg143ynlzb80000gn/T/ecma-870859-out"
