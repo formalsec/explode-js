@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "total.js": "3.4.6"
+  },
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-3wj8-vp9h-rm6m",
+    "sink": {
+      "code": "var fn = new Function('w', 'a', 'b', a);",
+      "file": "./utils.js",
+      "line": 6624
+    }
+  }
+}

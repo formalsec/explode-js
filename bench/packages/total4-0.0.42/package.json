@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "total4": "0.0.42"
+  },
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-g7mq-rfj2-25wq",
+    "sink": {
+      "code": "var fn = new Function('w', 'a', 'b', a);",
+      "file": "./utils.js",
+      "line": 5500
+    }
+  }
+}
