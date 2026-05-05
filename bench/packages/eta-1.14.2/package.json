@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "eta": "1.14.2"
+  },
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-mf6x-hrgr-658f",
+    "sink": {
+      "code": "return new ctor(options.varName, \"E\",",
+      "file": "./dist/eta.umd.js",
+      "lineno": 543
+    }
+  }
+}
