@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "google-cloudstorage-commands": "0.0.1"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-6367-p3v8-7mgw",
+    "sink": {
+      "file": "index.js",
+      "lineno": 11,
+      "code": "let _cmd = exec(`gsutil -m cp ${_rn} -a public-read ${_path} ${bucket}`)"
+    }
+  }
+}

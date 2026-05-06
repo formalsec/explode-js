@@ -1,0 +1,17 @@
+{
+  "dependencies": {
+    "typed-function": "< 0.10.6"
+  },
+  "vulnerabilities": {
+    "state" : {
+      "harness" : "ready"
+    },
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-3qh4-r86r-grvm",
+    "sink": {
+      "code": "var factory = (new Function(refs.name, 'createError', body));",
+      "file": "./typed-function.js",
+      "line": 1115
+    }
+  }
+}

@@ -6,11 +6,10 @@
     "type": "code-injection",
     "ghsa": "",
     "snyk": "https://security.snyk.io/vuln/npm:mixin-pro:20160407",
-    "nvd": ""
     "sink": {
       "file": "mixin.js",
-      "lineno": 134,
-      "code": "return eval(name);"
+      "code": "return eval(name);",
+      "line": 133
     }
   }
 }
