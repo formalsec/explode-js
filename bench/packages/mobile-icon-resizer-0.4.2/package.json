@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "mobile-icon-resizer": "0.4.2"
+  },
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-mxjr-xmcg-fg7w",
+    "sink": {
+      "file": "lib/resize.js",
+      "line": 31,
+      "code": "var ratio = eval(options.ratio); // Yeah, eval... Deal with it!"
+    }
+  }
+}
