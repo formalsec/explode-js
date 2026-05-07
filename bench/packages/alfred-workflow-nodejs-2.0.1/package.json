@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "alfred-workflow-nodejs": "2.0.1"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-9jm3-5835-537m",
+    "sink": {
+      "file":"alfredNode.js",
+      "line":445,
+      "code": "exec(getCommand, function(err, stdout, stderr) {"
+    }
+  }
+}

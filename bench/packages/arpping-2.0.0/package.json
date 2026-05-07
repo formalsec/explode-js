@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "arpping": "2.0.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": null,
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-ARPPING-1060047",
+    "sink": {
+      "file":"index.js",
+      "line":120,
+      "code": "exec(`ping ${flag} ${this.timeout} ${ip}`, (err, stdout, stderr) => {"
+    }
+  }
+}
