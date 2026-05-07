@@ -13,8 +13,8 @@ Test prototype-pollution:
   [+] 📄 Trying model :
    (model
     (path str "__proto__.toString")
-    (symbol_15 str "__proto__")
-    (symbol_16 str "toString")
+    (symbol_10 str "toString")
+    (symbol_9 str "__proto__")
     (val str "polluted"))
   [+] 📄 Node exited with 1
   [+] ✔ Status: Success (threw Error("I pollute."))

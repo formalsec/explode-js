@@ -33,21 +33,21 @@ Real world command injection
   } else { resolve(compassOptions["cssDir"]); } });
   
   Reached sensitive command-injection sink 'child_process.exec' with symbolic expr:
-  (str.++ symbol_14 " " "compile")
+  (str.++ symbol_8 " " "compile")
   Abort: ["/workspace_root/test/packages/cmd-04/_results/vuln_0/symbolic_test_0.js",
           24., "command-injection", "child_process.exec",
-          (str.++ symbol_14 " " "compile")]
+          (str.++ symbol_8 " " "compile")]
   [+] ⚠ Detected 1 issue(s)!
   [+] 📄 Trying model :
    (model
     (options str "")
-    (symbol_14 str "`touch success`"))
+    (symbol_8 str "`touch success`"))
   [+] 📄 Node exited with 1
   [-] ✖ Status: No side effect
   [+] 📄 Trying model :
    (model
     (options str "")
-    (symbol_14 str "''; touch success #"))
+    (symbol_8 str "''; touch success #"))
   [+] 📄 Node exited with 1
   [-] ✖ Status: No side effect
 
