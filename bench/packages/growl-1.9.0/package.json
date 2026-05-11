@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "growl": "1.9.0"
+  },
+  "vulnerabilities": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-qh2h-chj9-jffq",
+    "sink": {
+      "file": "lib/growl.js",
+      "lineno": 289,
+      "code": "exec(args.join(' '), fn);"
+    }
+  }
+}

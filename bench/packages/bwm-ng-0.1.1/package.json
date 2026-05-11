@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "bwm-ng": "^0.1.1"
+  }
+  "vulnerability" : {
+    "type" : "command-injetion",
+    "ghsa" : "https://github.com/advisories/GHSA-8vw3-vxmj-h43w",
+    "sink" : {
+      "file" : "./bwm-ng.js",
+      "line" : 17,
+      "code" : "exec(\"bwm-ng -c 1 -I \" + interfaces.join(',') + \" -o csv -T avg\", function(error, stdout, stderr)"
+    }
+  }
+}
