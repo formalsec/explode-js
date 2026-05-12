@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "font-converter": "1.1.1"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-g2c3-vwff-m3xr",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-FONTCONVERTER-2976194",
+    "sink": {
+      "file": "./index.js",
+      "code": "exec(command, callback);",
+      "lineno": 12
+    }
+  }
+}
