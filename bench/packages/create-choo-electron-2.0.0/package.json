@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "create-choo-electron": "2.0.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-j8wr-fwf2-vvr9",
+    "sink": {
+      "file": "./index.js",
+      "code": "exec(cmd, function (err)",
+      "lineno": 300
+    }
+  }
+}

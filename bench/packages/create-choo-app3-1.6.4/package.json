@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "create-choo-app3": "1.6.4"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-rj7m-2p3g-fjxg",
+    "sink": {
+      "file": "./index.js",
+      "code": "exec(cmd, function (err)",
+      "line": 262
+    }
+  }
+}
