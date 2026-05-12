@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "codecov": "3.6.4"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-xp63-6vf5-xf3v",
+    "sink": {
+      "file": "lib/codecov.js",
+      "line": 419 ,
+      "code": "execSync(gcov)"
+    }
+  }
+}

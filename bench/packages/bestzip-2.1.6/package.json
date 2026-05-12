@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "bestzip": "2.1.6"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-4qqc-mp5f-ccv4",
+    "sink": {
+      "file": "lib/bestzip.js",
+      "line": 27,
+      "code": "const zipProcess = cp.exec(command, {"
+      }
+    }
+  }

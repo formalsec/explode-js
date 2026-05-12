@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "async-git": "1.13.1"
+  },
+  "vulnerability": {
+    "type": "commad-injection",
+    "ghsa": "https://github.com/advisories/GHSA-6qpr-9mc5-7gch",
+    "sink": {
+      "file": "lib/reset/index.js",
+      "line": 11,
+      "code": "return await exec(`git reset ${JSON.stringify(destination)} ${hard ? '--hard' : ''}`);"
+    }
+  }
+}

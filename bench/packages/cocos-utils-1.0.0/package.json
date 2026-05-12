@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "cocos-utils": "1.0.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-rffp-mc78-wjf7",
+    "sink": {
+      "file": "./lib/core/core4cc.js",
+      "code": "exec(execCode, function(err, data, info)",
+      "line": 87
+    }
+  }
+}

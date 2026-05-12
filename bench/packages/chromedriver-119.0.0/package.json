@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "chromedriver": "119.0.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-hm92-vgmw-qfmx",
+    "sink": {
+      "file": "./lib/chromedriver.js",
+      "code": "const cp = require('child_process').spawn(command, args);" ,
+      "line": 28
+    }
+  }
+}

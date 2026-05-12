@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "command-exists": "1.2.2"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-cff4-rrq6-h78w",
+    "sink": {
+      "file": "lib/command-exists.js",
+      "line": 78,
+      "code": "var stdout = execSync('command -v ' + commandName +"
+    }
+  }
+}
