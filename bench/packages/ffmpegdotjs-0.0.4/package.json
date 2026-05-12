@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "ffmpegdotjs": "0.0.4"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-f39r-cpmj-whcg",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-FFMPEGDOTJS-1078542",
+    "sink": {
+      "file": "index.js",
+      "line": 191,
+      "code": "exec("
+    }
+  }
+}
