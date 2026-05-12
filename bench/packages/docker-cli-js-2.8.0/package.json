@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "docker-cli-js": "2.8.0"
+  },
+  "vulnerability": {
+    "type": "commad-injection",
+    "ghsa": "https://github.com/advisories/GHSA-ff45-7prw-58vj",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-DOCKERCLIJS-1568516",
+    "sink": {
+      "file": "./dist/index.js",
+      "code": "const childProcess = exec(execCommand, execOptions, (error, stdout, stderr) => {",
+      "line": 174
+    }
+  }
+}
