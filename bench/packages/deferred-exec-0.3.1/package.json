@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "deferred-exec": "0.3.1"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-54w4-2f2p-f48h",
+    "sink": {
+      "code": "child_process.exec( command, hollaback );",
+      "file": "lib/deferred-exec.js",
+      "lineno": 42
+    }
+  }
+}
