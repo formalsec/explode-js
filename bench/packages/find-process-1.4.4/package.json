@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "find-process": "1.4.4"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "github": "https://github.com/advisories/GHSA-qfxv-qqvg-24pg",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-FINDPROCESS-1090284",
+    "sink": {
+      "file": "lib/utils.js",
+      "line": 19,
+      "code": "cp.exec(cmd, {"
+    }
+  }
+}
