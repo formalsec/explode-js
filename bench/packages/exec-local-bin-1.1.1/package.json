@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "exec-local-bin": "1.1.1"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-f259-h6m8-hm8m",
+    "sink": {
+      "file": "./index.js",
+      "code": "const theProcess = exec(cmd, options, (error, stdout, stderr) => {",
+      "line": 9
+    }
+  }
+}
