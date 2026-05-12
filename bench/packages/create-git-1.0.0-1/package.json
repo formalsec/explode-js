@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "create-git": "1.0.0-1"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": null,
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-CREATEGIT-1022150"
+    "sink": {
+      "file": "./index.js",
+      "code": "const ret = await execFile('git', args, opts)",
+      "line": 326
+    }
+  }
+}
