@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "freediskspace":"0.1.2"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-4gfq-6m28-m5mg",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-FREEDISKSPACE-1040716",
+    "sink": {
+      "file": "freediskspace.js",
+      "lineno": 79,
+      "code": "fd.detail(drive, function (error, total, used, free) {"
+    }
+  }
+}
