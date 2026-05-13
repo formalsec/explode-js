@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "git-dummy-commit": "1.3.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://security.snyk.io/vuln/npm:git-dummy-commit:20180619",
+    "snyk": "https://github.com/advisories/GHSA-h3c2-x77c-7pvr",
+    "sink" : {
+      "file": "./index.js",
+      "code": "shell.exec('git commit ' + arg + ' --allow-empty --no-gpg-sign'",
+      "line": 37
+    }
+  }
+}
