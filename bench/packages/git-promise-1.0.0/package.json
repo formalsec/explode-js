@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "git-promise": "1.0.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "GHSA-chj3-f7xw-367m",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-GITPROMISE-2434310",
+    "sink": {
+      "file": "index.js",
+      "lineno": 34,
+      "code": "return execFile(execBinary, execArguments, execOptions).then("
+    }
+  }
+}
