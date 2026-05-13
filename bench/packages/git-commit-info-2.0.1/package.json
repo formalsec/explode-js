@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "git-commit-info": "2.0.1"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "github": "https://github.com/advisories/GHSA-h42j-mrmp-9369",
+    "snyk": null,
+    "sink": {
+      "file": "./dest/index.js",
+      "code": "var stdout = execa_1.default.commandSync(\"git --no-pager show \" + thisCommit + \" --summary\",",
+      "line": 39
+    }
+  }
+}
