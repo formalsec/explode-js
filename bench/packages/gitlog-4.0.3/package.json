@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "gitlog": "4.0.3"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-67mm-m3wx-j7fr",
+    "sink": {
+      "file": "./dist/gitlog.cjs.development.js",
+      "code": "var stdout = child_process.execSync(command, execOptions).toString();",
+      "lineno": 216
+    }
+  }
+}
