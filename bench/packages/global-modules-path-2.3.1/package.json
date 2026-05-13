@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "global-modules-path": "2.3.1"
+  },
+  "vulnerabilities": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-vvj3-85vf-fgmw",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-GLOBALMODULESPATH-3167973",
+    "sink": {
+      "file": "./lib/index.js",
+      "code": "const whichResult = (childProcess.execSync(`which ${executableName}`) || \"\").toString().trim(),",
+      "lineno": 148
+    }
+  }
+}
