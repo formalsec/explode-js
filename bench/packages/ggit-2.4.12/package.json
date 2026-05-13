@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "ggit": "2.4.12"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-62cx-5xj4-wfm4",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-GGIT-5731320",
+    "sink": {
+      "code": "return exec.exec(cmd)",
+      "file": "src/fetch-tags.js",
+      "lineno": 10
+    }
+  }
+}
