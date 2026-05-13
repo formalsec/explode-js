@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "gitlogplus": "3.1.7"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-3fxp-vwxm-2r5p",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-GITLOGPLUS-1315832",
+    "sink": {
+      "file": "./index.js",
+      "code": "var stdout = execSync(command, options.execOptions).toString()",
+      "lineno": 112
+    }
+  }
+}
