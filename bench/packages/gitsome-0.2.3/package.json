@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "gitsome": "0.2.3"
+  }
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "GHSA-9v73-x562-wv5x",
+    "sink": {
+      "file": "lib/run/index.js",
+      "lineno": 8,
+      "code": "return exec(params.join(' '), { encoding, cwd: path }).toString(encoding)"
+    }
+  }
+}
