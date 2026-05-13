@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "git-archive": "0.1.4"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-vqgr-mfxm-47f3",
+    "nvd": "https://nvd.nist.gov/vuln/detail/CVE-2020-28422",
+    "sink": {
+      "file": null,
+      "code": null,
+      "lineno": null
+    }
+  }
+}
