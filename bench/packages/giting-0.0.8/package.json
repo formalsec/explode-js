@@ -1,0 +1,14 @@
+{
+	"dependencies": {
+		"giting":"0.0.8"
+	},
+  "vulnerability": {
+    "type": "command-injection",
+	  "ghsa": "https://github.com/advisories/GHSA-7r9x-hr76-jr96",
+    "sink": {
+      "file": "lib/git.js",
+      "lineno": 223,
+      "code": "child.exec(cmd, {"
+    }
+  }
+}

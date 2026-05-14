@@ -1,5 +1,4 @@
 const esl = require('esl_symbolic');
-require.cache[require.resolve("debug")] = { exports : esl.lazy_object() };
 
 const Test = require("giting");
 
