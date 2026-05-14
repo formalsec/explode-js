@@ -1,6 +1,6 @@
 {
     "dependencies":{
-        "kill-port-process":"2.2.0"
+        "kill-port-process":"2.1.0"
     },
     "index":"dist/lib/index.js",
     "vulnerabilities":[
