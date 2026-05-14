@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "openssl": "2.0.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-75w2-qv55-x7fv",
+    "sink": {
+      "file": "./index.js",
+      "code": "const cp = exec(command);",
+      "lineno": 41
+    }
+  }
+}
