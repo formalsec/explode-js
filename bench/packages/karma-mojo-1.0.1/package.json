@@ -1,0 +1,15 @@
+{
+  "dependencies":{
+    "karma-mojo":"1.0.1"
+  },
+  "vulnerability": {
+    "type":"command-injection",
+    "ghsa":"https://github.com/advisories/GHSA-pf8j-vhg8-xmc3",
+    "snyk":"https://snyk.io/vuln/SNYK-JS-KARMAMOJO-564260"
+    "sink":{
+      "code":"exec('egrep -rl \"describe\\([\\'\\\"].*' + config.grep + '\" ' + config.grepDir, {",
+      "file":"index.js",
+      "line":100
+    }
+  }
+}
