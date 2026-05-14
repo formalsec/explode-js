@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "is-http2": "1.2.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "github": "https://github.com/advisories/GHSA-2275-rpf5-xv8h",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-ISHTTP2-3153878"
+    "sink": {
+      "file": "./index.js"
+      "code": "exec( openssl + ' version', function( error, result ) {",
+      "line": 23
+    }
+  }
+}
