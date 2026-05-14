@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "p4": "0.0.6"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-jfm8-hwhg-r6gg",
+    "sink": {
+      "code": "exec(\"p4 \" + command + \" \" + (args || \"\"), function(err, stdOut, stdErr) {",
+      "line": 12,
+      "file": "./index.js"
+    }
+  }
+}
