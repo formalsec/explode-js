@@ -7,7 +7,7 @@
     "ghsa": "https://github.com/advisories/GHSA-w868-4576-rv24",
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-NTESSERACT-1050982",
     "sink": {
-      "file": "./lib/tessaract.js",
+      "file": "./lib/tesseract.js",
       "code": "exec(command, opts, function(err) {",
       "lineno": 92
     }
