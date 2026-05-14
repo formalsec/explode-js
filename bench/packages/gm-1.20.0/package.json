@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "gm": "1.20.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-pjh3-jv7w-9jpr",
+    "snyk": "https://security.snyk.io/vuln/npm:gm:20151026",
+    "sink": {
+      "file": "lib/compare.js",
+      "lineno": 72,
+      "code": "exec(execCmd, function (err, stdout, stderr) {"
+    }
+  }
+}
