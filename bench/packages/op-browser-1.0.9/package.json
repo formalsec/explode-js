@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "op-browser": "1.0.9"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "GHSA-3hq6-rmv7-39vh",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-OPBROWSER-564259",
+    "sink": {
+      "file": "lib/index.js",
+      "lineno": 70,
+      "code": "childProcess.execFile(path.resolve(browserPath), commandOptions, {maxBuffer: 50000 * 1024}, function (err) {"
+    }
+  }
+}
