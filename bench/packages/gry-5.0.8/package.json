@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "gry": "5.0.8"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": null,
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-GRY-566987",
+    "sink": {
+      "file": "lib/index.js",
+      "line": 174,
+      "code": "return this.exec(\"pull \" + options, callback);"
+    }
+  }
+}
