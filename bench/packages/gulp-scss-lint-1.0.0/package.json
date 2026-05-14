@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "gulp-scss-lint":"1.0.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-g4hj-r7r3-9rwv",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-GULPSCSSLINT-560114",
+    "sink": {
+      "file": "src/command.js",
+      "lineno": 61,
+      "code": "child_process.exec(command, commandOptions, function(error, report) {"
+    }
+  }
+}
