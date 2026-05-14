@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "heroku-addonpool": "0.1.15"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-3q9x-w53p-jg53",
+    "snyk": "https://snyk.io/vuln/SNYK-JS-HEROKUADDONPOOL-564428",
+    "sink": {
+      "file": "./index.js"
+      "code": "cp.exec(`~/heroku config -s --app ${app}`, (err, stdout) =>",
+      "lineno": 38
+    }
+  }
+}
