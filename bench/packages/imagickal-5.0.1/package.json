@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "imagickal": "5.0.1"
+  },
+  "vulnerability": {
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-IMAGICKAL-1060040",
+    "ghsa": null,
+    "sink": {
+      "file": "lib/imagickal.js",
+      "line": 127,
+      "code": "const shell = exec(cmd, Object.assign({ stdio: ['pipe'] }, globalOpts.execOptions || {}), (err, stdout) => {"
+    }
+  }
+}
