@@ -1,0 +1,42 @@
+{
+  "dependencies": {
+    "gulp": "^5.0.1",
+    "gulp-tape": "1.0.0"
+  },
+  "index": "...",
+  "vulnerabilities": [
+    {
+      "advisory": {
+        "cve": "CVE-2020-7605",
+        "cwe": "CWE-78",
+        "github": "https://github.com/advisories/GHSA-x67x-98x7-wv26",
+        "id": "GHSA-x67x-98x7-wv26",
+        "nvd": "https://nvd.nist.gov/vuln/detail/CVE-2020-7605",
+        "snyk": "https://security.snyk.io/vuln/SNYK-JS-GULPTAPE-560124"
+      },
+      "location": {
+        "sink": {
+          "code": "const tapeProcess = childProcess.exec(args.join(' '), function (error) {",
+          "file": "index.js",
+          "lineno": 38
+        },
+        "source": {
+          "code": "function gulpTape (options) {",
+          "file": "index.js",
+          "lineno": 10
+        }
+      },
+      "patch": {
+        "diff": "path_para_ficheiro_com_diff_relevante",
+        "fixed_version": "id",
+        "url": "url do commit"
+      },
+      "pocs": [
+        {
+          "file": "gulp-tape.js",
+          "source": "https://security.snyk.io/vuln/SNYK-JS-GULPTAPE-560124"
+        }
+      ]
+    }
+  ]
+}
