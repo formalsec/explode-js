@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "node-os-utils": "< 1.1.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-j9f8-8h89-j69x",
+    "sink": {
+      "code": "cp.exec(command, { shell: true }, function (err, stdout, stderr) {",
+      "file": "./lib/bucket.js",
+      "line": 18
+    }
+  }
+}
