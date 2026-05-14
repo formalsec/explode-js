@@ -1,0 +1,69 @@
+{
+    "advisory": {
+        "id": "GHSA-h33p-5j96-w8qh",
+        "cve": "CVE-2020-7607",
+        "cwe": "CWE-78",
+        "github_link": "https://github.com/advisories/GHSA-h33p-5j96-w8qh"
+    },
+    "correct_cwe": "CWE-78",
+    "correct_package_link": "https://registry.npmjs.org/gulp-styledocco/-/gulp-styledocco-0.0.3.tgz",
+    "vulnerability": {
+        "vulnerability_location": [
+            {
+                "source": {
+                    "file": "index.js",
+                    "lineno": 9,
+                    "code": "module.exports = function (options) {"
+                },
+                "sink": {
+                    "file": "index.js",
+                    "lineno": 72,
+                    "code": "exec(bin + args.join(' '), function (error, stdout, stderr) {"
+                }
+            }
+        ]
+    },
+    "poc": [
+        {
+            "file_path": "GHSA-h33p-5j96-w8qh.poc.js"
+        }
+    ],
+    "patch": [
+        {
+            "url": "https://github.com/konitter/gulp-styledocco/pull/8"
+        }
+    ],
+    "tools": {
+        "codeql": {
+            "score": "D"
+        },
+        "njsscan": {
+            "score": "D"
+        },
+        "graudit": {
+            "score": "D"
+        },
+        "insidersec": {
+            "score": "D"
+        },
+        "eslint": {
+            "score": "C"
+        },
+        "msdevskim": {
+            "score": "D"
+        },
+        "drek": {
+            "score": "D"
+        },
+        "mosca": {
+            "score": "D"
+        },
+        "odgen": {
+            "score": "A"
+        }
+    },
+    "dependencies": {
+        "gulp": "^5.0.1",
+        "gulp-styledocco": "0.0.3"
+    }
+}
