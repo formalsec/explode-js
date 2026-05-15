@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "vboxmanage.js": "1.0.6"
+  },
+  "vulnerability": {
+    "type": "CWE-78",
+    "ghsa": "https://github.com/advisories/GHSA-whq6-mj2r-mjqc",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-VBOXMANAGEJS-607910",
+    "sink": {
+      "file": "index.js",
+      "line": 76,
+      "code": "child_process.exec(vBoxManageBinary + ' ' + command.join(' '), {}, function (err, stdout, stderr) {"
+    }
+  }
+}
