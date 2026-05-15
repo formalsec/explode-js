@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "window-control": "1.4.4"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-9mjx-wfqp-j5ph",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-WINDOWCONTROL-3186345",
+    "sink": {
+      "file": "./index.js",
+      "code": "exec(`${sendTextToWindowWithId} ${windowID} \"${keys}\"`, (error, stdout, stderr) => {",
+      "line": 89
+    }
+  }
+}
