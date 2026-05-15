@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "ts-process-promises": "1.0.2"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-ww4j-c2rq-47q8",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-TSPROCESSPROMISES-1048334",
+    "sink": {
+      "file": "lib/process-promises.js",
+      "lineno": 45,
+      "code": "var childProcess = cp.exec(command, options, function (err, stdout, stderr) {"
+    }
+  }
+}
