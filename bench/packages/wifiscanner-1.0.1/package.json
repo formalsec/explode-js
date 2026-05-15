@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "wifiscanner": "1.0.1"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-m6rw-m2v9-7hx4",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-WIFISCANNER-574786",
+    "sink": {
+      "file": "scanners/wifiscanner.js",
+      "lineno": 12,
+      "code": "childProcess.exec(this.command,  (error, standardOut, standardError) => {"
+    }
+  }
+}
