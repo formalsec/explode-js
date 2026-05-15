@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "umount": "1.1.6"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-6q48-vjq2-mwcj",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-UMOUNT-564265",
+    "sink": {
+      "file": "build/umount.js",
+      "lineno": 52,
+      "code": "return child_process.exec(unmountCommand + \" \"+ device, callback);"
+    }
+  }
+}
