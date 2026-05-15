@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "whereis": "0.4.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-wjr4-2jgw-hmv8",
+    "snyk": "https://security.snyk.io/vuln/npm:whereis:20180401",
+    "sink": {
+      "file": "index.js",
+      "line": 4,
+      "code": "cp.exec('which ' + name, function(error, stdout, stderr) {"
+    }
+  }
+}
