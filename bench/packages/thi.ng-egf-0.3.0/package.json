@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "@thi.ng/egf": "0.3.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-rj44-gpjc-29r7",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-THINGEGF-1089810",
+    "sink": {
+      "file": "lib/index.js",
+      "lineno": 157,
+      "code": "? child_process.execSync(`echo \"${body}\" | gpg --decrypt`).toString()"
+    }
+  }
+}
