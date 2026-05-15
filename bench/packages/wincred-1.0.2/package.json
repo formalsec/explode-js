@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "wincred": "1.0.2"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-v85c-hgq5-7pfw",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-WINCRED-1078538",
+    "sink": {
+      "file": "index.js",
+      "lineno": 16,
+      "code": "return exec(script)"
+    }
+  }
+}
