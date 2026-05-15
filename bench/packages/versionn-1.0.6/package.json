@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "versionn": "1.0.6"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-fj78-2vc5-f6cm",
+    "sink": {
+      "file": "./lib/gitfn.js",
+      "code": "child.exec(cmd, this._options, cb)",
+      "line": 31
+    }
+  }
+}
