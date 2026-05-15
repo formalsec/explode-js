@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "wc-cmd": "1.0.9"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-mx3r-w3pj-7wv7",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-WCCMD-1050423",
+    "sink": {
+      "file": "index.js",
+      "line": 49,
+      "code": "var child = exec(command, {"
+    }
+  }
+}
