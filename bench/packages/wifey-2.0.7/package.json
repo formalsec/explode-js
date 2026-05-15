@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "wifey": "2.0.7"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-xj9v-6q2f-vqhx",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-WIFEY-3175615",
+    "sink": {
+      "file": "./src/linux-connect.js",
+      "code": "exec(commandStr, env, function (err, resp) {" ,
+      "line": 19
+    }
+  }
+}
