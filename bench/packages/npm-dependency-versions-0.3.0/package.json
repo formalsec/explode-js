@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "npm-dependency-versions": "0.3.0"
+  },
+  "vulnerabilities": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-m7xq-8jp8-rj2c",
+    "sink": {
+      "file": "./getVersionAtDate.js",
+      "code": "const query = exec( 'npm view --json ' + name )",
+      "lineno": 21
+    }
+  }
+}
