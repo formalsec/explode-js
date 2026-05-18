@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "node-df": "0.1.4"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-wp7m-mrvf-599c",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-NODEDF-536779",
+    "sink": {
+      "file": "lib/index.js",
+      "lineno": 41,
+      "code": "exec(command, function(err, stdout, stderr) {"
+    }
+  }
+}
