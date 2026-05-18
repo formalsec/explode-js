@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "monorepo-build": "0.1.9"
+  },
+
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": null,
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-MONOREPOBUILD-1050392",
+    "sink": {
+      "file": "lib/util/exec.js",
+      "lineno": 4,
+      "code": "exports.execSync = (cwd, command) => child_process_1.execSync(command, { cwd, env: process.env });"
+    }
+  }
+}
