@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "npm-programmatic": "0.0.12"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-426h-24vj-qwxf",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-NPMPROGRAMMATIC-564115",
+    "sink": {
+      "file": "index.js",
+      "lineno": 18,
+      "code": "var cmd = exec(cmdString, {cwd: opts.cwd?opts.cwd:'/', maxBuffer: opts.maxBuffer?opts.maxBuffer:200 * 1024},(error, stdout, stderr) => {"
+    }
+  }
+}
