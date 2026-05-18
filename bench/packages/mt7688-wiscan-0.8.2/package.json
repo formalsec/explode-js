@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "mt7688-wiscan": "0.8.2"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-5h8c-8ccp-8gmh",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-MT7688WISCAN-3177394",
+    "sink": {
+      "file": "./index.js",
+      "code": "child = exec('iwinfo ' + intf + ' scan', function (error, stdout, stderr) {",
+      "lineno": 22
+    }
+  }
+}
