@@ -1,0 +1,14 @@
+{
+	"dependencies": {
+    "proctree":"0.1.1"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "github": "https://github.com/advisories/GHSA-cv76-rv4h-4mqc",
+    "sink": {
+      "file": "index.js",
+      "line": 46,
+      "code": "let psOutput = execSync(`ps -p ${pid} -o \"pid=,command=\"`).toString().trim();"
+    }
+  }
+}
