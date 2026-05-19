@@ -1,0 +1,40 @@
+{
+  "index": null,
+  "dependencies": {
+    "npos-tesseract": "0.0.3"
+  },
+  "vulnerabilities": [
+    {
+      "advisory": {
+        "id": "GHSA-mpwp-pf96-9g4r",
+        "cve": "CVE-2020-28453",
+        "cwe": "CWE-78",
+        "github": "https://github.com/advisories/GHSA-mpwp-pf96-9g4r",
+        "nvd": "https://nvd.nist.gov/vuln/detail/CVE-2020-28453",
+        "snyk": null
+      },
+      "location": {
+        "source": {
+          "code": null,
+          "file": null,
+          "lineno": null
+        },
+        "sink": {
+          "code": null,
+          "lineno": null
+        }
+      },
+      "patch": {
+        "diff": null,
+        "fixed_version": null,
+        "url": null
+      },
+      "pocs": [
+        {
+          "file": null,
+          "source": null
+        }
+      ]
+    }
+  ]
+}
