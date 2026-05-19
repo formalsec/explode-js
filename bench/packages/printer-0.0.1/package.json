@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "printer": "0.0.1"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-5c8j-xr24-2665",
+    "sink": {
+      "file": "./lib/printer.js",
+      "code": "child_process.exec('lpr -P'+printer+' -oraw -r'+' '+temp_file_name, function(err, stdout, stderr){",
+        "line": 96
+    }
+  }
+}
