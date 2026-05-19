@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "pdfinfojs": "0.3.6"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-3pxp-6963-46r9",
+    "snyk": "https://security.snyk.io/vuln/npm:pdfinfojs:20180409",
+    "sink": {
+      "file": "lib/pdfinfo.js",
+      "lineno": 47,
+      "code": "var child = shell.exec('pdfinfo ' + self.options.additional.join(' '), function(code, data) {"
+    }
+  }
+}
