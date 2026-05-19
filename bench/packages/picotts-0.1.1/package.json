@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "picotts": "0.1.1"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-wq7q-5v6j-xfv6",
+    "nvd": "https://nvd.nist.gov/vuln/detail/CVE-2021-23378",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-PICOTTS-1078539",
+    "sink": {
+      "file": "./index.js",
+      "code": "exec(command, function(err) {",
+      "line": 16
+    }
+  }
+}
