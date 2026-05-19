@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "promise-probe": "0.1.9"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-vmqq-7qvx-68qx",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-PROMISEPROBE-546816",
+    "sink": {
+      "file": "./index.js",
+      "code": "child_process_1.exec('ffmpeg -f lavfi -i anullsrc=r=' +",
+      "lineno": 38
+    }
+  }
+}
