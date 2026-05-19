@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "@pendo324/get-process-by-name": "1.0.1"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "github": "https://github.com/advisories/GHSA-qhxv-296x-hjv7",
+    "nvd": "https://nvd.nist.gov/vuln/detail/CVE-2022-25644",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-PENDO324GETPROCESSBYNAME-2419094",
+    "sink": {
+      "file": "./index.js",
+      "code": "exec(",
+      "line": 27
+    }
+  }
+}
