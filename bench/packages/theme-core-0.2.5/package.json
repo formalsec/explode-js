@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "theme-core": "0.2.5"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-fghm-67rm-fvph",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-THEMECORE-1050425",
+    "sink": {
+      "file": "lib/utils.js",
+      "lineno": 16,
+      "code": "const child = exec(cmd, {"
+    }
+  }
+}
