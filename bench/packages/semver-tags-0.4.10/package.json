@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "semver-tags": "0.4.10"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-8h3g-hcwp-6hxq",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-SEMVERTAGS-3175612",
+    "sink": {
+      "file": "./lib/get-tags.js",
+      "code": "cp.exec('git ls-remote --tags \"' + path + '\"', (err, stdout, stderr) => {",
+      "line": 22
+    }
+  }
+}
