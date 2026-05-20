@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "ps-visitor": "0.0.2"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "github": "https://github.com/advisories/GHSA-v2jv-33gh-xx29",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-PSVISITOR-1078544",
+    "sink": {
+      "file": "index.js",
+      "lineno": 404,
+      "code": "return exec(cmd).then((result) => {"
+    }
+  }
+}
