@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "samba-client": "3.4.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-r3j7-x2g5-9gx6",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-SAMBACLIENT-1071899",
+    "sink": {
+      "code": "exec(command, options, function (err, stdout, stderr) {",
+      "file": "index.js",
+      "line": 169
+    }
+  }
+}
