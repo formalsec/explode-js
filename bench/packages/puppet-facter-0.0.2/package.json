@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "puppet-facter": "0.0.2"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-g5qr-xgg7-8q2w",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-PUPPETFACTER-3175616",
+    "sink": {
+      "file": "./index.js",
+      "code": "exec('facter -j ' + factName, function (err, stdout, stderr) {",
+        "line": 10
+      }
+    }
+  }
