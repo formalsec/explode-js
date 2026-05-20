@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "sketchsvg": "<= 0.0.1"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-6722-xvq8-3254",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-SKETCHSVG-3167969",
+    "sink": {
+      "file": "lib/index.js",
+      "lineno": 64,
+      "code": "const allLayers = shell.exec(`${sketchTool} list layers ${value}`, { silent: true });"
+    }
+  }
+}
