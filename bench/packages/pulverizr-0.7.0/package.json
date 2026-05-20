@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "pulverizr": "0.7.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-fmf5-j5j9-99pp",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-PULVERIZR-560122",
+    "sink": {
+      "file": "lib/job.js",
+      "lineno": 73,
+      "code": "exec('cp \"' + filename + '\" ' + scratchSpace, function (error, stdout, stderr) {"
+    }
+  }
+}
