@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "rpi": "0.0.3"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-vf26-7gjf-f92r",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-RPI-548942",
+    "sink": {
+      "file": "./lib/gpio.js",
+      "code": "proc.exec([gpio, 'mode', pinNumber, direction].join(' '), function(error, stdout, stderr)",
+      "line": 49
+    }
+  }
+}
