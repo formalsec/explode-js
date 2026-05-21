@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "@stoqey/gnuplot": "0.0.3"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-795w-7426-m94j",
+    "snyk": null,
+    "sink": {
+      "file": "./dist/index.js",
+      "code": "child_process_1.exec(\"touch \" + filepath);",
+      "line": 207
+    }
+  }
+}
