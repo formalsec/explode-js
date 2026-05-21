@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "ssl-utils": "1.0.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-552j-pv39-f3jf",
+    "snyk": null,
+    "sink": {
+      "file": null,
+      "code": null,
+      "lineno": null
+    }
+  }
+}
