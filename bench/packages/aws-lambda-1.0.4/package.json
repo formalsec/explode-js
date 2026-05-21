@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "aws-lambda": "1.0.4"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": null,
+    "snyk": "https://security.snyk.io/package/npm/aws-lambda/1.0.4",
+    "sink": {
+      "file": "./lib/main.js",
+      "code": "exec( $zipCmd, { maxBuffer: 1024 * 1024 } ,function( err, stdout, stderr ) {",
+      "line": 187
+    }
+  }
+}
