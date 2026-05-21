@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "broccoli-compass": "0.2.4"
+  },
+  "vulnerability": {
+    "type": "CWE-78",
+    "ghsa": "https://github.com/advisories/GHSA-wq8f-xmq3-5vq9",
+    "snyk": null,
+    "sink": {
+      "file": null,
+      "code": null,
+      "line": null
+    }
+  }
+}
