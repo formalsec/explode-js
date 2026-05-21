@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "systeminformation": "4.34.23"
+  },
+  "vulnerability": {
+    "cve": "CVE-2021-21388",
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-jff2-qjw8-5476",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-SYSTEMINFORMATION-1089810",
+    "sink": {
+      "file": "lib/processes.js",
+      "lineno": 993,
+      "code": "exec('ps -axo pid,pcpu,pmem,comm | grep -i ' + procSanitized + ' | grep -v grep', { maxBuffer: 1024 * 20000 }, function (error, stdout) {"
+    }
+  }
+}
