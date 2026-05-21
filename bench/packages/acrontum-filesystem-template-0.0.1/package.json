@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "@acrontum/filesystem-template": "0.0.1"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-m2fc-9h5m-29cm",
+    "snyk": null,
+    "sink": {
+      "code": null,
+      "lineno": null
+    }
+  }
+}
