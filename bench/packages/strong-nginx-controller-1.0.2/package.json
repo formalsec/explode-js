@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "strong-nginx-controller": "1.0.2"
+  },
+  "vulnerabilities": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-4v9w-pvwr-38h3",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-STRONGNGINXCONTROLLER-560685",
+    "sink": {
+      "file": "lib/server.js",
+      "lineno": 65,
+      "code": "childProcess.exec(cmd.join(' '), function(err, stdout, stderr) {"
+    }
+  }
+}
