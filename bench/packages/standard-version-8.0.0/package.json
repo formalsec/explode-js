@@ -1,0 +1,17 @@
+{
+  "name": "standard-version-exploit",
+  "version": "1.0.0",
+  "dependencies": {
+    "standard-version": "8.0.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-7xcx-6wjh-7xp2",
+    "snyk": null,
+    "sink": {
+      "file": null,
+      "code": null,
+      "lineno": null
+    }
+  }
+}
