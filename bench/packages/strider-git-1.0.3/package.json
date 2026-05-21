@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "strider-git": "1.0.3"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-qfxv-qqvg-24pg",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-STRIDERGIT-572913",
+    "sink": {
+      "file": "lib/index.js",
+      "lineno": 151,
+      "code": "exec(`git ls-remote -h ${httpUrl(config)[0]}`, function (err, stdout) {"
+    }
+  }
+}
