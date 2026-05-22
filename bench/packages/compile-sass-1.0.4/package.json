@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "compile-sass": "1.0.4"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-79qm-h35f-hr77",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-COMPILESASS-551804",
+    "sink": {
+      "file": "dist/index.js",
+      "code": "child_process_1.exec(`rm -r ${cssPath}`, function (error) {",
+      "line": 119
+    }
+  }
+}
