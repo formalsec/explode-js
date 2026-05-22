@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "clamscan": "1.2.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/ghsa-5v25-xr56-phph",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-CLAMSCAN-564113",
+    "sink": {
+      "file": "index.js",
+      "lineno": 495,
+      "code": "const {stdout} = await cp_exec(version_cmds[scanner]);"
+    }
+  }
+}
