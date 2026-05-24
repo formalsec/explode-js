@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "dns-sync": "0.1.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-q5pq-pgrv-fh89",
+    "snyk": "https://security.snyk.io/vuln/npm:dns-sync:20141111",
+    "sink": {
+      "code": "response = shell.exec(cmd, {silent: true});",
+      "file": "lib/dns-sync.js",
+      "lineno": 21
+    }
+  }
+}

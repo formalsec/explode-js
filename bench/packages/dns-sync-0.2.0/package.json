@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "dns-sync": "0.2.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-wh69-wc6q-7888",
+    "nvd": "https://nvd.nist.gov/vuln/detail/CVE-2020-11079",
+    "sink": {
+      "code": "response = shell.exec(cmd, {silent: true});",
+      "file": "lib/dns-sync.js",
+      "lineno": 34
+    }
+  }
+}
