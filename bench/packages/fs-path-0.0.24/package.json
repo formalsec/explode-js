@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "fs-path":"0.0.24"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-8mrf-64fw-2x75",
+    "snyk": null,
+    "sink": {
+      "file": "lib/index.js",
+      "lineno": 62,
+      "code": "child_process.exec(cmd, function (error, stdout, stderr) {"
+    }
+  }
+}
