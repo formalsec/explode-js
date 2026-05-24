@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "git-diff-apply": "0.22.1"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-84cm-v6jp-gjmr",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-GITDIFFAPPLY-540774",
+    "sink": {
+      "file": null,
+      "code": null,
+      "lineno": null
+    }
+  }
+}
