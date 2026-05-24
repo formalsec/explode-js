@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "dawnsparks-node-tesseract": "0.4.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "github": "https://github.com/advisories/GHSA-88qf-5f3v-pm6m",
+    "snyk": null,
+    "sink": {
+      "file": "./lib/tesseract.js",
+      "code": "exec(command, opts, function(err, stdout, stderr) {",
+      "lineno": 84
+    }
+  }
+}
