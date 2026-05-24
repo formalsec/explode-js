@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "git-pull-or-clone": "2.0.1"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "GHSA-3x62-x456-q2vm",
+    "sink": {
+      "file": "index.js",
+      "lineno": 52,
+      "code": "const child = crossSpawn(command, args, opts)"
+    }
+  }
+}
