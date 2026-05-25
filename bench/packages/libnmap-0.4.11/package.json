@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "libnmap": "0.4.11"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-7g2w-6r25-2j7p",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-LIBNMAP-72551",
+    "sink": {
+      "file": "lib/classes/tools.js",
+      "line": 114,
+      "code": "const execute = proc(cmd, (err, stdout, stderr) => {"
+    }
+  }
+}
