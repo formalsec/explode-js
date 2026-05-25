@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "handlebars": "<3.0.8"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-2cf5-4w76-r9qv",
+    "snyk": "",
+    "sink": {
+      "code": "",
+      "file": "",
+      "line": 0
+    }
+  }
+}
