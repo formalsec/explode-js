@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "node-notifier": "5.4.4"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-5fw9-fq32-wv5p",
+    "snyk": null,
+    "sink": {
+      "file": null,
+      "code": null,
+      "line": null
+    }
+  }
+}
