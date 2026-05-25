@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "mversion": "1.13.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-6m8p-4fxj-pgc2",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-MVERSION-573174",
+    "sink": {
+      "file": "lib/git.js",
+      "line": 53,
+      "code": "cp.exec( [gitApp, \"tag\", \"-a\", tagName, \"-m\", message].join(\" \"), gitExtra, done);"
+    }
+  }
+}
