@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "value-censorship": "1.1.0"
+  },
+  "vulnerability":  {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-xrr6-6ww3-f3qm",
+    "sink": {
+      "file": "index.js",
+      "line": 22,
+      "code": "return (0, eval)('(__censorFn => {' + escodegen.generate(parsed) + '})')(censorFn)"
+    }
+  }
+}
