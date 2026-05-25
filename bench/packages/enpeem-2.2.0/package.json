@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "enpeem": "2.2.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-hmw2-mvvh-jf5j",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-ENPEEM-559007",
+    "sink": {
+      "file": "index.js",
+      "line": 114,
+      "code": "var npm = exec(cmd, {cwd: options.dir});"
+    }
+  }
+}
