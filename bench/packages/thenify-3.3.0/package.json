@@ -7,7 +7,7 @@
     "ghsa": "https://github.com/advisories/GHSA-29xr-v42j-r956",
     "sink": {
       "file": "index.js",
-      "lineno": 17,
+      "line": 17,
       "code": "return eval(createWrapper($$__fn__$$.name, options))"
     }
   }

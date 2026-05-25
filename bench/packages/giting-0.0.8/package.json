@@ -7,7 +7,7 @@
 	  "ghsa": "https://github.com/advisories/GHSA-7r9x-hr76-jr96",
     "sink": {
       "file": "lib/git.js",
-      "lineno": 223,
+      "line": 223,
       "code": "child.exec(cmd, {"
     }
   }

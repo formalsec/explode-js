@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-XOPEN-1050981",
     "sink": {
       "file": "index.js",
-      "lineno": 13,
+      "line": 13,
       "code": "exec(command + ' ' + filepath, (error, stdout, stderr)"
     }
   }

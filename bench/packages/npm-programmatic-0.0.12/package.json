@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-NPMPROGRAMMATIC-564115",
     "sink": {
       "file": "index.js",
-      "lineno": 18,
+      "line": 18,
       "code": "var cmd = exec(cmdString, {cwd: opts.cwd?opts.cwd:'/', maxBuffer: opts.maxBuffer?opts.maxBuffer:200 * 1024},(error, stdout, stderr) => {"
     }
   }

@@ -8,7 +8,7 @@
     "ghsa": "https://github.com/advisories/GHSA-c5hm-xc74-pqrg",
     "sink": {
       "file": "lib/jscover.js",
-      "lineno": 59,
+      "line": 59,
       "code": "var child = exec(cmd, function (err, stdout, stderr) {"
     }
   }

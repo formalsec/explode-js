@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/npm:pdf-image:20180529",
     "sink": {
       "file": "index.js",
-      "lineno": 43,
+      "line": 43,
       "code": "exec(getInfoCommand, function (err, stdout, stderr) {"
     }
   }

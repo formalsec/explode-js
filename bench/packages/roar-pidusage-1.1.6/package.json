@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-ROARPIDUSAGE-1078528",
     "sink": {
       "file": "lib/stats.js",
-      "lineno": 103,
+      "line": 103,
       "code": "exec(cmd + pid, function(err, stdout, stderr) {"
     }
   }

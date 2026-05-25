@@ -8,7 +8,7 @@
     "ghsa": "https://github.com/advisories/GHSA-gm9x-q798-hmr4",
     "sink": {
       "file": "dist/index.js",
-      "lineno": 1,
+      "line": 1,
       "code": "r.exec('git ls-remote --tags '+e,(e,r,o)=>{o&&s(new Error(o))"
     }
   }

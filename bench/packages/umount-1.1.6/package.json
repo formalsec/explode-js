@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-UMOUNT-564265",
     "sink": {
       "file": "build/umount.js",
-      "lineno": 52,
+      "line": 52,
       "code": "return child_process.exec(unmountCommand + \" \"+ device, callback);"
     }
   }

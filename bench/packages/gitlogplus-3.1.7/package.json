@@ -9,7 +9,7 @@
     "sink": {
       "file": "./index.js",
       "code": "var stdout = execSync(command, options.execOptions).toString()",
-      "lineno": 112
+      "line": 112
     }
   }
 }

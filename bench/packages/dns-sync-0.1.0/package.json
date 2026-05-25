@@ -9,7 +9,7 @@
     "sink": {
       "code": "response = shell.exec(cmd, {silent: true});",
       "file": "lib/dns-sync.js",
-      "lineno": 21
+      "line": 21
     }
   }
 }

@@ -9,7 +9,7 @@
     "sink": {
       "code": "exec('heroku config --app ' + app, function(err, stdout) {",
         "file": "lib/get.js",
-        "lineno": 3
+        "line": 3
     }
   }
 }

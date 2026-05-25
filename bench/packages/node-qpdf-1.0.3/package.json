@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-NODEQPDF-5747918",
     "sink": {
       "file": "index.js",
-      "lineno": 110,
+      "line": 110,
       "code": "child = spawn('/bin/sh', ['-c', args.join(' ') + ' | cat']);"
     }
   }

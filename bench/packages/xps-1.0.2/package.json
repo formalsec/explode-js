@@ -7,7 +7,7 @@
     "ghsa": "https://github.com/advisories/GHSA-wp7m-mrvf-599c",
     "sink": {
       "file": "lib/utils.js",
-      "lineno": 28,
+      "line": 28,
       "code": "exec(command, function(error, stdout, stderr)"
     }
   }

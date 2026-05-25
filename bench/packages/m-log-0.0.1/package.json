@@ -9,7 +9,7 @@
     "sink": {
       "file": "libs/log.js",
       "code": "eval('colors.setTheme({' + i + ':' + theme + '});');",
-      "lineno": 24
+      "line": 24
     }
   }
 }

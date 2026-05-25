@@ -9,7 +9,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-FFMPEGSDK-1050429",
     "sink": {
       "file": "index.js",
-      "lineno": 9,
+      "line": 9,
       "code": "exec(command, (error, stdout, stderr) => {"
     }
   }

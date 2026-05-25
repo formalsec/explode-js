@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-ONIONOLEDJS-1078808",
     "sink": {
       "file": "src/oled-exp.js",
-      "lineno": 91,
+      "line": 91,
       "code": "return exec(oledExecutable + ' write ' + direction);"
     }
   }

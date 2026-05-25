@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-LSOF-543632",
     "sink": {
       "file": "lib/lsof.js",
-      "lineno": 37,
+      "line": 37,
       "code": "cp.exec('lsof -i tcp:' + port, function(err, d) {"
     }
   }

@@ -9,7 +9,7 @@
     "sink": {
       "file": "./lib/processes.js",
       "code": "exec(comm + ' | grep -v grep | grep -iE \"' + srv + '\"', { maxBuffer: 1024 * 20000 }, function (error, stdout) {" ,
-      "lineno": 122
+      "line": 122
     }
   }
 }

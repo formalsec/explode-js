@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-TSPROCESSPROMISES-1048334",
     "sink": {
       "file": "lib/process-promises.js",
-      "lineno": 45,
+      "line": 45,
       "code": "var childProcess = cp.exec(command, options, function (err, stdout, stderr) {"
     }
   }

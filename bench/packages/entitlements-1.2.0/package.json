@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/package/npm/entitlements/1.2.0",
     "sink": {
       "file": "index.js",
-      "lineno": 7,
+      "line": 7,
       "code": "exec('codesign -d --entitlements :- ' + path, function(error, output){"
     }
   }

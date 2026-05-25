@@ -9,7 +9,7 @@
     "sink": {
       "file": "./index.js",
       "code": "exec(command, opts, function(err, stdout, stderr) {",
-      "lineno": 19
+      "line": 19
     }
   }
 }

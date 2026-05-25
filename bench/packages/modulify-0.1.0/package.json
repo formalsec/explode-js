@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/npm:modulify:20160407",
     "sink": {
       "file": "src/modulify.js",
-      "lineno": 74,
+      "line": 74,
       "code": "eval(src);"
     }
   }

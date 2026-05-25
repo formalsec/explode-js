@@ -9,7 +9,7 @@
     "sink": {
       "file": "./index.js",
       "code": "child_process_1.exec('ffmpeg -f lavfi -i anullsrc=r=' +",
-      "lineno": 38
+      "line": 38
     }
   }
 }

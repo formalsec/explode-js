@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-NODELATEXPDF-1050426",
     "sink": {
       "file": "node-latex-pdf.js",
-      "lineno": 10,
+      "line": 10,
       "code": "exec(\"pdflatex -output-directory \" + dest_file + \" \" + src_file, (err,stdout,stderr) => {"
     }
   }

@@ -9,7 +9,7 @@
     "ghsa": "https://github.com/advisories/GHSA-6m4r-m3gc-h4r5",
     "sink": {
       "file": "index.js",
-      "lineno": 82,
+      "line": 82,
       "code": "exec(args.join(' '), execOpts, (error, stdout, stderr) => {"
     }
   }

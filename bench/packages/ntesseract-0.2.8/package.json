@@ -9,7 +9,7 @@
     "sink": {
       "file": "./lib/tesseract.js",
       "code": "exec(command, opts, function(err) {",
-      "lineno": 92
+      "line": 92
     }
   }
 }

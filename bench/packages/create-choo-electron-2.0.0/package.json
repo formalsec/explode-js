@@ -8,7 +8,7 @@
     "sink": {
       "file": "./index.js",
       "code": "exec(cmd, function (err)",
-      "lineno": 300
+      "line": 300
     }
   }
 }

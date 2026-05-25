@@ -8,7 +8,7 @@
     "snyk": null,
     "sink": {
       "file": "lib/index.js",
-      "lineno": 23,
+      "line": 23,
       "code": "exec(execCommand, function (err, stdout, stderr) {"
     }
   }

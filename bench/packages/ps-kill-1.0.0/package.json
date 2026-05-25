@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-PSKILL-1078529",
     "sink": {
       "file": "index.js",
-      "lineno": 8,
+      "line": 8,
       "code": "exec(cmd, function (error) {"
       }
     }

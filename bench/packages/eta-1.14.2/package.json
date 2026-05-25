@@ -8,7 +8,7 @@
     "sink": {
       "code": "return new ctor(options.varName, \"E\",",
       "file": "./dist/eta.umd.js",
-      "lineno": 543
+      "line": 543
     }
   }
 }

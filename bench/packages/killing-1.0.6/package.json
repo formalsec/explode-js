@@ -2,13 +2,13 @@
   "dependencies": {
     "killing": "1.0.6"
   },
-  "vulnerabilities": {
-    "cwe":"CWE-78",
-    "github":"https://github.com/advisories/GHSA-cq77-8jpx-892g",
+  "vulnerability": {
+    "type":"command-injection",
+    "ghsa":"https://github.com/advisories/GHSA-cq77-8jpx-892g",
     "sink":{
       "code":"exec('ps -ef | grep ' + name, function(error, stdout)",
-      "file":"lib/killing.js",
-      "line":35
+        "file":"lib/killing.js",
+        "line":35
     }
   }
 }

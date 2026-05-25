@@ -4,12 +4,12 @@
   },
   "vulnerability": {
     "type": "command-injection",
-    "github": "https://github.com/advisories/GHSA-vvh2-82c7-ppfg",
+    "ghsa": "https://github.com/advisories/GHSA-vvh2-82c7-ppfg",
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-NETWORK-6184371",
     "sink": {
       "file": "./lib/linux.js",
       "code": "exec(cmd, function(err, out) {",
-      "lineno": 8
+      "line": 8
     }
   }
 }

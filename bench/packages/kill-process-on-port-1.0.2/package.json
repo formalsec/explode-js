@@ -9,7 +9,7 @@
     "sink":{
       "code": "const result = (await child_process_1.execSync(`fuser ${port}/tcp`)).toString();",
       "file":"build/main/lib/index.js",
-      "lineno": 15
+      "line": 15
     }
   }
 }

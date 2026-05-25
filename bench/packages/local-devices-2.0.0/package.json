@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-LOCALDEVICES-459898",
     "sink": {
       "file": "src/index.js",
-      "lineno": 114,
+      "line": 114,
       "code": "return cp.exec('arp -n ' + address).then(parseOne)"
     }
   }

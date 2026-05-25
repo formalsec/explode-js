@@ -7,7 +7,7 @@
     "sink": {
       "code": "return exec(opener + '\"' + escape(target) + '\"', callback);",
       "file": "lib/open.js",
-      "lineno": 58
+      "line": 58
     }
   }
 }

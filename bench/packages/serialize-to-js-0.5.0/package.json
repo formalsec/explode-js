@@ -8,7 +8,7 @@
     "ghsa": "https://github.com/advisories/GHSA-mm62-wxc8-cf7m",
     "sink": {
       "file": "lib/deserialize.js",
-      "lineno": 28,
+      "line": 28,
       "code": "return (new Function('return ' + str))()"
     }
   }

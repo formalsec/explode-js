@@ -9,7 +9,7 @@
     "sink": {
       "code": "pOut = childProcess.execSync(cli, options);",
       "file": "common.js",
-      "lineno": 9
+      "line": 9
     }
   }
 }

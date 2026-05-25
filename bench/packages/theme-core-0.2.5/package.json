@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-THEMECORE-1050425",
     "sink": {
       "file": "lib/utils.js",
-      "lineno": 16,
+      "line": 16,
       "code": "const child = exec(cmd, {"
     }
   }

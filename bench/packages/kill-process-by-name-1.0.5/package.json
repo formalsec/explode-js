@@ -9,7 +9,7 @@
     "sink":{
       "code":"exec('pkill -f ' + programname);",
       "file":"index.js",
-      "lineno":12
+      "line":12
     }
   }
 }

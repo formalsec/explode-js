@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-MOSC-571492",
     "sink": {
       "file": "mosc.js",
-      "lineno": 50,
+      "line": 50,
       "code": "propertyBase[property_parts[0]] = eval(get_eval_string(pvalue));"
     }
   }

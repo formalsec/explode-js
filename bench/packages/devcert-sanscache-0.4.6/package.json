@@ -5,7 +5,7 @@
   "vulnerability": {
     "type": "command-injection",
     "ghsa": "https://github.com/advisories/GHSA-4gp3-p7ph-x2jr",
-    "snyk": "https://security.snyk.io/vuln/SNYK-JS-DEVCERTSANSCACHE-540926"
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-DEVCERTSANSCACHE-540926",
     "sink": {
       "file": "./lib/openssl.js",
       "code": "childProcess.execSync(`openssl ${cmd}`,",

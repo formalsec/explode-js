@@ -1,5 +1,14 @@
 {
   "dependencies": {
     "chrome-launcher": "^0.13.1"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": null,
+    "sink": {
+      "file": null,
+      "code": null,
+      "line": 0
+    }
   }
 }

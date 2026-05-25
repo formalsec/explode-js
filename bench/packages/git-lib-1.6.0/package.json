@@ -4,6 +4,7 @@
   },
   "vulnerability": {
     "type": "command-injection",
+    "ghsa": null,
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-GITLIB-1012734",
     "sink": {
       "file": "git.js",

@@ -4,7 +4,7 @@
   },
   "vulnerability": {
     "type": "command-injection",
-    "github": "https://github.com/advisories/GHSA-h42j-mrmp-9369",
+    "ghsa": "https://github.com/advisories/GHSA-h42j-mrmp-9369",
     "snyk": null,
     "sink": {
       "file": "./dest/index.js",

@@ -9,7 +9,7 @@
     "sink": {
       "code": "cp.exec('git remote add ' + name + ' ' + url, {cwd: cwd}, cb);",
       "file": "index.js",
-      "lineno": 21
+      "line": 21
     }
   }
 }

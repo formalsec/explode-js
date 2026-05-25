@@ -9,7 +9,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-SYSTEMINFORMATION-1089810",
     "sink": {
       "file": "lib/processes.js",
-      "lineno": 993,
+      "line": 993,
       "code": "exec('ps -axo pid,pcpu,pmem,comm | grep -i ' + procSanitized + ' | grep -v grep', { maxBuffer: 1024 * 20000 }, function (error, stdout) {"
     }
   }

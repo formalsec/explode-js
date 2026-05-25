@@ -9,7 +9,7 @@
     "sink": {
       "file": "lib/linux.js",
       "code": "exec(\"cat /sys/class/net/\" + iface + \"/address\", function (err, out) {",
-      "lineno": 4
+      "line": 4
     }
   }
 }

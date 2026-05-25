@@ -9,7 +9,7 @@
     "sink": {
       "code": "exec('df -k \"' + path + '\"', function(err, stdout) {",
       "file": "lib/posix.js",
-      "lineno": 11
+      "line": 11
     }
   }
 }

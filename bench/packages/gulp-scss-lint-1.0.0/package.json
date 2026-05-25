@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-GULPSCSSLINT-560114",
     "sink": {
       "file": "src/command.js",
-      "lineno": 61,
+      "line": 61,
       "code": "child_process.exec(command, commandOptions, function(error, report) {"
     }
   }

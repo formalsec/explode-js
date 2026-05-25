@@ -9,7 +9,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-MONOREPOBUILD-1050392",
     "sink": {
       "file": "lib/util/exec.js",
-      "lineno": 4,
+      "line": 4,
       "code": "exports.execSync = (cwd, command) => child_process_1.execSync(command, { cwd, env: process.env });"
     }
   }

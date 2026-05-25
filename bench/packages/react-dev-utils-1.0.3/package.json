@@ -8,7 +8,7 @@
     "snyk": null,
     "sink": {
       "file": "getProcessForPort.js",
-      "lineno": 30,
+      "line": 30,
       "code": "return execSync('lsof -i:' + port + ' -P -t -sTCP:LISTEN', execOptions)"
     }
   }

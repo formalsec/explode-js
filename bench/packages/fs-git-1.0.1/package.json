@@ -9,7 +9,7 @@
     "snyk": "https://security.snyk.io/vuln/npm:fs-git:20170601",
     "sink": {
       "file": "lib/index.js",
-      "lineno": 56,
+      "line": 56,
       "code": "child_process.exec(command, { maxBuffer: maxBuffer }, function (error, stdout, stderr) {"
     }
   }

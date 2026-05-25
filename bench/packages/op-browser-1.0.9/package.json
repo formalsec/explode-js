@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-OPBROWSER-564259",
     "sink": {
       "file": "lib/index.js",
-      "lineno": 70,
+      "line": 70,
       "code": "childProcess.execFile(path.resolve(browserPath), commandOptions, {maxBuffer: 50000 * 1024}, function (err) {"
     }
   }

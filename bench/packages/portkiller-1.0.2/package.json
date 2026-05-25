@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-PORTKILLER-1078537",
     "sink": {
       "file": "index.js",
-      "lineno": 10,
+      "line": 10,
       "code": "exec(`lsof -n -i4TCP:${port} | grep LISTEN`, (err, out, stderr) => {"
     }
   }

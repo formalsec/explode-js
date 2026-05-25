@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-APICONNECTCLIPLUGINS-564427",
     "sink": {
       "file":"apiconnect-cli-plugins/lib/plugin-loader.js",
-      "lineno":181,
+      "line":181,
       "code": "var proc = exec(installCmd, function(err) {"
     }
   }

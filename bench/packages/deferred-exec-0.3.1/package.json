@@ -8,7 +8,7 @@
     "sink": {
       "code": "child_process.exec( command, hollaback );",
       "file": "lib/deferred-exec.js",
-      "lineno": 42
+      "line": 42
     }
   }
 }

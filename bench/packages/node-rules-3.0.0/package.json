@@ -8,7 +8,7 @@
     "ghsa": "https://github.com/advisories/GHSA-f78f-353m-cf4j",
     "sink": {
       "file": "lib/node-rules.js",
-      "lineno": 244,
+      "line": 244,
       "code": "rules.condition = eval(\"(\"+rules.condition+\")\");"
     }
   }

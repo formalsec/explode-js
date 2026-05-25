@@ -2,12 +2,12 @@
   "dependencies": {
     "blamer": "0.1.13"
   },
-  "vulnerabilities": {
+  "vulnerability": {
     "type": "command-injection",
     "ghsa": "https://github.com/advisories/GHSA-7vm7-j8p7-h346",
     "sink": {
       "file": "src/vcs/index.js",
-      "lineno": 24,
+      "line": 24,
       "code": "exec('git blame ' + args + ' ' + realFile, {"
     }
   }

@@ -8,7 +8,7 @@
     "snyk": null,
     "sink": {
       "file": "dist/index.js",
-      "lineno": 225,
+      "line": 225,
       "code": "child_process_1.exec(`touch ${filePath}`);"
     }
   }

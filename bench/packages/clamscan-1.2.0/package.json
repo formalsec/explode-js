@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-CLAMSCAN-564113",
     "sink": {
       "file": "index.js",
-      "lineno": 495,
+      "line": 495,
       "code": "const {stdout} = await cp_exec(version_cmds[scanner]);"
     }
   }

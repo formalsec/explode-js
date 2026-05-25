@@ -8,7 +8,7 @@
     "sink": {
       "file": "./dist/gitlog.cjs.development.js",
       "code": "var stdout = child_process.execSync(command, execOptions).toString();",
-      "lineno": 216
+      "line": 216
     }
   }
 }

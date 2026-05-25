@@ -8,7 +8,7 @@
     "sink": {
       "code": "return new Function(c.varname, str);",
       "file": "doT.js",
-      "lineno": 133
+      "line": 133
     }
   }
 }

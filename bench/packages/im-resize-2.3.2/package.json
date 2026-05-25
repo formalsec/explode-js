@@ -3,6 +3,7 @@
     "im-resize": "2.3.2"
   },
   "vulnerability": {
+    "type": "command-injection",
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-IMRESIZE-544183",
     "ghsa": "https://github.com/advisories/GHSA-r9vm-rhmf-7hxx",
     "sink":{

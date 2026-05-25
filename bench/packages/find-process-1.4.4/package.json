@@ -4,7 +4,7 @@
   },
   "vulnerability": {
     "type": "command-injection",
-    "github": "https://github.com/advisories/GHSA-qfxv-qqvg-24pg",
+    "ghsa": "https://github.com/advisories/GHSA-qfxv-qqvg-24pg",
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-FINDPROCESS-1090284",
     "sink": {
       "file": "lib/utils.js",

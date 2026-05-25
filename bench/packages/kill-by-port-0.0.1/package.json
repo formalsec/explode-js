@@ -9,7 +9,7 @@
     "sink":{
       "code":"processId = exec(`lsof -t -i:${port}`)",
       "file":"index.js",
-      "lineno":8
+      "line":8
     }
   }
 }

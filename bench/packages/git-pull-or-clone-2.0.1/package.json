@@ -7,7 +7,7 @@
     "ghsa": "GHSA-3x62-x456-q2vm",
     "sink": {
       "file": "index.js",
-      "lineno": 52,
+      "line": 52,
       "code": "const child = crossSpawn(command, args, opts)"
     }
   }

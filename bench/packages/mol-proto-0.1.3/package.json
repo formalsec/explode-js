@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/npm:mol-proto:20160407",
     "sink": {
       "file": "lib/proto_function.js",
-      "lineno": 62,
+      "line": 62,
       "code": "eval(code);"
     }
   }

@@ -1,9 +1,9 @@
 {
   "dependencies": {
     "bwm-ng": "^0.1.1"
-  }
+  },
   "vulnerability" : {
-    "type" : "command-injetion",
+    "type" : "command-injection",
     "ghsa" : "https://github.com/advisories/GHSA-8vw3-vxmj-h43w",
     "sink" : {
       "file" : "./bwm-ng.js",

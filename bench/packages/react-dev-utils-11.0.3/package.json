@@ -8,7 +8,7 @@
         "snyk": "https://security.snyk.io/vuln/SNYK-JS-REACTDEVUTILS-1083268",
         "sink": {
           "file": "getProcessForPort.js",
-          "lineno": 28,
+          "line": 28,
           "code": "return execSync('lsof -i:' + port + ' -P -t -sTCP:LISTEN', execOptions)"
         }
       }

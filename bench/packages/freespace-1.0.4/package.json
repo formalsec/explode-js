@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-FREESPACE-1018705",
     "sink": {
       "file": "index.js",
-      "lineno": 51,
+      "line": 51,
       "code": "cp.exec(`df -P ${driveOrMount} | awk 'NR==2 {print $4}'`, {}, cb);"
     }
   }

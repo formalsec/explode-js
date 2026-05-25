@@ -2,10 +2,7 @@
   "dependencies": {
     "typed-function": "< 0.10.6"
   },
-  "vulnerabilities": {
-    "state" : {
-      "harness" : "ready"
-    },
+  "vulnerability": {
     "type": "code-injection",
     "ghsa": "https://github.com/advisories/GHSA-3qh4-r86r-grvm",
     "sink": {

@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-PULVERIZR-560122",
     "sink": {
       "file": "lib/job.js",
-      "lineno": 73,
+      "line": 73,
       "code": "exec('cp \"' + filename + '\" ' + scratchSpace, function (error, stdout, stderr) {"
     }
   }

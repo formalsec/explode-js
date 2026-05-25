@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-FREEDISKSPACE-1040716",
     "sink": {
       "file": "freediskspace.js",
-      "lineno": 79,
+      "line": 79,
       "code": "fd.detail(drive, function (error, total, used, free) {"
     }
   }

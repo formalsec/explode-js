@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-PORTPROCESSES-1078536",
     "sink": {
       "file": "exec.js",
-      "lineno": 5,
+      "line": 5,
       "code": "exec(cmd, (err, stdout, stderr) => {"
     }
   }

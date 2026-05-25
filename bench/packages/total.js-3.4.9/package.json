@@ -8,7 +8,7 @@
     "sink": {
       "code": "var fn = (new Function('w', builder.join(';') + ';return w' + (v[0] === '[' ? '' : '.') + v));",
         "file": "./utils.js",
-        "lineno": 6647
+        "line": 6647
     }
   }
 }

@@ -4,11 +4,11 @@
   },
 
   "vulnerability": {
-    "type": "CWE-94",
+    "type": "code-injection",
     "ghsa": "https://github.com/advisories/GHSA-vm5j-vqr6-v7v8",
     "sink": {
       "file": "class.js",
-      "lineno": 26,
+      "line": 26,
       "code": "eval('constructor = function ('+args+') {'+inner_code+'};');"
     }
   }

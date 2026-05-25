@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "launchpad":"0.7.0",
+    "launchpad":"0.7.0"
   },
   "vulnerability": {
     "type": "command-injection",
@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-LAUNCHPAD-1044065",
     "sink": {
       "file": "lib/local/instance.js",
-      "lineno": 88,
+      "line": 88,
       "code": "exec(command);"
     }
   }

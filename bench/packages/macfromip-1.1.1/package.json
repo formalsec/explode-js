@@ -9,7 +9,7 @@
     "sink": {
       "code": "var ls = cp.exec('ping  -c 1 ' + ipAddress,",
       "file": "macfromip.js",
-      "lineno": 66
+      "line": 66
     }
   }
 }

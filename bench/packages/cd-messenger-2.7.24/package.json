@@ -7,7 +7,7 @@
     "ghsa": "https://github.com/advisories/GHSA-v756-4whv-48vc",
     "sink": {
       "file": "src/messenger-node.js",
-      "lineno": 70,
+      "line": 70,
       "code": "eval(`cl.${color}()`); // eslint-disable-line"
     }
   }

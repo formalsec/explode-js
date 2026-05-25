@@ -9,7 +9,7 @@
     "sink": {
       "file": "./index.js",
       "code": "child = exec('iwinfo ' + intf + ' scan', function (error, stdout, stderr) {",
-      "lineno": 22
+      "line": 22
     }
   }
 }

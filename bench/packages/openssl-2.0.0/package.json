@@ -8,7 +8,7 @@
     "sink": {
       "file": "./index.js",
       "code": "const cp = exec(command);",
-      "lineno": 41
+      "line": 41
     }
   }
 }

@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/npm:gm:20151026",
     "sink": {
       "file": "lib/compare.js",
-      "lineno": 72,
+      "line": 72,
       "code": "exec(execCmd, function (err, stdout, stderr) {"
     }
   }

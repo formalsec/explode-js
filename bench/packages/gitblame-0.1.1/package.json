@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-GITBLAME-1050430",
     "sink": {
       "file": "lib/gitblame.js",
-      "lineno": 15,
+      "line": 15,
       "code": "exec('git blame ' + filename, {cwd: dirname}, function (error, stdout, stderr) {"
     }
   }

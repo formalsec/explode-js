@@ -5,7 +5,7 @@
   "vulnerability": {
     "type": "command-injection",
     "ghsa": null,
-    "snyk": "https://security.snyk.io/vuln/SNYK-JS-CREATEGIT-1022150"
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-CREATEGIT-1022150",
     "sink": {
       "file": "./index.js",
       "code": "const ret = await execFile('git', args, opts)",

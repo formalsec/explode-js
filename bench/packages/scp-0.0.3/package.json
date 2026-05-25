@@ -8,7 +8,7 @@
     "snyk": null,
     "sink": {
       "file": "scp.js",
-      "lineno": 21,
+      "line": 21,
       "code": "exec(command.join(' '), function (err, stdout, stderr) {"
     }
   }

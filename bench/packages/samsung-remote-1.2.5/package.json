@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-SAMSUNGREMOTE-72278",
     "sink": {
       "file": "lib/samsung-remote.js",
-      "lineno": 103,
+      "line": 103,
       "code": "return exec(\"ping -c 1 \" + config.ip, function (error, stdout, stderr) {"
     }
   }

@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-GITPROMISE-2434310",
     "sink": {
       "file": "index.js",
-      "lineno": 34,
+      "line": 34,
       "code": "return execFile(execBinary, execArguments, execOptions).then("
     }
   }

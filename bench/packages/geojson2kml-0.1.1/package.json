@@ -9,7 +9,7 @@
     "sink": {
       "code": "exec(ogrCommand, function(err, stdout, stderr)",
       "file": "index.js",
-      "lineno": 6
+      "line": 6
     }
   }
 }

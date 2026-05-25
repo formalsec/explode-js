@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-NODEKEYSENDER-564261",
     "sink": {
       "file": "key-sender.js",
-      "lineno": 117,
+      "line": 117,
       "code": "return exec(command, {}, function(error, stdout, stderr) {"
     }
   }

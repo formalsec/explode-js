@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-NPMHELP-1050983",
     "sink": {
       "file": "index.js",
-      "lineno": 13,
+      "line": 13,
       "code": "var latestVersion = execSync('tnpm view ' + module + ' version').toString();"
     }
   }

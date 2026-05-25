@@ -7,7 +7,7 @@
     "ghsa": "https://github.com/advisories/GHSA-3pxp-6963-46r9",
     "sink": {
       "file": "lib/pdfinfo.js",
-      "lineno": 36,
+      "line": 36,
       "code": "let child = exec('pdfinfo ' + self.options.additional.join(' '), function(error, stdout, stderr) {"
     }
   }

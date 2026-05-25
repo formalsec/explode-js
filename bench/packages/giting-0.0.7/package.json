@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-GITING-559008",
     "sink": {
       "file": "lib/git.js",
-      "lineno": 223,
+      "line": 223,
       "code": "child.exec(cmd, {"
     }
   }

@@ -8,7 +8,7 @@
     "snyk": "https://snyk.io/vuln/npm:pidusage:20170605",
     "sink": {
       "file": "lib/stats.js",
-      "lineno": 103,
+      "line": 103,
       "code": "exec(cmd + pid, function(err, stdout, stderr) {"
     }
   }

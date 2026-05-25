@@ -8,7 +8,7 @@
     "sink": {
       "file": "lib/XMLHttpRequest.js",
       "code": "var syncProc = spawn(process.argv[0], [\"-e\", execString]);",
-      "lineno": 483
+      "line": 483
     }
   }
 }

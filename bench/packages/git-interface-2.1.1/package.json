@@ -3,11 +3,11 @@
     "git-interface": "2.1.1"
   },
   "vulnerability": {
-    "type": "command-injection"
+    "type": "command-injection",
     "ghsa": "GHSA-qffw-8wg7-h665",
     "sink": {
       "file": "index.js",
-      "lineno": 27,
+      "line": 27,
       "code": "const child = child_process_1.spawn('git', commandArgs, { cwd: this.dir });"
     }
   }

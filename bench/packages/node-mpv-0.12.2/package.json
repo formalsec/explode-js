@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-NODEMPV-564426",
     "sink": {
       "file": "lib/mpv/mpv.js",
-      "lineno": 45,
+      "line": 45,
       "code": "var output = exec((options.binary ? options.binary + \" --version\" : \"mpv --version\"), {encoding: 'utf8'});"
     }
   }

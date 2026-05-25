@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-PORTKILLER-1078533",
     "sink": {
       "file": "index.js",
-      "lineno": 19,
+      "line": 19,
       "code": "pid = execSync(`lsof -t -i:${port}`)"
     }
   }

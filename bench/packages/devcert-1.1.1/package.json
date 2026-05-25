@@ -5,11 +5,11 @@
   "vulnerability":    {
     "type": "command-injection",
     "ghsa": "https://github.com/advisories/GHSA-4228-7qvx-f4rq",
-    "snyk": "https://security.snyk.io/vuln/SNYK-JS-DEVCERT-571955"
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-DEVCERT-571955",
     "sink": {
       "code": "return child_process_1.execFileSync(cmd, args, options);",
       "file": "dist/utils.js",
-      "lineno": 22
+      "line": 22
     }
   }
 }

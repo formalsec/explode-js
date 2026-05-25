@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-SKETCHSVG-3167969",
     "sink": {
       "file": "lib/index.js",
-      "lineno": 64,
+      "line": 64,
       "code": "const allLayers = shell.exec(`${sketchTool} list layers ${value}`, { silent: true });"
     }
   }

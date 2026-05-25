@@ -8,7 +8,7 @@
     "snyk":"https://security.snyk.io/vuln/npm:pullit:20180214",
     "sink": {
       "file": "src/index.js",
-      "lineno": 37,
+      "line": 37,
       "code": "execSync("
     }
   }

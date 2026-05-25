@@ -9,7 +9,7 @@
     "sink": {
       "code": "return exec.exec(cmd)",
       "file": "src/fetch-tags.js",
-      "lineno": 10
+      "line": 10
     }
   }
 }

@@ -7,7 +7,7 @@
     "ghsa" : "https://github.com/advisories/GHSA-f5mh-hq6h-whxv",
     "sink": {
       "file": "dist/index.js",
-      "lineno": 59,
+      "line": 59,
       "code": "    return new Function(`return (${body});`)();"
     }
   }

@@ -4,11 +4,11 @@
   },
   "vulnerability": {
     "type": "command-injection",
-    "github": "https://github.com/advisories/GHSA-v2jv-33gh-xx29",
+    "ghsa": "https://github.com/advisories/GHSA-v2jv-33gh-xx29",
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-PSVISITOR-1078544",
     "sink": {
       "file": "index.js",
-      "lineno": 404,
+      "line": 404,
       "code": "return exec(cmd).then((result) => {"
     }
   }

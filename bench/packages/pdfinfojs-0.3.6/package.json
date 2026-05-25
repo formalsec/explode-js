@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/npm:pdfinfojs:20180409",
     "sink": {
       "file": "lib/pdfinfo.js",
-      "lineno": 47,
+      "line": 47,
       "code": "var child = shell.exec('pdfinfo ' + self.options.additional.join(' '), function(code, data) {"
     }
   }

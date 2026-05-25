@@ -2,12 +2,12 @@
   "dependencies": {
     "nuance-gulp-build-common": "0.0.1"
   },
-  "vulnerabilities": {
+  "vulnerability": {
     "type": "command-injection",
     "ghsa": "https://github.com/advisories/GHSA-8695-fr6h-9fq8",
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-NUANCEGULPBUILDCOMMON-1050419",
     "sink": {
-      "file": "./index.js"
+      "file": "./index.js",
       "code": "var child = p.exec(cmd, { env: process.env });",
       "line": 5
     }

@@ -3,6 +3,7 @@
     "imagickal": "5.0.1"
   },
   "vulnerability": {
+    "type": "command-injection",
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-IMAGICKAL-1060040",
     "ghsa": null,
     "sink": {

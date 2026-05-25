@@ -3,7 +3,7 @@
     "vboxmanage.js": "1.0.6"
   },
   "vulnerability": {
-    "type": "CWE-78",
+    "type": "command-injection",
     "ghsa": "https://github.com/advisories/GHSA-whq6-mj2r-mjqc",
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-VBOXMANAGEJS-607910",
     "sink": {

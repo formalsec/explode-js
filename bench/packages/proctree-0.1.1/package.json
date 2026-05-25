@@ -4,7 +4,7 @@
   },
   "vulnerability": {
     "type": "command-injection",
-    "github": "https://github.com/advisories/GHSA-cv76-rv4h-4mqc",
+    "ghsa": "https://github.com/advisories/GHSA-cv76-rv4h-4mqc",
     "sink": {
       "file": "index.js",
       "line": 46,

@@ -9,7 +9,7 @@
     "sink": {
       "code": "var execDockerCompose  = exec(\"docker-compose exec \" + serviceName + \" \" + cmd, { cwd: cwd });",
       "file": "index.js",
-      "lineno": 91
+      "line": 91
     }
   }
 }

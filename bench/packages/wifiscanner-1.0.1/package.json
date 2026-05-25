@@ -8,7 +8,7 @@
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-WIFISCANNER-574786",
     "sink": {
       "file": "scanners/wifiscanner.js",
-      "lineno": 12,
+      "line": 12,
       "code": "childProcess.exec(this.command,  (error, standardOut, standardError) => {"
     }
   }

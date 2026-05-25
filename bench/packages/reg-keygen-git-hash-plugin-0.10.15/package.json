@@ -8,7 +8,7 @@
     "snyk": null,
     "sink": {
       "file": "lib/git-cmd-client.js",
-      "lineno": 22,
+      "line": 22,
       "code": "return child_process_1.execSync(`git branch -a --contains ${hash}`, { encoding: \"utf8\" });"
     }
   }

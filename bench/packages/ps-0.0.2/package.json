@@ -4,11 +4,11 @@
   },
   "vulnerability": {
     "type": "command-injection",
-    "github": "https://github.com/advisories/GHSA-cfhg-9x44-78h2",
+    "ghsa": "https://github.com/advisories/GHSA-cfhg-9x44-78h2",
     "snyk": "https://security.snyk.io/vuln/SNYK-JS-PS-72307",
     "sink": {
       "file": "lib/index.js",
-      "lineno": 8,
+      "line": 8,
       "code": "cp.exec('ps ' + args, function(err, stdout, stderr) {"
     }
   }

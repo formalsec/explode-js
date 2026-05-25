@@ -8,7 +8,7 @@
     "sink": {
       "file": "dist/utils/parse.js",
       "code": "return eval('(' + result + ')');",
-      "lineno": 37
+      "line": 37
     }
   }
 }

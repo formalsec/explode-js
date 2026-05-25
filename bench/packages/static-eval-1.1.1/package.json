@@ -3,7 +3,7 @@
     "static-eval": "1.1.1"
   },
   "vulnerability": {
-    "cwe": "code-injection",
+    "type": "code-injection",
     "ghsa": "https://github.com/advisories/GHSA-8v27-2fg9-7h62",
     "sink": {
       "file": "index.js",
