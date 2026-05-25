@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "js-deobfuscator": "< 1.1.0"
+  },
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-9p6p-8v9r-8c9m",
+    "sink": {
+      "code": "eval.call(this, code);",
+      "file": "dist/modifications/execution/executedFunction.js",
+      "line": 75
+    }
+  }
+}
