@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "push-dir": "0.4.1"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-926x-m6m5-3mmp",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-PUSHDIR-559009",
+    "sink": {
+      "file": "index.js",
+      "line": 202,
+      "code": "childProcess.exec(cmd, function(error, stdout, stderr) {"
+      }
+    }
+  }
