@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "react-dev-utils": "5.0.1"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-29gp-92wp-94q8",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-REACTDEVUTILS-72875",
+    "sink": {
+      "file": "launchEditor.js",
+      "line": 334,
+      "code": "_childProcess = child_process.spawn("
+    }
+  }
+}
