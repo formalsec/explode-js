@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "lycwed-spritesheetjs": "1.2.5"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-rhwp-9vm9-547q",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-LYCWEDSPRITESHEETJS-1050428",
+    "sink": {
+      "file": "lib/generator.js",
+      "line": 85,
+      "code": "exec(command, next);"
+    }
+  }
+}
