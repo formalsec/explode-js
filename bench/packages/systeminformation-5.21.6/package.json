@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "systeminformation": "5.21.6"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-gx6r-qc2v-3p3v",
+    "snyk": null,
+    "sink": {
+      "file": null,
+      "code": null,
+      "line": null
+    }
+  }
+}
