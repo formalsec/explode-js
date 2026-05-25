@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "md-to-pdf": "4.1.0"
+  },
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-x949-7cm6-fm6p",
+    "snyk": "https://snyk.io/vuln/SNYK-JS-MDTOPDF-1657880",
+    "sink": {
+      "file": "dist/lib/md-to-pdf.js",
+      "line": 23,
+      "code": "const { content: md, data: frontMatterConfig } = gray_matter_1.default(mdFileContent);"
+    }
+  }
+}
