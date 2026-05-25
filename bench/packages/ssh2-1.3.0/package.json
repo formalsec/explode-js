@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "ssh2": "1.3.0"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-652h-xwhf-q4h6",
+    "snyk": null,
+    "sink": {
+      "file": null,
+      "code": null,
+      "line": null
+    }
+  }
+}
