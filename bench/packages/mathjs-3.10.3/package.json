@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "mathjs": "3.10.3"
+  },
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-pv8x-p9hq-j328",
+    "snyk": "https://security.snyk.io/vuln/npm:mathjs:20170402",
+    "sink": {
+      "file": "",
+      "line": 0,
+      "code": ""
+    }
+  }
+}
