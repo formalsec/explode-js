@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "json": "< 10.0.0"
+  },
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-3c6g-pvg8-gqw2",
+    "sink": {
+      "file": "lib/json.js",
+      "line": 129,
+      "code": "return eval(quoted);"
+    }
+  }
+}
