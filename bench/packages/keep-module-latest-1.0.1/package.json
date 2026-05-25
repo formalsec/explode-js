@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "keep-module-latest": "1.0.1"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-wxrx-pc44-rcgc",
+    "snyk": null,
+    "sink": {
+      "file": null,
+      "code": null,
+      "line": null
+    }
+  }
+}
