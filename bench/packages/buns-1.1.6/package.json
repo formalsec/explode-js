@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "buns": "1.1.6"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-487w-pqcm-63hq",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-BUNS-1050389",
+    "sink": {
+      "file": "lib/index.js",
+      "line": 678,
+      "code": "exec(command);"
+    }
+  }
+}
