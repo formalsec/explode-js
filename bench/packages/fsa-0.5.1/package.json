@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "fsa": "0.5.1"
+  },
+  "vulnerability": {
+    "type": "command-injection",
+    "ghsa": "https://github.com/advisories/GHSA-3p94-vj97-fm4q",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-FSA-564118",
+    "sink": {
+      "file": "./lib/rep.js",
+      "code": "exec(gitConsoleCommand, callback);",
+      "line": 63
+    }
+  }
+}
