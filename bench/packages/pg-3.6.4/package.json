@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "pg": "< 3.6.4"
+  },
+  "vulnerability":{
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/GHSA-wc9v-mj63-m9g5",
+    "snyk": "",
+    "sink": {
+      "code": "this.RowCtor = Function(\"parsers\", \"rowData\", ctorBody);",
+      "file": "lib/result.js",
+      "lineno": 98
+    }
+  }
+}
