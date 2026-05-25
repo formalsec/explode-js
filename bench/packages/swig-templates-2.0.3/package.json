@@ -1,0 +1,9 @@
+{
+  "dependencies": { "swig-templates": "2.0.3" },
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": null,
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-SWIGTEMPLATES-3266806",
+    "sink": { "code": "", "file": "", "line": -1 }
+  }
+}
