@@ -9,7 +9,7 @@
     "sink": {
       "code": "this.RowCtor = Function(\"parsers\", \"rowData\", ctorBody);",
       "file": "lib/result.js",
-      "lineno": 98
+      "line": 98
     }
   }
 }

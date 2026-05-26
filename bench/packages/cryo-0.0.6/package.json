@@ -2,39 +2,14 @@
   "dependencies": {
     "cryo": "0.0.6"
   },
-  "index": "lib/cryo.js",
-  "vulnerabilities": [
-    {
-      "advisory": {
-        "cve": "CVE-2018-3784",
-        "cwe": "CWE-94",
-        "github": "https://github.com/advisories/ghsa-38f5-ghc2-fcmv",
-        "id": "ghsa-38f5-ghc2-fcmv",
-        "nvd": "https://nvd.nist.gov/vuln/detail/CVE-2018-3784",
-        "snyk": "https://security.snyk.io/package/npm/cryo/0.0.6"
-      },
-      "location": {
-        "sink": {
-          "code": "return new Function(args, body);",
-          "file": "lib/cryo.js",
-          "lineno": 165
-        },
-        "source": {
-          "code": "var json = JSON.parse(string);",
-          "lineno": 77 
-        }
-      },
-      "patch": {
-        "diff": "path_para_ficheiro_com_diff_relevante",
-        "fixed_version": "id",
-        "url": "url do commit"
-      },
-      "pocs": [
-        {
-          "file": "cryo.test.js",
-          "source": "https://hackerone.com/reports/350418"
-        }
-      ]
+  "vulnerability": {
+    "type": "code-injection",
+    "ghsa": "https://github.com/advisories/ghsa-38f5-ghc2-fcmv",
+    "snyk": "https://security.snyk.io/package/npm/cryo/0.0.6",
+    "sink": {
+      "code": "return new Function(args, body);",
+      "file": "lib/cryo.js",
+      "line": 165
     }
-  ]
+  }
 }

@@ -3,7 +3,7 @@
     "mongo-express": "< 0.54.0"
   },
   "vulnerability": {
-    "type": "command-injection",
+    "type": "code-injection",
     "ghsa": "https://github.com/advisories/GHSA-h47j-hc6x-h3qq",
     "snyk": "https://snyk.io/vuln/SNYK-JS-MONGOEXPRESS-473215",
     "sink": {
