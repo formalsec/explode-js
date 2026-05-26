@@ -2,4 +2,6 @@
 
 (executable
  (name main)
- (libraries eio eio_main))
+ (preprocess
+  (pps ppx_deriving.make ppx_deriving_yojson))
+ (libraries cmdliner eio eio_main yojson ppx_deriving ppx_deriving_yojson))
