@@ -1,3 +1,5 @@
 var esl = require("esl_symbolic");
 var root = require("global-modules-path");
-root.getPath(esl.string("module"), esl.string("executable"));
+var executable = esl.string("executable");
+esl.assume(executable != "");
+root.getPath(esl.string("module"), executable);

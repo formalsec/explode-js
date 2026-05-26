@@ -300,7 +300,7 @@ module Cli = struct
     in
     Arg.(value & opt (some type_conv) None & info [ "type" ])
 
-  let time_limit = Arg.(value & opt float 300.0 & info [ "time-limit" ])
+  let time_limit = Arg.(value & opt float 600.0 & info [ "time-limit" ])
 
   let jobs = Arg.(value & opt int 6 & info [ "jobs" ])
 
