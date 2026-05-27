@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "mysql2": "3.15.3",
     "query-mysql": "0.0.2"
   },
   "vulnerability" : {
