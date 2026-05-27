@@ -13,4 +13,6 @@ explode-out/
 
 # Testing
 _results/
+results/
 node_modules/
+out.txt
