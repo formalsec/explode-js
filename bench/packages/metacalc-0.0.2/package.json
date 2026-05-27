@@ -3,7 +3,7 @@
     "metacalc": "< 0.0.2"
   },
   "vulnerability": {
-    "type": "command-injection",
+    "type": "code-injection",
     "ghsa": "https://github.com/advisories/GHSA-5gc4-cx9x-9c43",
     "snyk": "",
     "sink": {

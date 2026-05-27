@@ -1,11 +1,53 @@
 open Eio.Std
 module SSet = Set.Make (String)
 
+(* exclude packages that have harnesses but that we don't find anything *)
 let excludes =
   SSet.of_list
-    [ "reduce-css-calc-1.2.4"
-    ; "swig-templates-2.0.3"
-    ; "value-censorship-1.1.0"
+  (* code-injection *)
+  @@ [ "cryo-0.0.6"
+     ; "handlebars-3.0.8"
+     ; "hot-formula-parser-3.0.0"
+     ; "js-deobfuscator-1.1.0"
+     ; "mathjs-3.10.3"
+     ; "md-to-pdf-4.1.0"
+     ; "metacalc-0.0.2"
+     ; "mongoosemask-0.0.6"
+     ; "mosc-1.0.0"
+     ; "realms-shim-1.1.0"
+     ; "reduce-css-calc-1.2.4"
+     ; "swig-templates-2.0.3"
+     ; "value-censorship-1.1.0"
+     ; "xmlhttprequest-1.6.0"
+     ]
+  (* command-injection *)
+  @ [ "acrontum-filesystem-template-0.0.1"
+    ; "apiconnect-cli-plugins-6.0.2"
+    ; "chrome-launcher-0.13.1"
+    ; "codecov-3.6.4"
+    ; "cycle-import-check-1.3.1"
+    ; "enpeem-2.2.0"
+    ; "git-diff-apply-0.22.1"
+    ; "git-interface-2.1.1"
+    ; "giting-0.0.8"
+    ; "gulp-tape-1.0.0"
+    ; "gulp-styledocco-0.0.3"
+    ; "keep-module-latest-1.0.1"
+    ; "kill-port-process-2.1.0"
+    ; "libnmap-0.4.11"
+    ; "lycwed-spritesheetjs-1.2.5"
+    ; "mversion-1.13.0"
+    ; "node-notifier-5.4.5"
+    ; "npm-git-publish-0.2.4-beta"
+    ; "npm-lockfile-2.0.3"
+    ; "npos-tesseract-0.0.3"
+    ; "push-dir-0.4.1"
+    ; "react-dev-utils-5.0.1"
+    ; "ssh2-1.3.0"
+    ; "standard-version-8.0.0"
+    ; "strong-nginx-controller-1.0.2"
+    ; "systeminformation-5.21.6"
+    ; "thi.ng-egf-0.3.0"
     ]
 
 module State = struct
@@ -48,29 +90,32 @@ module Vuln_type = struct
   type t =
     | Code_injection
     | Command_injection
+    | Sql_injection
 
   let equal a b =
     match (a, b) with
-    | Code_injection, Code_injection | Command_injection, Command_injection ->
+    | Code_injection, Code_injection
+    | Command_injection, Command_injection
+    | Sql_injection, Sql_injection ->
       true
-    | (Code_injection | Command_injection), _ -> false
+    | (Code_injection | Command_injection | Sql_injection), _ -> false
 
   let pp fmt = function
     | Code_injection -> Fmt.pf fmt "code-injection"
     | Command_injection -> Fmt.pf fmt "command-injection"
+    | Sql_injection -> Fmt.pf fmt "sql-injection"
 
   let of_string = function
     | "code-injection" -> Ok Code_injection
     | "command-injection" -> Ok Command_injection
+    | "sql-injection" -> Ok Sql_injection
     | vuln_type -> Error (Fmt.str "unkown vuln_type: %s" vuln_type)
 
   let of_yojson = function
     | `String s -> of_string s
     | _ -> Error "vuln_type"
 
-  let to_yojson = function
-    | Code_injection -> `String "code-injection"
-    | Command_injection -> `String "command-injection"
+  let to_yojson ty = `String (Fmt.str "%a" pp ty)
 end
 
 module Vulnerability = struct
