@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "sql": "0.78.0",
+    "sqlite3": "5.1.7"
+  },
+  "vulnerability": {
+    "type": "sql-injection",
+    "ghsa": "https://github.com/advisories/GHSA-8f93-rv4p-x4jw",
+    "sink": {
+      "file": null,
+      "code": null,
+      "line": 0
+    }
+  }
+}
