@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "mysql2": "3.15.3",
+    "query-mysql": "0.0.2"
+  },
+  "vulnerability" : {
+    "type": "sql-injection",
+    "ghsa": null,
+    "snyk": null,
+    "sink": {
+      "file": "./lib/base.js",
+      "code": "connection.query(\"SELECT * FROM \" + table + \" WHERE \" +name_id+\"='\"+ id+\"'\", function (err, rows, fields) {",
+      "line": 176
+    }
+  }
+}
