@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "mysql": "*",
+    "untitled-model": "1.0.5"
+  },
+  "vulnerability": {
+    "type": "sql-injection",
+    "ghsa": "https://github.com/advisories/GHSA-hq8g-qq57-5275",
+    "snyk": null,
+    "sink": {
+      "file": "./lib/model.js",
+      "code": "con.query(query,function (e,data){",
+      "line": 314
+    }
+  }
+}
