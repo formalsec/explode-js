@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "mysql": "2.0.0-alpha4"
+  },
+  "vulnerability" : {
+    "type": "sql-injection",
+    "ghsa": "https://github.com/advisories/GHSA-fvq6-55gv-jx9f",
+    "snyk": null,
+    "sink": {
+      "file": null,
+      "code": null,
+      "line": null
+    }
+  }
+}
