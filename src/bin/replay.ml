@@ -3,7 +3,9 @@ open Result
 open Explode_js_gen
 module String = Astring.String
 
-let npm_install = Cmd.(v "npm" % "i")
+let npm_i = Cmd.(v "npm" % "i")
+
+let npm_ci = Cmd.(v "npm" % "ci")
 
 let node program_file = Cmd.(v "node" % p program_file)
 
@@ -15,12 +17,18 @@ let env =
 
 let setup_npm_dependencies () =
   let open Result.Syntax in
-  let package_json = Path.(v "." / "package.json") in
-  let* file_exists = OS.File.exists package_json in
-  if not file_exists then Ok ()
-  else
-    let* _ = OS.Cmd.(run_out ~err:OS.Cmd.err_run_out npm_install |> out_null) in
+  let package_lock_json = Path.(v "." / "package-lock.json") in
+  let* file_exists = OS.File.exists package_lock_json in
+  if file_exists then
+    let* _ = OS.Cmd.(run_out ~err:OS.Cmd.err_run_out npm_ci |> out_null) in
     Ok ()
+  else
+    let package_json = Path.(v "." / "package.json") in
+    let* file_exists = OS.File.exists package_json in
+    if not file_exists then Ok ()
+    else
+      let* _ = OS.Cmd.(run_out ~err:OS.Cmd.err_run_out npm_i |> out_null) in
+      Ok ()
 
 let generate_poc ~dir scheme model =
   let open Result.Syntax in
