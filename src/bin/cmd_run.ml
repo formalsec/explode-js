@@ -1,4 +1,4 @@
-let run_package (settings : Settings.Cmd_run.t) =
+let run_package ~env (settings : Settings.Cmd_run.t) =
   let open Result.Syntax in
   Logs.app (fun m ->
     m "[+] Starting static analysis (dir %a)" Path.pp settings.input_path );
@@ -11,17 +11,19 @@ let run_package (settings : Settings.Cmd_run.t) =
         (* Workspace dir is a global path here*)
         let settings = { settings with input_path; workspace_dir } in
         let* scheme_file = Static_analysis.find_vulnerabilities settings in
-        Taint_analysis.run_from_file { settings with input_path = scheme_file } )
+        Taint_analysis.run_from_file ~env
+          { settings with input_path = scheme_file } )
       Path.(v ".")
   in
   result
 
 let run (settings : Settings.Cmd_run.t) =
   let open Result.Syntax in
+  Eio_main.run @@ fun env ->
   let* stats = Bos.OS.Path.stat settings.input_path in
   match stats.st_kind with
-  | Unix.S_REG -> Taint_analysis.run_from_file settings
-  | S_DIR -> run_package settings
+  | Unix.S_REG -> Taint_analysis.run_from_file ~env settings
+  | S_DIR -> run_package ~env settings
   | S_CHR | S_BLK | S_LNK | S_FIFO | S_SOCK ->
     Error
       (`Msg (Fmt.str "%a: unsupported file type" Fpath.pp settings.input_path))

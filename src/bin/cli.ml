@@ -100,6 +100,37 @@ let cmd_run =
   in
   Cmd.v info command
 
+let cmd_check_js =
+  let info =
+    let doc = "Run symbolic execution and validation on a JS harness" in
+    let description =
+      "This command runs symbolic execution on a given JavaScript harness file \
+       and then validates any found exploits by replaying them using a custom \
+       JS runtime."
+    in
+    let man = [ `S Manpage.s_description; `P description ] in
+    let man_xrefs = [] in
+    Cmd.info "check-js" ~version ~doc ~sdocs ~man ~man_xrefs
+  in
+
+  let command =
+    let open Term.Syntax in
+    let+ workspace_dir
+    and+ lazy_values
+    and+ solver_type
+    and+ input_path =
+      let docv = "HARNESS" in
+      let doc = "Path to the JavaScript harness file." in
+      Arg.(required & pos 0 (some fpath) None & info [] ~doc ~docv)
+    and+ deterministic in
+    let settings =
+      Settings.Cmd_run.make ~workspace_dir ~lazy_values ~solver_type
+        ~path_only:false ~deterministic input_path
+    in
+    Cmd_check_js.run settings
+  in
+  Cmd.v info command
+
 let commands =
   let info =
     let doc = "An automatic exploit generator for Node.js packages" in
@@ -133,4 +164,4 @@ let commands =
     let man_xrefs = [] in
     Cmd.info ~version ~doc ~man ~man_xrefs "explode-js"
   in
-  Cmd.group info [ cmd_version; cmd_run ]
+  Cmd.group info [ cmd_version; cmd_run; cmd_check_js ]

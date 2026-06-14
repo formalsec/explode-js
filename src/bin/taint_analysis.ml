@@ -1,7 +1,7 @@
 open Explode_js_gen
 module Json = Yojson.Safe
 
-let execute_scheme (settings : Settings.Cmd_run.t) i (scheme : Scheme.t) =
+let execute_scheme ~env (settings : Settings.Cmd_run.t) i (scheme : Scheme.t) =
   let open Result.Syntax in
   let workspace = settings.workspace_dir in
   let* test_file =
@@ -29,16 +29,20 @@ let execute_scheme (settings : Settings.Cmd_run.t) i (scheme : Scheme.t) =
     | Ok results ->
       begin if settings.path_only then (results.execution_time, Path_found)
       else
-        let find_model = Replay.find_exploitable_model ~dir:workspace scheme in
+        let dir = Eio.Path.(Eio.Stdenv.fs env / Fpath.to_string workspace) in
+        let find_model = Replay.find_exploitable_model ~env ~dir scheme in
         match List.find_map find_model results.failures with
         | None -> (results.execution_time, Path_found)
         | Some (path, effect_) ->
+          let path =
+            Path.of_string (Eio.Path.native_exn path) |> Result.get_ok
+          in
           (results.execution_time, Exploit_found { path; effect_ })
       end
   in
   Ok (Analysis_results.make_test_result ~path:test_file ~outcome ~time)
 
-let test_vulnerability (settings : Settings.Cmd_run.t) i
+let test_vulnerability ~env (settings : Settings.Cmd_run.t) i
   (schemes : Scheme.t list) =
   let open Result.Syntax in
   let* workspace_dir =
@@ -49,7 +53,7 @@ let test_vulnerability (settings : Settings.Cmd_run.t) i
     | scheme :: rest -> begin
       Logs.app (fun k -> k "[+] Trying scheme %d..." i);
       let* result =
-        execute_scheme { settings with workspace_dir } i scheme
+        execute_scheme ~env { settings with workspace_dir } i scheme
         |> Result.map_error @@ fun (`Msg err) ->
            Logs.err (fun m -> m "Failed to execute scheme: %s" err);
            `Msg err
@@ -72,7 +76,7 @@ let test_vulnerability (settings : Settings.Cmd_run.t) i
   Analysis_results.make ~filename ?vuln_type ?sink ?sink_lineno ?result
     ~raw_results ()
 
-let run_from_file (settings : Settings.Cmd_run.t) =
+let run_from_file ~env (settings : Settings.Cmd_run.t) =
   let open Result.Syntax in
   let start_time = Unix.gettimeofday () in
   let* _ = Utils.create_dir settings.workspace_dir in
@@ -87,7 +91,14 @@ let run_from_file (settings : Settings.Cmd_run.t) =
   | n -> Logs.app (fun k -> k "[+] Found %d potential vulnerabilties" n) );
 
   let successes, failures =
-    let results = List.mapi (test_vulnerability settings) vulns in
+    let results =
+      let i = Atomic.make 0 in
+      Eio.Fiber.List.map
+        (fun vuln ->
+          let current_i = Atomic.fetch_and_add i 1 in
+          test_vulnerability ~env settings current_i vuln )
+        vulns
+    in
     List.partition_map
       (function
         | Ok v -> Either.Left v

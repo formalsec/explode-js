@@ -1,20 +1,35 @@
 const fs = require('fs');
-const path = require('path');
 
-const witness = process.argv[2];
-if (!fs.existsSync(witness)) {
-  console.log(`Non-existent witness file '${witness}'`);
-  process.exit(1);
+const modelPath = process.env.EXPLODE_JS_WITNESS || process.argv[2];
+
+function createLazyModel() {
+  let isLoaded = false;
+  let target = {};
+
+  const ensureLoaded = () => {
+    if (!isLoaded) {
+      try {
+        const contents = fs.readFileSync(modelPath, 'utf8');
+        target = JSON.parse(contents).model;
+      } catch (err) {
+        console.error(`Failed to load config from ${modelPath}`, err);
+        target = {};
+      }
+      isLoaded = true;
+    }
+  }
+
+  return new Proxy({}, {
+    get(_, prop) {
+      ensureLoaded();
+      return target[prop];
+    }
+  });
 }
 
-let json_string = fs.readFileSync(witness, { encoding: "utf8", flag: "r" });
-const symbolic_map = JSON.parse(json_string).model
-if (symbolic_map === undefined) {
-  console.log(`Unable to load symbolic_map from '${witness}'`)
-  process.exit(1);
-}
+let symbolic_map = createLazyModel();
 
-function get(x) {
+function getSymbol(x) {
   let symbol = symbolic_map[x];
   return (symbol === undefined) ? undefined : symbol.value;
 }
@@ -39,11 +54,11 @@ function polluted_object(depth) {
 }
 
 module.exports = {
-  any: get,
-  number: get,
-  string: get,
-  boolean: get,
-  function: function(_x) { return function() { }; },
+  any: getSymbol,
+  number: getSymbol,
+  string: getSymbol,
+  boolean: getSymbol,
+  function: function (_x) { return function () { }; },
   lazy_object: lazy_object,
   assume: ignore,
   assert: ignore,

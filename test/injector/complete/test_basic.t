@@ -1,5 +1,5 @@
 Basic completion:
-  $ explode-js injector complete ../mutual.bnf <<EOF
+  $ injector-js complete ../mutual.bnf <<EOF
   > 3
   > A_2
   > b

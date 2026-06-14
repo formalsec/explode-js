@@ -1,5 +1,5 @@
 Basic verification:
-  $ explode-js injector verify ../mutual.bnf <<EOF
+  $ injector-js verify ../mutual.bnf <<EOF
   > 3
   > A_2
   > cba

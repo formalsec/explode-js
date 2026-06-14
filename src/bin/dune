@@ -7,6 +7,8 @@
   dune-site
   dune-glob
   dune-build-info
+  eio
+  eio_main
   ecma-sl
   ecma-sl.symbolic
   ecma-sl.js2ecmasl

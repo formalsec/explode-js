@@ -1,99 +1,95 @@
 open Bos
-open Result
 open Explode_js_gen
 module String = Astring.String
 
-let npm_i = Cmd.(v "npm" % "i")
+let get_node_path () = try Unix.getenv "NODE_PATH" with Not_found -> ""
 
-let npm_ci = Cmd.(v "npm" % "ci")
+let get_full_env custom_vars =
+  let parent_env = Unix.environment () in
+  Array.append parent_env (Array.of_list custom_vars)
 
-let node program_file = Cmd.(v "node" % p program_file)
-
-let env =
+let replay_env =
   let sharejs = List.hd Sites.Share.nodejs in
-  let node_path = OS.Env.opt_var "NODE_PATH" ~absent:"" in
-  let node_path = Fmt.str "%s:.:%a" node_path Path.pp sharejs in
-  String.Map.of_list [ ("NODE_PATH", node_path) ]
+  let node_path = get_node_path () in
+  get_full_env [ Fmt.str "NODE_PATH=%s:.:%a" node_path Path.pp sharejs ]
 
-let setup_npm_dependencies () =
-  let open Result.Syntax in
-  let package_lock_json = Path.(v "." / "package-lock.json") in
-  let* file_exists = OS.File.exists package_lock_json in
-  if file_exists then
-    let* _ = OS.Cmd.(run_out ~err:OS.Cmd.err_run_out npm_ci |> out_null) in
-    Ok ()
+let setup_npm_dependencies env =
+  let open Eio in
+  let fs = Stdenv.fs env in
+  let proc_mgr = Stdenv.process_mgr env in
+  let package_lock_json = Path.(fs / "./package-lock.json") in
+  Path.with_open_out ~create:`Never Path.(fs / "/dev/null") @@ fun dev_null ->
+  if Path.is_file package_lock_json then
+    Process.run ~stderr:dev_null ~stdout:dev_null proc_mgr [ "npm"; "ci" ]
   else
-    let package_json = Path.(v "." / "package.json") in
-    let* file_exists = OS.File.exists package_json in
-    if not file_exists then Ok ()
-    else
-      let* _ = OS.Cmd.(run_out ~err:OS.Cmd.err_run_out npm_i |> out_null) in
-      Ok ()
+    let package_json = Path.(fs / "./package.json") in
+    if Path.is_file package_json then
+      Process.run ~stderr:dev_null ~stdout:dev_null proc_mgr [ "npm"; "i" ]
 
 let generate_poc ~dir scheme model =
-  let open Result.Syntax in
   let model = Model.from_smtml model in
   let poc = Exploit_templates.Literal.render model scheme in
-  let poc_file = Path.(dir / "poc.js") in
-  let* () = Bos.OS.File.writef poc_file "%s@." poc in
-  Ok poc_file
+  let poc_file = Eio.Path.(dir / "poc.js") in
+  Eio.Path.save ~create:(`Or_truncate 0o644) poc_file poc;
+  poc_file
 
-let with_potential_effects f =
+let with_potential_effects fs f =
   let open Replay_effect in
   (* Don't care if these file operations fail *)
-  let aux_file = Path.(v "./exploited") in
-  let _ = OS.File.write aux_file "success\n" in
-  Fun.protect ~finally:(fun () -> ignore (OS.File.delete aux_file)) @@ fun () ->
-  f (File_access aux_file :: Replay_effect.defaults)
+  let aux_file = Eio.Path.(fs / "./exploited") in
+  Eio.Path.save ~create:(`Or_truncate 0o644) aux_file "success\n";
+  Fun.protect ~finally:(fun () -> Eio.Path.unlink aux_file) @@ fun () ->
+  f
+    (let p = Path.of_string (Eio.Path.native_exn aux_file) |> Result.get_ok in
+     File_access p :: Replay_effect.defaults )
 
-let run_node_file ~env file =
-  let open Result.Syntax in
-  let cmd = node file in
-  let err_file = Path.add_ext ".stderr" file in
-  let out_file = Path.add_ext ".stdout" file in
-  let run_result =
-    OS.Cmd.run_out ~env ~err:(OS.Cmd.err_file err_file) cmd
-    |> OS.Cmd.out_file out_file
+let run_node_file ~fs ~proc_mgr ~env file =
+  let open Eio in
+  let native_file = Path.native_exn file in
+  let out_file = Path.(fs / (native_file ^ ".stdout")) in
+  let err_file = Path.(fs / (native_file ^ ".stderr")) in
+  let result =
+    Path.with_open_out ~create:(`Or_truncate 0o644) out_file @@ fun stdout ->
+    Path.with_open_out ~create:(`Or_truncate 0o644) err_file @@ fun stderr ->
+    Switch.run @@ fun sw ->
+    let proc =
+      Process.spawn ~sw proc_mgr ~stdout ~stderr ~env [ "node"; native_file ]
+    in
+    Process.await proc
   in
-  let status_result =
-    let+ (), status = run_result in
-    status
-  in
-  let* err_output = OS.File.read err_file in
-  let+ out_output = OS.File.read out_file in
-  (status_result, out_output, err_output)
+  (result, Path.load out_file, Path.load err_file)
 
-let check_poc_effects out_output err_output potential_effects =
+let check_poc_effects ~fs out_output err_output potential_effects =
+  let open Eio in
   let visiable_effect = function
     | Replay_effect.Stdout sub ->
       String.find_sub ~sub out_output |> Option.is_some
-    | File file ->
-      begin match OS.File.exists file with
-      | Ok file_exists -> file_exists
-      | Error (`Msg err) -> Fmt.failwith "%s" err
-      end
+    | File file -> Path.(is_file (fs / Fpath.to_string file))
     | File_access file ->
-      let { Unix.st_atime; st_ctime; _ } = Unix.stat (Path.to_string file) in
-      st_atime > st_ctime
+      let { File.Stat.atime; ctime; _ } =
+        Path.(stat ~follow:false (fs / Fpath.to_string file))
+      in
+      atime > ctime
     | Error str ->
       let sub = Fmt.str "Error: %s" str in
       String.find_sub ~sub err_output |> Option.is_some
   in
   List.find_opt visiable_effect potential_effects
 
-let execute_and_check_poc ~env poc_file =
-  let open Result.Syntax in
-  with_potential_effects @@ fun potential_effects ->
-  let+ status_result, out_output, err_output = run_node_file ~env poc_file in
-  let eff = check_poc_effects out_output err_output potential_effects in
-  (status_result, eff)
+let execute_and_check_poc ~fs ~proc_mgr ~env poc_file =
+  with_potential_effects fs @@ fun potential_effects ->
+  let status, out_output, err_output =
+    run_node_file ~fs ~proc_mgr ~env poc_file
+  in
+  let eff = check_poc_effects ~fs out_output err_output potential_effects in
+  (status, eff)
 
-let log_and_cleanup_effect eff =
+let log_and_cleanup_effect ~fs eff =
   match eff with
   | Some eff -> begin
     let () =
       match eff with
-      | Replay_effect.File file -> ignore @@ OS.Path.delete file
+      | Replay_effect.File file -> Eio.Path.(unlink (fs / Fpath.to_string file))
       | _ -> ()
     in
     Logs.app (fun k -> k "[+] \u{2714} Status: Success %a" Replay_effect.pp eff);
@@ -103,30 +99,24 @@ let log_and_cleanup_effect eff =
     Logs.app (fun k -> k "[-] \u{2716} Status: No side effect");
     None
 
-let test_model_exploit ~dir scheme model =
-  let open Result.Syntax in
+let test_model_exploit ~env ~dir scheme model =
   Logs.app (fun k ->
     k "[+] \u{1F4C4} Trying model :@\n %a"
       (Smtml.Model.pp ~no_values:false)
       model );
-  let* () = setup_npm_dependencies () in
-  let* poc_file = generate_poc ~dir scheme model in
-  let+ status_result, eff = execute_and_check_poc ~env poc_file in
-  match status_result with
-  | Ok (_, status) -> begin
-    Logs.app (fun k -> k "[+] \u{1F4C4} Node %a" OS.Cmd.pp_status status);
-    let final_effect = log_and_cleanup_effect eff in
-    Option.map (fun eff -> (poc_file, eff)) final_effect
-    end
-  | Error (`Msg err) -> begin
-    Logs.app (fun k -> k "[-] \u{1F4C4} Node: %s" err);
-    None
-    end
+  setup_npm_dependencies env;
+  let fs = Eio.Stdenv.fs env in
+  let proc_mgr = Eio.Stdenv.process_mgr env in
+  let poc = generate_poc ~dir scheme model in
+  let status, eff = execute_and_check_poc ~fs ~proc_mgr ~env:replay_env poc in
+  Logs.app (fun k -> k "[+] \u{1F4C4} Node %a" OS.Cmd.pp_status status);
+  let final_effect = log_and_cleanup_effect ~fs eff in
+  Option.map (fun eff -> (poc, eff)) final_effect
 
-let find_exploitable_model ~dir scheme (model : Sym_failure.t) =
+let find_exploitable_model ~env ~dir scheme (model : Sym_failure.t) =
   let open Option.Syntax in
   let* model = model.model in
-  let* result = test_model_exploit ~dir scheme model.data |> Result.to_option in
+  let result = test_model_exploit ~env ~dir scheme model.data in
   result
 
 (* let run_server ~workspace_dir server_file scheme *)
