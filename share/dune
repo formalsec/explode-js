@@ -1,0 +1,32 @@
+(library
+ (name injector_grammars))
+
+(rule
+ (target code.ml)
+ (deps code.ebnf)
+ (action
+  (with-stdout-to %{target}
+   (progn
+    (echo "let raw = {|")
+    (cat %{deps})
+    (echo "|}")))))
+
+(rule
+ (target command.ml)
+ (deps command.ebnf)
+ (action
+  (with-stdout-to %{target}
+   (progn
+    (echo "let raw = {|")
+    (cat %{deps})
+    (echo "|}")))))
+
+(rule
+ (target sql.ml)
+ (deps sql.ebnf)
+ (action
+  (with-stdout-to %{target}
+   (progn
+    (echo "let raw = {|")
+    (cat %{deps})
+    (echo "|}")))))
