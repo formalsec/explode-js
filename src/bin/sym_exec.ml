@@ -7,10 +7,10 @@ module Settings = struct
     { deterministic : bool [@default false]
     ; lazy_values : bool
     ; timeout : int [@default 30]
-    ; workspace_dir : Path.t
+    ; workspace_dir : string
     ; solver_type : Smtml.Solver_type.t
     ; path_only : bool
-    ; input_file : Path.t [@main]
+    ; input_file : string [@main]
     }
   [@@deriving make, show]
 end
@@ -24,7 +24,8 @@ module Input = struct
 
   let from_javascript_file file =
     let open Result.Syntax in
-    let ast_file = Path.(file -+ ast_file_suffix) in
+    let file = Fpath.of_string (Eio.Path.native_exn file) |> Result.get_ok in
+    let ast_file = Fpath.(file -+ ast_file_suffix) in
     Fun.protect ~finally:(fun () -> ignore @@ OS.File.delete ast_file)
     @@ fun () ->
     let* () = OS.Cmd.run (js2ecma_sl ~input_file:file ~output_file:ast_file) in
@@ -36,15 +37,17 @@ module Input = struct
       build_ast;
     Ok prog
 
-  let load_program (file : Path.t) =
-    if Path.has_ext ".js" file then from_javascript_file file
-    else Error (`Msg (Fmt.str "%a :unreconized file type" Path.pp file))
+  let load_program file =
+    let ext = Filename.extension (Eio.Path.native_exn file) in
+    if String.equal ext ".js" then from_javascript_file file
+    else Error (`Msg (Fmt.str "%a :unreconized file type" Eio.Path.pp file))
 end
 
 module Execution = struct
   let make_error_report (settings : Settings.t) exn_msg =
+    let filename = Fpath.of_string settings.input_file |> Result.get_ok in
     let report =
-      { Symbolic_result.filename = settings.input_file
+      { Symbolic_result.filename
       ; execution_time = 0.
       ; solver_time = 0.
       ; solver_queries = 0
@@ -55,14 +58,15 @@ module Execution = struct
     (Error (`Failure exn_msg), report)
 
   let run (settings : Settings.t) prog =
+    let filename = Fpath.of_string settings.input_file |> Result.get_ok in
     let engine_settings =
       Symbolic_engine.Settings.make ~lazy_values:settings.lazy_values
         ~timeout:settings.timeout ~print_return_value:false
         ~solver_type:settings.solver_type
-        ~memory_type:Symbolic_memory_type.Default ~filename:settings.input_file
-        prog
+        ~memory_type:Symbolic_memory_type.Default ~filename prog
     in
-    let testsuite_dir = Path.(settings.workspace_dir / "test-suite") in
+    let workspace = Fpath.of_string settings.workspace_dir |> Result.get_ok in
+    let testsuite_dir = Fpath.(workspace / "test-suite") in
     try
       run engine_settings ~callback_err:(fun thread ty ->
         let solver = Thread.solver thread in
@@ -94,18 +98,17 @@ module Reporting = struct
       Ok report
 end
 
-let setup_environment (settings : Settings.t) =
-  let open Result.Syntax in
+let setup_environment ~fs (settings : Settings.t) =
   Ecma_sl.Log.Config.log_warns := true;
   (* Ecma_sl.Log.Config.log_debugs := true; *)
   Logs.app (fun k -> k "[+] Symbolic execution output:");
-  let testsuite = Path.(settings.workspace_dir / "test-suite") in
-  let+ _ = OS.Dir.create ~mode:0o777 ~path:true testsuite in
-  ()
+  let testsuite = Eio.Path.(fs / settings.workspace_dir / "test-suite") in
+  Eio.Path.mkdirs ~exists_ok:true ~perm:0o777 testsuite
 
-let run_file settings =
+let run_file ~env settings =
   let open Result.Syntax in
-  let* () = setup_environment settings in
-  let* program = Input.load_program settings.input_file in
+  let fs = Eio.Stdenv.fs env in
+  setup_environment ~fs settings;
+  let* program = Input.load_program Eio.Path.(fs / settings.input_file) in
   let result, report = Execution.run settings program in
   Reporting.process_and_log_result settings report result

@@ -1,5 +1,5 @@
 module Settings = struct
-  type t = { input_path : Path.t [@main] } [@@deriving make, show]
+  type t = { input_path : Fpath.t [@main] } [@@deriving make, show]
 end
 
 let cmd_verify (settings : Settings.t) =
@@ -88,7 +88,7 @@ let cmd_complete (settings : Settings.t) =
 
 let cmds =
   let open Cmdliner in
-  let fpath = Arg.conv (Path.of_string, Path.pp) in
+  let fpath = Arg.conv (Fpath.of_string, Fpath.pp) in
 
   let input_path =
     let docv = "PATH" in

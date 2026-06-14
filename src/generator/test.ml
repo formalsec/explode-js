@@ -13,7 +13,9 @@ let generate_test_file prefix i =
 let resolve_file dir scheme = function
   | Some f -> f
   | None ->
-    let original_file = Option.get @@ Scheme.filename scheme in
+    let original_file =
+      Fpath.of_string @@ Option.get @@ Scheme.filename scheme |> Result.get_ok
+    in
     (* If path is relative, it is relative to the scheme dir *)
     if Fpath.is_abs original_file then original_file
     else Fpath.append dir original_file

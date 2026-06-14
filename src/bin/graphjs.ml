@@ -1,30 +1,19 @@
-open Bos
-open Result
-
-module Settings = struct
-  type t =
-    { optimized_import : bool [@default false]
-    ; file : Path.t
-    ; output : Path.t
-    }
-  [@@deriving make]
-end
-
-let cmd (settings : Settings.t) =
-  let optimized_load =
-    Cmd.(on settings.optimized_import (v "--optimized-import"))
+let run ~env ~stderr ~stdout workspace_dir entry_file =
+  let open Eio in
+  let proc_mgr = Stdenv.process_mgr env in
+  Path.with_open_out ~create:(`Or_truncate 0o644) stderr @@ fun stderr ->
+  Path.with_open_out ~create:(`Or_truncate 0o644) stdout @@ fun stdout ->
+  Switch.run @@ fun sw ->
+  let proc =
+    Process.spawn ~sw proc_mgr ~stdout ~stderr
+      [ "graphjs"
+      ; "--silent"
+      ; "--with-types"
+      ; "--dirty"
+      ; "-f"
+      ; Path.native_exn entry_file
+      ; "-o"
+      ; Path.native_exn workspace_dir
+      ]
   in
-  Cmd.(
-    v "graphjs" %% optimized_load % "--silent" % "--with-types" % "--dirty"
-    % "-f" % p settings.file % "-o" % p settings.output )
-
-let run ?stderr ?stdout settings =
-  let open Syntax in
-  let cmd = cmd settings in
-  let err = Option.map OS.Cmd.err_file stderr in
-  match stdout with
-  | None -> OS.Cmd.run_status ?err cmd
-  | Some out_file ->
-    let run_out = OS.Cmd.run_out ?err cmd in
-    let* (), (_, status) = OS.Cmd.out_file out_file run_out in
-    Ok status
+  Process.await proc

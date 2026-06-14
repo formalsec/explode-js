@@ -1,7 +1,7 @@
 type t =
   | Stdout of string
-  | File of Path.t
-  | File_access of Path.t
+  | File of string
+  | File_access of string
   | Error of string
 
 val defaults : t list

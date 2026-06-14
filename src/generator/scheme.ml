@@ -36,7 +36,7 @@ let rec equal_param_type a b =
     false
 
 type t =
-  { filename : Fpath.t option
+  { filename : string option
   ; ty : Vuln_type.t option
   ; source : string option
   ; source_lineno : int option
@@ -151,7 +151,7 @@ let rec unroll ~proto_pollution (tmpl : t) : t list =
 
 module Parser : sig
   val from_file :
-    proto_pollution:bool -> Fpath.t -> (t list list, [> `Msg of string ]) result
+    proto_pollution:bool -> string -> (t list list, [> `Msg of string ]) result
 end = struct
   module Json = Yojson.Safe
   module Json_util = Yojson.Safe.Util
@@ -253,7 +253,7 @@ end = struct
       | `Null -> Ok None
       | json ->
         let* filename = string json in
-        Ok (Some (Fpath.v (Unix.realpath filename)))
+        Ok (Some (Unix.realpath filename))
     in
     let* ty =
       let vuln_type = Json_util.member "vuln_type" json |> string_opt in
@@ -320,7 +320,6 @@ end = struct
 
   let from_file ~proto_pollution fname =
     let open Result.Syntax in
-    let fname = Fpath.to_string fname in
     match Json.from_file ~fname fname with
     | exception Yojson.Json_error msg -> Error (`Msg msg)
     | json ->

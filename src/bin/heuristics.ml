@@ -56,7 +56,7 @@ module Pollution = struct
   let has_recursive =
     let re = Dune_re.(compile @@ Perl.re {|exports.recursive|}) in
     fun input_file ->
-      In_channel.with_open_text (Path.to_string input_file) @@ fun ic ->
+      In_channel.with_open_text input_file @@ fun ic ->
       let file_data = In_channel.input_all ic in
       match Dune_re.exec_opt re file_data with
       | None -> false

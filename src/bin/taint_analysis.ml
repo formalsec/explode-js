@@ -2,24 +2,29 @@ open Explode_js_gen
 module Json = Yojson.Safe
 
 let execute_scheme ~env (settings : Settings.Cmd_run.t) i (scheme : Scheme.t) =
-  let open Result.Syntax in
-  let workspace = settings.workspace_dir in
-  let* test_file =
-    Utils.write_file
-      Path.(workspace / Fmt.str "symbolic_test_%d.js" i)
-      (Exploit_templates.Symbolic.render scheme)
+  let fs = Eio.Stdenv.fs env in
+  let workspace = Eio.Path.(fs / settings.workspace_dir) in
+  let test_file =
+    let path =
+      Utils.write_file
+        Eio.Path.(workspace / Fmt.str "symbolic_test_%d.js" i)
+        (Exploit_templates.Symbolic.render scheme)
+    in
+    Eio.Path.native_exn path
   in
-  let* sym_workspace =
-    Utils.create_dir Path.(workspace / Fmt.str "symbolic_test_%d" i)
+  let sym_workspace =
+    let path = Eio.Path.(workspace / Fmt.str "symbolic_test_%d" i) in
+    Eio.Path.mkdir ~perm:0o755 path;
+    path
   in
   let sym_settings =
     Sym_exec.Settings.make ~lazy_values:settings.lazy_values
-      ~workspace_dir:sym_workspace ~solver_type:settings.solver_type
-      ~path_only:settings.path_only ~deterministic:settings.deterministic
-      test_file
+      ~workspace_dir:(Eio.Path.native_exn sym_workspace)
+      ~solver_type:settings.solver_type ~path_only:settings.path_only
+      ~deterministic:settings.deterministic test_file
   in
   let time, outcome =
-    let sym_result = Sym_exec.run_file sym_settings in
+    let sym_result = Sym_exec.run_file ~env sym_settings in
     match sym_result with
     | Error (`Msg err) ->
       Logs.err (fun m -> m "run_scheme: %s" err);
@@ -29,14 +34,12 @@ let execute_scheme ~env (settings : Settings.Cmd_run.t) i (scheme : Scheme.t) =
     | Ok results ->
       begin if settings.path_only then (results.execution_time, Path_found)
       else
-        let dir = Eio.Path.(Eio.Stdenv.fs env / Fpath.to_string workspace) in
+        let dir = workspace in
         let find_model = Replay.find_exploitable_model ~env ~dir scheme in
         match List.find_map find_model results.failures with
         | None -> (results.execution_time, Path_found)
         | Some (path, effect_) ->
-          let path =
-            Path.of_string (Eio.Path.native_exn path) |> Result.get_ok
-          in
+          let path = Eio.Path.native_exn path in
           (results.execution_time, Exploit_found { path; effect_ })
       end
   in
@@ -45,9 +48,11 @@ let execute_scheme ~env (settings : Settings.Cmd_run.t) i (scheme : Scheme.t) =
 let test_vulnerability ~env (settings : Settings.Cmd_run.t) i
   (schemes : Scheme.t list) =
   let open Result.Syntax in
-  let* workspace_dir =
-    Utils.create_dir Path.(settings.workspace_dir / Fmt.str "vuln_%d" i)
+  let fs = Eio.Stdenv.fs env in
+  let workspace_dir =
+    Filename.concat settings.workspace_dir (Fmt.str "vuln_%d" i)
   in
+  let _ = Utils.create_dir Eio.Path.(fs / workspace_dir) in
   let rec loop (best_so_far, all_results) i = function
     | [] -> Ok (best_so_far, all_results)
     | scheme :: rest -> begin
@@ -78,9 +83,10 @@ let test_vulnerability ~env (settings : Settings.Cmd_run.t) i
 
 let run_from_file ~env (settings : Settings.Cmd_run.t) =
   let open Result.Syntax in
+  let fs = Eio.Stdenv.fs env in
   let start_time = Unix.gettimeofday () in
-  let* _ = Utils.create_dir settings.workspace_dir in
-  let* vulns =
+  let workspace = Utils.create_dir Eio.Path.(fs / settings.workspace_dir) in
+  let+ vulns =
     Scheme.Parser.from_file ~proto_pollution:false settings.input_path
   in
 
@@ -92,7 +98,7 @@ let run_from_file ~env (settings : Settings.Cmd_run.t) =
 
   let successes, failures =
     let results =
-      let i = Atomic.make 0 in
+      let i = Atomic.make 1 in
       Eio.Fiber.List.map
         (fun vuln ->
           let current_i = Atomic.fetch_and_add i 1 in
@@ -112,12 +118,9 @@ let run_from_file ~env (settings : Settings.Cmd_run.t) =
       Logs.err (fun m -> m "Failed to test vulnerability: %s" err) )
     failures;
 
-  Utils.write_time
-    Path.(settings.workspace_dir / "explode_time.txt")
-    execution_time;
+  Utils.write_time Eio.Path.(workspace / "explode_time.txt") execution_time;
 
   let json_results = List.map Analysis_results.to_yojson successes in
-  let output_file = Path.(settings.workspace_dir / "results.json") in
-  Bos.OS.File.writef output_file "%a@."
-    (Json.pretty_print ~std:true)
-    (`List json_results)
+  let output_file = Eio.Path.(workspace / "results.json") in
+  Eio.Path.save ~create:(`Or_truncate 0o644) output_file
+    (Fmt.str "%a@\n" (Json.pretty_print ~std:true) (`List json_results))

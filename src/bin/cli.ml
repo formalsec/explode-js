@@ -1,7 +1,5 @@
 open Cmdliner
 
-let fpath = Arg.conv (Path.of_string, Path.pp)
-
 let debug =
   let doc = "Debug mode." in
   Arg.(value & flag & info [ "debug" ] ~doc)
@@ -13,16 +11,16 @@ let deterministic =
 let input_path =
   let docv = "PATH" in
   let doc = "Path to the input file. Can be a directory." in
-  Arg.(required & pos 0 (some fpath) None & info [] ~doc ~docv)
+  Arg.(required & pos 0 (some path) None & info [] ~doc ~docv)
 
 let input_path_or default =
   let docv = "PATH" in
   let doc = "Path to the input file. Can be a directory." in
-  Arg.(value & pos 0 fpath default & info [] ~doc ~docv)
+  Arg.(value & pos 0 path default & info [] ~doc ~docv)
 
 let workspace_dir =
   let doc = "Directory to store intermediate results." in
-  Arg.(value & opt fpath (Path.v "_results") & info [ "workspace" ] ~doc)
+  Arg.(value & opt path "_results" & info [ "workspace" ] ~doc)
 
 let lazy_values =
   let doc =
@@ -89,7 +87,7 @@ let cmd_run =
     let+ workspace_dir
     and+ lazy_values
     and+ solver_type
-    and+ input_path = input_path_or (Path.v ".")
+    and+ input_path = input_path_or "."
     and+ path_only
     and+ deterministic in
     let settings =
@@ -121,7 +119,7 @@ let cmd_check_js =
     and+ input_path =
       let docv = "HARNESS" in
       let doc = "Path to the JavaScript harness file." in
-      Arg.(required & pos 0 (some fpath) None & info [] ~doc ~docv)
+      Arg.(required & pos 0 (some path) None & info [] ~doc ~docv)
     and+ deterministic in
     let settings =
       Settings.Cmd_run.make ~workspace_dir ~lazy_values ~solver_type

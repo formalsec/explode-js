@@ -64,8 +64,8 @@ let make_witness_writer =
 
     fun workspace pc model ->
       let base_name = Fmt.str "witness-%d" (next_int ()) in
-      let base_path = Path.(workspace / base_name) in
+      let base_path = Fpath.(workspace / base_name) in
       let* model = write_model base_path model in
-      let pc_path = Path.(base_path + ".smtml") in
+      let pc_path = Fpath.(base_path + ".smtml") in
       let+ () = Bos.OS.File.writef ~mode pc_path "%a" Smtml.Expr.Set.pp pc in
       (pc_path, model)

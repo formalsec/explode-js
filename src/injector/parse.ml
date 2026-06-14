@@ -20,7 +20,7 @@ let from_file path =
   Bos.OS.File.with_ic path
     (fun chan () ->
       let buf = Sedlexing.Utf8.from_channel chan in
-      Sedlexing.set_filename buf (Path.to_string path);
+      Sedlexing.set_filename buf (Fpath.to_string path);
       parse_with_error buf )
     ()
 

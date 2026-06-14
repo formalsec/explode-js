@@ -47,14 +47,3 @@ module List = struct
     let[@inline] ( let+ ) v f = List.map f v
   end
 end
-
-module Path = struct
-  include Fpath
-
-  let to_yojson fpath = `String (to_string fpath)
-
-  let of_yojson json =
-    match json with
-    | `String s -> Ok (v s)
-    | _ -> Error "invalid_arg: expecting a string"
-end

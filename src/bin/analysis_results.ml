@@ -1,7 +1,7 @@
 open Explode_js_gen
 
 type exploit =
-  { path : Path.t
+  { path : string
   ; effect_ : Replay_effect.t
   }
 [@@deriving yojson]
@@ -13,14 +13,14 @@ type outcome =
 [@@deriving yojson]
 
 type test_result =
-  { path : Path.t
+  { path : string
   ; outcome : outcome
   ; time : float
   }
 [@@deriving make, yojson]
 
 type t =
-  { filename : Path.t
+  { filename : string
   ; vuln_type : Vuln_type.t option
   ; sink : string option
   ; sink_lineno : int option
