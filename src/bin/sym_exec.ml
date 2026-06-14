@@ -20,7 +20,7 @@ module Input = struct
 
   let js2ecma_sl ~input_file ~output_file =
     let input_file = Fpath.to_string input_file in
-    EslJSParser.Api.cmd input_file (Some (Fpath.to_string output_file)) None
+    EslJSParser.Api.cmd ~output:(Fpath.to_string output_file) input_file
 
   let from_javascript_file file =
     let open Result.Syntax in
