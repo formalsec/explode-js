@@ -89,7 +89,7 @@ let cmd_run =
     let+ workspace_dir
     and+ lazy_values
     and+ solver_type
-    and+ input_path = input_path_or (Fpath.v ".")
+    and+ input_path = input_path_or (Path.v ".")
     and+ path_only
     and+ deterministic in
     let settings =
@@ -99,61 +99,6 @@ let cmd_run =
     Cmd_run.run settings
   in
   Cmd.v info command
-
-let cmd_injector =
-  let cmd_verify =
-    let info =
-      let doc = "Experimental payload verification engine" in
-      let description =
-        "This command is still experimental and intentionally not documented. \
-         Use at your own risk!"
-      in
-      let man = [ `S Manpage.s_description; `P description ] in
-      let man_xrefs = [] in
-      Cmd.info "verify" ~version ~doc ~sdocs ~man ~man_xrefs
-    in
-    let command =
-      let open Term.Syntax in
-      let+ input_path in
-      let settings = Settings.Cmd_injector.make input_path in
-      Cmd_injector.cmd_verify settings
-    in
-    Cmd.v info command
-  in
-
-  let cmd_complete =
-    let info =
-      let doc = "Experimental payload completion engine" in
-      let description =
-        "This command is still experimental and intentionally not documented. \
-         Use at your own risk!"
-      in
-      let man = [ `S Manpage.s_description; `P description ] in
-      let man_xrefs = [] in
-      Cmd.info "complete" ~version ~doc ~sdocs ~man ~man_xrefs
-    in
-    let command =
-      let open Term.Syntax in
-      let+ input_path in
-      let settings = Settings.Cmd_injector.make input_path in
-      Cmd_injector.cmd_complete settings
-    in
-    Cmd.v info command
-  in
-
-  let info =
-    let doc = "Experimental injector backend" in
-    let description =
-      [ `P
-          "This command is still experimental and intentionally not \
-           documented. Use at your own risk!"
-      ]
-    in
-    let man = `S Manpage.s_description :: description in
-    let man_xrefs = [] in
-    Cmd.info ~version ~doc ~man ~man_xrefs "injector"
-  in
-  Cmd.group info [ cmd_verify; cmd_complete ]
 
 let commands =
   let info =
@@ -188,4 +133,4 @@ let commands =
     let man_xrefs = [] in
     Cmd.info ~version ~doc ~man ~man_xrefs "explode-js"
   in
-  Cmd.group info [ cmd_version; cmd_run; cmd_injector ]
+  Cmd.group info [ cmd_version; cmd_run ]

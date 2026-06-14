@@ -1,4 +1,8 @@
-let cmd_verify (settings : Settings.Cmd_injector.t) =
+module Settings = struct
+  type t = { input_path : Path.t [@main] } [@@deriving make, show]
+end
+
+let cmd_verify (settings : Settings.t) =
   let open Result.Syntax in
   let module Solver = Smtml.Solver.Batch (Smtml.Z3_mappings) in
   let solver = Solver.create ~logic:QF_S () in
@@ -39,7 +43,7 @@ let cmd_verify (settings : Settings.Cmd_injector.t) =
       desired_rule
   | `Unknown -> assert false
 
-let cmd_complete (settings : Settings.Cmd_injector.t) =
+let cmd_complete (settings : Settings.t) =
   let open Result.Syntax in
   let module Solver = Smtml.Solver.Batch (Smtml.Z3_mappings) in
   let solver = Solver.create ~logic:QF_S () in
@@ -81,3 +85,87 @@ let cmd_complete (settings : Settings.Cmd_injector.t) =
   | `Unsat ->
     Fmt.pr "It's not possile to contain '%s' in the grammar@." candidate_str
   | `Unknown -> assert false
+
+let cmds =
+  let open Cmdliner in
+  let fpath = Arg.conv (Path.of_string, Path.pp) in
+
+  let input_path =
+    let docv = "PATH" in
+    let doc = "Path to the input file. Can be a directory." in
+    Arg.(required & pos 0 (some fpath) None & info [] ~doc ~docv)
+  in
+
+  let cmd_verify =
+    let info =
+      let doc = "Experimental payload verification engine" in
+      let description =
+        "This command is still experimental and intentionally not documented. \
+         Use at your own risk!"
+      in
+      let man = [ `S Manpage.s_description; `P description ] in
+      let man_xrefs = [] in
+      Cmd.info "verify" ~doc ~man ~man_xrefs
+    in
+    let command =
+      let open Term.Syntax in
+      let+ input_path in
+      let settings = Settings.make input_path in
+      cmd_verify settings
+    in
+    Cmd.v info command
+  in
+
+  let cmd_complete =
+    let info =
+      let doc = "Experimental payload completion engine" in
+      let description =
+        "This command is still experimental and intentionally not documented. \
+         Use at your own risk!"
+      in
+      let man = [ `S Manpage.s_description; `P description ] in
+      let man_xrefs = [] in
+      Cmd.info "complete" ~doc ~man ~man_xrefs
+    in
+    let command =
+      let open Term.Syntax in
+      let+ input_path in
+      let settings = Settings.make input_path in
+      cmd_complete settings
+    in
+    Cmd.v info command
+  in
+
+  let info =
+    let doc = "Experimental injector backend" in
+    let description =
+      [ `P
+          "This command is still experimental and intentionally not \
+           documented. Use at your own risk!"
+      ]
+    in
+    let man = `S Manpage.s_description :: description in
+    let man_xrefs = [] in
+    Cmd.info ~doc ~man ~man_xrefs "injector"
+  in
+  Cmd.group info [ cmd_verify; cmd_complete ]
+
+let returncode =
+  let open Cmdliner in
+  match Cmd.eval_value cmds with
+  | Ok (`Version | `Help) -> Cmd.Exit.ok
+  | Ok (`Ok result) ->
+    begin match result with
+    | Ok () -> Cmd.Exit.ok
+    | Error (`Msg str) ->
+      Logs.err (fun m -> m "%s" str);
+      1
+    end
+  | Error e ->
+    begin match e with
+    | `Term -> Cmd.Exit.some_error
+    | `Parse -> Cmd.Exit.cli_error
+    | `Exn -> Cmd.Exit.internal_error
+    end
+
+let () = exit returncode

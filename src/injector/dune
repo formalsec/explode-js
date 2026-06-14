@@ -11,3 +11,13 @@
   (:standard -open Std))
  (preprocess
   (pps sedlex.ppx ppx_deriving.show)))
+
+(executable
+ (name main)
+ (public_name injector-js)
+ (modules main)
+ (libraries cmdliner explode_js.std fmt injector smtml)
+ (flags
+  (:standard -open Std))
+ (preprocess
+  (pps ppx_deriving.make ppx_deriving.show)))

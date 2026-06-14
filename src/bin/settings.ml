@@ -10,7 +10,3 @@ module Cmd_run = struct
     }
   [@@deriving make, show]
 end
-
-module Cmd_injector = struct
-  type t = { input_path : Path.t [@main] } [@@deriving make, show]
-end
