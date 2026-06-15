@@ -1,36 +1,67 @@
 <start> ::= <program>;
 
-<program> ::= <line> | <line> "\n" <program>;
+<program> ::= <statement> | <statement> <program>;
 
-<line> ::= <command_list> | <comment> | <command_list> " " <comment> | "";
+<statement> ::= <var_decl>
+              | <assignment> ";"
+              | <if_stmt>
+              | <while_stmt>
+              | <function_decl>
+              | <expr> ";"
+              | <block>;
 
-<comment> ::= "#" <any_chars>;
+<block> ::= "{" <program> "}" | "{" "}";
 
-<command_list> ::= <command> | <command> ";" <command_list> | <command> "|" <command_list>;
+<var_decl> ::= "var " <id> " = " <expr> ";";
 
-<command> ::= <simple_cmd> | <var_assign> | <subshell>;
+<assignment> ::= <lhs> " = " <expr>;
 
-<simple_cmd> ::= <word> | <word> " " <args>;
+<lhs> ::= <id> | <property_lookup>;
 
-<args> ::= <arg> | <arg> " " <args>;
+<property_lookup> ::= <primary_expr> "." <id>;
 
-<arg> ::= <word> | <var_ref> | <redirection>;
+<if_stmt> ::= "if (" <expr> ") " <statement>
+            | "if (" <expr> ") " <statement> " else " <statement>;
 
-<var_assign> ::= <id> "=" <word>;
+<while_stmt> ::= "while (" <expr> ") " <statement>;
 
-<var_ref> ::= "$" <id> | "${" <id> "}";
+<function_decl> ::= "function " <id> "(" <params> ") " <block>;
 
-<subshell> ::= "$(" <command_list> ")";
+<expr> ::= <assignment>
+         | <call_expr>
+         | <arrow_expr>
+         | <binary_expr>
+         | <primary_expr>;
 
-<redirection> ::= ">" <word> | ">>" <word> | "<" <word>;
+<binary_expr> ::= <primary_expr> " " <op> " " <expr>;
 
-<word> ::= <id>;
+<op> ::= "+" | "-" | "*" | "/" | "==" | "<" | ">";
 
-<id> ::= <letter> | <letter> <id_tail>;
-<id_tail> ::= <alnum> | <alnum> <id_tail>;
+<call_expr> ::= <primary_expr> "(" <args> ")";
 
-<letter> ::= "a" | "b" | "c" | "z" | "A" | "Z" | "_";
+<args> ::= "" | <arg_list>;
+<arg_list> ::= <expr> | <expr> ", " <arg_list>;
+
+<params> ::= "" | <param_list>;
+<param_list> ::= <id> | <id> ", " <param_list>;
+
+<arrow_expr> ::= "(" <params> ") => " <arrow_body>;
+<arrow_body> ::= <expr> | <block>;
+
+<primary_expr> ::= <id>
+                 | <property_lookup>
+                 | <literal>
+                 | "(" <expr> ")";
+
+<literal> ::= <number> | <string_lit>;
+
+<id> ::= <letter> | <letter> <alnum>+;
+
+<string_lit> ::= "\"" <chars> "\"";
+<chars> ::= (<alnum> | " " | "!")*;
+
+<number> ::= <digit>+;
 <alnum> ::= <letter> | <digit>;
-<digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
-<any_chars> ::= "" | <any_char> <any_chars>;
-<any_char> ::= <alnum> | " " | "!" ;
+
+<letter> ::= [a-z] | [A-Z] | "_";
+<digit> ::= [0-9];

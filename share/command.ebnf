@@ -26,11 +26,8 @@
 
 <word> ::= <id>;
 
-<id> ::= <letter> | <letter> <id_tail>;
-<id_tail> ::= <alnum> | <alnum> <id_tail>;
+<id> ::= <letter> | <letter> <alnum>+;
+<any_chars> ::= (<alnum> | " " | "!")*;
 
-<letter> ::= "a" | "b" | "c" | "z" | "A" | "Z" | "_";
-<alnum> ::= <letter> | <digit>;
-<digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
-<any_chars> ::= "" | <any_char> <any_chars>;
-<any_char> ::= <alnum> | " " | "!" ;
+<alnum> ::= <letter> | [0-9];
+<letter> ::= [a-z] | [A-Z] | "_";
