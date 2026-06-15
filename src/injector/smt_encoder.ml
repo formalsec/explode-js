@@ -49,6 +49,7 @@ let encode (grammar : Rule.t list) (target_rule : string)
       Smtml.Typed.String.Re.range s1 s2
     | Star atom -> Smtml.Typed.String.Re.star (encode_atom atom)
     | Plus atom -> Smtml.Typed.String.Re.plus (encode_atom atom)
+    | Opt atom -> Smtml.Typed.String.Re.opt (encode_atom atom)
     | Group body -> encode_body body
     | Non_terminal id -> encode_rule id
   in

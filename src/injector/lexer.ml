@@ -51,6 +51,7 @@ let rec token buf =
   | "]" -> RBRACKET
   | "*" -> STAR
   | "+" -> PLUS
+  | "?" -> QUESTION
   | "(" -> LPAREN
   | ")" -> RPAREN
   | "-" -> DASH

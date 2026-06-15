@@ -12,6 +12,7 @@
 %token DASH
 %token STAR
 %token PLUS
+%token QUESTION
 %token LPAREN
 %token RPAREN
 %token EOF
@@ -40,6 +41,7 @@ let ruleatom :=
   | a = simple_ruleatom; { a }
   | a = simple_ruleatom; STAR; { Rule.Star a }
   | a = simple_ruleatom; PLUS; { Rule.Plus a }
+  | a = simple_ruleatom; QUESTION; { Rule.Opt a }
 
 let simple_ruleatom :=
   | name = rulename; { Rule.Non_terminal name }

@@ -8,7 +8,7 @@ let get_dependencies (rule : Rule.t) : StringSet.t =
   let rec atom_deps acc = function
     | Non_terminal id -> StringSet.add id acc
     | Terminal _ | Range _ -> acc
-    | Star atom | Plus atom -> atom_deps acc atom
+    | Star atom | Plus atom | Opt atom -> atom_deps acc atom
     | Group body ->
       List.fold_left (fun acc case -> List.fold_left atom_deps acc case) acc body
   in
