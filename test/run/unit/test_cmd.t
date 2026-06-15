@@ -5,12 +5,12 @@ Basic tests:
   [+] Testing command-injection vulnerability ...
   [+] Trying scheme 0...
   [+] Symbolic execution output:
-  /workspace_root/test/packages/cmd-01/_results/vuln_0/symbolic_test_0.js:4:2-4:17
+  /workspace_root/test/packages/cmd-01/_results/vuln_1/symbolic_test_0.js:4:2-4:17
   > return exec(x);
   
   Reached sensitive command-injection sink 'child_process.exec' with symbolic expr:
   x
-  Abort: ["/workspace_root/test/packages/cmd-01/_results/vuln_0/symbolic_test_0.js",
+  Abort: ["/workspace_root/test/packages/cmd-01/_results/vuln_1/symbolic_test_0.js",
           4., "command-injection", "child_process.exec", x]
   [+] ⚠ Detected 1 issue(s)!
   [+] 📄 Trying model :
@@ -25,7 +25,7 @@ Real world command injection
   [+] Testing command-injection vulnerability ...
   [+] Trying scheme 0...
   [+] Symbolic execution output:
-  /workspace_root/test/packages/cmd-04/_results/vuln_0/symbolic_test_0.js:24:4-32:7
+  /workspace_root/test/packages/cmd-04/_results/vuln_1/symbolic_test_0.js:24:4-32:7
   > exec(command, function(error, stdout, stderr) { if (error) {
     if (stdout) { console["log"](stdout); }
     if (stderr) { console["log"](stderr); }
@@ -34,7 +34,7 @@ Real world command injection
   
   Reached sensitive command-injection sink 'child_process.exec' with symbolic expr:
   (str.++ symbol_8 " " "compile")
-  Abort: ["/workspace_root/test/packages/cmd-04/_results/vuln_0/symbolic_test_0.js",
+  Abort: ["/workspace_root/test/packages/cmd-04/_results/vuln_1/symbolic_test_0.js",
           24., "command-injection", "child_process.exec",
           (str.++ symbol_8 " " "compile")]
   [+] ⚠ Detected 1 issue(s)!

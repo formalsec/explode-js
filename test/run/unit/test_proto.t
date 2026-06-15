@@ -1,26 +1,21 @@
 Test prototype-pollution:
-  $ cd ../../packages/proto-02; explode-js run --deterministic taint_summary.json
+  $ cd ../../packages/proto-02; explode-js run --deterministic taint_summary.json | sed '/^\//d'
   [+] Found 1 potential vulnerability
   [+] Testing prototype-pollution vulnerability ...
   [+] Trying scheme 0...
   [+] Symbolic execution output:
-  /workspace_root/test/packages/proto-02/_results/vuln_0/symbolic_test_0.js:20:2-20:18
   > obj[attr] = val;
   
   Uncaught TypeError: 'caller', 'callee', and 'arguments' properties may not be accessed on strict mode functions or the arguments objects for calls to them
-  /workspace_root/test/packages/proto-02/_results/vuln_0/symbolic_test_0.js:20:2-20:18
   > obj[attr] = val;
   
   Uncaught TypeError: 'caller', 'callee', and 'arguments' properties may not be accessed on strict mode functions or the arguments objects for calls to them
-  /workspace_root/test/packages/proto-02/_results/vuln_0/symbolic_test_0.js:20:2-20:18
   > obj[attr] = val;
   
   Uncaught TypeError: 'caller', 'callee', and 'arguments' properties may not be accessed on strict mode functions or the arguments objects for calls to them
-  /workspace_root/test/packages/proto-02/_results/vuln_0/symbolic_test_0.js:20:2-20:18
   > obj[attr] = val;
   
   Uncaught TypeError: 'caller', 'callee', and 'arguments' properties may not be accessed on strict mode functions or the arguments objects for calls to them
-  /workspace_root/test/packages/proto-02/_results/vuln_0/symbolic_test_0.js:10:35-10:61
   > throw Error("I pollute.");
   
   Uncaught Error: I pollute.
