@@ -2,4 +2,4 @@
   | <digit>
   | <digit> <digits>;
 
-<digit> ::= "0" | "1";
+<digit> ::= [0-1];

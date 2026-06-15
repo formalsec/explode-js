@@ -86,6 +86,60 @@ let cmd_complete (settings : Settings.t) =
     Fmt.pr "It's not possile to contain '%s' in the grammar@." candidate_str
   | `Unknown -> assert false
 
+let cmd_generate (settings : Settings.t) =
+  let open Result.Syntax in
+  let module Solver = Smtml.Solver.Batch (Smtml.Z3_mappings) in
+  let solver = Solver.create ~logic:QF_S () in
+
+  let+ rules = Injector.Parse.from_file settings.input_path in
+  Fmt.pr "Original grammar:@.";
+  List.iter (fun rule -> Fmt.pr "%a@." Injector.Rule.pp rule) rules;
+
+  let k =
+    Fmt.pr "Unfolding level:@.";
+    read_line () |> String.trim |> int_of_string
+  in
+  let unfolded_rules = Injector.Transform.unfold rules k in
+  Fmt.pr "Unfolded grammar (k = %d):@." k;
+  List.iter (fun rule -> Fmt.pr "%a@." Injector.Rule.pp rule) unfolded_rules;
+
+  let desired_rule =
+    Fmt.pr "Desired rule:@.";
+    read_line () |> String.trim
+  in
+
+  let test_cases =
+    Fmt.pr "Number of cases:@.";
+    read_line () |> String.trim |> int_of_string
+  in
+
+  let x = Smtml.Typed.symbol Smtml.Typed.Types.string "x" in
+  let e = Injector.Smt_encoder.encode unfolded_rules desired_rule x in
+  Fmt.pr "SMT Expr: %a@." Smtml.Typed.Bool.pp e;
+
+  let rec loop remaining =
+    if remaining = 0 then ()
+    else
+      match Solver.check solver [] with
+      | `Sat ->
+        begin match Solver.model solver with
+        | None -> assert false
+        | Some m ->
+          Fmt.pr "Satisfying model:@;%a@." (Smtml.Model.pp ~no_values:false) m;
+          let v =
+            Smtml.Model.evaluate m (Smtml.Symbol.make Ty_str "x")
+            |> Option.get |> Smtml.Expr.value |> Smtml.Typed.Unsafe.wrap
+          in
+          Solver.add solver
+            [ (Smtml.Typed.Bool.(not (eq x v)) :> Smtml.Expr.t) ];
+          loop (remaining - 1)
+        end
+      | `Unsat -> Fmt.pr "Grammar is not satisfiable@."
+      | `Unknown -> assert false
+  in
+  Solver.add solver [ (e :> Smtml.Expr.t) ];
+  loop test_cases
+
 let cmds =
   let open Cmdliner in
   let fpath = Arg.conv (Fpath.of_string, Fpath.pp) in
@@ -136,6 +190,26 @@ let cmds =
     Cmd.v info command
   in
 
+  let cmd_generate =
+    let info =
+      let doc = "Experimental payload completion engine" in
+      let description =
+        "This command is still experimental and intentionally not documented. \
+         Use at your own risk!"
+      in
+      let man = [ `S Manpage.s_description; `P description ] in
+      let man_xrefs = [] in
+      Cmd.info "generate" ~doc ~man ~man_xrefs
+    in
+    let command =
+      let open Term.Syntax in
+      let+ input_path in
+      let settings = Settings.make input_path in
+      cmd_generate settings
+    in
+    Cmd.v info command
+  in
+
   let info =
     let doc = "Experimental injector backend" in
     let description =
@@ -148,7 +222,7 @@ let cmds =
     let man_xrefs = [] in
     Cmd.info ~doc ~man ~man_xrefs "injector"
   in
-  Cmd.group info [ cmd_verify; cmd_complete ]
+  Cmd.group info [ cmd_verify; cmd_complete; cmd_generate ]
 
 let returncode =
   let open Cmdliner in

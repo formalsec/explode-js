@@ -7,6 +7,13 @@
 %token RANGLE
 %token UNION
 %token DEQ
+%token LBRACKET
+%token RBRACKET
+%token DASH
+%token STAR
+%token PLUS
+%token LPAREN
+%token RPAREN
 %token EOF
 
 %token <string> STR
@@ -30,5 +37,15 @@ let rulecase :=
   | case = ruleatom+; { case }
 
 let ruleatom :=
+  | a = simple_ruleatom; { a }
+  | a = simple_ruleatom; STAR; { Rule.Star a }
+  | a = simple_ruleatom; PLUS; { Rule.Plus a }
+
+let simple_ruleatom :=
   | name = rulename; { Rule.Non_terminal name }
   | t = STR; { Rule.Terminal t }
+  | LBRACKET; c1 = char; DASH; c2 = char; RBRACKET; { Rule.Range (c1, c2) }
+  | LPAREN; body = rulebody; RPAREN; { Rule.Group body }
+
+let char :=
+  | s = STR; { if String.length s = 1 then s.[0] else failwith "Expected single character" }

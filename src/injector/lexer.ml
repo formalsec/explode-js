@@ -44,9 +44,16 @@ let str = [%sedlex.regexp? "\"", Star string_elem, "\""]
 let rec token buf =
   match%sedlex buf with
   | Plus any_blank -> token buf
-  | intlit -> assert false
+  | intlit -> STR (lexeme buf)
   | "<" -> LANGLE
   | ">" -> RANGLE
+  | "[" -> LBRACKET
+  | "]" -> RBRACKET
+  | "*" -> STAR
+  | "+" -> PLUS
+  | "(" -> LPAREN
+  | ")" -> RPAREN
+  | "-" -> DASH
   | "|" -> UNION
   | ";" -> SEMI
   | "::=" -> DEQ

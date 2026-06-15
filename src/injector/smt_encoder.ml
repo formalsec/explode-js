@@ -26,6 +26,7 @@ let encode (grammar : Rule.t list) (target_rule : string)
   and encode_body body =
     let cases = List.map encode_case body in
     match cases with
+    | [] -> Smtml.Typed.String.Re.none
     | [ one ] -> one
     | _ -> Smtml.Typed.String.Re.union cases
   and encode_case atoms =
@@ -42,6 +43,13 @@ let encode (grammar : Rule.t list) (target_rule : string)
       in
       let s = Smtml.Typed.String.v s in
       Smtml.Typed.String.to_re s
+    | Range (c1, c2) ->
+      let s1 = Smtml.Typed.String.v (String.make 1 c1) in
+      let s2 = Smtml.Typed.String.v (String.make 1 c2) in
+      Smtml.Typed.String.Re.range s1 s2
+    | Star atom -> Smtml.Typed.String.Re.star (encode_atom atom)
+    | Plus atom -> Smtml.Typed.String.Re.plus (encode_atom atom)
+    | Group body -> encode_body body
     | Non_terminal id -> encode_rule id
   in
 

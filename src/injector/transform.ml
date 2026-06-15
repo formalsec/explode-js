@@ -7,22 +7,25 @@ let unfold (rules : Rule.t list) (k : int) : Rule.t list =
 
   let make_name name i = Printf.sprintf "%s_%d" name i in
 
-  let is_recursive_atom = function
+  let rec is_recursive_atom = function
     | Non_terminal id -> StringSet.mem id recursive
-    | Terminal _ -> false
-  in
+    | Terminal _ | Range _ -> false
+    | Star atom | Plus atom -> is_recursive_atom atom
+    | Group body -> List.exists is_recursive_case body
 
-  let is_recursive_case case = List.exists is_recursive_atom case in
+  and is_recursive_case case = List.exists is_recursive_atom case in
 
-  let transform_atom i atom =
+  let rec transform_atom i atom =
     match atom with
-    | Terminal t -> Terminal t
+    | Terminal _ | Range _ -> atom
+    | Star atom -> Star (transform_atom i atom)
+    | Plus atom -> Plus (transform_atom i atom)
+    | Group body -> Group (List.map (transform_case i) body)
     | Non_terminal id ->
       if StringSet.mem id recursive then Non_terminal (make_name id i)
       else Non_terminal id
-  in
 
-  let transform_case i case = List.map (transform_atom i) case in
+  and transform_case i case = List.map (transform_atom i) case in
 
   let build_new_rules rule =
     let rec loop acc i =
