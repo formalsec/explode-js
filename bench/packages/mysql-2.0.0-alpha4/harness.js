@@ -15,14 +15,14 @@ function dbCfg() {
 function makeConn() {
   const cfg = dbCfg();
 
-  console.log("[test] cfg", {
+  console.log("[test] cfg", JSON.stringify({
     host: cfg.host,
     port: cfg.port,
     user: cfg.user,
     password: cfg.password === "" ? "<empty>" : "<set>",
     database: cfg.database,
     multipleStatements: cfg.multipleStatements,
-  });
+  }));
 
   return mysql.createConnection(cfg);
 }
@@ -69,7 +69,7 @@ function queryP(conn, sql, values) {
           )
         );
       }
-      resolve({ rows, sql: q.sql });
+      resolve({ rows, sql: sql });
     });
 
     console.log("[generated sql]", q.sql);
@@ -91,14 +91,6 @@ async function resetRows(conn) {
   await queryP(conn, `TRUNCATE TABLE test_inject`);
 }
 
-async function valuesInTable(conn) {
-  const { rows } = await queryP(
-    conn,
-    `SELECT a FROM test_inject ORDER BY id ASC`
-  );
-
-  return rows.map((r) => r.a);
-}
 
 async function run() {
   await withConn(async (conn) => {
