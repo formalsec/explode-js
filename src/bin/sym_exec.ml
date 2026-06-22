@@ -31,7 +31,7 @@ module Input = struct
     let* () = OS.Cmd.run (js2ecma_sl ~input_file:file ~output_file:ast_file) in
     let* ast_content = OS.File.read ast_file in
     let build_ast = Ecma_sl.Parsing.parse_func ast_content in
-    let prog = Ecma_sl.Share.es6_sym_interp () |> Ecma_sl.Parsing.parse_prog in
+    let prog = Ecma_sl.Share.nodejs_interp () |> Ecma_sl.Parsing.parse_prog in
     Hashtbl.replace (Ecma_sl.Prog.funcs prog)
       (Ecma_sl.Func.name' build_ast)
       build_ast;

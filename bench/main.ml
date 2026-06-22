@@ -223,7 +223,7 @@ let run time_limit env (job : Job.t) : job_result =
     }
   | Ok () -> begin
     let command =
-      [ "ecma-sl"; "symbolic"; "run"; "harness.js"; "--workspace"; "results" ]
+      [ "ecma-sl"; "symbolic"; "harness.js"; "--workspace"; "results" ]
     in
     let out_txt = Path.(cwd / "out.txt") in
     Path.with_open_out ~create:(`Or_truncate 0o644) out_txt @@ fun out ->
