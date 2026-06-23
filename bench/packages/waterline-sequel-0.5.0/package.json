@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "waterline-sequel": "0.5.0"
+  },
+  "vulnerability": {
+    "type": "sql-injection",
+    "ghsa": "https://github.com/advisories/GHSA-cgpp-wm2h-6hqx",
+    "snyk": null,
+    "sink": {
+      "file": null,
+      "code": null,
+      "line": null
+    }
+  }
+
+}
