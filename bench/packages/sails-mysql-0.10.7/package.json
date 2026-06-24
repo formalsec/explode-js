@@ -1,0 +1,17 @@
+{
+  "dependencies": {
+    "mysql": "2.18.1",
+    "sails-mysql": "0.10.7"
+  },
+  "vulnerability" : {
+    "type": "sql-injection",
+    "ghsa": null,
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-SAILSMYSQL-174916",
+    "sink": {
+      "file": null,
+      "code": null,
+      "line": null
+    }
+  }
+
+}
