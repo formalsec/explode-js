@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "pg-promise": "11.5.4"
+  },
+  "vulnerability" : {
+    "type": "sql-injection",
+    "ghsa": "https://github.com/advisories/GHSA-ff9h-848c-4xfj",
+    "snyk": null,
+    "sink": {
+      "file": null,
+      "code": null,
+      "line": null
+    }
+  }
+}
