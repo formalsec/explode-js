@@ -4,7 +4,7 @@ const Symbolic = require('esl_symbolic');
 // Every query is just logged to the console and returns an empty result set.
 require.cache[require.resolve('pg')] = {
   exports: (() => {
-    const evt = { on() {}, removeListener() {}, emit() {} };
+    const evt = { on() { }, removeListener() { }, emit() { } };
 
     class MockClient {
       constructor(config) {
@@ -26,7 +26,7 @@ require.cache[require.resolve('pg')] = {
       end() {
         return Promise.resolve();
       }
-      release() {}
+      release() { }
     }
 
     class MockPool {
@@ -47,8 +47,8 @@ require.cache[require.resolve('pg')] = {
     return {
       Client: MockClient,
       Pool: MockPool,
-      Query: class {},
-      Connection: class {},
+      Query: class { },
+      Connection: class { },
       defaults: {},
       types: {},
       DatabaseError: Error,
