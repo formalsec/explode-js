@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "resquel": "1.0.0"
+  },
+  "vulnerability" : {
+    "type": "sql-injection",
+    "ghsa": null,
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-RESQUEL-449938",
+    "sink": {
+      "file": null,
+      "code": null,
+      "line": null
+    }
+  }
+}
