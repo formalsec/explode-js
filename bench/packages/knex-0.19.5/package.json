@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "knex": "0.19.4",
+    "mssql": "6.3.1"
+  },
+  "vulnerabilities": {
+    "type": "sql-injection",
+    "ghsa": "GHSA-58v4-qwx5-7f59-knex-mssql",
+    "sink": {
+      "file": null,
+      "code": null,
+      "line": null
+    }
+  }
+}
