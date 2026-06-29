@@ -58,7 +58,7 @@ function runAdapterTests() {
           callback = function() {};
         }
 
-        Symbolic.sinkCall('sql-injetion', 'query', sql);
+        Symbolic.sinkCall('sql-injection', 'query', sql);
         console.log('-> Intercepted SQL: ' + (typeof sql === 'string' ? sql : JSON.stringify(sql)));
 
         if (typeof sql === 'string' && /count\(\*\)/i.test(sql)) {
