@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "loopback-connector-postgresql": "5.5.0",
+    "pg": "^8.12.0"
+  },
+  "vulnerability" : {
+    "type": "sql-injection",
+    "ghsa": "https://github.com/advisories/GHSA-j259-6c58-9m58",
+    "snyk": null,
+    "sink": {
+      "file": null,
+      "code": null,
+      "line": null
+    }
+  }
+}
