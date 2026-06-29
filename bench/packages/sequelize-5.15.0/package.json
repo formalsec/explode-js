@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "mysql2": "^3.18.2",
+    "sequelize": "6.15.0"
+  },
+  "vulnerability": {
+    "type": "sql-injection",
+    "ghsa": "https://github.com/advisories/GHSA-m9jw-237r-gvfv",
+    "snyk": "https://security.snyk.io/vuln/SNYK-JS-SEQUELIZE-459751",
+    "sink": {
+      "file": null,
+      "line": null,
+      "code": null
+    }
+  }
+}
