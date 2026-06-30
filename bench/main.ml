@@ -1,4 +1,8 @@
 open Eio.Std
+
+(* "z3" or "cvc5" *)
+let solver = "z3"
+
 module SSet = Set.Make (String)
 
 (* exclude packages that have harnesses but that we don't find anything *)
@@ -223,7 +227,14 @@ let run time_limit env (job : Job.t) : job_result =
     }
   | Ok () -> begin
     let command =
-      [ "ecma-sl"; "symbolic"; "harness.js"; "--workspace"; "results" ]
+      [ "ecma-sl"
+      ; "symbolic"
+      ; "--solver"
+      ; solver
+      ; "harness.js"
+      ; "--workspace"
+      ; "results"
+      ]
     in
     let out_txt = Path.(cwd / "out.txt") in
     Path.with_open_out ~create:(`Or_truncate 0o644) out_txt @@ fun out ->
