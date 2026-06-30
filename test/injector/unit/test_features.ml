@@ -1,6 +1,7 @@
 open Injector
 
-let test_grammar_features = {|
+let test_grammar_features =
+  {|
 <Range> ::= [a-z] [A-Z] [0-9];
 <Star> ::= "a"* <Range>*;
 <Plus> ::= "b"+ [0-9]+;
