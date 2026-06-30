@@ -1,10 +1,17 @@
 module Settings = struct
-  type t = { input_path : Fpath.t [@main] } [@@deriving make, show]
+  type t =
+    { input_path : Fpath.t [@main]
+    ; solver_type : Smtml.Solver_type.t [@default Smtml.Solver_type.Z3_solver]
+    }
+  [@@deriving make, show]
 end
 
 let cmd_verify (settings : Settings.t) =
   let open Result.Syntax in
-  let module Solver = Smtml.Solver.Batch (Smtml.Z3_mappings) in
+  let module Mappings =
+    (val Smtml.Solver_dispatcher.mappings_of_solver settings.solver_type)
+  in
+  let module Solver = Smtml.Solver.Batch (Mappings) in
   let solver = Solver.create ~logic:QF_S () in
 
   let+ rules = Injector.Parse.from_file settings.input_path in
@@ -45,7 +52,10 @@ let cmd_verify (settings : Settings.t) =
 
 let cmd_complete (settings : Settings.t) =
   let open Result.Syntax in
-  let module Solver = Smtml.Solver.Batch (Smtml.Z3_mappings) in
+  let module Mappings =
+    (val Smtml.Solver_dispatcher.mappings_of_solver settings.solver_type)
+  in
+  let module Solver = Smtml.Solver.Batch (Mappings) in
   let solver = Solver.create ~logic:QF_S () in
 
   let+ rules = Injector.Parse.from_file settings.input_path in
@@ -88,7 +98,10 @@ let cmd_complete (settings : Settings.t) =
 
 let cmd_generate (settings : Settings.t) =
   let open Result.Syntax in
-  let module Solver = Smtml.Solver.Batch (Smtml.Z3_mappings) in
+  let module Mappings =
+    (val Smtml.Solver_dispatcher.mappings_of_solver settings.solver_type)
+  in
+  let module Solver = Smtml.Solver.Batch (Mappings) in
   let solver = Solver.create ~logic:QF_S () in
 
   let+ rules = Injector.Parse.from_file settings.input_path in
@@ -150,6 +163,15 @@ let cmds =
     Arg.(required & pos 0 (some fpath) None & info [] ~doc ~docv)
   in
 
+  let solver_type =
+    let docv = "SOLVER" in
+    let doc = "Name of the SMT solver to use for constraint solving" in
+    Arg.(
+      value
+      & opt (some Smtml.Solver_type.conv) None
+      & info [ "solver" ] ~doc ~docv )
+  in
+
   let cmd_verify =
     let info =
       let doc = "Experimental payload verification engine" in
@@ -163,8 +185,9 @@ let cmds =
     in
     let command =
       let open Term.Syntax in
-      let+ input_path in
-      let settings = Settings.make input_path in
+      let+ input_path
+      and+ solver_type in
+      let settings = Settings.make ?solver_type input_path in
       cmd_verify settings
     in
     Cmd.v info command
@@ -183,8 +206,9 @@ let cmds =
     in
     let command =
       let open Term.Syntax in
-      let+ input_path in
-      let settings = Settings.make input_path in
+      let+ input_path
+      and+ solver_type in
+      let settings = Settings.make ?solver_type input_path in
       cmd_complete settings
     in
     Cmd.v info command
@@ -203,8 +227,9 @@ let cmds =
     in
     let command =
       let open Term.Syntax in
-      let+ input_path in
-      let settings = Settings.make input_path in
+      let+ input_path
+      and+ solver_type in
+      let settings = Settings.make ?solver_type input_path in
       cmd_generate settings
     in
     Cmd.v info command
