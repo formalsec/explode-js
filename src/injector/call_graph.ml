@@ -10,7 +10,9 @@ let get_dependencies (rule : Rule.t) : StringSet.t =
     | Terminal _ | Range _ -> acc
     | Star atom | Plus atom | Opt atom -> atom_deps acc atom
     | Group body ->
-      List.fold_left (fun acc case -> List.fold_left atom_deps acc case) acc body
+      List.fold_left
+        (fun acc case -> List.fold_left atom_deps acc case)
+        acc body
   in
   List.fold_left
     (fun acc case -> List.fold_left atom_deps acc case)
@@ -24,17 +26,19 @@ let build (rules : Rule.t list) : t =
 let dependencies name cg =
   StringMap.find_opt name cg |> Option.value ~default:StringSet.empty
 
-let recursive_nonterminals cg =
-  let nodes = StringMap.bindings cg |> List.map fst in
-  let rec can_reach start target visited =
+let can_reach cg start target =
+  let rec loop start target visited =
     if StringSet.mem start visited then false
     else
       let deps = dependencies start cg in
       if StringSet.mem target deps then true
       else
         StringSet.exists
-          (fun next -> can_reach next target (StringSet.add start visited))
+          (fun next -> loop next target (StringSet.add start visited))
           deps
   in
-  List.filter (fun node -> can_reach node node StringSet.empty) nodes
-  |> StringSet.of_list
+  loop start target StringSet.empty
+
+let recursive_nonterminals cg =
+  let nodes = StringMap.bindings cg |> List.map fst in
+  List.filter (fun node -> can_reach cg node node) nodes |> StringSet.of_list
