@@ -16,7 +16,16 @@
  (name main)
  (public_name injector-js)
  (modules main)
- (libraries cmdliner explode_js.std fmt injector smtml)
+ (libraries
+  cmdliner
+  explode_js.std
+  fmt
+  injector
+  injector_grammars
+  logs
+  logs.fmt
+  smtml
+  yojson)
  (flags
   (:standard -open Std))
  (preprocess

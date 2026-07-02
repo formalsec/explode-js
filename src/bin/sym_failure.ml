@@ -47,7 +47,7 @@ let make_witness_writer =
   let mode = 0o666 in
 
   let pp_model fmt v =
-    Yojson.pretty_print ~std:true fmt (Smtml.Model.to_json v)
+    Yojson.Safe.pretty_print ~std:true fmt (Smtml.Model.to_json v)
   in
 
   let write_model file model =
